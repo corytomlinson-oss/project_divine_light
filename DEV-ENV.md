@@ -26,7 +26,10 @@ This guide walks through setting up the full development environment for Divine 
 
 ## Step 2 — Install OpenJDK 17
 
+> **Why 17 and not the latest?** Godot 4's Android export uses Gradle internally, and Gradle is tightly coupled to specific Java versions. Godot 4 was designed and tested against JDK 17. Using a newer version (21, 25, etc.) can cause Gradle compatibility errors during APK builds. Always use the version the engine specifies, not the latest available.
+
 1. Go to **adoptium.net** and download **Temurin 17 LTS** for Windows x64
+   - If the front page shows a newer version, click **Other platforms and versions** and select **Version: 17**
 2. Run the installer using all defaults
 3. Verify the install — open a new PowerShell window and run:
    ```

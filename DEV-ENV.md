@@ -70,13 +70,19 @@ Still inside Android Studio:
 
 ## Step 5 — Connect Godot to the Android SDK
 
-Back in Godot:
+The most reliable approach is setting the `ANDROID_HOME` environment variable — Godot detects it automatically on startup.
 
-1. Go to **Editor > Editor Settings**
-2. Search for `android`
-3. Set **Export > Android > Android Sdk Path** to the SDK path copied in Step 3
-4. Set **Export > Android > Java Sdk Path** to your JDK install location
-   - Typically: `C:\Program Files\Eclipse Adoptium\jdk-17.x.x-hotspot`
+1. Open PowerShell and run:
+   ```
+   [System.Environment]::SetEnvironmentVariable("ANDROID_HOME", "$env:LOCALAPPDATA\Android\Sdk", "User")
+   ```
+2. Close Godot completely and reopen it — it will detect the SDK automatically
+
+**Verifying manually in Godot (optional):**
+- Go to **Editor > Editor Settings**
+- In the left panel tree, navigate to **Export > Android** (do not use the search bar — navigate the tree directly)
+- Confirm **Android Sdk Path** and **Java Sdk Path** are populated
+- Note: The Export > Android section only appears after export templates are installed (Step 6)
 
 ---
 

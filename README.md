@@ -6,6 +6,73 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 ---
 
+## Current Status
+
+| Phase | Status |
+|---|---|
+| Game Design Document | Complete |
+| Dev Environment Setup | Complete |
+| Godot Project Created | Complete — `c:\vs_workspace\games\divine_light\` |
+| Implementation | Not started |
+
+**Next milestone:** Player character moving on a tile map (overworld exploration foundation)
+
+See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
+
+---
+
+## Implementation Roadmap
+
+Recommended build order — each milestone is a working, testable slice of the game:
+
+| # | Milestone | Description |
+|---|---|---|
+| 1 | **Player movement** | Character moves on a tile map — overworld foundation |
+| 2 | **Battle transition** | Walking triggers a scene switch from overworld to battle screen |
+| 3 | **Basic battle** | 1 character vs 1 enemy, action menu (Attack / Defend / Run) |
+| 4 | **Party system** | 4 characters, AGI-based turn order, round-based action selection |
+| 5 | **Full action menu** | Skill menu, Item menu, all actions per class |
+| 6 | **Status system** | HP/MP bars, KO state, level-up |
+| 7 | **Enemy groups + targeting** | Multiple enemies, player selects target |
+| 8 | **Class skills** | Implement skill lists starting with Vael, then Ryn, Lyra, Silas |
+| 9 | **Save / load** | 3 save slots at inns, auto-save after major events, suspend save |
+| 10 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
+| 11 | **Random encounters** | Step-triggered battles in dungeons and overworld |
+| 12 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
+| 13 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
+| 14 | **Android APK export** | Build and deploy to RP6, test controller input |
+| 15 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
+| 16 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss |
+
+---
+
+## Project Structure (Godot)
+
+Recommended folder layout inside the Godot project:
+
+```
+divine_light/
+├── scenes/
+│   ├── overworld/       # Tile maps, player movement
+│   ├── battle/          # Battle screen, UI
+│   ├── dungeons/        # Individual dungeon maps
+│   └── ui/              # Menus, HUD, dialogue boxes
+├── scripts/
+│   ├── player/          # Player controller, party management
+│   ├── battle/          # Turn order, action resolution, enemy AI
+│   ├── classes/         # Vael, Ryn, Lyra, Silas — stats and skills
+│   └── systems/         # Save/load, inventory, XP, status effects
+├── assets/
+│   ├── sprites/         # Character, enemy, tile sprites
+│   ├── tilesets/        # Overworld and dungeon tilesets
+│   ├── audio/           # Music and sound effects
+│   └── fonts/           # Pixel fonts
+└── data/
+    └── enemies/         # Enemy definitions (stats, drops, behavior)
+```
+
+---
+
 ## Platform & Technical Stack
 
 | Property | Value |

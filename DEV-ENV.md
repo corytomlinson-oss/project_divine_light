@@ -70,19 +70,26 @@ Still inside Android Studio:
 
 ## Step 5 — Connect Godot to the Android SDK
 
-The most reliable approach is setting the `ANDROID_HOME` environment variable — Godot detects it automatically on startup.
+The most reliable approach is setting environment variables — Godot detects them automatically on startup. Run all three commands in PowerShell:
 
-1. Open PowerShell and run:
-   ```
-   [System.Environment]::SetEnvironmentVariable("ANDROID_HOME", "$env:LOCALAPPDATA\Android\Sdk", "User")
-   ```
-2. Close Godot completely and reopen it — it will detect the SDK automatically
+```powershell
+# Android SDK path
+[System.Environment]::SetEnvironmentVariable("ANDROID_HOME", "$env:LOCALAPPDATA\Android\Sdk", "User")
 
-**Verifying manually in Godot (optional):**
+# Java SDK path (adjust version number to match your install)
+[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot", "User")
+
+# Add Java and ADB to PATH
+$currentPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+[System.Environment]::SetEnvironmentVariable("PATH", "$currentPath;C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot\bin;$env:LOCALAPPDATA\Android\Sdk\platform-tools", "User")
+```
+
+Close Godot completely and reopen it after running these.
+
+**Setting the Java SDK path manually in Godot:**
 - Go to **Editor > Editor Settings**
-- In the left panel tree, navigate to **Export > Android** (do not use the search bar — navigate the tree directly)
-- Confirm **Android Sdk Path** and **Java Sdk Path** are populated
-- Note: The Export > Android section only appears after export templates are installed (Step 6)
+- Navigate the left tree to **Export > Android** (do not use the search bar — the section only appears after export templates are installed in Step 6)
+- Set **Java Sdk Path** to: `C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot`
 
 ---
 

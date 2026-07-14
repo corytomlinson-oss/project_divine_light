@@ -145,14 +145,14 @@ All four party members are pure entities — one is the player's chosen class, t
 
 | Class | Name | Role | Primary Stats |
 |---|---|---|---|
-| **Templar** | Vael | Frontline tank, holy restoration healer | High HP, High Defense |
-| **Martial Artist** | Ryn | High-speed physical brawler | High STR, High AGI |
+| **Templar** | Vael | Frontline tank, party buffer, minor healer | High HP, High Defense |
+| **Martial Artist** | Ryn | Primary healer, physical striker, disabler | High STR, High AGI |
 | **Invoker** | Lyra | Elemental magic, dynamic spellkit | High INT, High MP |
 | **Assassin** | Silas | Agility striker, status debuffer | High AGI, High Crit |
 
 ### Utility NPC
 
-**Frank** — A traveling merchant encountered in the player's class dungeon (the NPC dungeon). Provides shop, healing, and disease-curing services for the rest of the game. Not a combat party member.
+**Frank** — A traveling merchant encountered in the player's class dungeon (the NPC dungeon). Provides shop, healing, disease-curing, and revival services for the rest of the game. Not a combat party member. Frank and revival consumables are the only sources of resurrection — no party member has a revive skill.
 
 ### The Antagonist
 
@@ -164,16 +164,16 @@ Ancient. Once one of the four pure entities of a previous cycle. Refused rebirth
 ## Class Mechanics
 
 ### Vael — The Templar
-- **Role:** Frontline tank and healer
+- **Role:** Frontline tank, party buffer, minor healer
 - **Resource:** MP (traditional)
-- **Unique Trait:** Holy/divine magic that damages corrupted enemies and restores allies
-- **Playstyle:** Absorbs damage for the party, sustains HP through combat
+- **Unique Trait:** Holy/divine magic that damages corrupted enemies, buffs allies, and provides minor healing as a backup
+- **Playstyle:** Protective anchor — draws enemy focus via Taunt, raises party DEF and STR through buffs, and provides clutch minor heals or status cleansing when Ryn can't
 
 ### Ryn — The Martial Artist
-- **Role:** High-speed physical damage dealer
+- **Role:** Primary healer, physical striker, disabler
 - **Resource:** Qi (replaces MP)
-- **Unique Mechanic — Qi System:** Basic attacks generate Qi. Special moves and combo finishers spend Qi. The longer a battle continues, the more dangerous Ryn becomes. Rewards aggressive, sustained fighting.
-- **Playstyle:** Pressure class — build Qi through early hits, unleash powerful finishers mid-to-late battle
+- **Unique Mechanic — Qi System:** Basic attacks generate Qi (1 per hit, 6 pip max). Qi can be spent on damage skills, healing skills, or disable skills — the player decides every turn. This creates constant tension: spend Qi to end the fight faster, or hold it for healing.
+- **Playstyle:** Combat-sustained healer — Ryn must stay in the fight and keep attacking to fuel the party's healing. Disable skills (stun, AGI reduction) are available but secondary to the damage/heal decision.
 
 ### Lyra — The Invoker
 - **Role:** Versatile backline elemental mage
@@ -311,39 +311,39 @@ A high-tier skill for Lyra. When activated:
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
-| 1 | **Holy Light** | Low | Restore HP to one ally |
+| 1 | **Holy Light** | Low | Restore minor HP to one ally |
 | 4 | **Smite** | Low | Holy damage to one enemy — bonus damage vs. corrupted enemies |
 | 7 | **Guard** | Low | Reduce incoming damage to one ally for 2 rounds |
-| 10 | **Mend** | Medium | Restore significant HP to one ally + cure poison |
-| 14 | **Radiance** | Medium | Restore HP to all allies (less per target than single-target heal) |
+| 10 | **Taunt** | Low | Force all enemies to target Vael for 1 round |
+| 14 | **Fortify** | Medium | Raise DEF for all allies for 2 rounds |
 | 17 | **Divine Strike** | Medium | Strong holy damage + chance to stun corrupted enemies |
 | 20 | **Divine Shield** | Medium | Reduce damage taken by all allies in Vael's row for 2 rounds |
-| 23 | **Purify** | Low | Remove all status effects from one ally |
+| 23 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
 | 26 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
-| 29 | **Resurrection** | High | Revive one KO'd ally with 50% HP |
-| 32 | **Sanctuary** | High | Nullify the next attack targeting one ally entirely |
+| 29 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
+| 32 | **Purify** | Low | Remove all status effects from one ally |
 | 35 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
 
 ---
 
 ### Ryn — The Martial Artist
 
-Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Skills spend Qi instead of MP.
+Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Qi can be spent on damage, healing, or disable skills — the player chooses each turn.
 
-| Level | Skill | Qi Cost | Effect |
-|---|---|---|---|
-| 1 | **Iron Fist** | 1 Qi | Enhanced single-target strike, stronger than a basic attack |
-| 4 | **Sweep** | 2 Qi | Spinning low kick — hits all front-row enemies |
-| 7 | **Counter** | 2 Qi | Ryn automatically counters the next physical attack that hits them this round with a free strike |
-| 10 | **Pressure Point** | 2 Qi | Strike targeting a vital point — inflicts stun |
-| 14 | **Ki Burst** | 3 Qi | Concentrated ki energy — ignores a portion of enemy defense |
-| 17 | **Ki Blast** | 3 Qi | Ranged ki projectile — full damage usable from back row |
-| 20 | **Storm Flurry** | 4 Qi | Rapid strikes — hits one target 3 times in succession |
-| 23 | **Qi Overdrive** | 4 Qi | Ryn enters a powered state for 2 rounds — all attacks deal bonus damage |
-| 26 | **Dragon's Maw** | 5 Qi | Devastating single-target strike — high damage, chance to inflict bleed |
-| 29 | **Thousand Strikes** | 5 Qi | Unleashes 6–8 rapid hits distributed across all enemies randomly |
-| 32 | **Earthquake Stomp** | 5 Qi | Ryn slams the ground — AoE damage to all enemies + chance to lower defense |
-| 35 | **Rising Dragon** | 6 Qi | Ryn's ultimate — massive single-target damage + guaranteed stun |
+| Level | Skill | Qi Cost | Type | Effect |
+|---|---|---|---|---|
+| 1 | **Iron Fist** | 1 Qi | Damage | Enhanced single-target strike, stronger than a basic attack |
+| 4 | **Vital Touch** | 2 Qi | Healing | Restore HP to one ally |
+| 7 | **Sweep** | 2 Qi | Damage | Spinning low kick — hits all front-row enemies |
+| 10 | **Pressure Point** | 2 Qi | Disable | Strike targeting a vital point — inflicts stun |
+| 14 | **Ki Burst** | 3 Qi | Damage | Concentrated ki energy — ignores a portion of enemy defense |
+| 17 | **Ki Blast** | 3 Qi | Damage | Ranged ki projectile — full damage usable from back row |
+| 20 | **Mending Flow** | 4 Qi | Healing | Restore significant HP to one ally |
+| 23 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
+| 26 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
+| 29 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
+| 32 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
+| 35 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
 
 ---
 
@@ -524,7 +524,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 
 | Set | Act | Bonus |
 |---|---|---|
-| **Holy Guardian Set** | I | All healing spells restore +25% more HP |
+| **Holy Guardian Set** | I | All buff skills last 1 extra round |
 | **Sacred Aegis Set** | II | Divine Shield now protects the entire party instead of same-row only |
 | **Divine Champion Set** | III | Resurrection revives the target at full HP instead of 50% |
 
@@ -533,7 +533,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 | Set | Act | Bonus |
 |---|---|---|
 | **Iron Monk Set** | I | Basic attacks generate +1 extra Qi per hit |
-| **Storm Dragon Set** | II | Storm Flurry hits 4 times instead of 3 |
+| **Storm Dragon Set** | II | Vital Touch and Mending Flow restore +30% more HP |
 | **Rising Force Set** | III | Rising Dragon costs 4 Qi instead of 6 |
 
 **Lyra — Invoker Sets**
@@ -566,7 +566,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 
 ### Frank's Stock
 
-Frank provides consumables, healing, disease curing, and basic equipment throughout the game.
+Frank provides consumables, healing, disease curing, revival, and basic equipment throughout the game. Revival (resurrection) is only available through Frank or revival consumables — no party member has a revive skill.
 
 **Accessory Stock (level-scaled)**
 - **Below level 11 (Act I):** Frank sells fixed consumables and standard equipment only

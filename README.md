@@ -21,7 +21,9 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 3 — Turn-based battle: Attack/Defend/Run cursor menu, enemy HP bar, damage/defend/victory/defeat states. Window set to 960×540 for PC development.
 
-**Next milestone:** Milestone 4 — Party system (4 characters, AGI-based turn order)
+**Completed:** Milestone 4 — Party system: Combatant data class, 4-member party with individual stats, round-based action selection per member, AGI-sorted turn execution, KO state with greyed HP labels.
+
+**Next milestone:** Milestone 5 — Full action menu (Skill menu, Item menu, all actions per class)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

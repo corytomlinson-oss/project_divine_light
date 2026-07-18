@@ -38,52 +38,67 @@ show_percentage = false
 
 [node name="MessageBox" type="Panel" parent="."]
 offset_left = 0.0
-offset_top = 73.0
+offset_top = 72.0
 offset_right = 320.0
-offset_bottom = 128.0
+offset_bottom = 126.0
 
 [node name="MessageLabel" type="Label" parent="MessageBox"]
 offset_left = 5.0
 offset_top = 4.0
 offset_right = 315.0
-offset_bottom = 51.0
+offset_bottom = 50.0
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 text = ""
 
-[node name="ActionMenu" type="VBoxContainer" parent="."]
-offset_left = 8.0
-offset_top = 132.0
-offset_right = 115.0
-offset_bottom = 176.0
-theme_override_constants/separation = 3
+[node name="SelectionArea" type="Node2D" parent="."]
 
-[node name="Option0" type="Label" parent="ActionMenu"]
+[node name="SelectionHeader" type="Label" parent="SelectionArea"]
+offset_left = 6.0
+offset_top = 126.0
+offset_right = 150.0
+offset_bottom = 138.0
+theme_override_font_sizes/font_size = 8
+text = ""
+
+[node name="ActionMenu" type="VBoxContainer" parent="SelectionArea"]
+offset_left = 6.0
+offset_top = 139.0
+offset_right = 150.0
+offset_bottom = 180.0
+theme_override_constants/separation = 2
+
+[node name="Option0" type="Label" parent="SelectionArea/ActionMenu"]
 theme_override_font_sizes/font_size = 8
 text = "> Attack"
 
-[node name="Option1" type="Label" parent="ActionMenu"]
+[node name="Option1" type="Label" parent="SelectionArea/ActionMenu"]
 theme_override_font_sizes/font_size = 8
 text = "  Defend"
 
-[node name="Option2" type="Label" parent="ActionMenu"]
+[node name="Option2" type="Label" parent="SelectionArea/ActionMenu"]
 theme_override_font_sizes/font_size = 8
 text = "  Run"
 
-[node name="PlayerArea" type="Node2D" parent="."]
-
-[node name="PlayerName" type="Label" parent="PlayerArea"]
-offset_left = 120.0
-offset_top = 134.0
+[node name="PartyPanel" type="VBoxContainer" parent="."]
+offset_left = 158.0
+offset_top = 127.0
 offset_right = 315.0
-offset_bottom = 146.0
-theme_override_font_sizes/font_size = 8
-text = "Vael"
+offset_bottom = 178.0
+theme_override_constants/separation = 1
 
-[node name="PlayerHPLabel" type="Label" parent="PlayerArea"]
-offset_left = 120.0
-offset_top = 148.0
-offset_right = 315.0
-offset_bottom = 160.0
+[node name="HP_Vael" type="Label" parent="PartyPanel"]
 theme_override_font_sizes/font_size = 8
-text = "HP 150/150"
+text = "Vael   150/150"
+
+[node name="HP_Ryn" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Ryn    100/100"
+
+[node name="HP_Lyra" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Lyra    70/ 70"
+
+[node name="HP_Silas" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Silas   90/ 90"

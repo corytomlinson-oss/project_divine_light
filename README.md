@@ -19,7 +19,9 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 2 — Random encounter triggers after 10–20 steps. Scene switches to Battle screen. Enter returns to overworld.
 
-**Next milestone:** Milestone 3 — Basic battle (1 character vs 1 enemy, action menu)
+**Completed:** Milestone 3 — Turn-based battle: Attack/Defend/Run cursor menu, enemy HP bar, damage/defend/victory/defeat states. Window set to 960×540 for PC development.
+
+**Next milestone:** Milestone 4 — Party system (4 characters, AGI-based turn order)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

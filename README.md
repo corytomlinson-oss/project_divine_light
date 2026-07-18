@@ -15,9 +15,11 @@ This document is the canonical design reference for *Divine Light*, a retro high
 | Godot Project Created | Complete — `c:\vs_workspace\games\project_divine_light\divine-light\` |
 | Implementation | In Progress — Milestone 1 complete |
 
-**Completed:** Milestone 1 — Player character moves on a TileMapLayer overworld. Camera2D follows player. Grid-based tile movement (16×16 tiles, 96px/sec). Debug prints removed. Committed to `cjt` branch.
+**Completed:** Milestone 1 — Player character moves on a TileMapLayer overworld. Camera2D follows player. Grid-based tile movement (16×16 tiles, 96px/sec).
 
-**Next milestone:** Milestone 2 — Battle screen transition (overworld → battle scene on encounter trigger)
+**Completed:** Milestone 2 — Random encounter triggers after 10–20 steps. Scene switches to Battle screen. Enter returns to overworld.
+
+**Next milestone:** Milestone 3 — Basic battle (1 character vs 1 enemy, action menu)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

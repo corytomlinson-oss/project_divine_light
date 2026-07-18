@@ -133,7 +133,7 @@ When a dungeon boss is defeated, the region transforms across three layers:
 **Core Premise:** Supernatural entities are cyclically reborn into Valdris embodying character classes — the mechanism that preserves cosmic balance. Vorath is deliberately corrupting this cycle using The Unraveling, causing every newly awakened entity to turn evil. Only four pure entities remain in the current cycle.
 
 ### Act I — The Gathering *(Forest Heartlands)*
-The player chooses their class and awakens as the first uncorrupted entity. Journey through the Forest Heartlands, locating and rescuing the other three pure entities from corrupted dungeons. Each rescue adds a party member. By Act I's end, the full party of four is assembled.
+The player chooses their class and awakens alone inside their class dungeon — captured by Vorath's corrupted forces. A fellow captive named Frank is found deeper in the dungeon. Together they fight toward the exit, culminating in a solo boss fight against a corrupted dungeon warden — a fight the player survives only because Frank intervenes. After escaping, Frank reveals what he knows: three other uncorrupted souls are imprisoned across the Forest Heartlands. He directs the player toward the first rescue. Each dungeon cleared adds a party member until all four are assembled.
 
 ### Act II — The Purge *(Tundra, Desert, Coastal Kingdoms)*
 Travel across Valdris's three corrupted kingdoms. Defeat the corrupted elite classes holding each kingdom captive and liberate the towns. Each kingdom has one major dungeon and one town that transforms upon cleansing.
@@ -158,7 +158,11 @@ All four party members are pure entities — one is the player's chosen class, t
 
 ### Utility NPC
 
-**Frank** — A traveling merchant encountered in the player's class dungeon (the NPC dungeon). Provides shop, healing, disease-curing, and revival services for the rest of the game. Not a combat party member. Frank and revival consumables are the only sources of resurrection — no party member has a revive skill.
+**Frank** — First encountered as a fellow captive in the player's starter dungeon. Provides shop, healing, disease-curing, and revival services throughout the rest of the game.
+
+Frank's merchant persona is a mask. His true identity — an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin — is concealed until the final confrontation. He has quietly guided the party since the moment they met. His real name is never spoken until the Vorath battle. In Phase 3 he drops the mask entirely, joins the fight as a 5th party member, and deploys power he has never once revealed.
+
+Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill.
 
 ### The Antagonist
 
@@ -197,35 +201,48 @@ Ancient. Once one of the four pure entities of a previous cycle. Refused rebirth
 
 ## Act I — Dungeon Structure
 
-Four dungeons in fixed order. **Whichever dungeon matches the player's chosen class becomes the NPC Dungeon** — still explorable but ends with meeting Silas (the traveling merchant) instead of a rescue boss. The remaining three are rescue dungeons.
+The player wakes up alone inside their class dungeon. Three others are held in the remaining dungeons. The order you visit them is determined by which gates you can unlock with the party members you already have.
 
-### Dungeon Order & Gating
+### The Solo Opening — Captive Start
 
-| # | Location | Captive | Gate to Enter |
-|---|---|---|---|
-| 1 | **The Cathedral** | Vael (Templar) | None — first dungeon |
-| 2 | **The Monastery** | Ryn (Martial Artist) | Holy power — provided by Vael or by the player if playing Vael |
-| 3 | **The Observatory** | Lyra (Invoker) | Physical strength — provided by Ryn or by the player if playing Ryn |
-| 4 | **The Underground Guild** | Silas (Assassin) | Arcane knowledge — provided by Lyra or by the player if playing Lyra |
+The game begins with the player already inside their class dungeon, captured by Vorath's forces. Partway through the escape, they find Frank — also a captive — and free him. The dungeon ends with a solo boss fight against a corrupted warden placed to prevent escape.
 
-### Corrupted Bosses (Act I)
-| Dungeon | Boss Concept |
+**Frank's role in the escape boss fight:**
+Frank improvises with what he has left in his pack. He intervenes twice:
+1. **At the start of the fight** — hurls a blinding vial at the warden, weakening it for the opening rounds
+2. **When the player's HP drops critically low** — throws a healing potion, keeping them in the fight
+
+After the warden falls and the player escapes, Frank explains the situation: three other uncorrupted souls are imprisoned nearby, and they must all be found. He directs the player toward the first rescue dungeon.
+
+**Escape warden (solo boss — tuned for Level 1 solo play):**
+| Class Dungeon | Warden Concept |
 |---|---|
-| The Cathedral | Corrupted high priest / fallen divine guardian |
-| The Monastery | Corrupted grandmaster |
-| The Observatory | Corrupted archmage / elemental titan |
-| The Underground Guild | Corrupted guild master / shadow lord |
+| The Cathedral | Fallen doorkeeper — armored and slow but punishes mistakes |
+| The Monastery | Corrupted sparring master — fast, multi-hit, teaches parry timing |
+| The Observatory | Void sentinel — spell-casting warden, exploitable by Lyra's INT |
+| The Underground Guild | Corrupted enforcer — dirty fighting, early status effect introduction |
 
-### The NPC Dungeon — Frank the Traveling Merchant
-When the player's chosen class dungeon is reached, it functions as a full explorable dungeon with the same enemy encounters but ends with **meeting Frank** rather than a rescue boss fight. Frank is a separate utility NPC — not a combat party member — who provides merchant services (shop, healing, curing diseases) throughout the rest of the game.
+---
 
-Thematically each version makes narrative sense:
-- **Vael chosen:** The Cathedral is Vael's origin. Frank took refuge in the holy ruins.
-- **Ryn chosen:** The Monastery is Ryn's training ground. Frank sheltered among the ruins.
-- **Lyra chosen:** The Observatory is Lyra's domain. Frank hid under the arcane wards left behind.
-- **Silas chosen:** The Underground Guild is Silas's home turf. Frank set up a traveling black market inside.
+### Dungeon Order by Starting Class
 
-Frank always provides the same services regardless of which dungeon he's found in — the player always encounters him, no content is wasted, and all class choices see the same amount of content.
+The three remaining dungeons are visited in an order where each gate requirement is already met. The player's starter dungeon is bypassed — they escape from inside. Each rescue unlocks the next gate.
+
+| Start | Dungeon 1 (Solo escape) | Dungeon 2 | Dungeon 3 | Dungeon 4 |
+|---|---|---|---|---|
+| **Vael** | The Cathedral | The Monastery *(Holy = Vael ✓)* | The Observatory *(Physical = Ryn ✓)* | The Underground Guild *(Arcane = Lyra ✓)* |
+| **Ryn** | The Monastery | The Observatory *(Physical = Ryn ✓)* | The Underground Guild *(Arcane = Lyra ✓)* | The Cathedral *(no gate)* |
+| **Lyra** | The Observatory | The Underground Guild *(Arcane = Lyra ✓)* | The Cathedral *(no gate)* | The Monastery *(Holy = Vael ✓)* |
+| **Silas** | The Underground Guild | The Cathedral *(no gate)* | The Monastery *(Holy = Vael ✓)* | The Observatory *(Physical = Ryn ✓)* |
+
+### Gate Requirements (Rescue Dungeons)
+
+| Location | Captive | Gate to Enter |
+|---|---|---|
+| **The Cathedral** | Vael (Templar) | None |
+| **The Monastery** | Ryn (Martial Artist) | Holy power — Vael in party or player IS Vael |
+| **The Observatory** | Lyra (Invoker) | Physical strength — Ryn in party or player IS Ryn |
+| **The Underground Guild** | Silas (Assassin) | Arcane knowledge — Lyra in party or player IS Lyra |
 
 ---
 
@@ -745,8 +762,19 @@ Vorath in his true form — a pure entity from a previous cycle, now utterly cor
 **Phase 2 — The Unraveling Manifest**
 Vorath channels The Unraveling directly. All attacks become AoE. He gains rotating elemental immunities — players must track which element he absorbs each round. Lyra's summons are dispelled. Vael's Resurrection becomes critical.
 
+**Frank's Revelation — Between Phase 2 and Phase 3**
+As Vorath begins his final transformation, Frank steps forward and abandons the merchant's mask. His true identity is revealed: an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin. His real name — never spoken once across the entire game — is said aloud here for the first time. He uses his true power to debuff Vorath before Phase 3 begins, then joins as a 5th party member.
+
+Frank's combat skills (Phase 3 only):
+
+| Skill | Effect |
+|---|---|
+| **[True Name]'s Blessing** | Restores HP to all party members — a callback to every "on the house" moment across the whole game |
+| **Balance's Judgment** | Massive attack exploiting Vorath's now-exposed weakness |
+| **The Final Invoice** | Frank's ultimate — deals damage scaled to everything Vorath has destroyed. Always connects. |
+
 **Phase 3 — The Void Form**
-Vorath transforms into pure void energy. DEF and RES drop — finally vulnerable — but damage spikes dramatically. Each round he charges **The Final Unraveling**, a party-wipe attack if allowed to complete. A race against time — Rising Dragon, Shadowstep, Divine Wrath, and Thunderstrike are the win conditions.
+Vorath transforms into pure void energy. DEF and RES drop — finally vulnerable — but damage spikes dramatically. Each round he charges **The Final Unraveling**, a party-wipe attack if allowed to complete. Frank's debuff from the revelation buys one free round before the charge begins. A race against time — Rising Dragon, Shadowstep, Divine Wrath, Thunderstrike, and Frank's Balance's Judgment are the win conditions.
 
 ---
 

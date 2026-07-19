@@ -49,10 +49,12 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 10 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
 | 11 | **Random encounters** | Step-triggered battles in dungeons and overworld |
 | 12 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
-| 13 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
-| 14 | **Android APK export** | Build and deploy to RP6, test controller input |
-| 15 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
-| 16 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss |
+| 13 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
+| 14 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
+| 15 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
+| 16 | **Android APK export** | Build and deploy to RP6, test controller input |
+| 17 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
+| 18 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
 
 ---
 

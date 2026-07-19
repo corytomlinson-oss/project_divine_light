@@ -29,7 +29,11 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 7 — Enemy groups + targeting: 1–3 enemies per fight (10 encounter groups, 20% single / 50% pairs / 30% triples), player selects target with arrow keys (yellow cursor), dead enemies grey out and skip their turn, XP sums across all enemies in the group. Enemy UI (sprites, name labels, HP bars) built dynamically so layout scales to group size.
 
-**Next milestone:** Milestone 8 — Class skills (implement full skill lists per class)
+**Completed:** Milestone 8a — Vael full skill set (12 skills, level-gated). New systems: buff system (DEF/ATK buffs with round duration), stun, Taunt (forces enemy targeting), Sanctuary (nullifies next hit), Purify (status clear), AoE holy damage (Consecrate), ally targeting cursor for single-ally skills (Guard/Sanctuary/Purify). Skill menu scrolls when list exceeds 5 visible slots. F1/F2 debug keys for instant level up/down (capped at level 35).
+
+**Completed:** Milestone 8b — Ryn full skill set (12 skills, level-gated, all Qi-based). New systems: AoE physical (Sweep), stun-only with no damage (Pressure Point), defense-piercing damage (Ki Burst — half defense), multi-hit (Storm Flurry — 3 hits, total shown), AGI debuff (Crippling Strike — halves enemy AGI for 2 rounds, affects next round's turn order), AoE heal (Healing Wave), Rising Dragon (max Qi cost, guaranteed stun).
+
+**Next milestone:** Milestone 8c — Lyra full skill set (stance system + all spells)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

@@ -1,5 +1,6 @@
 class_name Combatant
 
+const MAX_LEVEL: int = 35
 const LEVEL_GAINS: Dictionary = {
 	"Vael":  {"hp": 25, "mp":  8, "atk": 3, "def": 4, "int": 3, "agi": 2},
 	"Ryn":   {"hp": 17, "mp":  0, "atk": 6, "def": 2, "int": 1, "agi": 4},
@@ -25,7 +26,17 @@ var xp_reward: int = 0
 var char_class: String = ""
 var is_enemy: bool = false
 var is_ko: bool = false
+var is_stunned: bool = false
+var stun_rounds: int = 0
 var defending: bool = false
+var def_buff: int = 0
+var def_buff_rounds: int = 0
+var atk_buff: int = 0
+var atk_buff_rounds: int = 0
+var agi_debuff: int = 0
+var agi_debuff_rounds: int = 0
+var taunt_rounds: int = 0
+var sanctuary: bool = false
 var queued_action: String = ""
 var queued_skill: Dictionary = {}
 var queued_target: int = 0
@@ -64,12 +75,14 @@ func gain_xp(amount: int) -> bool:
 	var leveled := false
 	while xp >= xp_to_next:
 		xp -= xp_to_next
-		_level_up()
+		level_up()
 		leveled = true
 	return leveled
 
 
-func _level_up() -> void:
+func level_up() -> void:
+	if level >= MAX_LEVEL:
+		return
 	level += 1
 	xp_to_next = roundi(100.0 * pow(float(level), 1.5))
 	var g: Dictionary = LEVEL_GAINS.get(char_class, {})
@@ -81,3 +94,19 @@ func _level_up() -> void:
 	agi      += g.get("agi", 0)
 	hp = max_hp
 	mp = max_mp
+
+
+func level_down() -> void:
+	if level <= 1:
+		return
+	var g: Dictionary = LEVEL_GAINS.get(char_class, {})
+	max_hp   -= g.get("hp",  0)
+	max_mp   -= g.get("mp",  0)
+	atk      -= g.get("atk", 0)
+	defense  -= g.get("def", 0)
+	int_stat -= g.get("int", 0)
+	agi      -= g.get("agi", 0)
+	level -= 1
+	xp_to_next = roundi(100.0 * pow(float(level), 1.5))
+	hp = mini(hp, max_hp)
+	mp = mini(mp, max_mp)

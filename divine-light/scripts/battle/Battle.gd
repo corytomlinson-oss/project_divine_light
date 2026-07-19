@@ -1,21 +1,42 @@
 extends Node2D
 
 enum State { SELECTING, RESOLVING, BATTLE_OVER }
-enum MenuState { MAIN, SKILL, ITEM, TARGETING }
+enum MenuState { MAIN, SKILL, ITEM, TARGETING, ALLY_TARGETING }
 
 const CLASS_SKILLS: Dictionary = {
 	"Vael": [
-		{"name": "Holy Light", "cost": 10, "cost_type": "mp", "target": "ally",  "effect": "heal",     "power": 25},
-		{"name": "Smite",      "cost": 8,  "cost_type": "mp", "target": "enemy", "effect": "holy",     "power": 15},
+		{"name": "Holy Light",    "cost": 10, "cost_type": "mp", "target": "ally",        "effect": "heal",         "power": 25, "min_level": 1},
+		{"name": "Smite",         "cost": 8,  "cost_type": "mp", "target": "enemy",       "effect": "holy",         "power": 15, "min_level": 4},
+		{"name": "Guard",         "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "guard",        "power": 15, "min_level": 7},
+		{"name": "Taunt",         "cost": 6,  "cost_type": "mp", "target": "self",        "effect": "taunt",        "power": 0,  "min_level": 10},
+		{"name": "Fortify",       "cost": 15, "cost_type": "mp", "target": "ally_all",    "effect": "fortify",      "power": 10, "min_level": 14},
+		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "min_level": 17},
+		{"name": "Divine Shield", "cost": 20, "cost_type": "mp", "target": "ally_all",    "effect": "divine_shield","power": 12, "min_level": 20},
+		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 23},
+		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 26},
+		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 29},
+		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 32},
+		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 35},
 	],
 	"Ryn": [
-		{"name": "Iron Fist",   "cost": 1, "cost_type": "qi", "target": "enemy", "effect": "physical", "power": 18},
+		{"name": "Iron Fist",        "cost": 1, "cost_type": "qi", "target": "enemy",       "effect": "physical",     "power": 18, "min_level": 1},
+		{"name": "Vital Touch",      "cost": 2, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 30, "min_level": 4},
+		{"name": "Sweep",            "cost": 2, "cost_type": "qi", "target": "enemy_all",    "effect": "sweep",        "power": 12, "min_level": 7},
+		{"name": "Pressure Point",   "cost": 2, "cost_type": "qi", "target": "enemy",        "effect": "stun_phys",    "power": 0,  "min_level": 10},
+		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 14},
+		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 17},
+		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 20},
+		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 23},
+		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 26},
+		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 29},
+		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 32},
+		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 35},
 	],
 	"Lyra": [
-		{"name": "Ember",       "cost": 8, "cost_type": "mp", "target": "enemy", "effect": "fire",     "power": 14},
+		{"name": "Ember",       "cost": 8, "cost_type": "mp", "target": "enemy", "effect": "fire",     "power": 14, "min_level": 1},
 	],
 	"Silas": [
-		{"name": "Quick Strike","cost": 5, "cost_type": "mp", "target": "enemy", "effect": "physical", "power": 12},
+		{"name": "Quick Strike","cost": 5, "cost_type": "mp", "target": "enemy", "effect": "physical", "power": 12, "min_level": 1},
 	],
 }
 
@@ -69,9 +90,11 @@ var _menu_cursor: int = 0
 var _menu_options: Array = []
 var _option_labels: Array = []
 var _active_skills: Array = []
+var _skill_scroll: int = 0
 
 # Targeting
 var _target_index: int = 0
+var _target_ally_index: int = 0
 var _pending_action: String = ""
 var _pending_skill: Dictionary = {}
 
@@ -135,7 +158,7 @@ func _setup_enemy_ui() -> void:
 	var count: int = _enemies.size()
 	var gap := 4.0
 	var sprite_w := (90.0 - gap * (count - 1)) / count
-	var row_h := 22.0  # 14px label + 4px bar + 4px gap
+	var row_h := 22.0
 
 	for i in count:
 		var sx := 10.0 + i * (sprite_w + gap)
@@ -154,7 +177,6 @@ func _setup_enemy_ui() -> void:
 		$EnemyArea.add_child(label)
 		_enemy_labels.append(label)
 
-		# HP bar: background + fill as ColorRects (respect size directly, no theme minimum)
 		var bar_bg := ColorRect.new()
 		bar_bg.position = Vector2(108, 5 + i * row_h + 14)
 		bar_bg.size = Vector2(207, 4)
@@ -167,6 +189,14 @@ func _setup_enemy_ui() -> void:
 		bar_fill.color = Color(0.85, 0.25, 0.25, 1)
 		$EnemyArea.add_child(bar_fill)
 		_enemy_hp_bars.append(bar_fill)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F1:
+			_debug_level_all(1)
+		elif event.keycode == KEY_F2:
+			_debug_level_all(-1)
 
 
 func _process(_delta: float) -> void:
@@ -184,15 +214,30 @@ func _process(_delta: float) -> void:
 					get_tree().change_scene_to_file("res://scenes/overworld/Overworld.tscn")
 
 
+func _debug_level_all(direction: int) -> void:
+	for member in _party:
+		if direction > 0:
+			member.level_up()
+		else:
+			member.level_down()
+	_update_ui()
+	message_label.text = "[DEBUG] Party level %d  (F1=up F2=down)" % _party[0].level
+
+
 func _handle_menu_input() -> void:
 	if _menu_state == MenuState.TARGETING:
 		_handle_target_input()
 		return
+	if _menu_state == MenuState.ALLY_TARGETING:
+		_handle_ally_target_input()
+		return
 	if Input.is_action_just_pressed("ui_down"):
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
+		_clamp_skill_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_up"):
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
+		_clamp_skill_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_accept"):
 		_confirm_action()
@@ -227,6 +272,31 @@ func _handle_target_input() -> void:
 		message_label.text = "What will you do?"
 
 
+func _handle_ally_target_input() -> void:
+	var alive_idx: Array = []
+	for i in _party.size():
+		if _party[i].is_alive():
+			alive_idx.append(i)
+	if alive_idx.is_empty():
+		return
+	var pos: int = alive_idx.find(_target_ally_index)
+	if pos == -1:
+		pos = 0
+		_target_ally_index = alive_idx[0]
+
+	if Input.is_action_just_pressed("ui_down"):
+		_target_ally_index = alive_idx[(pos + 1) % alive_idx.size()]
+		_update_ui()
+	elif Input.is_action_just_pressed("ui_up"):
+		_target_ally_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
+		_update_ui()
+	elif Input.is_action_just_pressed("ui_accept"):
+		_confirm_ally_target()
+	elif Input.is_action_just_pressed("ui_cancel"):
+		_open_main_menu()
+		message_label.text = "What will you do?"
+
+
 func _confirm_action() -> void:
 	match _menu_state:
 		MenuState.MAIN:  _confirm_main()
@@ -253,15 +323,17 @@ func _open_main_menu() -> void:
 	_menu_cursor = 0
 	_update_menu()
 	_update_selection_header()
-	_update_enemy_ui()
+	_update_ui()
 
 
 func _open_skill_menu(member: Combatant) -> void:
-	_active_skills = CLASS_SKILLS.get(member.char_class, [])
+	var all_skills: Array = CLASS_SKILLS.get(member.char_class, [])
+	_active_skills = all_skills.filter(func(s): return member.level >= int(s.get("min_level", 1)))
 	if _active_skills.is_empty():
 		message_label.text = "No skills learned yet."
 		return
 	_menu_state = MenuState.SKILL
+	_skill_scroll = 0
 	_menu_options = []
 	for skill in _active_skills:
 		var cost_label: String = "(%dQi)" % skill["cost"] if skill["cost_type"] == "qi" else "(%dMP)" % skill["cost"]
@@ -294,6 +366,21 @@ func _enter_targeting(action: String, skill: Dictionary) -> void:
 	message_label.text = "Select a target."
 
 
+func _enter_ally_targeting(action: String, skill: Dictionary) -> void:
+	_pending_action = action
+	_pending_skill = skill
+	_menu_state = MenuState.ALLY_TARGETING
+	_target_ally_index = 0
+	for i in _party.size():
+		if _party[i].is_alive():
+			_target_ally_index = i
+			break
+	action_menu.visible = false
+	selection_header.text = "Target Ally?"
+	_update_ui()
+	message_label.text = "Select an ally."
+
+
 func _confirm_target() -> void:
 	var member: Combatant = _party[_selecting_index]
 	member.queued_action = _pending_action
@@ -301,6 +388,16 @@ func _confirm_target() -> void:
 	member.queued_target = _target_index
 	_advance_selection()
 	_update_enemy_ui()
+
+
+func _confirm_ally_target() -> void:
+	var member: Combatant = _party[_selecting_index]
+	member.queued_action = _pending_action
+	member.queued_skill = _pending_skill
+	member.queued_target = _target_ally_index
+	_menu_state = MenuState.MAIN
+	_update_ui()
+	_advance_selection()
 
 
 func _confirm_skill() -> void:
@@ -314,13 +411,17 @@ func _confirm_skill() -> void:
 	if skill["cost_type"] == "qi" and member.qi < int(skill["cost"]):
 		message_label.text = "Not enough Qi!"
 		return
-	if skill["target"] == "ally":
-		member.queued_action = "skill"
-		member.queued_skill = skill
-		member.queued_target = -1
-		_advance_selection()
-	else:
-		_enter_targeting("skill", skill)
+	var target_type: String = skill["target"]
+	match target_type:
+		"ally", "ally_all", "self", "enemy_all":
+			member.queued_action = "skill"
+			member.queued_skill = skill
+			member.queued_target = -1
+			_advance_selection()
+		"ally_choose":
+			_enter_ally_targeting("skill", skill)
+		"enemy":
+			_enter_targeting("skill", skill)
 
 
 func _confirm_item() -> void:
@@ -369,7 +470,7 @@ func _begin_resolving() -> void:
 	for enemy in _enemies:
 		if enemy.is_alive():
 			_turn_queue.append(enemy)
-	_turn_queue.sort_custom(func(a, b): return a.agi > b.agi)
+	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
 	message_label.text = "Press Enter..."
 
@@ -382,9 +483,16 @@ func _execute_next_turn() -> void:
 			member.defending = false
 		for enemy in _enemies:
 			enemy.defending = false
+		_tick_buffs()
 		_begin_selection()
 		return
 	var combatant: Combatant = _turn_queue.pop_front()
+	if combatant.is_stunned:
+		combatant.stun_rounds -= 1
+		if combatant.stun_rounds <= 0:
+			combatant.is_stunned = false
+		message_label.text = "%s is stunned and cannot act!" % combatant.display_name
+		return
 	if combatant.is_enemy:
 		_execute_enemy_turn(combatant)
 	else:
@@ -401,6 +509,16 @@ func _get_enemy_target(member: Combatant) -> Combatant:
 	return null
 
 
+func _get_ally_target(member: Combatant, skill: Dictionary) -> Combatant:
+	if skill["target"] == "ally_choose":
+		var idx: int = member.queued_target
+		if idx >= 0 and idx < _party.size() and _party[idx].is_alive():
+			return _party[idx]
+	var alive: Array = _party.filter(func(c): return c.is_alive())
+	alive.sort_custom(func(a, b): return float(a.hp) / a.max_hp < float(b.hp) / b.max_hp)
+	return alive[0] if not alive.is_empty() else member
+
+
 func _execute_party_turn(member: Combatant) -> void:
 	match member.queued_action:
 		"attack":      _do_attack(member)
@@ -415,7 +533,7 @@ func _do_attack(member: Combatant) -> void:
 	var target: Combatant = _get_enemy_target(member)
 	if target == null:
 		return
-	var dmg := maxi(1, member.atk - target.defense + randi_range(-2, 2))
+	var dmg := maxi(1, (member.atk + member.atk_buff) - target.defense + randi_range(-2, 2))
 	target.receive_damage(dmg)
 	if member.max_qi > 0:
 		member.qi = mini(member.max_qi, member.qi + 1)
@@ -434,28 +552,209 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 	var effect: String = skill["effect"]
 	var power: int = int(skill["power"])
 
-	if effect == "heal":
-		var alive: Array = _party.filter(func(c): return c.is_alive())
-		alive.sort_custom(func(a, b): return float(a.hp) / a.max_hp < float(b.hp) / b.max_hp)
-		var target: Combatant = alive[0]
-		var amount: int = power + member.int_stat / 2
-		target.hp = mini(target.max_hp, target.hp + amount)
-		_update_ui()
-		message_label.text = "%s uses %s!\n%s restores %d HP!" % [member.display_name, skill["name"], target.display_name, amount]
-	else:
-		var target: Combatant = _get_enemy_target(member)
-		if target == null:
-			return
-		var dmg: int
-		if effect in ["holy", "fire", "ice", "lightning", "earth"]:
-			dmg = maxi(1, power + member.int_stat / 2 + randi_range(-2, 2))
-		else:
-			dmg = maxi(1, power + member.atk / 2 - target.defense + randi_range(-2, 2))
-		target.receive_damage(dmg)
-		_update_ui()
-		message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
-		if _enemies.filter(func(e): return e.is_alive()).is_empty():
-			_end_battle(true)
+	match effect:
+		"heal":
+			var target: Combatant = _get_ally_target(member, skill)
+			var amount: int = power + member.int_stat / 2
+			target.hp = mini(target.max_hp, target.hp + amount)
+			_update_ui()
+			message_label.text = "%s uses %s!\n%s restored %d HP!" % [member.display_name, skill["name"], target.display_name, amount]
+
+		"holy", "fire", "ice", "lightning", "earth":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.int_stat / 2 + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"holy_stun":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.int_stat / 2 + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			var stunned := false
+			if not target.is_ko and randi() % 100 < 40:
+				target.is_stunned = true
+				target.stun_rounds = 1
+				stunned = true
+			_update_ui()
+			var suffix := " Stunned!" if stunned else ""
+			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"holy_wrath":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.int_stat / 2 + randi_range(-3, 3))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			var suffix := " Stunned!" if not target.is_ko else ""
+			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"guard":
+			var target: Combatant = _get_ally_target(member, skill)
+			target.def_buff = int(power)
+			target.def_buff_rounds = 2
+			_update_ui()
+			message_label.text = "%s uses %s on %s!\nDEF +%d for 2 rounds!" % [member.display_name, skill["name"], target.display_name, power]
+
+		"taunt":
+			member.taunt_rounds = 1
+			_update_ui()
+			message_label.text = "%s taunts!\nAll enemies must attack %s!" % [member.display_name, member.display_name]
+
+		"fortify":
+			for ally in _party:
+				if ally.is_alive():
+					ally.def_buff = maxi(ally.def_buff, int(power))
+					ally.def_buff_rounds = 2
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll allies gain DEF for 2 rounds!" % [member.display_name, skill["name"]]
+
+		"divine_shield":
+			for ally in _party:
+				if ally.is_alive():
+					ally.def_buff = maxi(ally.def_buff, int(power))
+					ally.def_buff_rounds = 2
+			_update_ui()
+			message_label.text = "%s raises %s!\nParty DEF increased for 2 rounds!" % [member.display_name, skill["name"]]
+
+		"battle_hymn":
+			for ally in _party:
+				if ally.is_alive():
+					ally.atk_buff = maxi(ally.atk_buff, int(power))
+					ally.atk_buff_rounds = 2
+			_update_ui()
+			message_label.text = "%s sings %s!\nAll allies gain ATK for 2 rounds!" % [member.display_name, skill["name"]]
+
+		"consecrate":
+			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
+			for enemy in alive_enemies:
+				var dmg: int = maxi(1, power + member.int_stat / 2 + randi_range(-2, 2))
+				enemy.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll enemies take holy damage!" % [member.display_name, skill["name"]]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"sanctuary":
+			var target: Combatant = _get_ally_target(member, skill)
+			target.sanctuary = true
+			_update_ui()
+			message_label.text = "%s casts %s on %s!\nNext hit on them is nullified!" % [member.display_name, skill["name"], target.display_name]
+
+		"purify":
+			var target: Combatant = _get_ally_target(member, skill)
+			target.is_stunned = false
+			target.stun_rounds = 0
+			_update_ui()
+			message_label.text = "%s uses %s on %s!\nAll status effects cleared!" % [member.display_name, skill["name"], target.display_name]
+
+		"physical":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"sweep":
+			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
+			for enemy in alive_enemies:
+				var dmg: int = maxi(1, power + member.atk / 2 - enemy.defense + randi_range(-2, 2))
+				enemy.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll enemies take damage!" % [member.display_name, skill["name"]]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"stun_phys":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			if not target.is_ko:
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			message_label.text = "%s uses %s!\n%s is stunned!" % [member.display_name, skill["name"], target.display_name]
+
+		"ki_burst":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk - target.defense / 2 + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"multi_hit":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var total := 0
+			for _h in 3:
+				if target.is_alive():
+					var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-1, 1))
+					target.receive_damage(dmg)
+					total += dmg
+			_update_ui()
+			message_label.text = "%s uses %s!\n3 hits on %s — %d total!" % [member.display_name, skill["name"], target.display_name, total]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"cripple":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-1, 1))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.agi_debuff = target.agi / 2
+				target.agi_debuff_rounds = 2
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!\nAGI halved for 2 rounds!" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"heal_all":
+			var amount: int = power + member.int_stat / 2
+			for ally in _party:
+				if ally.is_alive():
+					ally.hp = mini(ally.max_hp, ally.hp + amount)
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll allies restored %d HP!" % [member.display_name, skill["name"], amount]
+
+		"rising_dragon":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-3, 3))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			var suffix := " Stunned!" if not target.is_ko else ""
+			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
 
 
 func _do_item_potion(member: Combatant) -> void:
@@ -469,8 +768,25 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
-	var target: Combatant = targets[randi() % targets.size()]
-	var def_val := target.defense * 2 if target.defending else target.defense
+
+	# Taunt forces all enemies to target the taunting member
+	var target: Combatant = null
+	for m in _party:
+		if m.is_alive() and m.taunt_rounds > 0:
+			target = m
+			break
+	if target == null:
+		target = targets[randi() % targets.size()]
+
+	# Sanctuary nullifies the hit entirely
+	if target.sanctuary:
+		target.sanctuary = false
+		_update_ui()
+		message_label.text = "%s's Sanctuary absorbs\n%s's attack!" % [target.display_name, enemy.display_name]
+		return
+
+	var effective_def := target.defense + target.def_buff
+	var def_val := effective_def * 2 if target.defending else effective_def
 	var dmg := maxi(1, enemy.atk - def_val + randi_range(-1, 1))
 	target.receive_damage(dmg)
 	var suffix := " (reduced!)" if target.defending else ""
@@ -478,6 +794,24 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	message_label.text = "%s hits %s for %d%s!" % [enemy.display_name, target.display_name, dmg, suffix]
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+func _tick_buffs() -> void:
+	for c in _party + _enemies:
+		if c.def_buff_rounds > 0:
+			c.def_buff_rounds -= 1
+			if c.def_buff_rounds <= 0:
+				c.def_buff = 0
+		if c.atk_buff_rounds > 0:
+			c.atk_buff_rounds -= 1
+			if c.atk_buff_rounds <= 0:
+				c.atk_buff = 0
+		if c.agi_debuff_rounds > 0:
+			c.agi_debuff_rounds -= 1
+			if c.agi_debuff_rounds <= 0:
+				c.agi_debuff = 0
+		if c.taunt_rounds > 0:
+			c.taunt_rounds -= 1
 
 
 func _end_battle(victory: bool) -> void:
@@ -507,11 +841,23 @@ func _build_levelup_text(member: Combatant) -> String:
 	return "%s reached Level %d!\n%s\n%s  Press Enter." % [member.display_name, member.level, line2, line3]
 
 
+func _clamp_skill_scroll() -> void:
+	if _menu_state != MenuState.SKILL:
+		return
+	var page: int = _option_labels.size()
+	if _menu_cursor < _skill_scroll:
+		_skill_scroll = _menu_cursor
+	elif _menu_cursor >= _skill_scroll + page:
+		_skill_scroll = _menu_cursor - page + 1
+
+
 func _update_menu() -> void:
 	action_menu.visible = true
-	for i in _option_labels.size():
-		if i < _menu_options.size():
-			_option_labels[i].text = ("> " if i == _menu_cursor else "  ") + _menu_options[i]
+	var page: int = _option_labels.size()
+	for i in page:
+		var idx: int = (_skill_scroll + i) if _menu_state == MenuState.SKILL else i
+		if idx < _menu_options.size():
+			_option_labels[i].text = ("> " if idx == _menu_cursor else "  ") + _menu_options[idx]
 			_option_labels[i].visible = true
 		else:
 			_option_labels[i].text = ""
@@ -566,12 +912,19 @@ func _update_ui() -> void:
 		var pct: float = float(member.hp) / float(member.max_hp) if member.max_hp > 0 else 0.0
 		var label_tint: Color
 		var bar_tint: Color
+
+		var name_str: String
+		if _menu_state == MenuState.ALLY_TARGETING:
+			name_str = ("> " if i == _target_ally_index else "  ") + member.display_name
+		else:
+			name_str = member.display_name
+
 		if member.is_ko:
-			label.text = "%s L%d  --/--" % [member.display_name, member.level]
+			label.text = "%s L%d  --/--" % [name_str, member.level]
 			label_tint = Color(0.5, 0.5, 0.5)
 			bar_tint   = Color(0.5, 0.5, 0.5)
 		else:
-			label.text = "%s L%d  %d/%d" % [member.display_name, member.level, member.hp, member.max_hp]
+			label.text = "%s L%d  %d/%d" % [name_str, member.level, member.hp, member.max_hp]
 			if pct > 0.5:
 				label_tint = Color(1.0, 1.0, 1.0)
 				bar_tint   = Color(0.3, 0.9, 0.3)
@@ -581,6 +934,10 @@ func _update_ui() -> void:
 			else:
 				label_tint = Color(1.0, 0.35, 0.35)
 				bar_tint   = Color(1.0, 0.35, 0.35)
+
+		if _menu_state == MenuState.ALLY_TARGETING and i == _target_ally_index and not member.is_ko:
+			label_tint = Color(1.0, 1.0, 0.3)
+
 		label.modulate = label_tint
 		if i < _party_hp_bars.size():
 			_party_hp_bars[i].value    = pct * 100.0

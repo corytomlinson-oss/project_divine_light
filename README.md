@@ -23,7 +23,13 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 4 — Party system: Combatant data class, 4-member party with individual stats, round-based action selection per member, AGI-sorted turn execution, KO state with greyed HP labels.
 
-**Next milestone:** Milestone 5 — Full action menu (Skill menu, Item menu, all actions per class)
+**Completed:** Milestone 5 — Full action menu: 5-option main menu (Attack/Skill/Item/Defend/Run), class-specific skill submenus, item submenu (placeholder), Escape to go back. Qi system live for Ryn (builds on Attack, shown as pip display). MP tracking for Vael/Lyra/Silas. INT-based damage formula for magic skills vs ATK-based for physical.
+
+**Completed:** Milestone 6 — Status system: colored HP bars (green/yellow/red) added dynamically per party member, level display in party panel, XP + level-up system with fixed stat gains per class, full HP/MP restore on level-up, level-up message queue after victory. GameManager autoload singleton added — party HP/XP/level now persists across battles.
+
+**Completed:** Milestone 7 — Enemy groups + targeting: 1–3 enemies per fight (10 encounter groups, 20% single / 50% pairs / 30% triples), player selects target with arrow keys (yellow cursor), dead enemies grey out and skip their turn, XP sums across all enemies in the group. Enemy UI (sprites, name labels, HP bars) built dynamically so layout scales to group size.
+
+**Next milestone:** Milestone 8 — Class skills (implement full skill lists per class)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

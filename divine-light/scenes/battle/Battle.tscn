@@ -1,0 +1,104 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/battle/Battle.gd" id="1_battle"]
+
+[node name="Battle" type="Node2D"]
+script = ExtResource("1_battle")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 180.0
+color = Color(0.04, 0.04, 0.12, 1)
+
+[node name="EnemySprite" type="ColorRect" parent="."]
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 100.0
+offset_bottom = 68.0
+color = Color(0.55, 0.12, 0.12, 1)
+
+[node name="EnemyArea" type="Node2D" parent="."]
+
+[node name="EnemyName" type="Label" parent="EnemyArea"]
+offset_left = 108.0
+offset_top = 6.0
+offset_right = 315.0
+offset_bottom = 18.0
+theme_override_font_sizes/font_size = 8
+text = "Enemy"
+
+[node name="EnemyHPBar" type="ProgressBar" parent="EnemyArea"]
+offset_left = 108.0
+offset_top = 22.0
+offset_right = 315.0
+offset_bottom = 33.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="MessageBox" type="Panel" parent="."]
+offset_left = 0.0
+offset_top = 72.0
+offset_right = 320.0
+offset_bottom = 126.0
+
+[node name="MessageLabel" type="Label" parent="MessageBox"]
+offset_left = 5.0
+offset_top = 4.0
+offset_right = 315.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 8
+autowrap_mode = 3
+text = ""
+
+[node name="SelectionArea" type="Node2D" parent="."]
+
+[node name="SelectionHeader" type="Label" parent="SelectionArea"]
+offset_left = 6.0
+offset_top = 126.0
+offset_right = 150.0
+offset_bottom = 138.0
+theme_override_font_sizes/font_size = 8
+text = ""
+
+[node name="ActionMenu" type="VBoxContainer" parent="SelectionArea"]
+offset_left = 6.0
+offset_top = 139.0
+offset_right = 150.0
+offset_bottom = 180.0
+theme_override_constants/separation = 2
+
+[node name="Option0" type="Label" parent="SelectionArea/ActionMenu"]
+theme_override_font_sizes/font_size = 8
+text = "> Attack"
+
+[node name="Option1" type="Label" parent="SelectionArea/ActionMenu"]
+theme_override_font_sizes/font_size = 8
+text = "  Defend"
+
+[node name="Option2" type="Label" parent="SelectionArea/ActionMenu"]
+theme_override_font_sizes/font_size = 8
+text = "  Run"
+
+[node name="PartyPanel" type="VBoxContainer" parent="."]
+offset_left = 158.0
+offset_top = 127.0
+offset_right = 315.0
+offset_bottom = 178.0
+theme_override_constants/separation = 1
+
+[node name="HP_Vael" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Vael   150/150"
+
+[node name="HP_Ryn" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Ryn    100/100"
+
+[node name="HP_Lyra" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Lyra    70/ 70"
+
+[node name="HP_Silas" type="Label" parent="PartyPanel"]
+theme_override_font_sizes/font_size = 8
+text = "Silas   90/ 90"

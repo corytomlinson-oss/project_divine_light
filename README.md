@@ -15,9 +15,15 @@ This document is the canonical design reference for *Divine Light*, a retro high
 | Godot Project Created | Complete — `c:\vs_workspace\games\project_divine_light\divine-light\` |
 | Implementation | In Progress — Milestone 1 complete |
 
-**Completed:** Milestone 1 — Player character moves on a TileMapLayer overworld. Camera2D follows player. Grid-based tile movement (16×16 tiles, 96px/sec). Debug prints removed. Committed to `cjt` branch.
+**Completed:** Milestone 1 — Player character moves on a TileMapLayer overworld. Camera2D follows player. Grid-based tile movement (16×16 tiles, 96px/sec).
 
-**Next milestone:** Milestone 2 — Battle screen transition (overworld → battle scene on encounter trigger)
+**Completed:** Milestone 2 — Random encounter triggers after 10–20 steps. Scene switches to Battle screen. Enter returns to overworld.
+
+**Completed:** Milestone 3 — Turn-based battle: Attack/Defend/Run cursor menu, enemy HP bar, damage/defend/victory/defeat states. Window set to 960×540 for PC development.
+
+**Completed:** Milestone 4 — Party system: Combatant data class, 4-member party with individual stats, round-based action selection per member, AGI-sorted turn execution, KO state with greyed HP labels.
+
+**Next milestone:** Milestone 5 — Full action menu (Skill menu, Item menu, all actions per class)
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 
@@ -127,7 +133,7 @@ When a dungeon boss is defeated, the region transforms across three layers:
 **Core Premise:** Supernatural entities are cyclically reborn into Valdris embodying character classes — the mechanism that preserves cosmic balance. Vorath is deliberately corrupting this cycle using The Unraveling, causing every newly awakened entity to turn evil. Only four pure entities remain in the current cycle.
 
 ### Act I — The Gathering *(Forest Heartlands)*
-The player chooses their class and awakens as the first uncorrupted entity. Journey through the Forest Heartlands, locating and rescuing the other three pure entities from corrupted dungeons. Each rescue adds a party member. By Act I's end, the full party of four is assembled.
+The player chooses their class and awakens alone inside their class dungeon — captured by Vorath's corrupted forces. A fellow captive named Frank is found deeper in the dungeon. Together they fight toward the exit, culminating in a solo boss fight against a corrupted dungeon warden — a fight the player survives only because Frank intervenes. After escaping, Frank reveals what he knows: three other uncorrupted souls are imprisoned across the Forest Heartlands. He directs the player toward the first rescue. Each dungeon cleared adds a party member until all four are assembled.
 
 ### Act II — The Purge *(Tundra, Desert, Coastal Kingdoms)*
 Travel across Valdris's three corrupted kingdoms. Defeat the corrupted elite classes holding each kingdom captive and liberate the towns. Each kingdom has one major dungeon and one town that transforms upon cleansing.
@@ -145,14 +151,18 @@ All four party members are pure entities — one is the player's chosen class, t
 
 | Class | Name | Role | Primary Stats |
 |---|---|---|---|
-| **Templar** | Vael | Frontline tank, holy restoration healer | High HP, High Defense |
-| **Martial Artist** | Ryn | High-speed physical brawler | High STR, High AGI |
+| **Templar** | Vael | Frontline tank, party buffer, minor healer | High HP, High Defense |
+| **Martial Artist** | Ryn | Primary healer, physical striker, disabler | High STR, High AGI |
 | **Invoker** | Lyra | Elemental magic, dynamic spellkit | High INT, High MP |
 | **Assassin** | Silas | Agility striker, status debuffer | High AGI, High Crit |
 
 ### Utility NPC
 
-**Frank** — A traveling merchant encountered in the player's class dungeon (the NPC dungeon). Provides shop, healing, and disease-curing services for the rest of the game. Not a combat party member.
+**Frank** — First encountered as a fellow captive in the player's starter dungeon. Provides shop, healing, disease-curing, and revival services throughout the rest of the game.
+
+Frank's merchant persona is a mask. His true identity — an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin — is concealed until the final confrontation. He has quietly guided the party since the moment they met. His real name is never spoken until the Vorath battle. In Phase 3 he drops the mask entirely, joins the fight as a 5th party member, and deploys power he has never once revealed.
+
+Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill.
 
 ### The Antagonist
 
@@ -164,16 +174,16 @@ Ancient. Once one of the four pure entities of a previous cycle. Refused rebirth
 ## Class Mechanics
 
 ### Vael — The Templar
-- **Role:** Frontline tank and healer
+- **Role:** Frontline tank, party buffer, minor healer
 - **Resource:** MP (traditional)
-- **Unique Trait:** Holy/divine magic that damages corrupted enemies and restores allies
-- **Playstyle:** Absorbs damage for the party, sustains HP through combat
+- **Unique Trait:** Holy/divine magic that damages corrupted enemies, buffs allies, and provides minor healing as a backup
+- **Playstyle:** Protective anchor — draws enemy focus via Taunt, raises party DEF and STR through buffs, and provides clutch minor heals or status cleansing when Ryn can't
 
 ### Ryn — The Martial Artist
-- **Role:** High-speed physical damage dealer
+- **Role:** Primary healer, physical striker, disabler
 - **Resource:** Qi (replaces MP)
-- **Unique Mechanic — Qi System:** Basic attacks generate Qi. Special moves and combo finishers spend Qi. The longer a battle continues, the more dangerous Ryn becomes. Rewards aggressive, sustained fighting.
-- **Playstyle:** Pressure class — build Qi through early hits, unleash powerful finishers mid-to-late battle
+- **Unique Mechanic — Qi System:** Basic attacks generate Qi (1 per hit, 6 pip max). Qi can be spent on damage skills, healing skills, or disable skills — the player decides every turn. This creates constant tension: spend Qi to end the fight faster, or hold it for healing.
+- **Playstyle:** Combat-sustained healer — Ryn must stay in the fight and keep attacking to fuel the party's healing. Disable skills (stun, AGI reduction) are available but secondary to the damage/heal decision.
 
 ### Lyra — The Invoker
 - **Role:** Versatile backline elemental mage
@@ -191,35 +201,48 @@ Ancient. Once one of the four pure entities of a previous cycle. Refused rebirth
 
 ## Act I — Dungeon Structure
 
-Four dungeons in fixed order. **Whichever dungeon matches the player's chosen class becomes the NPC Dungeon** — still explorable but ends with meeting Silas (the traveling merchant) instead of a rescue boss. The remaining three are rescue dungeons.
+The player wakes up alone inside their class dungeon. Three others are held in the remaining dungeons. The order you visit them is determined by which gates you can unlock with the party members you already have.
 
-### Dungeon Order & Gating
+### The Solo Opening — Captive Start
 
-| # | Location | Captive | Gate to Enter |
-|---|---|---|---|
-| 1 | **The Cathedral** | Vael (Templar) | None — first dungeon |
-| 2 | **The Monastery** | Ryn (Martial Artist) | Holy power — provided by Vael or by the player if playing Vael |
-| 3 | **The Observatory** | Lyra (Invoker) | Physical strength — provided by Ryn or by the player if playing Ryn |
-| 4 | **The Underground Guild** | Silas (Assassin) | Arcane knowledge — provided by Lyra or by the player if playing Lyra |
+The game begins with the player already inside their class dungeon, captured by Vorath's forces. Partway through the escape, they find Frank — also a captive — and free him. The dungeon ends with a solo boss fight against a corrupted warden placed to prevent escape.
 
-### Corrupted Bosses (Act I)
-| Dungeon | Boss Concept |
+**Frank's role in the escape boss fight:**
+Frank improvises with what he has left in his pack. He intervenes twice:
+1. **At the start of the fight** — hurls a blinding vial at the warden, weakening it for the opening rounds
+2. **When the player's HP drops critically low** — throws a healing potion, keeping them in the fight
+
+After the warden falls and the player escapes, Frank explains the situation: three other uncorrupted souls are imprisoned nearby, and they must all be found. He directs the player toward the first rescue dungeon.
+
+**Escape warden (solo boss — tuned for Level 1 solo play):**
+| Class Dungeon | Warden Concept |
 |---|---|
-| The Cathedral | Corrupted high priest / fallen divine guardian |
-| The Monastery | Corrupted grandmaster |
-| The Observatory | Corrupted archmage / elemental titan |
-| The Underground Guild | Corrupted guild master / shadow lord |
+| The Cathedral | Fallen doorkeeper — armored and slow but punishes mistakes |
+| The Monastery | Corrupted sparring master — fast, multi-hit, teaches parry timing |
+| The Observatory | Void sentinel — spell-casting warden, exploitable by Lyra's INT |
+| The Underground Guild | Corrupted enforcer — dirty fighting, early status effect introduction |
 
-### The NPC Dungeon — Frank the Traveling Merchant
-When the player's chosen class dungeon is reached, it functions as a full explorable dungeon with the same enemy encounters but ends with **meeting Frank** rather than a rescue boss fight. Frank is a separate utility NPC — not a combat party member — who provides merchant services (shop, healing, curing diseases) throughout the rest of the game.
+---
 
-Thematically each version makes narrative sense:
-- **Vael chosen:** The Cathedral is Vael's origin. Frank took refuge in the holy ruins.
-- **Ryn chosen:** The Monastery is Ryn's training ground. Frank sheltered among the ruins.
-- **Lyra chosen:** The Observatory is Lyra's domain. Frank hid under the arcane wards left behind.
-- **Silas chosen:** The Underground Guild is Silas's home turf. Frank set up a traveling black market inside.
+### Dungeon Order by Starting Class
 
-Frank always provides the same services regardless of which dungeon he's found in — the player always encounters him, no content is wasted, and all class choices see the same amount of content.
+The three remaining dungeons are visited in an order where each gate requirement is already met. The player's starter dungeon is bypassed — they escape from inside. Each rescue unlocks the next gate.
+
+| Start | Dungeon 1 (Solo escape) | Dungeon 2 | Dungeon 3 | Dungeon 4 |
+|---|---|---|---|---|
+| **Vael** | The Cathedral | The Monastery *(Holy = Vael ✓)* | The Observatory *(Physical = Ryn ✓)* | The Underground Guild *(Arcane = Lyra ✓)* |
+| **Ryn** | The Monastery | The Observatory *(Physical = Ryn ✓)* | The Underground Guild *(Arcane = Lyra ✓)* | The Cathedral *(no gate)* |
+| **Lyra** | The Observatory | The Underground Guild *(Arcane = Lyra ✓)* | The Cathedral *(no gate)* | The Monastery *(Holy = Vael ✓)* |
+| **Silas** | The Underground Guild | The Cathedral *(no gate)* | The Monastery *(Holy = Vael ✓)* | The Observatory *(Physical = Ryn ✓)* |
+
+### Gate Requirements (Rescue Dungeons)
+
+| Location | Captive | Gate to Enter |
+|---|---|---|
+| **The Cathedral** | Vael (Templar) | None |
+| **The Monastery** | Ryn (Martial Artist) | Holy power — Vael in party or player IS Vael |
+| **The Observatory** | Lyra (Invoker) | Physical strength — Ryn in party or player IS Ryn |
+| **The Underground Guild** | Silas (Assassin) | Arcane knowledge — Lyra in party or player IS Lyra |
 
 ---
 
@@ -311,39 +334,39 @@ A high-tier skill for Lyra. When activated:
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
-| 1 | **Holy Light** | Low | Restore HP to one ally |
+| 1 | **Holy Light** | Low | Restore minor HP to one ally |
 | 4 | **Smite** | Low | Holy damage to one enemy — bonus damage vs. corrupted enemies |
 | 7 | **Guard** | Low | Reduce incoming damage to one ally for 2 rounds |
-| 10 | **Mend** | Medium | Restore significant HP to one ally + cure poison |
-| 14 | **Radiance** | Medium | Restore HP to all allies (less per target than single-target heal) |
+| 10 | **Taunt** | Low | Force all enemies to target Vael for 1 round |
+| 14 | **Fortify** | Medium | Raise DEF for all allies for 2 rounds |
 | 17 | **Divine Strike** | Medium | Strong holy damage + chance to stun corrupted enemies |
 | 20 | **Divine Shield** | Medium | Reduce damage taken by all allies in Vael's row for 2 rounds |
-| 23 | **Purify** | Low | Remove all status effects from one ally |
+| 23 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
 | 26 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
-| 29 | **Resurrection** | High | Revive one KO'd ally with 50% HP |
-| 32 | **Sanctuary** | High | Nullify the next attack targeting one ally entirely |
+| 29 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
+| 32 | **Purify** | Low | Remove all status effects from one ally |
 | 35 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
 
 ---
 
 ### Ryn — The Martial Artist
 
-Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Skills spend Qi instead of MP.
+Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Qi can be spent on damage, healing, or disable skills — the player chooses each turn.
 
-| Level | Skill | Qi Cost | Effect |
-|---|---|---|---|
-| 1 | **Iron Fist** | 1 Qi | Enhanced single-target strike, stronger than a basic attack |
-| 4 | **Sweep** | 2 Qi | Spinning low kick — hits all front-row enemies |
-| 7 | **Counter** | 2 Qi | Ryn automatically counters the next physical attack that hits them this round with a free strike |
-| 10 | **Pressure Point** | 2 Qi | Strike targeting a vital point — inflicts stun |
-| 14 | **Ki Burst** | 3 Qi | Concentrated ki energy — ignores a portion of enemy defense |
-| 17 | **Ki Blast** | 3 Qi | Ranged ki projectile — full damage usable from back row |
-| 20 | **Storm Flurry** | 4 Qi | Rapid strikes — hits one target 3 times in succession |
-| 23 | **Qi Overdrive** | 4 Qi | Ryn enters a powered state for 2 rounds — all attacks deal bonus damage |
-| 26 | **Dragon's Maw** | 5 Qi | Devastating single-target strike — high damage, chance to inflict bleed |
-| 29 | **Thousand Strikes** | 5 Qi | Unleashes 6–8 rapid hits distributed across all enemies randomly |
-| 32 | **Earthquake Stomp** | 5 Qi | Ryn slams the ground — AoE damage to all enemies + chance to lower defense |
-| 35 | **Rising Dragon** | 6 Qi | Ryn's ultimate — massive single-target damage + guaranteed stun |
+| Level | Skill | Qi Cost | Type | Effect |
+|---|---|---|---|---|
+| 1 | **Iron Fist** | 1 Qi | Damage | Enhanced single-target strike, stronger than a basic attack |
+| 4 | **Vital Touch** | 2 Qi | Healing | Restore HP to one ally |
+| 7 | **Sweep** | 2 Qi | Damage | Spinning low kick — hits all front-row enemies |
+| 10 | **Pressure Point** | 2 Qi | Disable | Strike targeting a vital point — inflicts stun |
+| 14 | **Ki Burst** | 3 Qi | Damage | Concentrated ki energy — ignores a portion of enemy defense |
+| 17 | **Ki Blast** | 3 Qi | Damage | Ranged ki projectile — full damage usable from back row |
+| 20 | **Mending Flow** | 4 Qi | Healing | Restore significant HP to one ally |
+| 23 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
+| 26 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
+| 29 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
+| 32 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
+| 35 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
 
 ---
 
@@ -524,7 +547,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 
 | Set | Act | Bonus |
 |---|---|---|
-| **Holy Guardian Set** | I | All healing spells restore +25% more HP |
+| **Holy Guardian Set** | I | All buff skills last 1 extra round |
 | **Sacred Aegis Set** | II | Divine Shield now protects the entire party instead of same-row only |
 | **Divine Champion Set** | III | Resurrection revives the target at full HP instead of 50% |
 
@@ -533,7 +556,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 | Set | Act | Bonus |
 |---|---|---|
 | **Iron Monk Set** | I | Basic attacks generate +1 extra Qi per hit |
-| **Storm Dragon Set** | II | Storm Flurry hits 4 times instead of 3 |
+| **Storm Dragon Set** | II | Vital Touch and Mending Flow restore +30% more HP |
 | **Rising Force Set** | III | Rising Dragon costs 4 Qi instead of 6 |
 
 **Lyra — Invoker Sets**
@@ -566,7 +589,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 
 ### Frank's Stock
 
-Frank provides consumables, healing, disease curing, and basic equipment throughout the game.
+Frank provides consumables, healing, disease curing, revival, and basic equipment throughout the game. Revival (resurrection) is only available through Frank or revival consumables — no party member has a revive skill.
 
 **Accessory Stock (level-scaled)**
 - **Below level 11 (Act I):** Frank sells fixed consumables and standard equipment only
@@ -739,8 +762,19 @@ Vorath in his true form — a pure entity from a previous cycle, now utterly cor
 **Phase 2 — The Unraveling Manifest**
 Vorath channels The Unraveling directly. All attacks become AoE. He gains rotating elemental immunities — players must track which element he absorbs each round. Lyra's summons are dispelled. Vael's Resurrection becomes critical.
 
+**Frank's Revelation — Between Phase 2 and Phase 3**
+As Vorath begins his final transformation, Frank steps forward and abandons the merchant's mask. His true identity is revealed: an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin. His real name — never spoken once across the entire game — is said aloud here for the first time. He uses his true power to debuff Vorath before Phase 3 begins, then joins as a 5th party member.
+
+Frank's combat skills (Phase 3 only):
+
+| Skill | Effect |
+|---|---|
+| **[True Name]'s Blessing** | Restores HP to all party members — a callback to every "on the house" moment across the whole game |
+| **Balance's Judgment** | Massive attack exploiting Vorath's now-exposed weakness |
+| **The Final Invoice** | Frank's ultimate — deals damage scaled to everything Vorath has destroyed. Always connects. |
+
 **Phase 3 — The Void Form**
-Vorath transforms into pure void energy. DEF and RES drop — finally vulnerable — but damage spikes dramatically. Each round he charges **The Final Unraveling**, a party-wipe attack if allowed to complete. A race against time — Rising Dragon, Shadowstep, Divine Wrath, and Thunderstrike are the win conditions.
+Vorath transforms into pure void energy. DEF and RES drop — finally vulnerable — but damage spikes dramatically. Each round he charges **The Final Unraveling**, a party-wipe attack if allowed to complete. Frank's debuff from the revelation buys one free round before the charge begins. A race against time — Rising Dragon, Shadowstep, Divine Wrath, Thunderstrike, and Frank's Balance's Judgment are the win conditions.
 
 ---
 

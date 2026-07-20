@@ -94,3 +94,4 @@ No automated tests — this is manual playtesting in the Godot editor. When a mi
 - Always commit + push to `cjt` after a milestone is confirmed working by the user — don't leave work uncommitted between sessions.
 - Update README.md's "Current Status" section (and this file's status table) in the same commit as the milestone.
 - Keep milestone commits scoped to one sub-milestone at a time; don't bundle unrelated changes.
+- Keep this file (CLAUDE.md) current, not just README.md and the status table. Whenever something changes that a fresh session would need to know — new reusable system, a gotcha hit and fixed, a scoping decision (like the rows question below), debug tooling added, a working-agreement change — add or update the relevant section here in the same commit. Treat stale info here as a bug: if something in this file no longer matches the code, fix it rather than leaving it.

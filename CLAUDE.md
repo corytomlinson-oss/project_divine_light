@@ -30,12 +30,13 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 8b | Ryn full skill set (12 skills) | ✅ |
 | 8c | Lyra full skill set (stances) | ✅ |
 | 8d | Silas full skill set | **← next up** |
-| 9 | Save/load | Not started |
-| 10 | Dungeon tile maps | Not started |
-| 11 | Random encounters (dungeon) | Not started |
-| 12 | Boss encounters | Not started |
-| 13 | Sprites & tiles | Not started |
-| 14 | Music & sound | Not started |
+| 9 | Items & inventory (real data, replaces item-menu stub) | Not started |
+| 10 | Save/load | Not started |
+| 11 | Dungeon tile maps | Not started |
+| 12 | Random encounters (dungeon) | Not started |
+| 13 | Boss encounters | Not started |
+| 14 | Sprites & tiles | Not started |
+| 15 | Music & sound | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 

@@ -37,7 +37,7 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Next milestone:** Milestone 8d — Silas full skill set
 
-**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
+**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 11 dungeon content.
 
 See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
 
@@ -57,16 +57,17 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 6 | **Status system** | HP/MP bars, KO state, level-up |
 | 7 | **Enemy groups + targeting** | Multiple enemies, player selects target |
 | 8 | **Class skills** | Implement skill lists starting with Vael, then Ryn, Lyra, Silas |
-| 9 | **Save / load** | 3 save slots at inns, auto-save after major events, suspend save |
-| 10 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
-| 11 | **Random encounters** | Step-triggered battles in dungeons and overworld |
-| 12 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
-| 13 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
-| 14 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
-| 15 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
-| 16 | **Android APK export** | Build and deploy to RP6, test controller input |
-| 17 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
-| 18 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
+| 9 | **Items & inventory** | Real inventory data (replaces the hardcoded item-menu stub) — stackable consumables (Potions, Antidotes, Elixirs, Remedies) up to 99 per type, actual use/decrement in battle, status-cure items tying into 8's DoT/status effects |
+| 10 | **Save / load** | 3 save slots at inns, auto-save after major events, suspend save |
+| 11 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
+| 12 | **Random encounters** | Step-triggered battles in dungeons and overworld |
+| 13 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
+| 14 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
+| 15 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
+| 16 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
+| 17 | **Android APK export** | Build and deploy to RP6, test controller input |
+| 18 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
+| 19 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
 
 ---
 

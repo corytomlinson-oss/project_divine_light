@@ -2,10 +2,10 @@ class_name Combatant
 
 const MAX_LEVEL: int = 35
 const LEVEL_GAINS: Dictionary = {
-	"Vael":  {"hp": 25, "mp":  8, "atk": 3, "def": 4, "int": 3, "agi": 2},
-	"Ryn":   {"hp": 17, "mp":  0, "atk": 6, "def": 2, "int": 1, "agi": 4},
-	"Lyra":  {"hp": 11, "mp": 15, "atk": 1, "def": 1, "int": 7, "agi": 3},
-	"Silas": {"hp": 14, "mp":  9, "atk": 4, "def": 2, "int": 1, "agi": 5},
+	"Vael":  {"hp": 25, "mp":  8, "atk": 3, "def": 4, "int": 3, "agi": 2, "res": 3},
+	"Ryn":   {"hp": 17, "mp":  0, "atk": 6, "def": 2, "int": 1, "agi": 4, "res": 2},
+	"Lyra":  {"hp": 11, "mp": 15, "atk": 1, "def": 1, "int": 7, "agi": 3, "res": 3},
+	"Silas": {"hp": 14, "mp":  9, "atk": 4, "def": 2, "int": 1, "agi": 5, "res": 2},
 }
 
 var display_name: String
@@ -18,6 +18,7 @@ var max_qi: int = 0
 var atk: int
 var defense: int
 var int_stat: int = 0
+var res_stat: int = 0
 var agi: int
 var level: int = 1
 var xp: int = 0
@@ -37,13 +38,22 @@ var agi_debuff: int = 0
 var agi_debuff_rounds: int = 0
 var taunt_rounds: int = 0
 var sanctuary: bool = false
+var stance: String = "Fire"
+var burn_rounds: int = 0
+var burn_power: int = 0
+var poison_rounds: int = 0
+var poison_power: int = 0
+var bleed_rounds: int = 0
+var bleed_power: int = 0
+var evasion_rounds: int = 0
+var accuracy_debuff_rounds: int = 0
 var queued_action: String = ""
 var queued_skill: Dictionary = {}
 var queued_target: int = 0
 
 
 func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,
-		p_enemy: bool = false, p_mp: int = 0, p_class: String = "", p_int: int = 0) -> void:
+		p_enemy: bool = false, p_mp: int = 0, p_class: String = "", p_int: int = 0, p_res: int = 0) -> void:
 	display_name = p_name
 	hp = p_hp
 	max_hp = p_hp
@@ -53,6 +63,7 @@ func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,
 	defense = p_def
 	agi = p_agi
 	int_stat = p_int
+	res_stat = p_res
 	is_enemy = p_enemy
 	char_class = p_class
 	if p_class == "Ryn":
@@ -91,6 +102,7 @@ func level_up() -> void:
 	atk      += g.get("atk", 0)
 	defense  += g.get("def", 0)
 	int_stat += g.get("int", 0)
+	res_stat += g.get("res", 0)
 	agi      += g.get("agi", 0)
 	hp = max_hp
 	mp = max_mp
@@ -105,6 +117,7 @@ func level_down() -> void:
 	atk      -= g.get("atk", 0)
 	defense  -= g.get("def", 0)
 	int_stat -= g.get("int", 0)
+	res_stat -= g.get("res", 0)
 	agi      -= g.get("agi", 0)
 	level -= 1
 	xp_to_next = roundi(100.0 * pow(float(level), 1.5))

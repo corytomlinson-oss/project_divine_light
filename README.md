@@ -33,9 +33,17 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 8b — Ryn full skill set (12 skills, level-gated, all Qi-based). New systems: AoE physical (Sweep), stun-only with no damage (Pressure Point), defense-piercing damage (Ki Burst — half defense), multi-hit (Storm Flurry — 3 hits, total shown), AGI debuff (Crippling Strike — halves enemy AGI for 2 rounds, affects next round's turn order), AoE heal (Healing Wave), Rising Dragon (max Qi cost, guaranteed stun).
 
-**Next milestone:** Milestone 8c — Lyra full skill set (stance system + all spells)
+**Completed:** Milestone 8c — Lyra full skill set (4 elemental stances, 11 spells, level-gated). New systems: stance tracking (Fire/Ice/Lightning/Earth, starts Fire, persists across battles), stance switching consumes the turn action (skill menu shows current stance's spells + "Switch: X" entries for the other three), Burn DoT (3 rounds, ticks each round alongside buffs, can finish off enemies mid-round), Freeze/Paralysis (reuse the stun system), AGI slow (reuse Crippling Strike's debuff pattern, 1 round), AoE ice/lightning/earth spells, DEF-down debuff (Quake). Row-dependent Tremor behavior deferred — combat doesn't have front/back rows yet, so Tremor and Silas's future Vanish are scoped as row-independent until that's built as its own milestone. Summons (Ignus/Glacius) also deferred — big enough mechanic (temporary independent combatant) to warrant its own pass rather than folding into 8c.
 
-**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
+**Completed:** Milestone 8d — Silas full skill set (12 skills, level-gated) — **Milestone 8 (Class Skills) is now fully complete for all four classes.** New systems: Poison DoT (3 rounds, Envenom/Toxic Cloud) and Bleed DoT (4 rounds, Purify-only cure, Lacerate) — both tick alongside Burn in `_tick_dot()` and can stack simultaneously on the same target since they're tracked as separate fields. Evasion (Vanish — 50% dodge chance on incoming attacks for 1 round) and enemy accuracy debuff (Smoke Bomb — 30% miss chance on the debuffed enemy's own attacks for 2 rounds), both checked in `_execute_enemy_turn()` before damage resolves. Expose and Death Mark reuse the DEF-down debuff pattern from Lyra's Quake. Flurry reuses Storm Flurry's multi-hit effect with a configurable `hits` count (4 instead of 3). Purify now also clears poison and bleed, not just stun. Also fixed a latent bug from 8c: negative `def_buff` (debuffs) was only ever applied when the *enemy* attacked the party, never when the *party* attacked a debuffed enemy — meaning Quake's DEF-down had no actual effect on damage dealt to it. All party-vs-enemy physical damage formulas now correctly subtract `target.def_buff`.
+
+**Completed:** Milestone 9 — Items & Inventory: real inventory data replaces the hardcoded item-menu stub. `GameManager.inventory` (Dictionary, item name → count) persists across battles the same way the party does, starting stock Potion x10 / Elixir x3 / Ether x5 / Antidote x5. Item menu now lists only items with count > 0 and shows live counts ("Potion x10"), reuses the same ally-targeting cursor flow Vael's Guard/Sanctuary/Purify already used, and decrements the count on use. Four items to start: Potion (50 HP), Elixir (120 HP), Ether (30 MP), Antidote (cures Poison). Bleed intentionally has no item cure — the design doc scopes it as Purify-only, so no "Remedy" cure-all item was added to avoid contradicting that. Item list also scrolls if it ever exceeds 5 entries (shares the scroll system the skill menu already had).
+
+**Completed:** Milestone 10 — Combat formula completion. RES stat added (new `Combatant.res_stat` field + `res` growth per class in `LEVEL_GAINS`, matching the README's Stats tables) and now subtracted from every magic-based damage formula (Vael's holy spells, all of Lyra's elemental spells) — magic damage is no longer unmitigated. AGI-based crit system added: `_crit_chance()` = `min(50, agi / 4)`, rolled independently on every instance of party-dealt damage (including per-hit on AoE loops and multi-hit skills like Flurry/Storm Flurry, matching "each hit rolls for crit independently"), doubling damage on a hit and tagging the message with "CRIT!". Crit is party-only for now — enemies don't roll crits against the party. Run/Escape now actually rolls: base 50% + 2% per point of average party AGI vs average enemy AGI difference, clamped 10–90%; failure shows "Couldn't escape!" and returns to the action menu instead of always succeeding instantly. Boss-fight escape lockout is still a no-op since bosses don't exist yet.
+
+**Next milestone:** Milestone 11 — Formation & rows
+
+**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 13 dungeon content.
 
 See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
 
@@ -55,16 +63,20 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 6 | **Status system** | HP/MP bars, KO state, level-up |
 | 7 | **Enemy groups + targeting** | Multiple enemies, player selects target |
 | 8 | **Class skills** | Implement skill lists starting with Vael, then Ryn, Lyra, Silas |
-| 9 | **Save / load** | 3 save slots at inns, auto-save after major events, suspend save |
-| 10 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
-| 11 | **Random encounters** | Step-triggered battles in dungeons and overworld |
-| 12 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
-| 13 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
-| 14 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
-| 15 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
-| 16 | **Android APK export** | Build and deploy to RP6, test controller input |
-| 17 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
-| 18 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
+| 9 | **Items & inventory** | Real inventory data (replaces the hardcoded item-menu stub) — stackable consumables (Potions, Antidotes, Elixirs, Remedies) up to 99 per type, actual use/decrement in battle, status-cure items tying into 8's DoT/status effects |
+| 10 | **Combat formula completion** | Close gaps between the design doc's Combat System / Stats tables and what's actually implemented: RES stat (currently missing entirely — magic damage has zero defense-side mitigation), AGI-based crit chance (referenced by several skill descriptions but never built), and a real Run/Escape roll (AGI vs enemy speed, currently always succeeds instantly) |
+| 11 | **Formation & rows** | Front/back row system for the party (currently row-independent). Unblocks the row-dependent behavior already scoped out of Tremor (Lyra), Vanish (Silas), Shadow Strike (Silas, front-row only), Ki Blast (Ryn, full damage from back row), and Divine Shield (Vael, same-row only), plus row placement for Lyra's future Summons |
+| 12 | **Save / load** | 3 save slots at inns, auto-save after major events, suspend save |
+| 13 | **Dungeon maps** | Tile-based dungeon (The Cathedral first) with random encounters |
+| 14 | **Random encounters** | Step-triggered battles in dungeons and overworld |
+| 15 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
+| 16 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
+| 17 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
+| 18 | **Equipment & gear** | Real equipment system — 5 slots per character (Weapon/Armor/Helmet/Gloves/Accessory), class-locked weapons/armor, stat bonuses from gear, Full Set Bonus tracking (3 sets per class, one per act, passive skill upgrades), and an equip UI screen (doesn't exist yet — nothing outside the battle scene currently handles menu input). Deliberately placed after dungeon-map tech (13) exists so loot has somewhere to drop from, and just before Act I content so the system is ready when real armor-set loot gets placed in dungeons/shops |
+| 19 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
+| 20 | **Android APK export** | Build and deploy to RP6, test controller input |
+| 21 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
+| 22 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
 
 ---
 

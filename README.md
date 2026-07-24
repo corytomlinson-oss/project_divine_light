@@ -33,7 +33,9 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 8b — Ryn full skill set (12 skills, level-gated, all Qi-based). New systems: AoE physical (Sweep), stun-only with no damage (Pressure Point), defense-piercing damage (Ki Burst — half defense), multi-hit (Storm Flurry — 3 hits, total shown), AGI debuff (Crippling Strike — halves enemy AGI for 2 rounds, affects next round's turn order), AoE heal (Healing Wave), Rising Dragon (max Qi cost, guaranteed stun).
 
-**Next milestone:** Milestone 8c — Lyra full skill set (stance system + all spells)
+**Completed:** Milestone 8c — Lyra full skill set (4 elemental stances, 11 spells, level-gated). New systems: stance tracking (Fire/Ice/Lightning/Earth, starts Fire, persists across battles), stance switching consumes the turn action (skill menu shows current stance's spells + "Switch: X" entries for the other three), Burn DoT (3 rounds, ticks each round alongside buffs, can finish off enemies mid-round), Freeze/Paralysis (reuse the stun system), AGI slow (reuse Crippling Strike's debuff pattern, 1 round), AoE ice/lightning/earth spells, DEF-down debuff (Quake). Row-dependent Tremor behavior deferred — combat doesn't have front/back rows yet, so Tremor and Silas's future Vanish are scoped as row-independent until that's built as its own milestone. Summons (Ignus/Glacius) also deferred — big enough mechanic (temporary independent combatant) to warrant its own pass rather than folding into 8c.
+
+**Next milestone:** Milestone 8d — Silas full skill set
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 10 dungeon content.
 

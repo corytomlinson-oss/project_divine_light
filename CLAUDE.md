@@ -28,8 +28,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 7 | Enemy groups + targeting | ✅ |
 | 8a | Vael full skill set (12 skills) | ✅ |
 | 8b | Ryn full skill set (12 skills) | ✅ |
-| 8c | Lyra full skill set (stances) | **← next up** |
-| 8d | Silas full skill set | Not started |
+| 8c | Lyra full skill set (stances) | ✅ |
+| 8d | Silas full skill set | **← next up** |
 | 9 | Save/load | Not started |
 | 10 | Dungeon tile maps | Not started |
 | 11 | Random encounters (dungeon) | Not started |
@@ -54,18 +54,22 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 - Skill menu scrolling — `_skill_scroll`, needed once a class has >5 skills
 - AoE handled per-effect-type inline in `_do_skill()` (loop over `_enemies`/`_party` filtered by `is_alive()`)
 
-**What 8c (Lyra) needs that doesn't exist yet:**
-- Stance tracking (Fire/Ice/Lightning/Earth) — likely a field on Combatant or a Battle.gd var, persists across the battle (defaults to last-used, starts at Fire)
-- Switching stance costs the turn action (no spell cast that round)
-- Skill menu must filter to only the active stance's spells, plus a "Switch Stance" option
-- New status effects: Burn (DoT, 3 rounds), Freeze (skip turn), Paralysis (skip turn) — Freeze/Paralysis can likely reuse `is_stunned`/`stun_rounds`; Burn needs a new DoT pattern (see Silas's Poison/Bleed in 8d — same shape, build once if doing both)
-- Row-dependent behavior (Tremor: front row = single target, back row = AoE reduced) — rows aren't implemented in combat yet at all, so this needs scoping/a decision before 8c starts
-- Summons (Ignus/Glacius) — temporary front-row combatant fighting independently for 2-3 rounds; biggest new mechanic, probably deserves its own design pass
+**8c (Lyra) is done. New systems it added (reuse these too now):**
+- Stance tracking — `Combatant.stance: String`, defaults `"Fire"`, persists across battles (same object reference via GameManager, matches design intent: "starts each battle in her last used stance")
+- Stance switching — modeled as pseudo-skills in the skill list itself, not a separate menu state. `_open_lyra_skill_menu()` builds `_active_skills` from `LYRA_SKILLS[member.stance]` (level-filtered) plus one `"Switch: X"` entry per other stance (`effect: "switch_stance"`, `cost: 0`, `target: "self"`). No new MenuState or targeting flow needed — `_confirm_skill()`'s existing `"self"` branch already handles it for free.
+- Burn DoT — `Combatant.burn_rounds` / `burn_power`, ticked in new `_tick_dot()` (called alongside `_tick_buffs()` in `_execute_next_turn()`'s queue-empty branch). This is the pattern to reuse for Silas's Poison/Bleed in 8d — just add more `*_rounds`/`*_power` field pairs (or genericize into a list of active DoTs if Silas needs 2+ simultaneous DoTs on one target, which Poison+Bleed stacking would require — worth refactoring to an array of `{power, rounds}` dicts before 8d if so, rather than bolting on more named fields).
+- Freeze/Paralysis — reuse `is_stunned`/`stun_rounds` directly, no new fields needed
+- DoT ticking can now end the battle — `_execute_next_turn()` checks `_enemies`/`_party` alive-emptiness right after `_tick_dot()` and calls `_end_battle()` before falling through to `_begin_selection()`. Any future round-end effect that can deal damage must respect this same check-after-tick order.
+- Per-class skill menu builder — Lyra needed a full custom `_open_lyra_skill_menu()` instead of the generic `_open_skill_menu()` path (branched at the top of `_open_skill_menu()` on `char_class == "Lyra"`). If Silas needs something structurally different too (e.g. a stance-like mechanic), follow this same branch-and-delegate pattern rather than overloading the generic path with conditionals.
+
+**Scoping decision — rows are out of scope for now:** Tremor (Lyra, Earth) was designed as row-dependent (front row = single target, back row = AoE reduced) but combat has no front/back row concept at all yet. Scoped Tremor as row-independent single-target for 8c. **This same decision applies to Silas's Vanish in 8d** — don't implement partial row logic just for one skill; if row mechanics are wanted, they should be their own milestone touching formation UI, front/back damage modifiers, etc. across all four classes at once.
+
+**Deferred, not forgotten:** Lyra's Summons (Ignus/Glacius, level 26/35) — a temporary independent front-row combatant that acts on its own for 2-3 rounds. Big enough mechanic (needs its own turn-queue entry, its own AI, row placement) that it was deliberately left out of 8c rather than rushed. Pick a milestone number for it whenever it's prioritized — likely after rows are implemented, since summons are described as row-placed.
 
 **What 8d (Silas) will need:**
-- Poison DoT (3 rounds), Bleed DoT (4 rounds, Purify-only cure) — new DoT pattern, tick at start/end of round
-- Accuracy debuff (Smoke Bomb), defense reduction (Expose), damage amplification mark (Death Mark)
-- Vanish (row swap — blocked on the same row-position question as Lyra's Tremor)
+- Poison DoT (3 rounds), Bleed DoT (4 rounds, Purify-only cure — note Purify currently only clears `is_stunned`, will need to also clear poison/bleed fields once they exist) — see the DoT refactor note above if both need to stack simultaneously
+- Accuracy debuff (Smoke Bomb), defense reduction (Expose — can reuse the negative-`def_buff` pattern from Lyra's Quake), damage amplification mark (Death Mark)
+- Vanish (row swap — deferred per the rows scoping decision above; implement as a no-op row-independent evasion buff for now if you want the skill usable before rows exist)
 
 ## Debug tooling
 

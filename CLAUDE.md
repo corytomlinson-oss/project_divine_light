@@ -33,19 +33,36 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 9 | Items & inventory (real data, replaces item-menu stub) | ✅ |
 | 10 | Combat formula completion (RES stat, crit, real escape roll) | ✅ |
 | 11 | Formation & rows | ✅ |
-| 12 | Save/load | **← next up** |
-| 13 | Dungeon tile maps | Not started |
-| 14 | Random encounters (dungeon) | Not started |
-| 15 | Boss encounters | Not started |
-| 16 | Sprites & tiles | Not started |
-| 17 | Music & sound | Not started |
-| 18 | Equipment & gear (slots, stat bonuses, set bonuses, equip UI) | Not started |
-| 19 | Act I content | Not started |
+| 12 | Save/load — core system (serialization only, no triggers yet) | **← next up** |
+| 13 | Dungeon tile maps (merged — absorbs old "Random encounters") | Not started |
+| 14 | Boss encounters | Not started |
+| 15 | Sprites & tiles | Not started |
+| 16 | Music & sound | Not started |
+| 17 | Equipment & gear (slots, stat bonuses, set bonuses, equip UI) | Not started |
+| 18a | Act I — The Cathedral (Vael) | Not started |
+| 18b | Act I — The Monastery (Ryn) | Not started |
+| 18c | Act I — The Observatory (Lyra) | Not started |
+| 18d | Act I — The Underground Guild (Silas) | Not started |
+| 19 | Save/load — triggers & integration (inns, auto-save, suspend save) | Not started |
 | 20 | Android APK export | Not started |
-| 21 | Act II content | Not started |
+| 21a | Act II — Cleansing transformation system | Not started |
+| 21b | Act II — Nordveil (Tundra) | Not started |
+| 21c | Act II — Duskara (Desert) | Not started |
+| 21d | Act II — Selavon (Coastal) | Not started |
 | 22 | Act III + Vorath | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
+
+## Roadmap restructuring (post-Milestone-11 review)
+
+Before starting 12, did a pass over the whole remaining roadmap asking "does anything here need the same 8a-8d treatment Class Skills got?" Four changes landed, all in README.md's Implementation Roadmap table:
+
+- **Act I content → 18a-18d**, one per dungeon (Cathedral/Monastery/Observatory/Underground Guild), same shape as 8a-8d: each is dungeon + solo-escape boss variant + dungeon-end boss + rescue, a genuinely testable slice. It was one of the largest single bundles in the whole roadmap — 4 dungeons, 4 bosses, 3 rescues, Frank's arc, and 2 towns all under one number.
+- **Act II content → 21a-21d**: 21a pulls the cleansing-transformation system out as shared infrastructure (built once, not three times), then 21b/c/d are one kingdom each (Nordveil/Duskara/Selavon), same per-kingdom shape (dungeon + mini-boss + 3-phase boss + before/after town state).
+- **Save/Load split into two non-adjacent milestones** (12 and 19) rather than lettered sub-parts, because unlike 8/18/21 the two halves aren't sequential work — they're separated by everything else. Milestone 12 (now, right where Save/Load used to sit) is just the data serialization: can `GameManager.party`/`inventory`/formation be written to and read from disk. This is buildable today with a debug trigger since it has zero content dependencies. The real triggers — manual save at inns, auto-save after boss/rescue/region-clear events, suspend save mid-dungeon — literally cannot exist until Act I builds towns, dungeons, and bosses, so that half moved to **Milestone 19**, right after Act I content (18) and before the APK export (20). If Save/Load had stayed as one milestone positioned right after Rows, it would have been unbuildable/untestable end-to-end — there'd be nothing to save at.
+- **Dungeon maps (13) and the old "Random encounters" (14) merged into one.** They overlapped: 13's own description already said "with random encounters," and the overworld's step-triggered encounter system has existed since Milestone 2 — the only genuinely new work in old-14 was extending that mechanic into dungeon tile maps, which is inherently part of building dungeon tech, not a separate system. Removing the redundant slot is why Boss Encounters/Sprites/Music/Equipment all shifted down by one number (15→14, 16→15, 17→16, 18→17) even though their scope didn't change.
+
+Sprites & tiles (15) and Music & sound (16) are also oversized — both are "replace/build everything across the whole game" passes with no natural stopping point until every act's content exists. Flagged but **not split** in this pass since Cory didn't select them when asked; if they come up again, the natural split mirrors content delivery (Act I assets alongside 18, Act II assets alongside 21) rather than one monolithic art/audio pass done in isolation with nothing built yet to apply it to. Act III + Vorath (22) has the same oversized shape as Act I/II (a dungeon, Frank's 5th-member skill kit, a class-mirroring 3-phase final boss) but is lowest priority to resolve since it's last in the sequence — revisit closer to when Act II wraps.
 
 ## Milestone 8 approach
 

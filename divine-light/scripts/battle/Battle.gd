@@ -24,7 +24,7 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Sweep",            "cost": 2, "cost_type": "qi", "target": "enemy_all",    "effect": "sweep",        "power": 12, "min_level": 7},
 		{"name": "Pressure Point",   "cost": 2, "cost_type": "qi", "target": "enemy",        "effect": "stun_phys",    "power": 0,  "min_level": 10},
 		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 14},
-		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 17},
+		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 17, "ranged": true},
 		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 20},
 		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 23},
 		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 26},
@@ -35,7 +35,7 @@ const CLASS_SKILLS: Dictionary = {
 	"Silas": [
 		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "min_level": 1},
 		{"name": "Envenom",       "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "poison",      "power": 10, "min_level": 4},
-		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "min_level": 7},
+		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "min_level": 7, "row_restrict": "front"},
 		{"name": "Vanish",        "cost": 6,  "cost_type": "mp", "target": "self",      "effect": "vanish",      "power": 0,  "min_level": 10},
 		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 13},
 		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 16},
@@ -354,6 +354,9 @@ func _confirm_main() -> void:
 			member.queued_action = "defend"
 			_advance_selection()
 		4:
+			member.queued_action = "swap_row"
+			_advance_selection()
+		5:
 			_attempt_escape()
 
 
@@ -387,10 +390,25 @@ func _roll_crit(attacker: Combatant) -> bool:
 	return randi() % 100 < _crit_chance(attacker)
 
 
+const BACK_ROW_MOD: float = 0.75
+
+
+func _row_mult(attacker: Combatant, defender: Combatant, ranged: bool = false) -> float:
+	if ranged:
+		return 1.0
+	var mult := 1.0
+	if not attacker.is_enemy and attacker.row == "back":
+		mult *= BACK_ROW_MOD
+	if not defender.is_enemy and defender.row == "back":
+		mult *= BACK_ROW_MOD
+	return mult
+
+
 func _open_main_menu() -> void:
 	_menu_state = MenuState.MAIN
-	_menu_options = ["Attack", "Skill", "Item", "Defend", "Run"]
+	_menu_options = ["Attack", "Skill", "Item", "Defend", "Swap Row", "Run"]
 	_menu_cursor = 0
+	_list_scroll = 0
 	_update_menu()
 	_update_selection_header()
 	_update_ui()
@@ -401,7 +419,9 @@ func _open_skill_menu(member: Combatant) -> void:
 		_open_lyra_skill_menu(member)
 		return
 	var all_skills: Array = CLASS_SKILLS.get(member.char_class, [])
-	_active_skills = all_skills.filter(func(s): return member.level >= int(s.get("min_level", 1)))
+	_active_skills = all_skills.filter(func(s):
+		return member.level >= int(s.get("min_level", 1))
+			and (s.get("row_restrict", "") == "" or member.row == s["row_restrict"]))
 	if _active_skills.is_empty():
 		message_label.text = "No skills learned yet."
 		return
@@ -419,7 +439,18 @@ func _open_skill_menu(member: Combatant) -> void:
 func _open_lyra_skill_menu(member: Combatant) -> void:
 	var current_stance: String = member.stance
 	var stance_skills: Array = LYRA_SKILLS.get(current_stance, [])
-	_active_skills = stance_skills.filter(func(s): return member.level >= int(s.get("min_level", 1)))
+	var filtered: Array = stance_skills.filter(func(s): return member.level >= int(s.get("min_level", 1)))
+	_active_skills = []
+	for skill in filtered:
+		if skill["name"] == "Tremor" and member.row == "back":
+			var back_row_tremor: Dictionary = skill.duplicate()
+			back_row_tremor["name"] = "Tremor (AoE)"
+			back_row_tremor["effect"] = "earth_aoe"
+			back_row_tremor["power"] = 14
+			back_row_tremor["target"] = "enemy_all"
+			_active_skills.append(back_row_tremor)
+		else:
+			_active_skills.append(skill)
 	for s in LYRA_STANCES:
 		if s != current_stance:
 			_active_skills.append({
@@ -644,6 +675,10 @@ func _execute_party_turn(member: Combatant) -> void:
 			member.defending = true
 			message_label.text = "%s defends!" % member.display_name
 		"item_use": _do_item(member, member.queued_skill)
+		"swap_row":
+			member.row = "back" if member.row == "front" else "front"
+			_update_ui()
+			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
 
 
 func _do_attack(member: Combatant) -> void:
@@ -651,6 +686,7 @@ func _do_attack(member: Combatant) -> void:
 	if target == null:
 		return
 	var dmg := maxi(1, (member.atk + member.atk_buff) - (target.defense + target.def_buff) + randi_range(-2, 2))
+	dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 	var crit := _roll_crit(member)
 	if crit:
 		dmg *= 2
@@ -756,11 +792,11 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 
 		"divine_shield":
 			for ally in _party:
-				if ally.is_alive():
+				if ally.is_alive() and ally.row == member.row:
 					ally.def_buff = maxi(ally.def_buff, int(power))
 					ally.def_buff_rounds = 2
 			_update_ui()
-			message_label.text = "%s raises %s!\nParty DEF increased for 2 rounds!" % [member.display_name, skill["name"]]
+			message_label.text = "%s raises %s!\n%s row DEF increased for 2 rounds!" % [member.display_name, skill["name"], member.row.capitalize()]
 
 		"battle_hymn":
 			for ally in _party:
@@ -804,6 +840,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target, bool(skill.get("ranged", false)))))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -818,6 +855,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies:
 				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
+				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
 				enemy.receive_damage(dmg)
@@ -841,6 +879,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk - (target.defense + target.def_buff) / 2 + randi_range(-2, 2))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -861,6 +900,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			for _h in hits:
 				if target.is_alive():
 					var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
+					dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 					if _roll_crit(member):
 						dmg *= 2
 						any_crit = true
@@ -877,6 +917,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -903,6 +944,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1039,11 +1081,24 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
 				_end_battle(true)
 
+		"earth_aoe":
+			var alive_enemies_tr: Array = _enemies.filter(func(e): return e.is_alive())
+			for enemy in alive_enemies_tr:
+				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				if _roll_crit(member):
+					dmg *= 2
+				enemy.receive_damage(dmg)
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll enemies take reduced earth damage!" % [member.display_name, skill["name"]]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
 		"poison":
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1062,6 +1117,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1077,8 +1133,9 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 
 		"vanish":
 			member.evasion_rounds = 1
+			member.row = "back"
 			_update_ui()
-			message_label.text = "%s vanishes into the shadows!\nEvasion increased this round!" % member.display_name
+			message_label.text = "%s vanishes into the shadows!\nMoves to the back row, evasion increased!" % member.display_name
 
 		"smoke_bomb":
 			var alive_enemies_sb: Array = _enemies.filter(func(e): return e.is_alive())
@@ -1111,6 +1168,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var alive_enemies_tc: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_tc:
 				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
+				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
 				enemy.receive_damage(dmg)
@@ -1137,6 +1195,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if target == null:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
+			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1219,6 +1278,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var effective_def := target.defense + target.def_buff
 	var def_val := effective_def * 2 if target.defending else effective_def
 	var dmg := maxi(1, enemy.atk - def_val + randi_range(-1, 1))
+	dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target)))
 	target.receive_damage(dmg)
 	var suffix := " (reduced!)" if target.defending else ""
 	_update_ui()
@@ -1297,7 +1357,7 @@ func _build_levelup_text(member: Combatant) -> String:
 
 
 func _clamp_list_scroll() -> void:
-	if _menu_state != MenuState.SKILL and _menu_state != MenuState.ITEM:
+	if _menu_state != MenuState.SKILL and _menu_state != MenuState.ITEM and _menu_state != MenuState.MAIN:
 		return
 	var page: int = _option_labels.size()
 	if _menu_cursor < _list_scroll:
@@ -1309,7 +1369,7 @@ func _clamp_list_scroll() -> void:
 func _update_menu() -> void:
 	action_menu.visible = true
 	var page: int = _option_labels.size()
-	var scrollable: bool = _menu_state == MenuState.SKILL or _menu_state == MenuState.ITEM
+	var scrollable: bool = _menu_state == MenuState.SKILL or _menu_state == MenuState.ITEM or _menu_state == MenuState.MAIN
 	for i in page:
 		var idx: int = (_list_scroll + i) if scrollable else i
 		if idx < _menu_options.size():
@@ -1324,17 +1384,18 @@ func _update_selection_header() -> void:
 	if _selecting_index >= _party.size():
 		return
 	var member: Combatant = _party[_selecting_index]
+	var row_label: String = "Front" if member.row == "front" else "Back"
 	if member.char_class == "Ryn":
 		var pips := ""
 		for i in member.max_qi:
 			pips += "●" if i < member.qi else "○"
-		selection_header.text = "%s: %s" % [member.display_name, pips]
+		selection_header.text = "%s (%s): %s" % [member.display_name, row_label, pips]
 	elif member.char_class == "Lyra":
-		selection_header.text = "%s [%s]: %d/%d MP" % [member.display_name, member.stance, member.mp, member.max_mp]
+		selection_header.text = "%s (%s) [%s]: %d/%d MP" % [member.display_name, row_label, member.stance, member.mp, member.max_mp]
 	elif member.max_mp > 0:
-		selection_header.text = "%s: %d/%d MP" % [member.display_name, member.mp, member.max_mp]
+		selection_header.text = "%s (%s): %d/%d MP" % [member.display_name, row_label, member.mp, member.max_mp]
 	else:
-		selection_header.text = member.display_name + ":"
+		selection_header.text = "%s (%s):" % [member.display_name, row_label]
 
 
 func _update_enemy_ui() -> void:
@@ -1376,13 +1437,14 @@ func _update_ui() -> void:
 			name_str = ("> " if i == _target_ally_index else "  ") + member.display_name
 		else:
 			name_str = member.display_name
+		var row_tag: String = "F" if member.row == "front" else "B"
 
 		if member.is_ko:
-			label.text = "%s L%d  --/--" % [name_str, member.level]
+			label.text = "%s %s L%d  --/--" % [name_str, row_tag, member.level]
 			label_tint = Color(0.5, 0.5, 0.5)
 			bar_tint   = Color(0.5, 0.5, 0.5)
 		else:
-			label.text = "%s L%d  %d/%d" % [name_str, member.level, member.hp, member.max_hp]
+			label.text = "%s %s L%d  %d/%d" % [name_str, row_tag, member.level, member.hp, member.max_hp]
 			if pct > 0.5:
 				label_tint = Color(1.0, 1.0, 1.0)
 				bar_tint   = Color(0.3, 0.9, 0.3)

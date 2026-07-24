@@ -47,6 +47,7 @@ var bleed_rounds: int = 0
 var bleed_power: int = 0
 var evasion_rounds: int = 0
 var accuracy_debuff_rounds: int = 0
+var row: String = "front"
 var queued_action: String = ""
 var queued_skill: Dictionary = {}
 var queued_target: int = 0

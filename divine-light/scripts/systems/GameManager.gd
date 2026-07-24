@@ -12,6 +12,10 @@ func _ready() -> void:
 			Combatant.new("Lyra",   70,  5,  4,  8, false, 50, "Lyra", 15, 8),
 			Combatant.new("Silas",  90, 12,  7, 14, false, 30, "Silas",  4, 5),
 		]
+		party[0].row = "front"  # Vael
+		party[1].row = "front"  # Ryn
+		party[2].row = "back"   # Lyra
+		party[3].row = "back"   # Silas
 	if inventory.is_empty():
 		inventory = {
 			"Potion": 10,

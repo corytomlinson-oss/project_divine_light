@@ -33,7 +33,18 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 35},
 	],
 	"Silas": [
-		{"name": "Quick Strike","cost": 5, "cost_type": "mp", "target": "enemy", "effect": "physical", "power": 12, "min_level": 1},
+		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "min_level": 1},
+		{"name": "Envenom",       "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "poison",      "power": 10, "min_level": 4},
+		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "min_level": 7},
+		{"name": "Vanish",        "cost": 6,  "cost_type": "mp", "target": "self",      "effect": "vanish",      "power": 0,  "min_level": 10},
+		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 13},
+		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 16},
+		{"name": "Expose",        "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "expose",      "power": 10, "min_level": 19},
+		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 22},
+		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 25, "hits": 4},
+		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 28},
+		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 31},
+		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 35},
 	],
 }
 
@@ -588,7 +599,7 @@ func _do_attack(member: Combatant) -> void:
 	var target: Combatant = _get_enemy_target(member)
 	if target == null:
 		return
-	var dmg := maxi(1, (member.atk + member.atk_buff) - target.defense + randi_range(-2, 2))
+	var dmg := maxi(1, (member.atk + member.atk_buff) - (target.defense + target.def_buff) + randi_range(-2, 2))
 	target.receive_damage(dmg)
 	if member.max_qi > 0:
 		member.qi = mini(member.max_qi, member.qi + 1)
@@ -714,6 +725,10 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_ally_target(member, skill)
 			target.is_stunned = false
 			target.stun_rounds = 0
+			target.poison_rounds = 0
+			target.poison_power = 0
+			target.bleed_rounds = 0
+			target.bleed_power = 0
 			_update_ui()
 			message_label.text = "%s uses %s on %s!\nAll status effects cleared!" % [member.display_name, skill["name"], target.display_name]
 
@@ -721,7 +736,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-2, 2))
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
 			target.receive_damage(dmg)
 			_update_ui()
 			message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
@@ -731,7 +746,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"sweep":
 			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies:
-				var dmg: int = maxi(1, power + member.atk / 2 - enemy.defense + randi_range(-2, 2))
+				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
 				enemy.receive_damage(dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take damage!" % [member.display_name, skill["name"]]
@@ -752,7 +767,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk - target.defense / 2 + randi_range(-2, 2))
+			var dmg: int = maxi(1, power + member.atk - (target.defense + target.def_buff) / 2 + randi_range(-2, 2))
 			target.receive_damage(dmg)
 			_update_ui()
 			message_label.text = "%s uses %s on %s for %d!" % [member.display_name, skill["name"], target.display_name, dmg]
@@ -763,14 +778,15 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
+			var hits: int = int(skill.get("hits", 3))
 			var total := 0
-			for _h in 3:
+			for _h in hits:
 				if target.is_alive():
-					var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-1, 1))
+					var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
 					target.receive_damage(dmg)
 					total += dmg
 			_update_ui()
-			message_label.text = "%s uses %s!\n3 hits on %s — %d total!" % [member.display_name, skill["name"], target.display_name, total]
+			message_label.text = "%s uses %s!\n%d hits on %s — %d total!" % [member.display_name, skill["name"], hits, target.display_name, total]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
 				_end_battle(true)
 
@@ -778,7 +794,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-1, 1))
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
 			target.receive_damage(dmg)
 			if not target.is_ko:
 				target.agi_debuff = target.agi / 2
@@ -800,7 +816,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - target.defense + randi_range(-3, 3))
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
 			target.receive_damage(dmg)
 			if not target.is_ko:
 				target.is_stunned = true
@@ -915,6 +931,107 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
 				_end_battle(true)
 
+		"poison":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.poison_rounds = 3
+				target.poison_power = 8 + member.atk / 6
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!\nPoisoned for 3 rounds!" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"bleed":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.bleed_rounds = 4
+				target.bleed_power = 10 + member.atk / 5
+			_update_ui()
+			message_label.text = "%s uses %s on %s for %d!\nBleeding for 4 rounds! (Purify only)" % [member.display_name, skill["name"], target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"vanish":
+			member.evasion_rounds = 1
+			_update_ui()
+			message_label.text = "%s vanishes into the shadows!\nEvasion increased this round!" % member.display_name
+
+		"smoke_bomb":
+			var alive_enemies_sb: Array = _enemies.filter(func(e): return e.is_alive())
+			for enemy in alive_enemies_sb:
+				enemy.accuracy_debuff_rounds = 2
+			_update_ui()
+			message_label.text = "%s throws a smoke bomb!\nAll enemies' accuracy is lowered!" % member.display_name
+
+		"expose":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			if not target.is_ko:
+				target.def_buff = -int(power)
+				target.def_buff_rounds = 3
+			_update_ui()
+			message_label.text = "%s exposes %s's weak point!\nDEF lowered — party deals bonus damage!" % [member.display_name, target.display_name]
+
+		"garrote":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			if not target.is_ko:
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			message_label.text = "%s uses %s!\n%s is stunned!" % [member.display_name, skill["name"], target.display_name]
+
+		"toxic_cloud":
+			var alive_enemies_tc: Array = _enemies.filter(func(e): return e.is_alive())
+			for enemy in alive_enemies_tc:
+				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
+				enemy.receive_damage(dmg)
+				if not enemy.is_ko:
+					enemy.poison_rounds = 3
+					enemy.poison_power = 8 + member.atk / 6
+			_update_ui()
+			message_label.text = "%s uses %s!\nAll enemies poisoned!" % [member.display_name, skill["name"]]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
+		"death_mark":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			if not target.is_ko:
+				target.def_buff = -int(power)
+				target.def_buff_rounds = 3
+			_update_ui()
+			message_label.text = "%s marks %s for death!\nThey take increased damage for 3 rounds!" % [member.display_name, target.display_name]
+
+		"shadowstep":
+			var target: Combatant = _get_enemy_target(member)
+			if target == null:
+				return
+			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
+			target.receive_damage(dmg)
+			if not target.is_ko:
+				target.poison_rounds = 3
+				target.poison_power = 10 + member.atk / 6
+				target.bleed_rounds = 4
+				target.bleed_power = 12 + member.atk / 5
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			message_label.text = "%s uses Shadowstep on %s for %d!\nPoisoned, Bleeding, and Stunned!" % [member.display_name, target.display_name, dmg]
+			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+				_end_battle(true)
+
 
 func _do_item_potion(member: Combatant) -> void:
 	var amount := 50
@@ -936,6 +1053,18 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 			break
 	if target == null:
 		target = targets[randi() % targets.size()]
+
+	# Smoke Bomb: the enemy's own accuracy is lowered
+	if enemy.accuracy_debuff_rounds > 0 and randi() % 100 < 30:
+		_update_ui()
+		message_label.text = "%s's attack misses!" % enemy.display_name
+		return
+
+	# Vanish: target has increased evasion this round
+	if target.evasion_rounds > 0 and randi() % 100 < 50:
+		_update_ui()
+		message_label.text = "%s dodges %s's attack!" % [target.display_name, enemy.display_name]
+		return
 
 	# Sanctuary nullifies the hit entirely
 	if target.sanctuary:
@@ -971,6 +1100,10 @@ func _tick_buffs() -> void:
 				c.agi_debuff = 0
 		if c.taunt_rounds > 0:
 			c.taunt_rounds -= 1
+		if c.evasion_rounds > 0:
+			c.evasion_rounds -= 1
+		if c.accuracy_debuff_rounds > 0:
+			c.accuracy_debuff_rounds -= 1
 
 
 func _tick_dot() -> void:
@@ -980,6 +1113,16 @@ func _tick_dot() -> void:
 			c.burn_rounds -= 1
 			if c.burn_rounds <= 0:
 				c.burn_power = 0
+		if c.poison_rounds > 0 and c.is_alive():
+			c.receive_damage(c.poison_power)
+			c.poison_rounds -= 1
+			if c.poison_rounds <= 0:
+				c.poison_power = 0
+		if c.bleed_rounds > 0 and c.is_alive():
+			c.receive_damage(c.bleed_power)
+			c.bleed_rounds -= 1
+			if c.bleed_rounds <= 0:
+				c.bleed_power = 0
 	_update_ui()
 
 

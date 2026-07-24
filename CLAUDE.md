@@ -29,8 +29,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 8a | Vael full skill set (12 skills) | ✅ |
 | 8b | Ryn full skill set (12 skills) | ✅ |
 | 8c | Lyra full skill set (stances) | ✅ |
-| 8d | Silas full skill set | **← next up** |
-| 9 | Items & inventory (real data, replaces item-menu stub) | Not started |
+| 8d | Silas full skill set | ✅ — **Milestone 8 fully complete, pending full 4-class regression test** |
+| 9 | Items & inventory (real data, replaces item-menu stub) | **← next up** |
 | 10 | Save/load | Not started |
 | 11 | Dungeon tile maps | Not started |
 | 12 | Random encounters (dungeon) | Not started |
@@ -67,10 +67,14 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 
 **Deferred, not forgotten:** Lyra's Summons (Ignus/Glacius, level 26/35) — a temporary independent front-row combatant that acts on its own for 2-3 rounds. Big enough mechanic (needs its own turn-queue entry, its own AI, row placement) that it was deliberately left out of 8c rather than rushed. Pick a milestone number for it whenever it's prioritized — likely after rows are implemented, since summons are described as row-placed.
 
-**What 8d (Silas) will need:**
-- Poison DoT (3 rounds), Bleed DoT (4 rounds, Purify-only cure — note Purify currently only clears `is_stunned`, will need to also clear poison/bleed fields once they exist) — see the DoT refactor note above if both need to stack simultaneously
-- Accuracy debuff (Smoke Bomb), defense reduction (Expose — can reuse the negative-`def_buff` pattern from Lyra's Quake), damage amplification mark (Death Mark)
-- Vanish (row swap — deferred per the rows scoping decision above; implement as a no-op row-independent evasion buff for now if you want the skill usable before rows exist)
+**8d (Silas) is done — Milestone 8 (Class Skills) is now complete for all four classes.** New systems it added:
+- Poison DoT (`poison_rounds`/`poison_power`) and Bleed DoT (`bleed_rounds`/`bleed_power`) — separate named field pairs rather than the generic-array refactor floated above, so Poison and Bleed (and Burn) can all be active on the same target simultaneously (Shadowstep applies all three status types plus a stun at once). All three DoTs tick together in `_tick_dot()`.
+- Purify now clears poison and bleed too, not just stun — update this again if a 4th status type gets added later.
+- Evasion — `evasion_rounds` on the *target*, checked in `_execute_enemy_turn()` before the hit lands (50% dodge chance while active). Vanish sets it to 1 round. Implemented as a no-op row-independent buff per the rows scoping decision below (no actual front/back row swap).
+- Enemy accuracy debuff — `accuracy_debuff_rounds` on the *enemy*, also checked in `_execute_enemy_turn()` (30% chance the debuffed enemy's own attack misses entirely). Smoke Bomb applies it to all enemies for 2 rounds.
+- Expose and Death Mark both reuse the negative-`def_buff` debuff pattern from Lyra's Quake (8c) — no new fields needed, just `target.def_buff = -power`.
+- `multi_hit` (Ryn's Storm Flurry) now takes an optional `"hits"` key on the skill dict (defaults to 3) so Silas's Flurry could reuse it at 4 hits instead of duplicating the effect handler.
+- **Bug fix carried over from 8c:** negative `def_buff` was only ever read in `_execute_enemy_turn()` (enemy attacking the party) — every party-vs-enemy damage formula (`_do_attack`, and the `physical`/`sweep`/`ki_burst`/`multi_hit`/`cripple`/`rising_dragon` effects in `_do_skill()`) ignored `target.def_buff` entirely. This meant Quake's DEF-down debuff had zero actual effect on damage, and would have made Expose/Death Mark equally inert. Fixed by adding `+ target.def_buff` (or `enemy.def_buff`) into all of those formulas. Pure-INT magic effects (`holy`/`fire`/`ice`/`lightning`/`earth` and their variants) don't use defense at all by design, so they're unaffected and unchanged.
 
 ## Debug tooling
 

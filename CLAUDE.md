@@ -31,12 +31,14 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 8c | Lyra full skill set (stances) | ✅ |
 | 8d | Silas full skill set | ✅ — **Milestone 8 fully complete, pending full 4-class regression test** |
 | 9 | Items & inventory (real data, replaces item-menu stub) | **← next up** |
-| 10 | Save/load | Not started |
-| 11 | Dungeon tile maps | Not started |
-| 12 | Random encounters (dungeon) | Not started |
-| 13 | Boss encounters | Not started |
-| 14 | Sprites & tiles | Not started |
-| 15 | Music & sound | Not started |
+| 10 | Combat formula completion (RES stat, crit, real escape roll) | Not started |
+| 11 | Formation & rows | Not started |
+| 12 | Save/load | Not started |
+| 13 | Dungeon tile maps | Not started |
+| 14 | Random encounters (dungeon) | Not started |
+| 15 | Boss encounters | Not started |
+| 16 | Sprites & tiles | Not started |
+| 17 | Music & sound | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 
@@ -63,9 +65,9 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 - DoT ticking can now end the battle — `_execute_next_turn()` checks `_enemies`/`_party` alive-emptiness right after `_tick_dot()` and calls `_end_battle()` before falling through to `_begin_selection()`. Any future round-end effect that can deal damage must respect this same check-after-tick order.
 - Per-class skill menu builder — Lyra needed a full custom `_open_lyra_skill_menu()` instead of the generic `_open_skill_menu()` path (branched at the top of `_open_skill_menu()` on `char_class == "Lyra"`). If Silas needs something structurally different too (e.g. a stance-like mechanic), follow this same branch-and-delegate pattern rather than overloading the generic path with conditionals.
 
-**Scoping decision — rows are out of scope for now:** Tremor (Lyra, Earth) was designed as row-dependent (front row = single target, back row = AoE reduced) but combat has no front/back row concept at all yet. Scoped Tremor as row-independent single-target for 8c. **This same decision applies to Silas's Vanish in 8d** — don't implement partial row logic just for one skill; if row mechanics are wanted, they should be their own milestone touching formation UI, front/back damage modifiers, etc. across all four classes at once.
+**Scoping decision — rows are out of scope for now:** Tremor (Lyra, Earth) was designed as row-dependent (front row = single target, back row = AoE reduced) but combat has no front/back row concept at all yet. Scoped Tremor as row-independent single-target for 8c. **This same decision applies to Silas's Vanish, Shadow Strike, Ryn's Ki Blast, and Vael's Divine Shield** — all currently row-independent/unrestricted. Formation & rows is now **Milestone 11** in the roadmap; don't patch in partial row logic for one skill outside that milestone.
 
-**Deferred, not forgotten:** Lyra's Summons (Ignus/Glacius, level 26/35) — a temporary independent front-row combatant that acts on its own for 2-3 rounds. Big enough mechanic (needs its own turn-queue entry, its own AI, row placement) that it was deliberately left out of 8c rather than rushed. Pick a milestone number for it whenever it's prioritized — likely after rows are implemented, since summons are described as row-placed.
+**Deferred, not forgotten:** Lyra's Summons (Ignus/Glacius, level 26/35) — a temporary independent front-row combatant that acts on its own for 2-3 rounds. Big enough mechanic (needs its own turn-queue entry, its own AI, row placement) that it was deliberately left out of 8c rather than rushed. Best tackled after Milestone 11 (Formation & Rows), since summons are described as row-placed.
 
 **8d (Silas) is done — Milestone 8 (Class Skills) is now complete for all four classes.** New systems it added:
 - Poison DoT (`poison_rounds`/`poison_power`) and Bleed DoT (`bleed_rounds`/`bleed_power`) — separate named field pairs rather than the generic-array refactor floated above, so Poison and Bleed (and Burn) can all be active on the same target simultaneously (Shadowstep applies all three status types plus a stun at once). All three DoTs tick together in `_tick_dot()`.
@@ -75,6 +77,15 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 - Expose and Death Mark both reuse the negative-`def_buff` debuff pattern from Lyra's Quake (8c) — no new fields needed, just `target.def_buff = -power`.
 - `multi_hit` (Ryn's Storm Flurry) now takes an optional `"hits"` key on the skill dict (defaults to 3) so Silas's Flurry could reuse it at 4 hits instead of duplicating the effect handler.
 - **Bug fix carried over from 8c:** negative `def_buff` was only ever read in `_execute_enemy_turn()` (enemy attacking the party) — every party-vs-enemy damage formula (`_do_attack`, and the `physical`/`sweep`/`ki_burst`/`multi_hit`/`cripple`/`rising_dragon` effects in `_do_skill()`) ignored `target.def_buff` entirely. This meant Quake's DEF-down debuff had zero actual effect on damage, and would have made Expose/Death Mark equally inert. Fixed by adding `+ target.def_buff` (or `enemy.def_buff`) into all of those formulas. Pure-INT magic effects (`holy`/`fire`/`ice`/`lightning`/`earth` and their variants) don't use defense at all by design, so they're unaffected and unchanged.
+
+## Milestone 10 — Combat formula completion
+
+Found during a full docs-vs-code audit after Milestone 8 wrapped (not new work, just previously undocumented gaps between the README's Combat System / Stats tables and the actual implementation):
+
+- **RES stat doesn't exist.** No field on `Combatant`, no `"res"` key in `LEVEL_GAINS`, and no damage formula reads it — magic effects (`holy`/`fire`/`ice`/`lightning`/`earth` and every variant of them) deal `power + int_stat/2 [+ rand]` with **zero target-side mitigation**. Physical damage at least subtracts `target.defense + target.def_buff`; magic subtracts nothing. Adding RES means: new `Combatant.res_stat` field + `LEVEL_GAINS` entries (values are in the README's Growth System / Stat Benchmark tables already), then subtracting it (or `res_stat/2`, tune to taste) in every magic damage formula.
+- **No crit system**, despite AGI being the documented crit stat and several skills explicitly naming it in flavor text (Quick Strike, Flurry). Needs a design decision on crit multiplier/chance formula before implementing — not just a bug fix.
+- **Run/Escape always succeeds** (`_confirm_main()` case 4 just calls `change_scene_to_file` unconditionally). Design wants an AGI-vs-enemy-speed roll, blocked during boss fights (boss concept doesn't exist yet either, so that half is a no-op until bosses do).
+- **Side effect worth knowing:** because magic ignores defense entirely, Death Mark and Expose (Silas, 8d) only actually boost *physical* damage against the marked enemy right now, not magic — their def_buff debuff has nothing to subtract from on the magic side. Revisit whether that's intended or whether Death Mark/Expose should get a separate magic-damage hook once RES exists.
 
 ## Debug tooling
 

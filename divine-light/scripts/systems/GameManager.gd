@@ -1,6 +1,7 @@
 extends Node
 
 var party: Array = []
+var inventory: Dictionary = {}
 
 
 func _ready() -> void:
@@ -11,3 +12,10 @@ func _ready() -> void:
 			Combatant.new("Lyra",   70,  5,  4,  8, false, 50, "Lyra", 15),
 			Combatant.new("Silas",  90, 12,  7, 14, false, 30, "Silas",  4),
 		]
+	if inventory.is_empty():
+		inventory = {
+			"Potion": 10,
+			"Elixir": 3,
+			"Ether": 5,
+			"Antidote": 5,
+		}

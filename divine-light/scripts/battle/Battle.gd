@@ -72,6 +72,13 @@ const LYRA_SKILLS: Dictionary = {
 	],
 }
 
+const ITEM_DEFS: Dictionary = {
+	"Potion":   {"name": "Potion",   "effect": "item_heal",       "power": 50,  "target": "ally_choose"},
+	"Elixir":   {"name": "Elixir",   "effect": "item_heal",       "power": 120, "target": "ally_choose"},
+	"Ether":    {"name": "Ether",    "effect": "item_restore_mp", "power": 30,  "target": "ally_choose"},
+	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
+}
+
 const ENCOUNTERS: Array = [
 	# Singles (2/10 = 20%)
 	[{"name": "Blighted Wolf",    "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25}],
@@ -122,7 +129,8 @@ var _menu_cursor: int = 0
 var _menu_options: Array = []
 var _option_labels: Array = []
 var _active_skills: Array = []
-var _skill_scroll: int = 0
+var _active_items: Array = []
+var _list_scroll: int = 0
 
 # Targeting
 var _target_index: int = 0
@@ -265,11 +273,11 @@ func _handle_menu_input() -> void:
 		return
 	if Input.is_action_just_pressed("ui_down"):
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
-		_clamp_skill_scroll()
+		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_up"):
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
-		_clamp_skill_scroll()
+		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_accept"):
 		_confirm_action()
@@ -368,7 +376,7 @@ func _open_skill_menu(member: Combatant) -> void:
 		message_label.text = "No skills learned yet."
 		return
 	_menu_state = MenuState.SKILL
-	_skill_scroll = 0
+	_list_scroll = 0
 	_menu_options = []
 	for skill in _active_skills:
 		var cost_label: String = "(%dQi)" % skill["cost"] if skill["cost_type"] == "qi" else "(%dMP)" % skill["cost"]
@@ -390,7 +398,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 				"to_stance": s, "min_level": 1,
 			})
 	_menu_state = MenuState.SKILL
-	_skill_scroll = 0
+	_list_scroll = 0
 	_menu_options = []
 	for skill in _active_skills:
 		if skill["effect"] == "switch_stance":
@@ -403,8 +411,21 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 
 
 func _open_item_menu() -> void:
+	_active_items = []
+	for item_name in ITEM_DEFS.keys():
+		var count: int = int(GameManager.inventory.get(item_name, 0))
+		if count > 0:
+			_active_items.append(ITEM_DEFS[item_name])
+	if _active_items.is_empty():
+		message_label.text = "No items available."
+		return
 	_menu_state = MenuState.ITEM
-	_menu_options = ["Potion x5", "-- Empty --"]
+	_list_scroll = 0
+	_menu_options = []
+	for item_def in _active_items:
+		var item_name: String = item_def["name"]
+		var count: int = int(GameManager.inventory.get(item_name, 0))
+		_menu_options.append("%s x%d" % [item_name, count])
 	_menu_cursor = 0
 	_update_menu()
 	selection_header.text = "-- Items --"
@@ -484,10 +505,10 @@ func _confirm_skill() -> void:
 
 
 func _confirm_item() -> void:
-	if _menu_cursor == 0:
-		var member: Combatant = _party[_selecting_index]
-		member.queued_action = "item_potion"
-		_advance_selection()
+	if _active_items.is_empty():
+		return
+	var item_def: Dictionary = _active_items[_menu_cursor]
+	_enter_ally_targeting("item_use", item_def)
 
 
 func _advance_selection() -> void:
@@ -592,7 +613,7 @@ func _execute_party_turn(member: Combatant) -> void:
 		"defend":
 			member.defending = true
 			message_label.text = "%s defends!" % member.display_name
-		"item_potion": _do_item_potion(member)
+		"item_use": _do_item(member, member.queued_skill)
 
 
 func _do_attack(member: Combatant) -> void:
@@ -1033,11 +1054,32 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				_end_battle(true)
 
 
-func _do_item_potion(member: Combatant) -> void:
-	var amount := 50
-	member.hp = mini(member.max_hp, member.hp + amount)
-	_update_ui()
-	message_label.text = "%s uses Potion!\nRestores %d HP!" % [member.display_name, amount]
+func _do_item(member: Combatant, item_def: Dictionary) -> void:
+	var item_name: String = item_def["name"]
+	var count: int = int(GameManager.inventory.get(item_name, 0))
+	if count <= 0:
+		message_label.text = "No %s left!" % item_name
+		return
+	GameManager.inventory[item_name] = count - 1
+
+	var target: Combatant = _get_ally_target(member, item_def)
+	var effect: String = item_def["effect"]
+	var power: int = int(item_def["power"])
+
+	match effect:
+		"item_heal":
+			target.hp = mini(target.max_hp, target.hp + power)
+			_update_ui()
+			message_label.text = "%s uses %s on %s!\nRestored %d HP!" % [member.display_name, item_name, target.display_name, power]
+		"item_restore_mp":
+			target.mp = mini(target.max_mp, target.mp + power)
+			_update_ui()
+			message_label.text = "%s uses %s on %s!\nRestored %d MP!" % [member.display_name, item_name, target.display_name, power]
+		"item_cure_poison":
+			target.poison_rounds = 0
+			target.poison_power = 0
+			_update_ui()
+			message_label.text = "%s uses %s on %s!\nPoison cured!" % [member.display_name, item_name, target.display_name]
 
 
 func _execute_enemy_turn(enemy: Combatant) -> void:
@@ -1153,21 +1195,22 @@ func _build_levelup_text(member: Combatant) -> String:
 	return "%s reached Level %d!\n%s\n%s  Press Enter." % [member.display_name, member.level, line2, line3]
 
 
-func _clamp_skill_scroll() -> void:
-	if _menu_state != MenuState.SKILL:
+func _clamp_list_scroll() -> void:
+	if _menu_state != MenuState.SKILL and _menu_state != MenuState.ITEM:
 		return
 	var page: int = _option_labels.size()
-	if _menu_cursor < _skill_scroll:
-		_skill_scroll = _menu_cursor
-	elif _menu_cursor >= _skill_scroll + page:
-		_skill_scroll = _menu_cursor - page + 1
+	if _menu_cursor < _list_scroll:
+		_list_scroll = _menu_cursor
+	elif _menu_cursor >= _list_scroll + page:
+		_list_scroll = _menu_cursor - page + 1
 
 
 func _update_menu() -> void:
 	action_menu.visible = true
 	var page: int = _option_labels.size()
+	var scrollable: bool = _menu_state == MenuState.SKILL or _menu_state == MenuState.ITEM
 	for i in page:
-		var idx: int = (_skill_scroll + i) if _menu_state == MenuState.SKILL else i
+		var idx: int = (_list_scroll + i) if scrollable else i
 		if idx < _menu_options.size():
 			_option_labels[i].text = ("> " if idx == _menu_cursor else "  ") + _menu_options[idx]
 			_option_labels[i].visible = true

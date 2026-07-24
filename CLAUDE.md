@@ -30,8 +30,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 8b | Ryn full skill set (12 skills) | ✅ |
 | 8c | Lyra full skill set (stances) | ✅ |
 | 8d | Silas full skill set | ✅ — **Milestone 8 fully complete, regression-tested across all 4 classes** |
-| 9 | Items & inventory (real data, replaces item-menu stub) | **← next up** |
-| 10 | Combat formula completion (RES stat, crit, real escape roll) | Not started |
+| 9 | Items & inventory (real data, replaces item-menu stub) | ✅ |
+| 10 | Combat formula completion (RES stat, crit, real escape roll) | **← next up** |
 | 11 | Formation & rows | Not started |
 | 12 | Save/load | Not started |
 | 13 | Dungeon tile maps | Not started |
@@ -77,6 +77,17 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 - Expose and Death Mark both reuse the negative-`def_buff` debuff pattern from Lyra's Quake (8c) — no new fields needed, just `target.def_buff = -power`.
 - `multi_hit` (Ryn's Storm Flurry) now takes an optional `"hits"` key on the skill dict (defaults to 3) so Silas's Flurry could reuse it at 4 hits instead of duplicating the effect handler.
 - **Bug fix carried over from 8c:** negative `def_buff` was only ever read in `_execute_enemy_turn()` (enemy attacking the party) — every party-vs-enemy damage formula (`_do_attack`, and the `physical`/`sweep`/`ki_burst`/`multi_hit`/`cripple`/`rising_dragon` effects in `_do_skill()`) ignored `target.def_buff` entirely. This meant Quake's DEF-down debuff had zero actual effect on damage, and would have made Expose/Death Mark equally inert. Fixed by adding `+ target.def_buff` (or `enemy.def_buff`) into all of those formulas. Pure-INT magic effects (`holy`/`fire`/`ice`/`lightning`/`earth` and their variants) don't use defense at all by design, so they're unaffected and unchanged.
+
+## Milestone 9 — Items & Inventory (done)
+
+- Inventory lives on `GameManager.inventory: Dictionary` (item name → count), initialized once in `_ready()` the same way `party` is, persists across battles via the same reference-not-copy mechanism.
+- Item definitions live in `Battle.gd`'s `ITEM_DEFS` const, same shape as `CLASS_SKILLS`/`LYRA_SKILLS` entries (`name`, `effect`, `power`, `target`) so they slot into the existing ally-targeting pipeline for free — `_confirm_item()` just calls `_enter_ally_targeting("item_use", item_def)`, identical to how Vael's Guard/Sanctuary/Purify already worked. No new targeting code was needed.
+- `_open_item_menu()` filters `ITEM_DEFS` down to whatever has `count > 0` in `GameManager.inventory`, shows `"Potion x10"`-style labels, and falls back to `"No items available."` if the whole inventory is empty (same pattern as the skill menu's `"No skills learned yet."`).
+- `_do_item()` decrements the count, dispatches on `effect` (`item_heal`, `item_restore_mp`, `item_cure_poison`) similar to `_do_skill()`'s effect match.
+- `_list_scroll` (renamed from `_skill_scroll` — it's shared infrastructure now) and its clamp function `_clamp_list_scroll()` now also apply to `MenuState.ITEM`, not just `MenuState.SKILL`, so the item list will scroll correctly if it ever exceeds 5 entries.
+- Starting stock: Potion x10 (50 HP), Elixir x3 (120 HP), Ether x5 (30 MP), Antidote x5 (cures Poison only).
+- **Scoping decision:** no "Remedy"/cure-all item. The design doc's Status Effects table scopes Bleed as Purify-only ("antidotes cannot cure it") — a cure-all item would contradict that, so Antidote only touches `poison_rounds`/`poison_power`. If a broader cure item is wanted later, it needs a product decision on whether it's meant to override that Bleed rule, not just an implementation task.
+- Not handled: Ether on a target with `max_mp == 0` (e.g. Ryn) silently restores 0 MP with an awkward "Restored 0 MP!" message. Minor, low-priority UX rough edge — player has to know not to Ether Ryn.
 
 ## Milestone 10 — Combat formula completion
 

@@ -39,6 +39,11 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 15 | Boss encounters | Not started |
 | 16 | Sprites & tiles | Not started |
 | 17 | Music & sound | Not started |
+| 18 | Equipment & gear (slots, stat bonuses, set bonuses, equip UI) | Not started |
+| 19 | Act I content | Not started |
+| 20 | Android APK export | Not started |
+| 21 | Act II content | Not started |
+| 22 | Act III + Vorath | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 

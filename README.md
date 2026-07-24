@@ -72,10 +72,11 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 15 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights |
 | 16 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
 | 17 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
-| 18 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
-| 19 | **Android APK export** | Build and deploy to RP6, test controller input |
-| 20 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
-| 21 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
+| 18 | **Equipment & gear** | Real equipment system — 5 slots per character (Weapon/Armor/Helmet/Gloves/Accessory), class-locked weapons/armor, stat bonuses from gear, Full Set Bonus tracking (3 sets per class, one per act, passive skill upgrades), and an equip UI screen (doesn't exist yet — nothing outside the battle scene currently handles menu input). Deliberately placed after dungeon-map tech (13) exists so loot has somewhere to drop from, and just before Act I content so the system is ready when real armor-set loot gets placed in dungeons/shops |
+| 19 | **Act I content** | All 4 dungeons, party recruitment, Frank, Verdance + Edenmere |
+| 20 | **Android APK export** | Build and deploy to RP6, test controller input |
+| 21 | **Act II content** | 3 kingdoms, 3 dungeons, cleansing transformation |
+| 22 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
 
 ---
 

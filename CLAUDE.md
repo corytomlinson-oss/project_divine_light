@@ -29,7 +29,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 8a | Vael full skill set (12 skills) | ✅ |
 | 8b | Ryn full skill set (12 skills) | ✅ |
 | 8c | Lyra full skill set (stances) | ✅ |
-| 8d | Silas full skill set | ✅ — **Milestone 8 fully complete, pending full 4-class regression test** |
+| 8d | Silas full skill set | ✅ — **Milestone 8 fully complete, regression-tested across all 4 classes** |
 | 9 | Items & inventory (real data, replaces item-menu stub) | **← next up** |
 | 10 | Combat formula completion (RES stat, crit, real escape roll) | Not started |
 | 11 | Formation & rows | Not started |

@@ -419,9 +419,10 @@ func _open_skill_menu(member: Combatant) -> void:
 		_open_lyra_skill_menu(member)
 		return
 	var all_skills: Array = CLASS_SKILLS.get(member.char_class, [])
-	_active_skills = all_skills.filter(func(s):
-		return member.level >= int(s.get("min_level", 1))
-			and (s.get("row_restrict", "") == "" or member.row == s["row_restrict"]))
+	_active_skills = all_skills.filter(
+		func(s):
+			return member.level >= int(s.get("min_level", 1)) and (s.get("row_restrict", "") == "" or member.row == s["row_restrict"])
+	)
 	if _active_skills.is_empty():
 		message_label.text = "No skills learned yet."
 		return

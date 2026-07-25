@@ -47,6 +47,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). **Cory wants dungeons randomly generated so each playthrough differs at least somewhat** — leaning toward procedural or hybrid over fully hand-crafted, but this needs a real design discussion before Milestone 13 starts (layout algorithm, how fixed story beats like the captive/boss/gate rooms survive randomization, whether this warrants its own milestone). Do not start Milestone 13 without having that conversation first.
 
+**Enemy scaling note (open question, no target milestone yet):** Cory wants to discuss whether enemies should scale with the party's level, so the game stays challenging no matter where the player is in the story instead of becoming trivial once over-leveled. He's not sure yet whether it's a good idea for this game or when the right time to design it would be — noted here so it doesn't get lost. Currently `ENCOUNTERS` in Battle.gd has fixed enemy stats with no relationship to player level at all, and the difficulty curve described below (Enemy Design section) is by *region*, not by player level — so this would be a new axis, not an extension of anything already planned.
+
 See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
 
 ---

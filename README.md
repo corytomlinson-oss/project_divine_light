@@ -45,7 +45,7 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Next milestone:** Milestone 12 — Save / load (core system)
 
-**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). Revisit when building Milestone 13 dungeon content.
+**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). **Cory wants dungeons randomly generated so each playthrough differs at least somewhat** — leaning toward procedural or hybrid over fully hand-crafted, but this needs a real design discussion before Milestone 13 starts (layout algorithm, how fixed story beats like the captive/boss/gate rooms survive randomization, whether this warrants its own milestone). Do not start Milestone 13 without having that conversation first.
 
 See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
 

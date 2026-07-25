@@ -6,6 +6,10 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **User:** Cory. First-time game dev, new to Godot. Explain concepts clearly, guide step by step, don't assume prior game-dev knowledge. Home hobby project — no deadlines.
 
+## ⚠ Open item before Milestone 13 (Dungeon maps)
+
+Cory wants dungeons **randomly generated** so each playthrough differs at least somewhat, instead of fully hand-crafted. He wants to talk through the approach together before any dungeon-tech work starts — not decided yet whether this is a design tweak to Milestone 13 or warrants being split out as its own milestone. Points to work through when that conversation happens: layout generation approach (procedural vs hybrid — leaning away from pure hand-crafted per his stated preference), how fixed story beats survive randomization (captive room, boss room, gate/order requirements, mini-boss placement per the Frozen Citadel/Sunken Sanctum/Drowned Fortress "unique mechanic" rooms), and whether randomization applies to all dungeons equally or just standard ones vs. the more scripted Act I dungeons. **Do not start Milestone 13 implementation without having this discussion first** — see README.md's "Dungeon generation note" for the same flag.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`

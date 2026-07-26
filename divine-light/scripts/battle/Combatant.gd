@@ -124,3 +124,47 @@ func level_down() -> void:
 	xp_to_next = roundi(100.0 * pow(float(level), 1.5))
 	hp = mini(hp, max_hp)
 	mp = mini(mp, max_mp)
+
+
+func to_save_dict() -> Dictionary:
+	return {
+		"display_name": display_name,
+		"char_class": char_class,
+		"level": level,
+		"xp": xp,
+		"xp_to_next": xp_to_next,
+		"hp": hp,
+		"max_hp": max_hp,
+		"mp": mp,
+		"max_mp": max_mp,
+		"qi": qi,
+		"max_qi": max_qi,
+		"atk": atk,
+		"defense": defense,
+		"int_stat": int_stat,
+		"res_stat": res_stat,
+		"agi": agi,
+		"row": row,
+		"stance": stance,
+		"is_ko": is_ko,
+	}
+
+
+func load_save_dict(data: Dictionary) -> void:
+	level = int(data.get("level", level))
+	xp = int(data.get("xp", xp))
+	xp_to_next = int(data.get("xp_to_next", xp_to_next))
+	hp = int(data.get("hp", hp))
+	max_hp = int(data.get("max_hp", max_hp))
+	mp = int(data.get("mp", mp))
+	max_mp = int(data.get("max_mp", max_mp))
+	qi = int(data.get("qi", qi))
+	max_qi = int(data.get("max_qi", max_qi))
+	atk = int(data.get("atk", atk))
+	defense = int(data.get("defense", defense))
+	int_stat = int(data.get("int_stat", int_stat))
+	res_stat = int(data.get("res_stat", res_stat))
+	agi = int(data.get("agi", agi))
+	row = String(data.get("row", row))
+	stance = String(data.get("stance", stance))
+	is_ko = bool(data.get("is_ko", is_ko))

@@ -39,8 +39,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 9 | Items & inventory (real data, replaces item-menu stub) | ✅ |
 | 10 | Combat formula completion (RES stat, crit, real escape roll) | ✅ |
 | 11 | Formation & rows | ✅ |
-| 12 | Save/load — core system (serialization only, no triggers yet) | **← next up** |
-| 13 | Dungeon tile maps (merged — absorbs old "Random encounters") | Not started |
+| 12 | Save/load — core system (serialization only, no triggers yet) | ✅ |
+| 13 | Dungeon tile maps (merged — absorbs old "Random encounters") | **← next up** (blocked — see open design question #1 above) |
 | 14 | Boss encounters | Not started |
 | 15 | Sprites & tiles | Not started |
 | 16 | Music & sound | Not started |
@@ -139,12 +139,23 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - **UI.** Party HP labels now show a one-letter row tag (`F`/`B`) right after the name, e.g. `"Vael F L5  120/150"`. The turn-selection header spells it out, e.g. `"Vael (Front): 30/30 MP"` — added consistently across the Ryn-Qi, Lyra-stance, generic-MP, and no-MP header variants.
 - **Scoped out:** the outside-battle Formation menu (README's controller mapping: "Select: Formation menu, swap rows outside battle"). There's no overworld menu system of any kind yet — `Player.gd` only handles movement — so building a Formation screen now would mean building an overworld menu shell just to hold one option. Row swaps are battle-only for the moment, which still satisfies the in-battle half of the design doc (swapping costs a turn) even though the free outside-battle swap doesn't exist yet.
 
+## Milestone 12 — Save/load core system (done)
+
+- **`Combatant.to_save_dict()` / `load_save_dict(data)`** — serialize/restore progression state only: `level`, `xp`, `xp_to_next`, `hp`/`max_hp`, `mp`/`max_mp`, `qi`/`max_qi`, `atk`, `defense`, `int_stat`, `res_stat`, `agi`, `row`, `stance`, `is_ko` (plus `display_name`/`char_class` written for save-file readability but not read back — party order/identity is fixed, matched by index). Battle-transient fields (buffs, stun, DoTs, evasion, taunt, queued action) are deliberately **not** persisted — they're meant to live only within a single battle. Note: nothing currently clears those fields between battles either (pre-existing gap, not introduced or fixed here) — irrelevant to save/load since a save always happens outside battle.
+- **`GameManager.save_game(slot: int)` / `load_game(slot: int)`** — write/read `user://saves/slot_<N>.json` (`SAVE_SLOTS = 3`) via `JSON.stringify()` / `JSON.parse_string()`. Payload is just `{"party": [...], "inventory": {...}}`. `save_exists(slot)` checks a slot without loading it — needed later for a save-slot picker UI.
+- **Load mutates in place.** `load_game()` calls `party[i].load_save_dict(...)` on the *existing* `Combatant` objects rather than replacing the array — `Battle.gd` holds `_party = GameManager.party` as a direct reference (see the reference-semantics gotcha below), so replacing the array instead of mutating its contents would silently desync any scene already holding that reference.
+- **Debug trigger:** F5 (save slot 1) / F6 (load slot 1), added to `GameManager._input()` rather than `Battle.gd` — GameManager is the one autoload present in every scene, so this works from the overworld too, unlike Battle's F1/F2 which only make sense mid-battle. This is scaffolding for testing only; Milestone 19 replaces it with real triggers (manual save at inns, auto-save after boss/rescue/region-clear, suspend save) and these debug keys should be removed then.
+- **Verified via headless test** (Godot `--headless --script`, not committed) that a save/load round-trip correctly restores level, hp, row, and inventory counts after mutating them post-save — no in-editor UI to click yet, so this was the only way to confirm the JSON round-trip works before Milestone 19 wires it to real UI.
+- **UI refresh gotcha, fixed:** `load_game()` mutates `Combatant` fields in place, but `Battle.gd`'s HP labels/bars are only redrawn when `_update_ui()` runs, which nothing was triggering on load — first playtest showed loaded state sitting stale on screen until the next action resolved and incidentally called `_update_ui()` itself. Fixed with `GameManager.party_loaded` signal, emitted at the end of a successful `load_game()`; `Battle._ready()` connects it straight to `_update_ui`. Any future screen that displays live party state (an overworld HUD, a save-slot menu) needs to connect to this same signal rather than assuming GameManager mutating data is enough to repaint anything.
+
 ## Debug tooling
 
 - **F1** — level up entire party by 1 (Battle.gd `_input()`)
 - **F2** — level down entire party by 1
 - Capped at `Combatant.MAX_LEVEL = 35`, floored at 1
 - Use this to jump to a target level and test newly-unlocked skills without grinding
+- **F5** — save party + inventory to slot 1 (GameManager.gd `_input()`, works from any scene)
+- **F6** — load slot 1 back into the live party + inventory
 
 ## GDScript gotchas hit so far
 

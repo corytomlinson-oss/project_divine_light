@@ -161,6 +161,7 @@ func _ready() -> void:
 	_setup_party_bars()
 	_enemies = _generate_encounter()
 	_setup_enemy_ui()
+	GameManager.party_loaded.connect(_update_ui)
 	_update_ui()
 	_begin_selection()
 

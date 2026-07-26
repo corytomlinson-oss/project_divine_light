@@ -44,18 +44,19 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 | 14 | Boss encounters | Not started |
 | 15 | Sprites & tiles | Not started |
 | 16 | Music & sound | Not started |
-| 17 | Equipment & gear (slots, stat bonuses, set bonuses, equip UI) | Not started |
-| 18a | Act I — The Cathedral (Vael) | Not started |
-| 18b | Act I — The Monastery (Ryn) | Not started |
-| 18c | Act I — The Observatory (Lyra) | Not started |
-| 18d | Act I — The Underground Guild (Silas) | Not started |
-| 19 | Save/load — triggers & integration (inns, auto-save, suspend save) | Not started |
-| 20 | Android APK export | Not started |
-| 21a | Act II — Cleansing transformation system | Not started |
-| 21b | Act II — Nordveil (Tundra) | Not started |
-| 21c | Act II — Duskara (Desert) | Not started |
-| 21d | Act II — Selavon (Coastal) | Not started |
-| 22 | Act III + Vorath | Not started |
+| 17 | UI/UX polish (HUD composition, transitions, controller-nav feel — once real art/audio exist) | Not started |
+| 18 | Equipment & gear (slots, stat bonuses, set bonuses, equip UI) | Not started |
+| 19a | Act I — The Cathedral (Vael) | Not started |
+| 19b | Act I — The Monastery (Ryn) | Not started |
+| 19c | Act I — The Observatory (Lyra) | Not started |
+| 19d | Act I — The Underground Guild (Silas) | Not started |
+| 20 | Save/load — triggers & integration (inns, auto-save, suspend save) | Not started |
+| 21 | Android APK export | Not started |
+| 22a | Act II — Cleansing transformation system | Not started |
+| 22b | Act II — Nordveil (Tundra) | Not started |
+| 22c | Act II — Duskara (Desert) | Not started |
+| 22d | Act II — Selavon (Coastal) | Not started |
+| 23 | Act III + Vorath | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 
@@ -63,9 +64,10 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 
 Before starting 12, did a pass over the whole remaining roadmap asking "does anything here need the same 8a-8d treatment Class Skills got?" Four changes landed, all in README.md's Implementation Roadmap table:
 
-- **Act I content → 18a-18d**, one per dungeon (Cathedral/Monastery/Observatory/Underground Guild), same shape as 8a-8d: each is dungeon + solo-escape boss variant + dungeon-end boss + rescue, a genuinely testable slice. It was one of the largest single bundles in the whole roadmap — 4 dungeons, 4 bosses, 3 rescues, Frank's arc, and 2 towns all under one number.
-- **Act II content → 21a-21d**: 21a pulls the cleansing-transformation system out as shared infrastructure (built once, not three times), then 21b/c/d are one kingdom each (Nordveil/Duskara/Selavon), same per-kingdom shape (dungeon + mini-boss + 3-phase boss + before/after town state).
-- **Save/Load split into two non-adjacent milestones** (12 and 19) rather than lettered sub-parts, because unlike 8/18/21 the two halves aren't sequential work — they're separated by everything else. Milestone 12 (now, right where Save/Load used to sit) is just the data serialization: can `GameManager.party`/`inventory`/formation be written to and read from disk. This is buildable today with a debug trigger since it has zero content dependencies. The real triggers — manual save at inns, auto-save after boss/rescue/region-clear events, suspend save mid-dungeon — literally cannot exist until Act I builds towns, dungeons, and bosses, so that half moved to **Milestone 19**, right after Act I content (18) and before the APK export (20). If Save/Load had stayed as one milestone positioned right after Rows, it would have been unbuildable/untestable end-to-end — there'd be nothing to save at.
+- **Act I content → 19a-19d**, one per dungeon (Cathedral/Monastery/Observatory/Underground Guild), same shape as 8a-8d: each is dungeon + solo-escape boss variant + dungeon-end boss + rescue, a genuinely testable slice. It was one of the largest single bundles in the whole roadmap — 4 dungeons, 4 bosses, 3 rescues, Frank's arc, and 2 towns all under one number.
+- **Act II content → 22a-22d**: 22a pulls the cleansing-transformation system out as shared infrastructure (built once, not three times), then 22b/c/d are one kingdom each (Nordveil/Duskara/Selavon), same per-kingdom shape (dungeon + mini-boss + 3-phase boss + before/after town state).
+- **Save/Load split into two non-adjacent milestones** (12 and 20) rather than lettered sub-parts, because unlike 8/19/22 the two halves aren't sequential work — they're separated by everything else. Milestone 12 (now, right where Save/Load used to sit) is just the data serialization: can `GameManager.party`/`inventory`/formation be written to and read from disk. This is buildable today with a debug trigger since it has zero content dependencies. The real triggers — manual save at inns, auto-save after boss/rescue/region-clear events, suspend save mid-dungeon — literally cannot exist until Act I builds towns, dungeons, and bosses, so that half moved to **Milestone 20**, right after Act I content (19) and before the APK export (21). If Save/Load had stayed as one milestone positioned right after Rows, it would have been unbuildable/untestable end-to-end — there'd be nothing to save at.
+- **New Milestone 17 (UI/UX polish)**, inserted between Music & sound (16) and Equipment (18) — added when Cory asked whether a "final UI once we have graphics" milestone existed and it turned out Sprites & tiles (15) only covers swapping placeholder assets for real art, not an actual layout/UX pass (HUD composition, menu screen polish, transitions, controller-nav readability). Placed after both art (15) and audio (16) exist, since a real UI pass benefits from having real assets to design around rather than guessing ahead of them. Deliberately excludes Equipment's equip screen (18) and Save/load's slot-picker screen (20) — those are new screens with their own functional scope tied to their own milestones, not part of "polish what's already built."
 - **Dungeon maps (13) and the old "Random encounters" (14) merged into one.** They overlapped: 13's own description already said "with random encounters," and the overworld's step-triggered encounter system has existed since Milestone 2 — the only genuinely new work in old-14 was extending that mechanic into dungeon tile maps, which is inherently part of building dungeon tech, not a separate system. Removing the redundant slot is why Boss Encounters/Sprites/Music/Equipment all shifted down by one number (15→14, 16→15, 17→16, 18→17) even though their scope didn't change.
 
 Sprites & tiles (15) and Music & sound (16) are also oversized — both are "replace/build everything across the whole game" passes with no natural stopping point until every act's content exists. Flagged but **not split** in this pass since Cory didn't select them when asked; if they come up again, the natural split mirrors content delivery (Act I assets alongside 18, Act II assets alongside 21) rather than one monolithic art/audio pass done in isolation with nothing built yet to apply it to. Act III + Vorath (22) has the same oversized shape as Act I/II (a dungeon, Frank's 5th-member skill kit, a class-mirroring 3-phase final boss) but is lowest priority to resolve since it's last in the sequence — revisit closer to when Act II wraps.
@@ -144,8 +146,8 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - **`Combatant.to_save_dict()` / `load_save_dict(data)`** — serialize/restore progression state only: `level`, `xp`, `xp_to_next`, `hp`/`max_hp`, `mp`/`max_mp`, `qi`/`max_qi`, `atk`, `defense`, `int_stat`, `res_stat`, `agi`, `row`, `stance`, `is_ko` (plus `display_name`/`char_class` written for save-file readability but not read back — party order/identity is fixed, matched by index). Battle-transient fields (buffs, stun, DoTs, evasion, taunt, queued action) are deliberately **not** persisted — they're meant to live only within a single battle. Note: nothing currently clears those fields between battles either (pre-existing gap, not introduced or fixed here) — irrelevant to save/load since a save always happens outside battle.
 - **`GameManager.save_game(slot: int)` / `load_game(slot: int)`** — write/read `user://saves/slot_<N>.json` (`SAVE_SLOTS = 3`) via `JSON.stringify()` / `JSON.parse_string()`. Payload is just `{"party": [...], "inventory": {...}}`. `save_exists(slot)` checks a slot without loading it — needed later for a save-slot picker UI.
 - **Load mutates in place.** `load_game()` calls `party[i].load_save_dict(...)` on the *existing* `Combatant` objects rather than replacing the array — `Battle.gd` holds `_party = GameManager.party` as a direct reference (see the reference-semantics gotcha below), so replacing the array instead of mutating its contents would silently desync any scene already holding that reference.
-- **Debug trigger:** F5 (save slot 1) / F6 (load slot 1), added to `GameManager._input()` rather than `Battle.gd` — GameManager is the one autoload present in every scene, so this works from the overworld too, unlike Battle's F1/F2 which only make sense mid-battle. This is scaffolding for testing only; Milestone 19 replaces it with real triggers (manual save at inns, auto-save after boss/rescue/region-clear, suspend save) and these debug keys should be removed then.
-- **Verified via headless test** (Godot `--headless --script`, not committed) that a save/load round-trip correctly restores level, hp, row, and inventory counts after mutating them post-save — no in-editor UI to click yet, so this was the only way to confirm the JSON round-trip works before Milestone 19 wires it to real UI.
+- **Debug trigger:** F5 (save slot 1) / F6 (load slot 1), added to `GameManager._input()` rather than `Battle.gd` — GameManager is the one autoload present in every scene, so this works from the overworld too, unlike Battle's F1/F2 which only make sense mid-battle. This is scaffolding for testing only; Milestone 20 replaces it with real triggers (manual save at inns, auto-save after boss/rescue/region-clear, suspend save) and these debug keys should be removed then.
+- **Verified via headless test** (Godot `--headless --script`, not committed) that a save/load round-trip correctly restores level, hp, row, and inventory counts after mutating them post-save — no in-editor UI to click yet, so this was the only way to confirm the JSON round-trip works before Milestone 20 wires it to real UI.
 - **UI refresh gotcha, fixed:** `load_game()` mutates `Combatant` fields in place, but `Battle.gd`'s HP labels/bars are only redrawn when `_update_ui()` runs, which nothing was triggering on load — first playtest showed loaded state sitting stale on screen until the next action resolved and incidentally called `_update_ui()` itself. Fixed with `GameManager.party_loaded` signal, emitted at the end of a successful `load_game()`; `Battle._ready()` connects it straight to `_update_ui`. Any future screen that displays live party state (an overworld HUD, a save-slot menu) needs to connect to this same signal rather than assuming GameManager mutating data is enough to repaint anything.
 
 ## Debug tooling

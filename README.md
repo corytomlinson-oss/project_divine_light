@@ -45,9 +45,19 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 12 — Save/load core system. `Combatant.to_save_dict()`/`load_save_dict()` serialize progression state (level, xp, xp_to_next, hp/max_hp, mp/max_mp, qi/max_qi, atk, defense, int_stat, res_stat, agi, row, stance, is_ko) to/from a Dictionary — battle-transient state (buffs, stun, DoTs, evasion) is deliberately excluded since it's not meant to persist between sessions. `GameManager.save_game(slot)`/`load_game(slot)` write/read `user://saves/slot_N.json` (3 slots) via `JSON.stringify`/`JSON.parse_string`, covering `party` and `inventory`. Load mutates the existing `Combatant` objects in place rather than replacing them, since other code (Battle.gd) holds direct references to `GameManager.party` members. No real triggers yet (that's Milestone 20, once inns/bosses/regions exist to trigger off of) — for now, debug keys **F5** (save to slot 1) / **F6** (load slot 1) on `GameManager` (works from any scene, since it's the autoload) are the only way to exercise it. A `party_loaded` signal fires after a successful load so the Battle screen's HP/level display refreshes immediately, instead of sitting stale until the next action resolves.
 
-**Next milestone:** Milestone 13 — Dungeon tile maps (blocked on the dungeon-generation design discussion below)
+**Next milestone:** Milestone 13a — Dungeon tech (TileMapLayer, collision, doors/stairs, encounters in dungeons, one hand-built Cathedral to test against)
 
-**Dungeon generation note:** Decision deferred. Options are hand-crafted, fully procedural (GDScript `set_cell()` at runtime), or hybrid (fixed anchor rooms + procedural filler). **Cory wants dungeons randomly generated so each playthrough differs at least somewhat** — leaning toward procedural or hybrid over fully hand-crafted, but this needs a real design discussion before Milestone 13 starts (layout algorithm, how fixed story beats like the captive/boss/gate rooms survive randomization, whether this warrants its own milestone). Do not start Milestone 13 without having that conversation first.
+**Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
+
+1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.
+2. **Room graph (procedural)** — generates a room graph satisfying the template, then places anchors at required graph positions (entrance at root, captive mid-depth, boss deepest). Done at graph level rather than tile-level BSP because every constraint that matters ("boss far from entrance", "captive before boss", "all rooms reachable") is naturally a graph property.
+3. **Tile layout (procedural)** — rooms-and-corridors on a grid. Anchor rooms use hand-designed prefab interiors; filler rooms are generated. No cellular-automata caves — Act I's locations are all buildings (cathedral, monastery, observatory, guild), so rectangular rooms match the aesthetic and are simpler.
+
+**Anchors are just entrance / captive / boss** (plus Frank in the starter dungeon). The gate requirements are *entry* gates on the dungeon door, not internal doors, so gating never constrains layout.
+
+**Determinism is required, not optional** — Milestone 20's suspend save stores mid-dungeon position, so a dungeon must regenerate identically on load. Seed is generated on first entry to a dungeon, persisted in the save (one int per dungeon), and reused forever after, so backtracking finds the same map. A new game rolls new seeds — that's where replayability comes from. Must use a dedicated `RandomNumberGenerator` instance per dungeon, **not** global `randi()`, whose state is advanced by unrelated calls (crit rolls, encounter rolls) and would desync regeneration.
+
+**Split into 13a/13b** (matching the 8a–8d / 19a–19d convention) so dungeon traversal tech is proven against a fixed, hand-built map before generation randomness is layered on top.
 
 **Enemy scaling note (open question, no target milestone yet):** Cory wants to discuss whether enemies should scale with the party's level, so the game stays challenging no matter where the player is in the story instead of becoming trivial once over-leveled. He's not sure yet whether it's a good idea for this game or when the right time to design it would be — noted here so it doesn't get lost. Currently `ENCOUNTERS` in Battle.gd has fixed enemy stats with no relationship to player level at all, and the difficulty curve described below (Enemy Design section) is by *region*, not by player level — so this would be a new axis, not an extension of anything already planned.
 
@@ -73,7 +83,7 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 10 | **Combat formula completion** | Close gaps between the design doc's Combat System / Stats tables and what's actually implemented: RES stat (currently missing entirely — magic damage has zero defense-side mitigation), AGI-based crit chance (referenced by several skill descriptions but never built), and a real Run/Escape roll (AGI vs enemy speed, currently always succeeds instantly) |
 | 11 | **Formation & rows** | Front/back row system for the party (currently row-independent). Unblocks the row-dependent behavior already scoped out of Tremor (Lyra), Vanish (Silas), Shadow Strike (Silas, front-row only), Ki Blast (Ryn, full damage from back row), and Divine Shield (Vael, same-row only), plus row placement for Lyra's future Summons |
 | 12 | **Save / load — core system** | Save file format + serialization for `GameManager` state (party, inventory, formation). Debug-triggerable save/load — a real save-slot UI comes later, in Milestone 20. Buildable now since it only depends on data structures that already exist, not on any in-game trigger |
-| 13 | **Dungeon maps** | Tile-based dungeon tech (The Cathedral first), resolving the hand-crafted/procedural/hybrid generation decision. Extends the overworld's existing step-triggered encounter system (Milestone 2) to work inside dungeon tile maps — this absorbs what used to be a separate "Random encounters" milestone, since encounters-in-dungeons is inherently dungeon-tech, not its own system, and the overworld half of that was already done back in Milestone 2 |
+| 13 | **Dungeon maps** | Split into 13a (tech) and 13b (generation) — see breakdown below. Absorbs what used to be a separate "Random encounters" milestone, since encounters-in-dungeons is inherently dungeon-tech, not its own system, and the overworld half of that was already done back in Milestone 2 |
 | 14 | **Boss encounters** | Visible on-screen enemies, multi-phase boss fights — a generic system built here, then used by both Act I's dungeon bosses (19) and Act II's kingdom bosses (22) |
 | 15 | **Sprites & tiles** | Replace all placeholders — character sprites, enemy sprites, overworld/dungeon tilesets, battle backgrounds, UI frames. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first; use Midjourney/DALL-E for concept generation if needed (I can write the prompts) |
 | 16 | **Music & sound** | BGM for overworld, dungeons, battle, boss, towns + SFX for attacks, spells, UI, victory, level-up. **Asset strategy:** use Suno AI (suno.com) for chiptune/SNES-style generation via text prompts; OpenGameArt.org for pre-made free tracks |
@@ -84,6 +94,13 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 21 | **Android APK export** | Build and deploy to RP6, test controller input |
 | 22 | **Act II content** | Split into 22a–22d — a shared cleansing-transformation system plus one sub-milestone per kingdom. See breakdown below |
 | 23 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation |
+
+### Milestone 13 — Dungeon Maps Breakdown
+
+| # | Sub-milestone | Description |
+|---|---|---|
+| 13a | Dungeon tech | TileMapLayer dungeon scenes, wall collision, doors/stairs and dungeon↔overworld transitions, extending the overworld's step-triggered encounter system into dungeons, dungeon-specific enemy tables. Built and validated against **one hand-placed Cathedral map** so traversal/collision/encounter bugs are debugged in a map whose layout is fully known, before generation randomness is added |
+| 13b | Procedural generation | The three-layer hybrid generator (template → room graph → tile layout) described above, replacing 13a's hand-placed test map. Includes per-dungeon seed generation, persistence into the save file, and deterministic regeneration on load |
 
 ### Milestone 19 — Act I Breakdown
 

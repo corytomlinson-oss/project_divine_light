@@ -4,6 +4,7 @@ const TILE_SIZE: int = 16
 const MOVE_SPEED: float = 96.0
 const WALL_ATLAS_COORDS := Vector2i(1, 0)
 const DOOR_ATLAS_COORDS := Vector2i(2, 0)
+const BOSS_ATLAS_COORDS := Vector2i(4, 0)
 
 var _moving: bool = false
 var _target: Vector2
@@ -57,8 +58,12 @@ func _is_walkable(world_pos: Vector2) -> bool:
 
 func _on_tile_entered() -> void:
 	var cell: Vector2i = _tile_map.local_to_map(position)
-	if _tile_map.get_cell_atlas_coords(cell) == DOOR_ATLAS_COORDS:
+	var coords: Vector2i = _tile_map.get_cell_atlas_coords(cell)
+	if coords == DOOR_ATLAS_COORDS:
 		_use_door(cell)
+		return
+	if coords == BOSS_ATLAS_COORDS:
+		_trigger_boss_battle()
 		return
 	_check_encounter()
 
@@ -79,6 +84,15 @@ func _check_encounter() -> void:
 		GameManager.pending_spawn_position = position
 		GameManager.has_pending_spawn = true
 		get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
+
+
+## Fixed, visible encounter (Milestone 14) - unlike _check_encounter()'s random
+## step-triggered roll, walking onto a boss tile always starts a fight.
+func _trigger_boss_battle() -> void:
+	GameManager.pending_spawn_position = position
+	GameManager.has_pending_spawn = true
+	GameManager.pending_boss_battle = true
+	get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
 
 
 func _reset_encounter_counter() -> void:

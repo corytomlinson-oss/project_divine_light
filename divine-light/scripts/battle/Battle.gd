@@ -128,6 +128,18 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"cathedral": CATHEDRAL_ENCOUNTERS,
 }
 
+# Milestone 14 test boss for the Cathedral's generated boss room. A stand-in,
+# not the real Fallen Guardian (that's Milestone 19a's job, with its own
+# 2-phase kit: physical+self-DEF-buff -> corrupted holy magic). This one
+# exists to prove the generic system - visible/fixed encounter, phase
+# transition, escape lockout, bonus XP - works end to end.
+const BOSS_ENCOUNTERS: Dictionary = {
+	"cathedral": {
+		"name": "Hollow Warden", "hp": 220, "atk": 14, "def": 8, "agi": 9, "xp": 300,
+		"phase_hp_thresholds": [0.5],
+	},
+}
+
 # Party
 var _party: Array = []
 var _party_hp_labels: Array = []
@@ -189,14 +201,26 @@ func _ready() -> void:
 
 
 func _generate_encounter() -> Array:
+	if GameManager.pending_boss_battle:
+		GameManager.pending_boss_battle = false
+		var boss_data: Dictionary = BOSS_ENCOUNTERS.get(GameManager.current_location, {})
+		if not boss_data.is_empty():
+			var boss: Combatant = _build_enemy(boss_data)
+			boss.is_boss = true
+			boss.phase_hp_thresholds = boss_data.get("phase_hp_thresholds", []).duplicate()
+			return [boss]
 	var table: Array = ENCOUNTER_TABLES.get(GameManager.current_location, ENCOUNTERS)
 	var group: Array = table[randi() % table.size()]
 	var result: Array = []
 	for data in group:
-		var e := Combatant.new(data["name"], int(data["hp"]), int(data["atk"]), int(data["def"]), int(data["agi"]), true)
-		e.xp_reward = int(data["xp"])
-		result.append(e)
+		result.append(_build_enemy(data))
 	return result
+
+
+func _build_enemy(data: Dictionary) -> Combatant:
+	var e := Combatant.new(data["name"], int(data["hp"]), int(data["atk"]), int(data["def"]), int(data["agi"]), true)
+	e.xp_reward = int(data["xp"])
+	return e
 
 
 func _setup_party_bars() -> void:
@@ -396,6 +420,9 @@ func _confirm_main() -> void:
 
 
 func _attempt_escape() -> void:
+	if _enemies.any(func(e: Combatant) -> bool: return e.is_boss):
+		message_label.text = "Can't escape from a boss battle!"
+		return
 	var party_total := 0
 	var party_count := 0
 	for m in _party:
@@ -1283,6 +1310,10 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if targets.is_empty():
 		return
 
+	var phase_note := ""
+	if enemy.is_boss:
+		phase_note = _check_boss_phase_transition(enemy)
+
 	# Taunt forces all enemies to target the taunting member
 	var target: Combatant = null
 	for m in _party:
@@ -1295,20 +1326,20 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	# Smoke Bomb: the enemy's own accuracy is lowered
 	if enemy.accuracy_debuff_rounds > 0 and randi() % 100 < 30:
 		_update_ui()
-		message_label.text = "%s's attack misses!" % enemy.display_name
+		message_label.text = phase_note + "%s's attack misses!" % enemy.display_name
 		return
 
 	# Vanish: target has increased evasion this round
 	if target.evasion_rounds > 0 and randi() % 100 < 50:
 		_update_ui()
-		message_label.text = "%s dodges %s's attack!" % [target.display_name, enemy.display_name]
+		message_label.text = phase_note + "%s dodges %s's attack!" % [target.display_name, enemy.display_name]
 		return
 
 	# Sanctuary nullifies the hit entirely
 	if target.sanctuary:
 		target.sanctuary = false
 		_update_ui()
-		message_label.text = "%s's Sanctuary absorbs\n%s's attack!" % [target.display_name, enemy.display_name]
+		message_label.text = phase_note + "%s's Sanctuary absorbs\n%s's attack!" % [target.display_name, enemy.display_name]
 		return
 
 	var effective_def := target.defense + target.def_buff
@@ -1317,10 +1348,34 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target)))
 	target.receive_damage(dmg)
 	var suffix := " (reduced!)" if target.defending else ""
+	if enemy.is_boss and enemy.boss_phase >= 1:
+		target.def_buff = -4
+		target.def_buff_rounds = 2
+		suffix += " DEF lowered!"
 	_update_ui()
-	message_label.text = "%s hits %s for %d%s!" % [enemy.display_name, target.display_name, dmg, suffix]
+	message_label.text = phase_note + "%s hits %s for %d%s!" % [enemy.display_name, target.display_name, dmg, suffix]
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+## Boss fights get harder as they take damage, checked once per boss turn
+## (not the instant a threshold is crossed) so it reads as "the boss recoils,
+## then comes back stronger" rather than interrupting whatever just hit it.
+## Returns a message prefix (with trailing newline) if a transition happened
+## this turn, so the caller can fold it into whatever message it shows next
+## instead of the transition note getting silently overwritten a line later.
+## Milestone 14 test boss just permanently hits harder past the threshold -
+## real bosses (Milestone 19a/22b-d) will want per-phase skill kits, which
+## needs an enemy-ability dispatch system that doesn't exist yet.
+func _check_boss_phase_transition(enemy: Combatant) -> String:
+	if enemy.boss_phase >= enemy.phase_hp_thresholds.size():
+		return ""
+	var hp_frac: float = float(enemy.hp) / float(enemy.max_hp) if enemy.max_hp > 0 else 0.0
+	if hp_frac > enemy.phase_hp_thresholds[enemy.boss_phase]:
+		return ""
+	enemy.boss_phase += 1
+	enemy.atk += 6
+	return "%s enters a new phase! Its attacks grow fiercer!\n" % enemy.display_name
 
 
 func _tick_buffs() -> void:
@@ -1374,6 +1429,8 @@ func _end_battle(victory: bool) -> void:
 		var total_xp: int = 0
 		for e in _enemies:
 			total_xp += e.xp_reward
+			if e.is_boss:
+				GameManager.defeated_bosses[GameManager.current_location] = true
 		for member in _party:
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))

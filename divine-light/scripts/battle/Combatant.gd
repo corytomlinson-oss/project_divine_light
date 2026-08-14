@@ -51,6 +51,9 @@ var row: String = "front"
 var queued_action: String = ""
 var queued_skill: Dictionary = {}
 var queued_target: int = 0
+var is_boss: bool = false
+var boss_phase: int = 0
+var phase_hp_thresholds: Array = []
 
 
 func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,

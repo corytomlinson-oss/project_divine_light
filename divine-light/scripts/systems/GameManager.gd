@@ -12,6 +12,8 @@ var current_scene_path: String = "res://scenes/overworld/Overworld.tscn"
 var pending_spawn_position: Vector2 = Vector2.ZERO
 var has_pending_spawn: bool = false
 var dungeon_seeds: Dictionary = {}
+var pending_boss_battle: bool = false
+var defeated_bosses: Dictionary = {}
 
 
 func _ready() -> void:
@@ -61,6 +63,7 @@ func save_game(slot: int) -> bool:
 		"party": party.map(func(c: Combatant) -> Dictionary: return c.to_save_dict()),
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
+		"defeated_bosses": defeated_bosses.duplicate(),
 	}
 	file.store_string(JSON.stringify(data))
 	return true
@@ -85,6 +88,10 @@ func load_game(slot: int) -> bool:
 	dungeon_seeds.clear()
 	for location in save_dungeon_seeds:
 		dungeon_seeds[location] = int(save_dungeon_seeds[location])
+	var save_defeated_bosses: Dictionary = parsed.get("defeated_bosses", {})
+	defeated_bosses.clear()
+	for location in save_defeated_bosses:
+		defeated_bosses[location] = bool(save_defeated_bosses[location])
 	party_loaded.emit()
 	return true
 

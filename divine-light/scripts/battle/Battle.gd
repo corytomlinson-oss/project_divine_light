@@ -106,6 +106,28 @@ const ENCOUNTERS: Array = [
 	 {"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20}],
 ]
 
+# Placeholder stat-only roster for the Milestone 13a test dungeon (The Cathedral).
+# The README's Fallen Priest/Cursed Paladin/Shadow Acolyte roles (debuff DEF,
+# stun, buff allies) need an enemy-ability system that doesn't exist yet, so
+# these are differentiated by stats only for now. Full behavior is Milestone
+# 19a's job when the Cathedral's real content gets built.
+const CATHEDRAL_ENCOUNTERS: Array = [
+	[{"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30}],
+	[{"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40}],
+	[{"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28},
+	 {"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28}],
+	[{"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30},
+	 {"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40}],
+	[{"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40},
+	 {"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28},
+	 {"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30}],
+]
+
+const ENCOUNTER_TABLES: Dictionary = {
+	"overworld": ENCOUNTERS,
+	"cathedral": CATHEDRAL_ENCOUNTERS,
+}
+
 # Party
 var _party: Array = []
 var _party_hp_labels: Array = []
@@ -167,7 +189,8 @@ func _ready() -> void:
 
 
 func _generate_encounter() -> Array:
-	var group: Array = ENCOUNTERS[randi() % ENCOUNTERS.size()]
+	var table: Array = ENCOUNTER_TABLES.get(GameManager.current_location, ENCOUNTERS)
+	var group: Array = table[randi() % table.size()]
 	var result: Array = []
 	for data in group:
 		var e := Combatant.new(data["name"], int(data["hp"]), int(data["atk"]), int(data["def"]), int(data["agi"]), true)
@@ -238,6 +261,8 @@ func _input(event: InputEvent) -> void:
 			_debug_level_all(1)
 		elif event.keycode == KEY_F2:
 			_debug_level_all(-1)
+		elif event.keycode == KEY_F3:
+			_debug_auto_win()
 
 
 func _process(_delta: float) -> void:
@@ -252,7 +277,7 @@ func _process(_delta: float) -> void:
 				if not _level_up_queue.is_empty():
 					message_label.text = _level_up_queue.pop_front()
 				else:
-					get_tree().change_scene_to_file("res://scenes/overworld/Overworld.tscn")
+					get_tree().change_scene_to_file(GameManager.current_scene_path)
 
 
 func _debug_level_all(direction: int) -> void:
@@ -263,6 +288,15 @@ func _debug_level_all(direction: int) -> void:
 			member.level_down()
 	_update_ui()
 	message_label.text = "[DEBUG] Party level %d  (F1=up F2=down)" % _party[0].level
+
+
+func _debug_auto_win() -> void:
+	if state == State.BATTLE_OVER:
+		return
+	for e in _enemies:
+		e.receive_damage(e.hp)
+	_update_ui()
+	_end_battle(true)
 
 
 func _handle_menu_input() -> void:
@@ -378,7 +412,7 @@ func _attempt_escape() -> void:
 	var avg_enemy: float = float(enemy_total) / max(1, enemy_count)
 	var chance: int = clampi(50 + roundi((avg_party - avg_enemy) * 2.0), 10, 90)
 	if randi() % 100 < chance:
-		get_tree().change_scene_to_file("res://scenes/overworld/Overworld.tscn")
+		get_tree().change_scene_to_file(GameManager.current_scene_path)
 	else:
 		message_label.text = "Couldn't escape!"
 

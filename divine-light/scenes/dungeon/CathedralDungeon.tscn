@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/dungeon/Dungeon.gd" id="1_dungeon"]
+[ext_resource type="Texture2D" uid="uid://d4cx7ioised60" path="res://assets/tilesets/placeholder_tiles.png" id="2_tiles"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cathedral"]
+texture = ExtResource("2_tiles")
+0:0/next_alternative_id = 2
+0:0/0 = 0
+0:0/1 = 1
+1:0/next_alternative_id = 2
+1:0/0 = 0
+1:0/1 = 1
+2:0/next_alternative_id = 2
+2:0/0 = 0
+2:0/1 = 1
+
+[sub_resource type="TileSet" id="TileSet_cathedral"]
+sources/0 = SubResource("TileSetAtlasSource_cathedral")
+
+[node name="CathedralDungeon" type="Node2D"]
+script = ExtResource("1_dungeon")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_set = SubResource("TileSet_cathedral")
+
+[node name="Player" parent="TileMapLayer" instance=ExtResource("3_player")]
+position = Vector2(64, 80)

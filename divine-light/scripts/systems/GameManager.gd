@@ -7,6 +7,10 @@ const SAVE_SLOTS: int = 3
 
 var party: Array = []
 var inventory: Dictionary = {}
+var current_location: String = "overworld"
+var current_scene_path: String = "res://scenes/overworld/Overworld.tscn"
+var pending_spawn_position: Vector2 = Vector2.ZERO
+var has_pending_spawn: bool = false
 
 
 func _ready() -> void:

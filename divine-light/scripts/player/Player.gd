@@ -12,9 +12,6 @@ var _steps_to_encounter: int = 0
 
 
 func _ready() -> void:
-	if GameManager.has_pending_spawn:
-		position = GameManager.pending_spawn_position
-		GameManager.has_pending_spawn = false
 	_target = position
 	_reset_encounter_counter()
 
@@ -86,3 +83,14 @@ func _check_encounter() -> void:
 
 func _reset_encounter_counter() -> void:
 	_steps_to_encounter = randi_range(10, 20)
+
+
+## Directly repositions the player, bypassing the tile-to-tile tween. For a
+## map's own controller script to call right after generating/loading its
+## layout (Dungeon.gd uses this for the procedurally-chosen spawn point) -
+## distinct from GameManager's pending-spawn mechanism, which is specifically
+## for "restore where I was before a battle interrupted me."
+func snap_to(world_pos: Vector2) -> void:
+	position = world_pos
+	_target = world_pos
+	_moving = false

@@ -835,10 +835,11 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 
 		"guard":
 			var target: Combatant = _get_ally_target(member, skill)
+			var rounds: int = _buff_duration(member, 2)
 			target.def_buff = int(power)
-			target.def_buff_rounds = 2
+			target.def_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s uses %s on %s!\nDEF +%d for 2 rounds!" % [member.display_name, skill["name"], target.display_name, power]
+			message_label.text = "%s uses %s on %s!\nDEF +%d for %d rounds!" % [member.display_name, skill["name"], target.display_name, power, rounds]
 
 		"taunt":
 			member.taunt_rounds = 1
@@ -846,28 +847,31 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			message_label.text = "%s taunts!\nAll enemies must attack %s!" % [member.display_name, member.display_name]
 
 		"fortify":
+			var rounds: int = _buff_duration(member, 2)
 			for ally in _party:
 				if ally.is_alive():
 					ally.def_buff = maxi(ally.def_buff, int(power))
-					ally.def_buff_rounds = 2
+					ally.def_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s uses %s!\nAll allies gain DEF for 2 rounds!" % [member.display_name, skill["name"]]
+			message_label.text = "%s uses %s!\nAll allies gain DEF for %d rounds!" % [member.display_name, skill["name"], rounds]
 
 		"divine_shield":
+			var rounds: int = _buff_duration(member, 2)
 			for ally in _party:
 				if ally.is_alive() and ally.row == member.row:
 					ally.def_buff = maxi(ally.def_buff, int(power))
-					ally.def_buff_rounds = 2
+					ally.def_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s raises %s!\n%s row DEF increased for 2 rounds!" % [member.display_name, skill["name"], member.row.capitalize()]
+			message_label.text = "%s raises %s!\n%s row DEF increased for %d rounds!" % [member.display_name, skill["name"], member.row.capitalize(), rounds]
 
 		"battle_hymn":
+			var rounds: int = _buff_duration(member, 2)
 			for ally in _party:
 				if ally.is_alive():
 					ally.atk_buff = maxi(ally.atk_buff, int(power))
-					ally.atk_buff_rounds = 2
+					ally.atk_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s sings %s!\nAll allies gain ATK for 2 rounds!" % [member.display_name, skill["name"]]
+			message_label.text = "%s sings %s!\nAll allies gain ATK for %d rounds!" % [member.display_name, skill["name"], rounds]
 
 		"consecrate":
 			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
@@ -1376,6 +1380,17 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	enemy.boss_phase += 1
 	enemy.atk += 6
 	return "%s enters a new phase! Its attacks grow fiercer!\n" % enemy.display_name
+
+
+## Milestone 15's one wired-up Full Set Bonus: Vael's Holy Guardian Set
+## ("all buff skills last 1 extra round"). The other 11 sets in the design
+## doc each change a different, specific skill's behavior and aren't
+## implemented yet - add a check here (or a similarly-named helper) when
+## each one is actually needed, same pattern as this one.
+func _buff_duration(caster: Combatant, base_rounds: int) -> int:
+	if Equipment.has_set_bonus(caster, "holy_guardian"):
+		return base_rounds + int(Equipment.SET_BONUSES["holy_guardian"]["buff_duration_bonus"])
+	return base_rounds
 
 
 func _tick_buffs() -> void:

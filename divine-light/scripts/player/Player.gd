@@ -17,6 +17,19 @@ func _ready() -> void:
 	_reset_encounter_counter()
 
 
+## Milestone 15's equip screen entry point. Lives here (not Overworld.gd or
+## Dungeon.gd) since Player.gd is already shared between every map scene, so
+## this works from both Overworld and dungeons for free. Not the full "B =
+## main menu" shell the design doc's controller mapping describes - there's
+## no Formation/Inventory/Party status screen to put alongside it yet, so
+## this is a single-purpose key straight to the one screen that exists.
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
+		GameManager.pending_spawn_position = position
+		GameManager.has_pending_spawn = true
+		get_tree().change_scene_to_file("res://scenes/equip/Equip.tscn")
+
+
 func _process(delta: float) -> void:
 	if _moving:
 		position = position.move_toward(_target, MOVE_SPEED * delta)

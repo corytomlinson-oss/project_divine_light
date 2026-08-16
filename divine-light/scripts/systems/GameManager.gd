@@ -12,6 +12,8 @@ var current_scene_path: String = "res://scenes/overworld/Overworld.tscn"
 var pending_spawn_position: Vector2 = Vector2.ZERO
 var has_pending_spawn: bool = false
 var dungeon_seeds: Dictionary = {}
+var pending_boss_battle: bool = false
+var defeated_bosses: Dictionary = {}
 
 
 func _ready() -> void:
@@ -32,6 +34,22 @@ func _ready() -> void:
 			"Elixir": 3,
 			"Ether": 5,
 			"Antidote": 5,
+			# Milestone 15 starter gear - placeholder test items, not real loot.
+			# The full Holy Guardian Set is included so the one wired-up set
+			# bonus (Vael's "buff skills last 1 extra round") is immediately
+			# testable without a shop/loot system, which doesn't exist yet.
+			"Iron Sword": 1,
+			"Guardian Plate": 1,
+			"Guardian Helm": 1,
+			"Guardian Gauntlets": 1,
+			"Guardian Emblem": 1,
+			"Iron Claws": 1,
+			"Monk Wraps": 1,
+			"Apprentice Staff": 1,
+			"Scholar's Robe": 1,
+			"Twin Daggers": 1,
+			"Leather Hood": 1,
+			"Traveler's Ring": 1,
 		}
 
 
@@ -61,6 +79,7 @@ func save_game(slot: int) -> bool:
 		"party": party.map(func(c: Combatant) -> Dictionary: return c.to_save_dict()),
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
+		"defeated_bosses": defeated_bosses.duplicate(),
 	}
 	file.store_string(JSON.stringify(data))
 	return true
@@ -85,6 +104,10 @@ func load_game(slot: int) -> bool:
 	dungeon_seeds.clear()
 	for location in save_dungeon_seeds:
 		dungeon_seeds[location] = int(save_dungeon_seeds[location])
+	var save_defeated_bosses: Dictionary = parsed.get("defeated_bosses", {})
+	defeated_bosses.clear()
+	for location in save_defeated_bosses:
+		defeated_bosses[location] = bool(save_defeated_bosses[location])
 	party_loaded.emit()
 	return true
 

@@ -51,6 +51,10 @@ var row: String = "front"
 var queued_action: String = ""
 var queued_skill: Dictionary = {}
 var queued_target: int = 0
+var is_boss: bool = false
+var boss_phase: int = 0
+var phase_hp_thresholds: Array = []
+var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 
 func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,
@@ -147,6 +151,7 @@ func to_save_dict() -> Dictionary:
 		"row": row,
 		"stance": stance,
 		"is_ko": is_ko,
+		"equipment": equipment.duplicate(),
 	}
 
 
@@ -168,3 +173,6 @@ func load_save_dict(data: Dictionary) -> void:
 	row = String(data.get("row", row))
 	stance = String(data.get("stance", stance))
 	is_ko = bool(data.get("is_ko", is_ko))
+	var saved_equipment: Dictionary = data.get("equipment", {})
+	for slot in equipment.keys():
+		equipment[slot] = String(saved_equipment.get(slot, ""))

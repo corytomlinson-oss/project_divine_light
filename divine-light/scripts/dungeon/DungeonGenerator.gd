@@ -15,13 +15,14 @@ const FLOOR := "floor"
 const WALL := "wall"
 const DOOR := "door"
 const CAPTIVE_MARKER := "captive"
+const BOSS_TRIGGER := "boss_trigger"
 
 const DIRECTIONS: Array = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
 
 
 ## template keys: min_rooms, max_rooms, room_min_size (Vector2i), room_max_size (Vector2i)
 ## Returns: {tiles: Dictionary[Vector2i, String], entrance_cell, exit_cell,
-##           captive_cell, player_spawn, room_count}
+##           captive_cell, boss_trigger_cell, player_spawn, room_count}
 static func generate(template: Dictionary, seed_value: int) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
@@ -153,20 +154,37 @@ static func _build_tile_layout(graph: Dictionary, anchors: Dictionary, room_min:
 	tiles[exit_cell] = DOOR
 	tiles[captive_cell] = CAPTIVE_MARKER
 
-	var entrance_rect: Rect2i = room_rects[anchors["entrance_id"]]
-	var spawn_dir := Vector2i(0, 1) if entrance_rect.size.y > 1 else Vector2i(1, 0)
-	var player_spawn: Vector2i = entrance_cell + spawn_dir
-	if not tiles.has(player_spawn) or tiles[player_spawn] == WALL:
-		player_spawn = entrance_cell
+	var player_spawn: Vector2i = _offset_within_room(entrance_cell, room_rects[anchors["entrance_id"]], tiles)
+
+	# Boss trigger sits one tile off the boss room's door/center, same offset
+	# pattern as the player spawn - a fixed, visible encounter (per the
+	# Milestone 14 design) rather than the random step-counter standard
+	# enemies use. Painted here as its own tag so Dungeon.gd can turn it back
+	# into plain floor once GameManager records the boss as defeated.
+	var boss_trigger_cell: Vector2i = _offset_within_room(exit_cell, room_rects[anchors["boss_id"]], tiles)
+	tiles[boss_trigger_cell] = BOSS_TRIGGER
 
 	return {
 		"tiles": tiles,
 		"entrance_cell": entrance_cell,
 		"exit_cell": exit_cell,
 		"captive_cell": captive_cell,
+		"boss_trigger_cell": boss_trigger_cell,
 		"player_spawn": player_spawn,
 		"room_count": slot_of.size(),
 	}
+
+
+# Finds a tile just off a room's center (its door), always inside the room
+# and never on a wall - used for both the player's dungeon-entry spawn point
+# and the boss encounter trigger, which both need to sit just inside a door
+# rather than directly on top of it.
+static func _offset_within_room(center: Vector2i, rect: Rect2i, tiles: Dictionary) -> Vector2i:
+	var offset_dir := Vector2i(0, 1) if rect.size.y > 1 else Vector2i(1, 0)
+	var offset_cell: Vector2i = center + offset_dir
+	if not tiles.has(offset_cell) or tiles[offset_cell] == WALL:
+		return center
+	return offset_cell
 
 
 static func _carve_corridor(tiles: Dictionary, from: Vector2i, to: Vector2i) -> void:

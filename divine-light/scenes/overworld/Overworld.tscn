@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://dvvtvbraj0o2r"]
 
 [ext_resource type="Script" path="res://scripts/overworld/Overworld.gd" id="1_ow"]
-[ext_resource type="Texture2D" uid="uid://d4cx7ioised60" path="res://assets/tilesets/placeholder_tiles.png" id="1_sc77d"]
+[ext_resource type="Texture2D" path="res://assets/tilesets/overworld_tiles.png" id="1_sc77d"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fd81m"]
@@ -9,8 +9,6 @@ texture = ExtResource("1_sc77d")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
-3:0/0 = 0
-4:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_fd81m"]
 sources/0 = SubResource("TileSetAtlasSource_fd81m")
@@ -24,4 +22,4 @@ tile_map_data = PackedByteArray("AAAAAP//AAAAAAAAAAD/////AAAAAAAAAAD+////AAAAAAA
 tile_set = SubResource("TileSet_fd81m")
 
 [node name="Player" parent="TileMapLayer" instance=ExtResource("2_player")]
-position = Vector2(160, 90)
+position = Vector2(168, 88)

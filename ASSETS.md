@@ -38,16 +38,23 @@ Each entry's prompt is self-contained and ready to paste into an AI image/music 
 
 Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the roadmap restructuring notes). Cathedral's captive-marker and boss-marker tiles are dungeon-only; Overworld registers those same 2 slots but doesn't currently paint them anywhere.
 
-#### Overworld tileset
+#### Overworld tileset — ✅ fully integrated
 
-- [ ] **Grass floor**
-  Prompt: *"16-bit SNES-era JRPG pixel art tile, seamless tileable grass ground texture, subtle blade-of-grass detail, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, top-down view, 16x16 tile"*
+*Generated with [Retro Diffusion](https://retrodiffusion.ai) — Tilesets tab, Single Tile mode, 16×16. That tool handles pixel-art styling and resolution via mode/settings rather than prompt text, so the prompts actually used were pared down to just the subject — see each entry below. Retro Diffusion's default "Download Image" gives an upscaled PNG (512×512, a clean 32× nearest-neighbor scale) rather than the true pixel size — all three were downscaled back to genuine 16×16 after saving. Source files: `divine-light/assets/tilesets/source/overworld/`.*
 
-- [ ] **Tree/hedge wall**
-  Prompt: *"16-bit SNES-era JRPG pixel art tile, dense hedge or tree-line wall texture blocking passage, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+*Combined into `divine-light/assets/tilesets/overworld_tiles.png` (a new file — Overworld and Cathedral now have separate tilesets, Cathedral still on the placeholder until its own art exists) and wired into `Overworld.tscn`/`Overworld.gd`. Also painted a wall border around the Milestone 1 floor patch for the first time (it had zero walls before — nothing to show the wall art on) and fixed a real bug found via playtesting: the player's spawn position was never actually tile-centered (8px off on one axis since Milestone 1, invisible until real wall art existed to visibly overlap with). Full details in CLAUDE.md's Milestone 16 section.*
 
-- [ ] **Wooden gate door**
-  Prompt: *"16-bit SNES-era JRPG pixel art tile, a wooden gate or archway set into a hedge, clearly readable as an entrance, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+- [x] **Grass floor** — `grass_floor.png`
+  Prompt used: *"Seamless tileable grass ground texture, subtle blade-of-grass detail, slightly worn and weathered, muted natural green tones"*
+  Note: first attempt had strong vertical striping from "blade of grass" phrasing — revised to "mottled/soft variation" language to fix it. Passed seam check clean.
+
+- [x] **Tree/hedge wall** — `tree_hedge_wall.png`
+  Prompt used: *"Dense hedge or tree-line wall texture, dark and slightly overgrown, blocking passage, muted natural green-brown tones"*
+  Passed seam check clean on the first attempt.
+
+- [x] **Wooden gate door** — `wooden_gate_door.png`
+  Prompt used: *"A wooden gate or archway set into a hedge, clearly readable as an entrance, warm wood tones"*
+  Note: showed a visible seam in the tiled preview, but this doesn't matter for a door — it's placed as a single tile in-game, never repeated edge-to-edge against a copy of itself the way floor/wall are. Kept as-is.
 
 #### Cathedral (dungeon) tileset
 

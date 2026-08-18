@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tile Seam Preview</title>
+<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+		background: #1a1a1a;
+		font-family: sans-serif;
+		color: #eee;
+	}
+	#dropzone {
+		position: fixed;
+		top: 0; left: 0; right: 0;
+		padding: 14px 16px;
+		background: #111;
+		border-bottom: 2px solid #333;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+	#dropzone.dragover {
+		background: #223;
+		border-bottom-color: #6c6;
+	}
+	#tiles {
+		position: absolute;
+		top: 70px; left: 0; right: 0; bottom: 0;
+		display: grid;
+		image-rendering: pixelated;
+		image-rendering: -moz-crisp-edges;
+		image-rendering: crisp-edges;
+	}
+	#tiles img {
+		width: 100%;
+		height: 100%;
+		display: block;
+		image-rendering: pixelated;
+		image-rendering: -moz-crisp-edges;
+		image-rendering: crisp-edges;
+	}
+	.hint {
+		color: #999;
+		font-size: 13px;
+	}
+	input[type=range] {
+		width: 160px;
+	}
+	label {
+		font-size: 13px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.grid-toggle {
+		font-size: 13px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		cursor: pointer;
+		user-select: none;
+	}
+	.seam-line {
+		position: absolute;
+		top: 70px; left: 0; right: 0; bottom: 0;
+		pointer-events: none;
+		display: none;
+	}
+</style>
+</head>
+<body>
+
+<div id="dropzone">
+	<strong>Tile Seam Preview</strong>
+	<span class="hint">Drop an image here, or</span>
+	<input type="file" id="fileInput" accept="image/*">
+	<label>Zoom: <input type="range" id="zoom" min="1" max="8" value="4" step="1"><span id="zoomVal">4x</span></label>
+	<label class="grid-toggle"><input type="checkbox" id="gridToggle"> show seam grid lines</label>
+	<span class="hint" id="statusText">No image loaded yet.</span>
+</div>
+
+<div id="tiles"></div>
+<div class="seam-line" id="seamOverlay"></div>
+
+<script>
+	const tiles = document.getElementById('tiles');
+	const fileInput = document.getElementById('fileInput');
+	const dropzone = document.getElementById('dropzone');
+	const zoomSlider = document.getElementById('zoom');
+	const zoomVal = document.getElementById('zoomVal');
+	const gridToggle = document.getElementById('gridToggle');
+	const seamOverlay = document.getElementById('seamOverlay');
+	const statusText = document.getElementById('statusText');
+
+	let nativeSize = 16;
+
+	function loadImage(file) {
+		if (!file || !file.type.startsWith('image/')) return;
+		const url = URL.createObjectURL(file);
+		const probe = new Image();
+		probe.onload = () => {
+			nativeSize = probe.naturalWidth;
+			statusText.textContent = file.name + '  (' + probe.naturalWidth + '×' + probe.naturalHeight + 'px native)';
+			renderTiles(url);
+		};
+		probe.src = url;
+	}
+
+	function renderTiles(url) {
+		const zoom = parseInt(zoomSlider.value, 10);
+		const tilePx = nativeSize * zoom;
+		const cols = Math.ceil(window.innerWidth / tilePx) + 1;
+		const rows = Math.ceil((window.innerHeight - 70) / tilePx) + 1;
+
+		tiles.style.gridTemplateColumns = 'repeat(' + cols + ', ' + tilePx + 'px)';
+		tiles.style.gridTemplateRows = 'repeat(' + rows + ', ' + tilePx + 'px)';
+		tiles.innerHTML = '';
+
+		for (let i = 0; i < cols * rows; i++) {
+			const img = document.createElement('img');
+			img.src = url;
+			tiles.appendChild(img);
+		}
+
+		seamOverlay.style.backgroundImage =
+			'repeating-linear-gradient(to right, red 0, red 1px, transparent 1px, transparent ' + tilePx + 'px),' +
+			'repeating-linear-gradient(to bottom, red 0, red 1px, transparent 1px, transparent ' + tilePx + 'px)';
+	}
+
+	fileInput.addEventListener('change', (e) => loadImage(e.target.files[0]));
+
+	['dragenter', 'dragover'].forEach(evt =>
+		dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+	['dragleave', 'drop'].forEach(evt =>
+		dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+	dropzone.addEventListener('drop', (e) => loadImage(e.dataTransfer.files[0]));
+
+	zoomSlider.addEventListener('input', () => {
+		zoomVal.textContent = zoomSlider.value + 'x';
+		if (tiles.children.length) {
+			const currentImg = tiles.children[0].src;
+			renderTiles(currentImg);
+		}
+	});
+
+	gridToggle.addEventListener('change', () => {
+		seamOverlay.style.display = gridToggle.checked ? 'block' : 'none';
+	});
+
+	window.addEventListener('resize', () => {
+		if (tiles.children.length) renderTiles(tiles.children[0].src);
+	});
+</script>
+
+</body>
+</html>

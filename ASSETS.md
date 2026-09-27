@@ -56,28 +56,47 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
   Prompt used: *"A wooden gate or archway set into a hedge, clearly readable as an entrance, warm wood tones"*
   Note: showed a visible seam in the tiled preview, but this doesn't matter for a door — it's placed as a single tile in-game, never repeated edge-to-edge against a copy of itself the way floor/wall are. Kept as-is.
 
-#### Cathedral (dungeon) tileset
+#### Cathedral (dungeon) tileset — ✅ fully integrated
 
-- [ ] **Stone floor**
+*Made differently than the Overworld set: hand-coded pixel art (Python + PIL), not AI-generated — same technique as the message box panel (see CLAUDE.md's "Code-based pixel art" note). All 5 tiles generated natively at 16×16 (no upscale/downscale step needed, unlike the Retro Diffusion tiles). Generator script + individual source tiles: `divine-light/assets/tilesets/source/cathedral/build_tiles.py`. Combined into `divine-light/assets/tilesets/cathedral_tiles.png` (80×16, 5 columns in the exact order `Dungeon.gd`'s `TAG_TO_COORDS` expects: floor/wall/door/captive/boss) and wired into `CathedralDungeon.tscn`'s `TileSetAtlasSource`, replacing `placeholder_tiles.png` (now deleted — nothing referenced it anymore once this landed). Verified headlessly: texture path/size, all 5 atlas coords registered, and a round-trip paint/read check on each.*
+
+- [x] **Stone floor**
   Prompt: *"16-bit SNES-era JRPG pixel art tile, seamless tileable worn stone cathedral floor, subtle cracked flagstone detail, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+  Built as a 2×2 grid of 8×8 flagstone blocks (period divides 16, so it tiles cleanly) with per-block color jitter and a few scattered crack pixels. Passed seam check clean.
 
-- [ ] **Stone wall**
+- [x] **Stone wall**
   Prompt: *"16-bit SNES-era JRPG pixel art tile, corrupted cathedral stone wall texture, faint dark cracks or unnatural veining, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+  Running-bond ashlar coursing (2 courses, offset every other row) plus a wobbling violet "corruption vein" thread and a couple of crack accents. Passed seam check clean.
 
-- [ ] **Arched door**
+- [x] **Arched door**
   Prompt: *"16-bit SNES-era JRPG pixel art tile, an ornate stone archway doorway set into a cathedral wall, clearly readable as an entrance/exit, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+  Single-instance tile (like the Overworld gate) — no seam check needed, never repeated edge-to-edge in-game.
 
-- [ ] **Captive marker** *(marks the room holding a rescuable party member)*
+- [x] **Captive marker** *(marks the room holding a rescuable party member)*
   Prompt: *"16-bit SNES-era JRPG pixel art tile, a glowing violet rune or sigil set into a stone floor, marking a point of interest, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+  A rune ring + radiating spokes + glowing core, sitting on the same stone-floor base so it drops into the floor tile cleanly.
 
-- [ ] **Boss-trigger marker** *(marks the tile that starts the boss fight)*
+- [x] **Boss-trigger marker** *(marks the tile that starts the boss fight)*
   Prompt: *"16-bit SNES-era JRPG pixel art tile, a menacing glowing crimson rune or sigil set into a stone floor, marking a dangerous point of interest, top-down view, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, 16x16 tile"*
+  Same rune-ring construction as the captive marker, crimson palette instead of violet, so the two read as a clearly distinct pair.
 
 ### Characters
 
-- [ ] **Player (generic overworld sprite)**
-  *No starting-class selection exists in code yet, so this is one generic placeholder representing "the player," not a specific class.*
-  Prompt: *"16-bit SNES-era JRPG pixel art character sprite, a lone hooded adventurer, front-facing, simple 3-4 frame walk-ready pose, top-down RPG proportions (like classic Final Fantasy overworld sprites), clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette, transparent background"*
+*Scope call (2026-09-27): generating all 4 class-specific overworld sprites now instead of one generic placeholder, since each class's look is already fixed by the design doc. **Full class-selection isn't built** — no starting-class-selection feature exists in code (`GameManager.gd` always creates all 4 party members from the start; nothing marks any one of them as "the player"). Rather than sit unused, Vael's sprite was wired in directly as `Player.tscn`'s current default appearance — a pragmatic single-sprite stand-in, not a real per-class swap system. When the class-selection feature (Act I content work, Milestone 18a+) actually lands, that's the point to make `Player.tscn`'s texture swappable and wire in the other 3.*
+
+- [x] **Vael overworld sprite** *(Templar — tank/buffer/minor healer)*
+  Prompt used: *"A holy knight templar, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, wearing plate armor with a shield, warm gold/white holy color accents"*
+  Generated via Retro Diffusion (Sprite mode, 16×32 canvas — RD Pro model); an earlier attempt or two along the way reportedly came back reading as an unarmored figure, but the two candidates actually reviewed both looked like a proper armored knight — used the tighter-cropped one, where the gold cross on the shield read most clearly. Same upscale gotcha as the tiles (RD's download was a clean 4× upscale, 64×128 — downscaled to the true 16×32). `assets/sprites/vael.png`, wired into `Player.tscn`'s `Sprite2D` in place of the placeholder `icon.svg` (scale reset from 0.1 to 1.0 since this is already native pixel size). Verified headlessly: texture path/size, and that the player is still correctly tile-centered with the new sprite.
+  **A code-based version was tried for comparison first** (same Python/PIL technique as the panel and Cathedral tiles) — took 3 passes (first read as a mace/lollipop silhouette from a pure distance-based body shape, second lost the leg gap and had no visible arms, third fixed both) but even the improved version didn't hold up next to the AI-generated one, so Retro Diffusion's result was kept as the real asset. Confirms the earlier read: this technique is solid for geometric/pattern work (tiles, borders, runes) but organic humanoid proportions are a real weak point. Experiment files stay in the session scratchpad, not the project.
+
+- [ ] **Ryn overworld sprite** *(Martial Artist — Qi-based primary healer)*
+  Prompt: *"A martial artist monk, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, simple wrapped robes and bandaged forearms, no weapon, calm and disciplined bearing"*
+
+- [ ] **Lyra overworld sprite** *(Invoker — elemental mage)*
+  Prompt: *"An elemental invoker mage, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, flowing spellcaster robes and a staff, faint elemental glow"*
+
+- [ ] **Silas overworld sprite** *(Assassin — status effects, highest AGI)*
+  Prompt: *"A hooded assassin, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, dark fitted leathers with a pair of daggers, stealthy silhouette"*
 
 ### Enemies
 
@@ -111,17 +130,21 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [ ] **Battle background**
   Prompt: *"16-bit SNES-era JRPG battle background, a dim corrupted forest clearing at dusk, subtle parallax-ready single layer, atmospheric and moody, muted high-fantasy palette with a corrupted/twisted undertone, 320x180 pixel art"*
 
-- [ ] **Message box panel** *(320×42px area — provide as a 9-slice border texture)*
+- [x] **Message box panel** *(320×42px area — provide as a 9-slice border texture)*
   Prompt: *"16-bit SNES-era JRPG UI dialogue box frame, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, ready to tile/stretch, muted high-fantasy palette, transparent center"*
+  **Made differently than the rest of this list:** hand-coded pixel art (Python + PIL), not AI-generated — see the "Code-based pixel art" note in CLAUDE.md's Milestone 16 section. `assets/ui/panel_frame.png` (32×32, 11px solid border, 10px transparent stretchable center), generator script kept at `assets/ui/source/build_panel.py`. Wired into `Battle.tscn`'s `MessageBox` panel as a `StyleBoxTexture` (`texture_margin_*` = 11), verified headlessly.
 
 - [ ] **Action menu panel** *(144×56px area — provide as a 9-slice border texture, can reuse the message box style)*
   Prompt: *"16-bit SNES-era JRPG UI menu panel frame, matching the game's dialogue box style, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
+  **Tried, then reverted — genuinely doesn't fit.** Framed with the shared panel texture the same way as the message box, but this panel's actual content (5 menu options) needs a minimum 55-59px of vertical room, and the 144×56 footprint only has 56px total — an 11px top+bottom border leaves no room at all. Confirmed via Cory's playtest (the 5th option, "Run," was pushed off the bottom of the screen entirely) and via headless measurement of the real rendered minimum size. Reverted to a plain unframed `VBoxContainer`, same as before this pass. See CLAUDE.md's Milestone 16 section for the full story — this isn't a fit for the current battle screen's vertical budget without either shrinking content further or reworking the layout, so it stays unchecked.
 
 - [ ] **Party panel frame** *(157×64px area — can reuse the action menu style)*
   Prompt: *"16-bit SNES-era JRPG UI status panel frame, matching the game's menu panel style, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
+  **Same problem as the action menu, worse.** 4 party members (label + HP bar each) need a minimum 64-71px, and the 157×64 footprint only has 64px total with zero border overhead available. Silas's HP bar was pushed off-screen in Cory's playtest. Reverted to unframed. Also surfaced a real pre-existing bug independent of this pass: even without any border, this panel's content was already ~5px taller than its allotted space (nobody had noticed since nothing revealed the exact cutoff) — fixed by removing the 1px inter-item separation, which was enough to bring it back within the screen either way.
 
-- [ ] **Enemy display backdrop** *(~100×68px area)*
+- [x] **Enemy display backdrop** *(~100×68px area)*
   Prompt: *"16-bit SNES-era JRPG UI battle backdrop element, a subtle dark vignette or platform silhouette for enemies to stand on, matching a corrupted forest battle background, muted high-fantasy palette, transparent-friendly"*
+  **Reuses the message box panel texture directly.** New `EnemyBackdrop` `Panel` added as the first child of `EnemyArea` in `Battle.tscn` (drawn behind the dynamically-created enemy sprites). `Battle.gd`'s `_setup_enemy_ui()` placeholder sprite rects were reflowed to fit inside the backdrop's 11px border (width budget 90→78, start x 10→16, y 5→11, height 63→50) instead of overlapping it. Placeholder red rectangles still stand in for real enemy sprites (see Enemies section below) — this backdrop will sit behind whatever art replaces them later. Verified headlessly (each sprite rect confirmed inside the backdrop's content zone).
 
 ### Audio — BGM
 

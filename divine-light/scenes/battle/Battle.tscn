@@ -1,6 +1,14 @@
-[gd_scene format=4]
+[gd_scene load_steps=3 format=4]
 
 [ext_resource type="Script" path="res://scripts/battle/Battle.gd" id="1_battle"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_frame.png" id="2_panel_frame"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel_frame"]
+texture = ExtResource("2_panel_frame")
+texture_margin_left = 11.0
+texture_margin_top = 11.0
+texture_margin_right = 11.0
+texture_margin_bottom = 11.0
 
 [node name="Battle" type="Node2D"]
 script = ExtResource("1_battle")
@@ -12,17 +20,25 @@ color = Color(0.04, 0.04, 0.12, 1)
 
 [node name="EnemyArea" type="Node2D" parent="."]
 
+[node name="EnemyBackdrop" type="Panel" parent="EnemyArea"]
+offset_left = 5.0
+offset_top = 0.0
+offset_right = 105.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel_frame")
+
 [node name="MessageBox" type="Panel" parent="."]
 offset_left = 0.0
 offset_top = 72.0
 offset_right = 320.0
 offset_bottom = 114.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel_frame")
 
 [node name="MessageLabel" type="Label" parent="MessageBox"]
-offset_left = 5.0
-offset_top = 4.0
-offset_right = 315.0
-offset_bottom = 38.0
+offset_left = 11.0
+offset_top = 11.0
+offset_right = 309.0
+offset_bottom = 31.0
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 text = ""
@@ -42,7 +58,7 @@ offset_left = 6.0
 offset_top = 124.0
 offset_right = 150.0
 offset_bottom = 180.0
-theme_override_constants/separation = 1
+theme_override_constants/separation = 0
 
 [node name="Option0" type="Label" parent="SelectionArea/ActionMenu"]
 theme_override_font_sizes/font_size = 7
@@ -69,7 +85,7 @@ offset_left = 158.0
 offset_top = 114.0
 offset_right = 315.0
 offset_bottom = 178.0
-theme_override_constants/separation = 1
+theme_override_constants/separation = 0
 
 [node name="HP_Vael" type="Label" parent="PartyPanel"]
 theme_override_font_sizes/font_size = 8

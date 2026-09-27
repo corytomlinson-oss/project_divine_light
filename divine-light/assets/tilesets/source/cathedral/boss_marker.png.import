@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4cx7ioised60"
-path="res://.godot/imported/placeholder_tiles.png-c0f5b0b12f4381af96c6e665cd0aa67c.ctex"
+uid="uid://c2aanbvpcxnop"
+path="res://.godot/imported/boss_marker.png-92c17c39ff79da23e12325ff24c46231.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tilesets/placeholder_tiles.png"
-dest_files=["res://.godot/imported/placeholder_tiles.png-c0f5b0b12f4381af96c6e665cd0aa67c.ctex"]
+source_file="res://assets/tilesets/source/cathedral/boss_marker.png"
+dest_files=["res://.godot/imported/boss_marker.png-92c17c39ff79da23e12325ff24c46231.ctex"]
 
 [params]
 

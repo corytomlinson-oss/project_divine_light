@@ -245,14 +245,14 @@ func _setup_enemy_ui() -> void:
 	_enemy_sprites = []
 	var count: int = _enemies.size()
 	var gap := 4.0
-	var sprite_w := (90.0 - gap * (count - 1)) / count
+	var sprite_w := (78.0 - gap * (count - 1)) / count
 	var row_h := 22.0
 
 	for i in count:
-		var sx := 10.0 + i * (sprite_w + gap)
+		var sx := 16.0 + i * (sprite_w + gap)
 		var sprite := ColorRect.new()
-		sprite.position = Vector2(sx, 5)
-		sprite.size = Vector2(sprite_w, 63)
+		sprite.position = Vector2(sx, 11)
+		sprite.size = Vector2(sprite_w, 50)
 		sprite.color = Color(0.55, 0.12, 0.12, 1)
 		$EnemyArea.add_child(sprite)
 		_enemy_sprites.append(sprite)

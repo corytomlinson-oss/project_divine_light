@@ -11,7 +11,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 Currently mid-**Milestone 16** (current-content art & music pass) — 11 of 38 assets in `ASSETS.md` done (Overworld tileset, Cathedral tileset, message box panel, enemy display backdrop, Vael's overworld sprite). Everything committed and pushed to `cjt`; nothing in progress or uncommitted. Natural next steps, any order:
 - Ryn/Lyra/Silas overworld sprites + all 8 enemy sprites + the battle background — all organic art, all a Retro Diffusion job (see the Milestone 16 section's "code-based pixel art" notes for why character art specifically stays with Retro Diffusion, not the procedural technique).
 - BGM/SFX — not started at all yet.
-- Walk-cycle animation and spell VFX are planned but deliberately not started — see the dedicated note in the Milestone 16 section for the approach and an asset-count/cost estimate already given to Cory.
+- **Vael's walk cycle is built (2026-09-27):** hand-placed pixel frames (see ASSETS.md's Vael entry: this beat Retro Diffusion for character art after all), `Player.tscn` now uses an `AnimatedSprite2D` with `assets/sprites/vael_frames.tres`, and `Player.gd` tracks `_facing` and plays `walk_<dir>` / `idle_<dir>` (left = `side` + `flip_h`). Animation is switched only from `_handle_input()`, never on tile arrival, so holding a direction doesn't flash the idle frame at tile boundaries. Facing isn't persisted across scene changes (always faces down after a battle). Spell VFX are still planned but not started (see the Milestone 16 section).
 
 ## ⚠ Open design questions (discuss before implementing)
 

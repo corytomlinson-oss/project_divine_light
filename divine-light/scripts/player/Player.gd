@@ -9,7 +9,11 @@ const BOSS_ATLAS_COORDS := Vector2i(4, 0)
 var _moving: bool = false
 var _target: Vector2
 var _steps_to_encounter: int = 0
+## "down" / "up" / "left" / "right". Left has no art of its own - it plays the
+## "side" animations (drawn facing right) with flip_h.
+var _facing: String = "down"
 @onready var _tile_map: TileMapLayer = get_parent()
+@onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 
 func _ready() -> void:
@@ -54,14 +58,41 @@ func _handle_input() -> void:
 		dir = Vector2.UP
 
 	if dir == Vector2.ZERO:
+		_play_anim("idle")
 		return
 
+	_face(dir)
 	var next_target: Vector2 = position + dir * TILE_SIZE
 	if not _is_walkable(next_target):
+		# Turn to face the wall but stay standing, like classic tile RPGs.
+		_play_anim("idle")
 		return
 
 	_target = next_target
 	_moving = true
+	_play_anim("walk")
+
+
+func _face(dir: Vector2) -> void:
+	if dir == Vector2.RIGHT:
+		_facing = "right"
+	elif dir == Vector2.LEFT:
+		_facing = "left"
+	elif dir == Vector2.DOWN:
+		_facing = "down"
+	else:
+		_facing = "up"
+
+
+## Only called from _handle_input(), never on tile arrival - holding a
+## direction goes arrive -> _handle_input() -> walk again on the next frame,
+## and play() with the already-playing animation continues it rather than
+## restarting, so the walk cycle runs smoothly across tiles instead of
+## flashing the idle frame at every tile boundary.
+func _play_anim(kind: String) -> void:
+	var sheet_dir: String = "side" if _facing == "left" or _facing == "right" else _facing
+	_sprite.flip_h = _facing == "left"
+	_sprite.play(kind + "_" + sheet_dir)
 
 
 func _is_walkable(world_pos: Vector2) -> bool:

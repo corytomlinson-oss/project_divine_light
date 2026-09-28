@@ -236,6 +236,8 @@ func _ready() -> void:
 	_setup_background()
 	_setup_party_bars()
 	_enemies = _generate_encounter()
+	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
+	Music.play("boss" if boss_fight else "battle", "battle")
 	_setup_enemy_ui()
 	_setup_party_sprites()
 	GameManager.party_loaded.connect(_update_ui)
@@ -1793,9 +1795,11 @@ func _end_battle(victory: bool) -> void:
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))
 		_update_ui()
+		Music.stop(0.3)
 		Sfx.play("victory")
 		message_label.text = "Victory! +%d XP\nPress Enter." % total_xp
 	else:
+		Music.stop(1.0)
 		message_label.text = "The party has fallen...\nPress Enter."
 
 

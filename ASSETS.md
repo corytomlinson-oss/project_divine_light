@@ -157,18 +157,20 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### Audio — BGM
 
+*Done 2026-09-27, composed and synthesized in code rather than made with the tools/prompts below (kept for reference): `assets/audio/source/build_music.py` writes each track as per-voice note lists (pulse lead, pulse arpeggio, triangle bass, noise/kick drums, optional organ pad) -> `assets/audio/music/<track>.wav`, with a `smpl` loop chunk so Godot loops from the end of the intro. Played through the `Music` autoload (`scripts/systems/Music.gd`). Overworld: G major 120 BPM. Dungeon (Cathedral): A minor 80 BPM. Battle: D minor 152 BPM. Boss: E minor 168 BPM.*
+
 *Suno AI (suno.com) or similar — describe genre/instrumentation/mood, not a literal image-style prompt.*
 
-- [ ] **Overworld theme**
+- [x] **Overworld theme**
   Prompt: *"16-bit SNES-style JRPG overworld exploration theme, chiptune instrumentation, gentle but slightly tense fantasy melody, looping, evokes a beautiful world under quiet threat, mid-tempo, instrumental only"*
 
-- [ ] **Dungeon theme** *(Cathedral)*
+- [x] **Dungeon theme** *(Cathedral)*
   Prompt: *"16-bit SNES-style JRPG dungeon exploration theme, chiptune instrumentation, echoing and eerie, slow tempo, corrupted cathedral atmosphere, looping, instrumental only"*
 
-- [ ] **Standard battle theme**
+- [x] **Standard battle theme**
   Prompt: *"16-bit SNES-style JRPG random-encounter battle theme, chiptune instrumentation, upbeat and energetic, driving rhythm, looping, instrumental only"*
 
-- [ ] **Boss battle theme**
+- [x] **Boss battle theme**
   Prompt: *"16-bit SNES-style JRPG boss battle theme, chiptune instrumentation, intense and dramatic, faster and heavier than a standard battle theme, looping, instrumental only"*
 
 ### Audio — SFX

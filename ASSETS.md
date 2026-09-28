@@ -133,20 +133,23 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### UI Frames
 
-- [ ] **Battle background**
+- [x] **Battle background**
   Prompt: *"16-bit SNES-era JRPG battle background, a dim corrupted forest clearing at dusk, subtle parallax-ready single layer, atmospheric and moody, muted high-fantasy palette with a corrupted/twisted undertone, 320x180 pixel art"*
+  **Done 2026-09-27, code-generated** (too big for hand-placed grids): `assets/ui/source/build_battle_bg.py` builds it in seeded layers with a 28-color palette and ordered dithering -> `assets/ui/battle_bg_forest.png`. The scene fills the top 72px; below that it fades to near-black because the battle UI draws text over it. Used for Overworld battles only (`Battle.gd`'s `BATTLE_BACKGROUNDS`); Cathedral battles keep the plain color until they get their own interior background.
 
 - [x] **Message box panel** *(320×42px area — provide as a 9-slice border texture)*
   Prompt: *"16-bit SNES-era JRPG UI dialogue box frame, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, ready to tile/stretch, muted high-fantasy palette, transparent center"*
   **Made differently than the rest of this list:** hand-coded pixel art (Python + PIL), not AI-generated — see the "Code-based pixel art" note in CLAUDE.md's Milestone 16 section. `assets/ui/panel_frame.png` (32×32, 11px solid border, 10px transparent stretchable center), generator script kept at `assets/ui/source/build_panel.py`. Wired into `Battle.tscn`'s `MessageBox` panel as a `StyleBoxTexture` (`texture_margin_*` = 11), verified headlessly.
 
-- [ ] **Action menu panel** *(144×56px area — provide as a 9-slice border texture, can reuse the message box style)*
+- [~] **Action menu panel** *(144×56px area — provide as a 9-slice border texture, can reuse the message box style)*
   Prompt: *"16-bit SNES-era JRPG UI menu panel frame, matching the game's dialogue box style, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
   **Tried, then reverted — genuinely doesn't fit.** Framed with the shared panel texture the same way as the message box, but this panel's actual content (5 menu options) needs a minimum 55-59px of vertical room, and the 144×56 footprint only has 56px total — an 11px top+bottom border leaves no room at all. Confirmed via Cory's playtest (the 5th option, "Run," was pushed off the bottom of the screen entirely) and via headless measurement of the real rendered minimum size. Reverted to a plain unframed `VBoxContainer`, same as before this pass. See CLAUDE.md's Milestone 16 section for the full story — this isn't a fit for the current battle screen's vertical budget without either shrinking content further or reworking the layout, so it stays unchecked.
+  **Deferred:** the bottom of the 180px battle screen has no room for an 11px border without reworking the whole layout (see the 2026-09-27 VBoxContainer overflow note in CLAUDE.md). Not blocking Milestone 16.
 
-- [ ] **Party panel frame** *(157×64px area — can reuse the action menu style)*
+- [~] **Party panel frame** *(157×64px area — can reuse the action menu style)*
   Prompt: *"16-bit SNES-era JRPG UI status panel frame, matching the game's menu panel style, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
   **Same problem as the action menu, worse.** 4 party members (label + HP bar each) need a minimum 64-71px, and the 157×64 footprint only has 64px total with zero border overhead available. Silas's HP bar was pushed off-screen in Cory's playtest. Reverted to unframed. Also surfaced a real pre-existing bug independent of this pass: even without any border, this panel's content was already ~5px taller than its allotted space (nobody had noticed since nothing revealed the exact cutoff) — fixed by removing the 1px inter-item separation, which was enough to bring it back within the screen either way.
+  **Deferred:** the bottom of the 180px battle screen has no room for an 11px border without reworking the whole layout (see the 2026-09-27 VBoxContainer overflow note in CLAUDE.md). Not blocking Milestone 16.
 
 - [x] **Enemy display backdrop** *(~100×68px area)*
   Prompt: *"16-bit SNES-era JRPG UI battle backdrop element, a subtle dark vignette or platform silhouette for enemies to stand on, matching a corrupted forest battle background, muted high-fantasy palette, transparent-friendly"*

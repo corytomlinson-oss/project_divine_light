@@ -90,14 +90,17 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
   **Replaced 2026-09-27 by a hand-placed version + full walk cycle.** A second code-based attempt that places every pixel by hand on a 16×32 character grid (one character = one pixel, fixed ~18-color palette), rather than generating a body from shapes like the attempt below, beat the Retro Diffusion sprite in a side-by-side (one revision: the gold stripe down the helm was swapped for a plain steel bucket helm with a single eye slit, closer to the RD look). Built out into all 9 walk frames: `assets/sprites/vael_walk.png` (48×96 sheet: rows down/up/right, columns idle/stepA/stepB; left = right row with `flip_h`), generator `assets/sprites/source/build_vael_walk.py`, Godot-generated `assets/sprites/vael_frames.tres` (idle_/walk_ × down/up/side, walk loops stepA→idle→stepB→idle at 6 fps). The old `vael.png` is no longer referenced.
   **A code-based version was tried for comparison first** (same Python/PIL technique as the panel and Cathedral tiles) — took 3 passes (first read as a mace/lollipop silhouette from a pure distance-based body shape, second lost the leg gap and had no visible arms, third fixed both) but even the improved version didn't hold up next to the AI-generated one, so Retro Diffusion's result was kept as the real asset. Confirms the earlier read: this technique is solid for geometric/pattern work (tiles, borders, runes) but organic humanoid proportions are a real weak point. Experiment files stay in the session scratchpad, not the project.
 
-- [ ] **Ryn overworld sprite** *(Martial Artist — Qi-based primary healer)*
+- [x] **Ryn overworld sprite** *(Martial Artist — Qi-based primary healer)*
   Prompt: *"A martial artist monk, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, simple wrapped robes and bandaged forearms, no weapon, calm and disciplined bearing"*
+  Done 2026-09-27 as a hand-placed 9-frame walk sheet (same technique and layout as Vael): `assets/sprites/ryn_walk.png`, `ryn_frames.tres`, generator `assets/sprites/source/build_ryn_walk.py` (shared helper `pixelgrid.py`). Not wired in yet, since only Vael is the player until class selection exists.
 
-- [ ] **Lyra overworld sprite** *(Invoker — elemental mage)*
+- [x] **Lyra overworld sprite** *(Invoker — elemental mage)*
   Prompt: *"An elemental invoker mage, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, flowing spellcaster robes and a staff, faint elemental glow"*
+  Done 2026-09-27 as a hand-placed 9-frame walk sheet (same technique and layout as Vael): `assets/sprites/lyra_walk.png`, `lyra_frames.tres`, generator `assets/sprites/source/build_lyra_walk.py` (shared helper `pixelgrid.py`). Not wired in yet, since only Vael is the player until class selection exists.
 
-- [ ] **Silas overworld sprite** *(Assassin — status effects, highest AGI)*
+- [x] **Silas overworld sprite** *(Assassin — status effects, highest AGI)*
   Prompt: *"A hooded assassin, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, dark fitted leathers with a pair of daggers, stealthy silhouette"*
+  Done 2026-09-27 as a hand-placed 9-frame walk sheet (same technique and layout as Vael): `assets/sprites/silas_walk.png`, `silas_frames.tres`, generator `assets/sprites/source/build_silas_walk.py` (shared helper `pixelgrid.py`). Not wired in yet, since only Vael is the player until class selection exists.
 
 ### Enemies
 

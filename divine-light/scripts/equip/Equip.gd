@@ -43,17 +43,23 @@ func _process(_delta: float) -> void:
 
 func _handle_list_input(count: int, on_confirm: Callable, on_cancel: Callable) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
+		Sfx.play("menu_cancel")
 		on_cancel.call()
 		return
 	if count == 0:
 		return
 	if Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_cursor = (_cursor + 1) % count
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_cursor = (_cursor - 1 + count) % count
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_accept"):
+		# Picking the item itself gets the equip clink instead (_confirm_item).
+		if _state != MenuState.ITEM_SELECT:
+			Sfx.play("menu_confirm")
 		on_confirm.call()
 
 
@@ -94,6 +100,7 @@ func _confirm_item() -> void:
 		Equipment.unequip(member, _slot)
 	else:
 		Equipment.equip(member, item_name)
+	Sfx.play("equip")
 	_back_to_slot_select()
 
 

@@ -448,6 +448,7 @@ func _animate_party_hp_changes(instant: bool = false) -> void:
 				sprite.modulate = Color(0.45, 0.4, 0.55)
 				sprite.position = _party_home(i)
 			else:
+				Sfx.play("hit")
 				sprite.modulate = Color(2.5, 2.5, 2.5)
 				t.set_parallel(true)
 				t.tween_property(sprite, "rotation", PI / 2.0, 0.25)
@@ -462,6 +463,7 @@ func _animate_party_hp_changes(instant: bool = false) -> void:
 			t.tween_property(sprite, "modulate", Color.WHITE, 0.2)
 		elif not member.is_ko and member.hp < _party_last_hp[i] and not instant:
 			_tween_hurt(_restart_party_tween(i), sprite, _party_home(i))
+			Sfx.play("hit")
 		_party_last_hp[i] = member.hp
 
 
@@ -599,6 +601,7 @@ func _process(delta: float) -> void:
 		State.BATTLE_OVER:
 			if Input.is_action_just_pressed("ui_accept"):
 				if not _level_up_queue.is_empty():
+					Sfx.play("level_up")
 					message_label.text = _level_up_queue.pop_front()
 				else:
 					get_tree().change_scene_to_file(GameManager.current_scene_path)
@@ -631,17 +634,21 @@ func _handle_menu_input() -> void:
 		_handle_ally_target_input()
 		return
 	if Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_action()
 	elif Input.is_action_just_pressed("ui_cancel"):
 		if _menu_state != MenuState.MAIN:
+			Sfx.play("menu_cancel")
 			_open_main_menu()
 			message_label.text = "What will you do?"
 
@@ -659,14 +666,18 @@ func _handle_target_input() -> void:
 		_target_index = alive_idx[0]
 
 	if Input.is_action_just_pressed("ui_right") or Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_enemy_ui()
 	elif Input.is_action_just_pressed("ui_left") or Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_enemy_ui()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_target()
 	elif Input.is_action_just_pressed("ui_cancel"):
+		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = "What will you do?"
 
@@ -684,14 +695,18 @@ func _handle_ally_target_input() -> void:
 		_target_ally_index = alive_idx[0]
 
 	if Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_ally_target()
 	elif Input.is_action_just_pressed("ui_cancel"):
+		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = "What will you do?"
 
@@ -1038,6 +1053,9 @@ func _execute_party_turn(member: Combatant) -> void:
 			or (member.queued_action == "skill" and str(member.queued_skill.get("target", "")).begins_with("enemy"))
 	if offensive:
 		_anim_party_attack(_party.find(member))
+	var sound := _party_action_sound(member)
+	if sound != "":
+		Sfx.play(sound)
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -1049,6 +1067,23 @@ func _execute_party_turn(member: Combatant) -> void:
 			member.row = "back" if member.row == "front" else "front"
 			_update_ui()
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
+
+
+## Weapon users (Ryn, Silas) sound physical when they hit enemies; everything
+## else a skill does - Vael's holy magic, Lyra's spells, any heal or buff - is
+## a spell. Defend and Swap Row are silent.
+func _party_action_sound(member: Combatant) -> String:
+	match member.queued_action:
+		"attack":
+			return "attack"
+		"item_use":
+			return "item"
+		"skill":
+			var targets_enemy: bool = str(member.queued_skill.get("target", "")).begins_with("enemy")
+			if targets_enemy and member.char_class in ["Ryn", "Silas"]:
+				return "attack"
+			return "spell"
+	return ""
 
 
 func _do_attack(member: Combatant) -> void:
@@ -1758,6 +1793,7 @@ func _end_battle(victory: bool) -> void:
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))
 		_update_ui()
+		Sfx.play("victory")
 		message_label.text = "Victory! +%d XP\nPress Enter." % total_xp
 	else:
 		message_label.text = "The party has fallen...\nPress Enter."

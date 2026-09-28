@@ -173,18 +173,20 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### Audio — SFX
 
+*Done 2026-09-27, synthesized in code rather than generated from the prompts below (kept for reference): `assets/audio/source/build_sfx.py` builds all ten from pulse/triangle/noise voices (pure Python) -> `assets/audio/sfx/<name>.wav`, with a per-sound `GAIN` table so menu blips sit below the fanfares. Played through the `Sfx` autoload (`scripts/systems/Sfx.gd`): `Sfx.play("attack")` etc.*
+
 *Short one-shot sounds — Suno isn't well suited to these; consider a dedicated SFX tool, or source free from OpenGameArt.org/freesound.org. Descriptions below work as a search query or a generation prompt either way.*
 
-- [ ] **Physical attack** — "8-bit/16-bit JRPG melee weapon swing/hit impact sound"
-- [ ] **Spell cast** — "16-bit JRPG magic spell cast sound, sparkling/energetic"
-- [ ] **Hit/damage impact** — "16-bit JRPG damage taken impact sound, punchy"
-- [ ] **Menu navigate** — "16-bit JRPG menu cursor move blip, short"
-- [ ] **Menu confirm** — "16-bit JRPG menu confirm/select chime, short"
-- [ ] **Menu cancel** — "16-bit JRPG menu back/cancel blip, short"
-- [ ] **Victory fanfare** — "16-bit JRPG battle victory fanfare, short and triumphant"
-- [ ] **Level-up fanfare** — "16-bit JRPG level-up chime, short and rewarding"
-- [ ] **Item use** — "16-bit JRPG item consumption sound, quick positive chime"
-- [ ] **Equip/unequip** — "16-bit JRPG equipment change sound, metallic clink"
+- [x] **Physical attack** — "8-bit/16-bit JRPG melee weapon swing/hit impact sound"
+- [x] **Spell cast** — "16-bit JRPG magic spell cast sound, sparkling/energetic"
+- [x] **Hit/damage impact** — "16-bit JRPG damage taken impact sound, punchy"
+- [x] **Menu navigate** — "16-bit JRPG menu cursor move blip, short"
+- [x] **Menu confirm** — "16-bit JRPG menu confirm/select chime, short"
+- [x] **Menu cancel** — "16-bit JRPG menu back/cancel blip, short"
+- [x] **Victory fanfare** — "16-bit JRPG battle victory fanfare, short and triumphant"
+- [x] **Level-up fanfare** — "16-bit JRPG level-up chime, short and rewarding"
+- [x] **Item use** — "16-bit JRPG item consumption sound, quick positive chime"
+- [x] **Equip/unequip** — "16-bit JRPG equipment change sound, metallic clink"
 
 ---
 

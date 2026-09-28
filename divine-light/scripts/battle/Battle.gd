@@ -150,6 +150,14 @@ var _enemies: Array = []
 var _enemy_labels: Array = []
 var _enemy_hp_bars: Array = []
 var _enemy_sprites: Array = []
+# Per-enemy animation state, parallel to _enemy_sprites: resting position (the
+# point every tween returns to), last seen HP (a drop means "just got hit"),
+# whether the death fade already played, and the running tween (killed before
+# a new one starts, so a hit landing mid-lunge doesn't leave it off-position).
+var _enemy_home: Array = []
+var _enemy_last_hp: Array = []
+var _enemy_death_shown: Array = []
+var _enemy_tweens: Array = []
 
 # Battle state
 var _selecting_index: int = 0
@@ -248,14 +256,31 @@ func _setup_enemy_ui() -> void:
 	var sprite_w := (78.0 - gap * (count - 1)) / count
 	var row_h := 22.0
 
+	_enemy_home = []
+	_enemy_last_hp = []
+	_enemy_death_shown = []
+	_enemy_tweens = []
 	for i in count:
 		var sx := 16.0 + i * (sprite_w + gap)
-		var sprite := ColorRect.new()
-		sprite.position = Vector2(sx, 11)
-		sprite.size = Vector2(sprite_w, 50)
-		sprite.color = Color(0.55, 0.12, 0.12, 1)
+		var sprite: CanvasItem = _make_enemy_sprite(_enemies[i].display_name)
+		if sprite == null:
+			# No art for this enemy yet - keep the old placeholder block.
+			var rect := ColorRect.new()
+			rect.position = Vector2(sx, 11)
+			rect.size = Vector2(sprite_w, 50)
+			rect.color = Color(0.55, 0.12, 0.12, 1)
+			sprite = rect
+		else:
+			# Centered sprite, standing on the same ground line (y=61) the
+			# placeholder blocks used, so every size lines up at the feet.
+			var h: float = (sprite as AnimatedSprite2D).sprite_frames.get_frame_texture(&"default", 0).get_height()
+			sprite.position = Vector2(sx + sprite_w / 2.0, 61.0 - h / 2.0)
 		$EnemyArea.add_child(sprite)
 		_enemy_sprites.append(sprite)
+		_enemy_home.append(sprite.position)
+		_enemy_last_hp.append(_enemies[i].hp)
+		_enemy_death_shown.append(false)
+		_enemy_tweens.append(null)
 
 		var label := Label.new()
 		label.position = Vector2(108, 5 + i * row_h)
@@ -277,6 +302,91 @@ func _setup_enemy_ui() -> void:
 		bar_fill.color = Color(0.85, 0.25, 0.25, 1)
 		$EnemyArea.add_child(bar_fill)
 		_enemy_hp_bars.append(bar_fill)
+
+
+## Battle sprite for an enemy, from assets/sprites/enemies/<name_in_snake_case>.png
+## (2 idle frames side by side, see assets/sprites/source/build_enemies.py).
+## Returns null when an enemy has no art yet.
+func _make_enemy_sprite(enemy_name: String) -> AnimatedSprite2D:
+	var path := "res://assets/sprites/enemies/%s.png" % enemy_name.to_lower().replace(" ", "_")
+	if not ResourceLoader.exists(path):
+		return null
+	var tex: Texture2D = load(path)
+	var w := int(tex.get_width() / 2.0)
+	var frames := SpriteFrames.new()
+	frames.set_animation_speed(&"default", 2.0)
+	for f in 2:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(f * w, 0, w, tex.get_height())
+		frames.add_frame(&"default", atlas)
+	var sprite := AnimatedSprite2D.new()
+	sprite.sprite_frames = frames
+	# Slightly different pace and phase per enemy, so a group of the same
+	# enemy doesn't breathe in lockstep.
+	sprite.speed_scale = randf_range(0.85, 1.15)
+	sprite.play(&"default")
+	sprite.frame_progress = randf()
+	return sprite
+
+
+func _restart_enemy_tween(i: int) -> Tween:
+	if _enemy_tweens[i] != null:
+		_enemy_tweens[i].kill()
+	var sprite: CanvasItem = _enemy_sprites[i]
+	sprite.position = _enemy_home[i]
+	var t := create_tween()
+	_enemy_tweens[i] = t
+	return t
+
+
+## Short hop toward the party when an enemy takes its turn.
+func _anim_enemy_attack(i: int) -> void:
+	if i < 0 or i >= _enemy_sprites.size():
+		return
+	var home: Vector2 = _enemy_home[i]
+	var t := _restart_enemy_tween(i)
+	t.tween_property(_enemy_sprites[i], "position", home + Vector2(6, 0), 0.08)
+	t.tween_property(_enemy_sprites[i], "position", home, 0.12)
+
+
+## White flash plus a quick side-to-side shake when an enemy loses HP.
+func _anim_enemy_hurt(i: int) -> void:
+	var sprite: CanvasItem = _enemy_sprites[i]
+	var home: Vector2 = _enemy_home[i]
+	var t := _restart_enemy_tween(i)
+	sprite.modulate = Color(2.5, 2.5, 2.5)
+	t.set_parallel(true)
+	t.tween_property(sprite, "modulate", Color.WHITE, 0.25)
+	var delay := 0.0
+	for dx: int in [2, -2, 1, 0]:
+		t.tween_property(sprite, "position", home + Vector2(dx, 0), 0.04).set_delay(delay)
+		delay += 0.04
+
+
+## The Unraveling takes it back: flash, then sink while fading to violet.
+func _anim_enemy_death(i: int) -> void:
+	var sprite: CanvasItem = _enemy_sprites[i]
+	var t := _restart_enemy_tween(i)
+	sprite.modulate = Color(2.5, 2.5, 2.5)
+	t.tween_property(sprite, "modulate", Color(0.8, 0.35, 1.0, 1.0), 0.12)
+	t.tween_property(sprite, "modulate", Color(0.8, 0.35, 1.0, 0.0), 0.5)
+	t.parallel().tween_property(sprite, "position", _enemy_home[i] + Vector2(0, 4), 0.5)
+
+
+## Called from _update_enemy_ui(): compares each enemy's HP to what it was on
+## the previous refresh, so every damage source (attacks, skills, poison/
+## burn/bleed ticks, the F3 debug win) animates without hooking each one.
+func _animate_enemy_hp_changes() -> void:
+	for i in mini(_enemies.size(), _enemy_sprites.size()):
+		var enemy: Combatant = _enemies[i]
+		if enemy.is_ko:
+			if not _enemy_death_shown[i]:
+				_enemy_death_shown[i] = true
+				_anim_enemy_death(i)
+		elif enemy.hp < _enemy_last_hp[i]:
+			_anim_enemy_hurt(i)
+		_enemy_last_hp[i] = enemy.hp
 
 
 func _input(event: InputEvent) -> void:
@@ -1313,6 +1423,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
+	_anim_enemy_attack(_enemies.find(enemy))
 
 	var phase_note := ""
 	if enemy.is_boss:
@@ -1507,6 +1618,7 @@ func _update_selection_header() -> void:
 
 
 func _update_enemy_ui() -> void:
+	_animate_enemy_hp_changes()
 	for i in _enemies.size():
 		if i >= _enemy_labels.size():
 			break

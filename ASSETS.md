@@ -104,28 +104,30 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### Enemies
 
-- [ ] **Blighted Wolf** *(Overworld — fast physical attacker)*
+*Done 2026-09-27, hand-placed like the party sprites rather than via the prompts below (kept for reference): `assets/sprites/source/build_enemies.py` -> `assets/sprites/enemies/<snake_case_name>.png`, each a 2-frame idle sheet (frames side by side; 24x32 standard so three fit across the 78px enemy area, 48x48 for the Hollow Warden). `Battle.gd` loads the sheet by enemy name, so a new enemy just needs a PNG with the matching name (missing art falls back to the old red block). Attack lunge, hit flash/shake and violet death fade are code tweens in `Battle.gd`, not extra frames.*
+
+- [x] **Blighted Wolf** *(Overworld — fast physical attacker)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a wolf corrupted by dark magic, cracked sickly fur, faint unnatural glow in the eyes, lean and fast-looking, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Hollow Archer** *(Overworld — ranged harasser)*
+- [x] **Hollow Archer** *(Overworld — ranged harasser)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a hollowed-out corrupted humanoid archer wielding a bow, tattered cloak, faint eerie glow, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Shade Wisp** *(Overworld — status applier)*
+- [x] **Shade Wisp** *(Overworld — status applier)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a small floating wisp of corrupted shadow energy, wispy translucent form, faint sickly purple-green glow, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Corrupted Farmer** *(Overworld — slow bruiser)*
+- [x] **Corrupted Farmer** *(Overworld — slow bruiser)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a hulking corrupted farmer wielding a makeshift weapon like a pitchfork or scythe, torn work clothes, unnatural muscular bulk, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Fallen Priest** *(Cathedral — debuffer)*
+- [x] **Fallen Priest** *(Cathedral — debuffer)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a corrupted priest in dark tattered holy robes, inverted or broken holy symbol, sickly pale skin, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Cursed Paladin** *(Cathedral — tank)*
+- [x] **Cursed Paladin** *(Cathedral — tank)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a heavily armored corrupted paladin, dark cracked plate armor, dim unholy glow from the visor, imposing and sturdy, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Shadow Acolyte** *(Cathedral — buffer)*
+- [x] **Shadow Acolyte** *(Cathedral — buffer)*
   Prompt: *"16-bit SNES-era JRPG pixel art enemy sprite, a corrupted acolyte in dark ceremonial robes, hands raised as if channeling a buff spell, faint dark aura, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 
-- [ ] **Hollow Warden** *(Cathedral boss)*
+- [x] **Hollow Warden** *(Cathedral boss)*
   *Single sprite only — phase 2 currently changes stats/behavior, not appearance, in code, so no separate phase-2 art is needed for this pass.*
   Prompt: *"16-bit SNES-era JRPG pixel art boss enemy sprite, a large imposing hollow guardian construct corrupted by dark magic, glowing cracks across its form, menacing silhouette clearly larger than a standard enemy, side-view battle sprite pose, clean pixel-grid linework, no anti-aliasing, muted high-fantasy palette with a corrupted/twisted undertone, transparent background"*
 

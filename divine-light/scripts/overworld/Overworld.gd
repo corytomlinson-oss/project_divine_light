@@ -33,6 +33,7 @@ const ENTRY_GAP_X := 9
 func _ready() -> void:
 	GameManager.current_location = "overworld"
 	GameManager.current_scene_path = "res://scenes/overworld/Overworld.tscn"
+	Music.play("overworld")
 	_paint_wall_border()
 	_tile_map.set_cell(CATHEDRAL_DOOR_CELL, 0, Vector2i(2, 0))
 	if GameManager.has_pending_spawn:

@@ -37,6 +37,7 @@ var _boss_trigger_cell: Vector2i
 func _ready() -> void:
 	GameManager.current_location = "cathedral"
 	GameManager.current_scene_path = "res://scenes/dungeon/CathedralDungeon.tscn"
+	Music.play("dungeon")
 	_generate_and_build()
 
 

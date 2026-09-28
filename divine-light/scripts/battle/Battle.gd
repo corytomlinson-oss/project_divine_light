@@ -133,6 +133,31 @@ const ENCOUNTER_TABLES: Dictionary = {
 # 2-phase kit: physical+self-DEF-buff -> corrupted holy magic). This one
 # exists to prove the generic system - visible/fixed encounter, phase
 # transition, escape lockout, bonus XP - works end to end.
+# Battle background art per location (320x180, drawn over the plain Background
+# ColorRect). Locations without an entry keep the plain color - e.g. the
+# Cathedral, where a forest backdrop would be wrong.
+const BATTLE_BACKGROUNDS: Dictionary = {
+	"overworld": "res://assets/ui/battle_bg_forest.png",
+}
+
+# Enemy name/HP bar width. Was 207 (the whole right side) before the party
+# sprites moved into the right of the top band.
+const ENEMY_BAR_W := 92.0
+
+# Party formation in the top band: a diagonal line, FF6-style, stepping down
+# and right per slot so 32px-tall sprites fit in 72px. Slots are grouped by
+# row - front-row members take the upper-left slots, back-row members the
+# lower-right ones - so the back-row shift only ever widens the gap between the
+# two groups. (Shifting back-row members within a fixed party-order line made
+# them collide with whoever came next; any shift big enough to notice a row
+# swap was bigger than the spacing.) The acting member steps toward the
+# enemies. Values are each sprite's top-left corner.
+const PARTY_ORIGIN := Vector2(210, 0)
+const PARTY_STEP := Vector2(24, 13)
+const PARTY_BACK_ROW_X := 18.0
+const PARTY_STEP_FORWARD := 5.0
+const PARTY_WALK_SPEED := 60.0
+
 const BOSS_ENCOUNTERS: Dictionary = {
 	"cathedral": {
 		"name": "Hollow Warden", "hp": 220, "atk": 14, "def": 8, "agi": 9, "xp": 300,
@@ -150,6 +175,22 @@ var _enemies: Array = []
 var _enemy_labels: Array = []
 var _enemy_hp_bars: Array = []
 var _enemy_sprites: Array = []
+# Per-enemy animation state, parallel to _enemy_sprites: resting position (the
+# point every tween returns to), last seen HP (a drop means "just got hit"),
+# whether the death fade already played, and the running tween (killed before
+# a new one starts, so a hit landing mid-lunge doesn't leave it off-position).
+var _enemy_home: Array = []
+var _enemy_last_hp: Array = []
+var _enemy_death_shown: Array = []
+var _enemy_tweens: Array = []
+# Party battle sprites (parallel to _party; null for a member with no art).
+# Same animation bookkeeping as the enemy arrays above, plus _party_acting:
+# the member stepping forward, either choosing a command or taking a turn.
+var _party_sprites: Array = []
+var _party_last_hp: Array = []
+var _party_ko_shown: Array = []
+var _party_tweens: Array = []
+var _party_acting: int = -1
 
 # Battle state
 var _selecting_index: int = 0
@@ -192,9 +233,13 @@ func _ready() -> void:
 		$PartyPanel/HP_Silas,
 	]
 	_party = GameManager.party
+	_setup_background()
 	_setup_party_bars()
 	_enemies = _generate_encounter()
+	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
+	Music.play("boss" if boss_fight else "battle", "battle")
 	_setup_enemy_ui()
+	_setup_party_sprites()
 	GameManager.party_loaded.connect(_update_ui)
 	_update_ui()
 	_begin_selection()
@@ -248,18 +293,35 @@ func _setup_enemy_ui() -> void:
 	var sprite_w := (78.0 - gap * (count - 1)) / count
 	var row_h := 22.0
 
+	_enemy_home = []
+	_enemy_last_hp = []
+	_enemy_death_shown = []
+	_enemy_tweens = []
 	for i in count:
 		var sx := 16.0 + i * (sprite_w + gap)
-		var sprite := ColorRect.new()
-		sprite.position = Vector2(sx, 11)
-		sprite.size = Vector2(sprite_w, 50)
-		sprite.color = Color(0.55, 0.12, 0.12, 1)
+		var sprite: CanvasItem = _make_enemy_sprite(_enemies[i].display_name)
+		if sprite == null:
+			# No art for this enemy yet - keep the old placeholder block.
+			var rect := ColorRect.new()
+			rect.position = Vector2(sx, 11)
+			rect.size = Vector2(sprite_w, 50)
+			rect.color = Color(0.55, 0.12, 0.12, 1)
+			sprite = rect
+		else:
+			# Centered sprite, standing on the same ground line (y=61) the
+			# placeholder blocks used, so every size lines up at the feet.
+			var h: float = (sprite as AnimatedSprite2D).sprite_frames.get_frame_texture(&"default", 0).get_height()
+			sprite.position = Vector2(sx + sprite_w / 2.0, 61.0 - h / 2.0)
 		$EnemyArea.add_child(sprite)
 		_enemy_sprites.append(sprite)
+		_enemy_home.append(sprite.position)
+		_enemy_last_hp.append(_enemies[i].hp)
+		_enemy_death_shown.append(false)
+		_enemy_tweens.append(null)
 
 		var label := Label.new()
 		label.position = Vector2(108, 5 + i * row_h)
-		label.size = Vector2(207, 14)
+		label.size = Vector2(ENEMY_BAR_W, 14)
 		label.add_theme_font_size_override("font_size", 8)
 		label.text = "  " + _enemies[i].display_name
 		$EnemyArea.add_child(label)
@@ -267,16 +329,257 @@ func _setup_enemy_ui() -> void:
 
 		var bar_bg := ColorRect.new()
 		bar_bg.position = Vector2(108, 5 + i * row_h + 14)
-		bar_bg.size = Vector2(207, 4)
+		bar_bg.size = Vector2(ENEMY_BAR_W, 4)
 		bar_bg.color = Color(0.2, 0.05, 0.05, 1)
 		$EnemyArea.add_child(bar_bg)
 
 		var bar_fill := ColorRect.new()
 		bar_fill.position = Vector2(108, 5 + i * row_h + 14)
-		bar_fill.size = Vector2(207, 4)
+		bar_fill.size = Vector2(ENEMY_BAR_W, 4)
 		bar_fill.color = Color(0.85, 0.25, 0.25, 1)
 		$EnemyArea.add_child(bar_fill)
 		_enemy_hp_bars.append(bar_fill)
+
+
+func _setup_background() -> void:
+	var path: String = BATTLE_BACKGROUNDS.get(GameManager.current_location, "")
+	if path.is_empty() or not ResourceLoader.exists(path):
+		return
+	var art := TextureRect.new()
+	art.name = "BackgroundArt"
+	art.texture = load(path)
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(art)
+	# Directly above the plain Background, below everything else.
+	move_child(art, $Background.get_index() + 1)
+
+
+## Each party member's overworld walk set doubles as their battle sprite: the
+## side-view animations mirrored with flip_h to face the enemies on the left.
+func _setup_party_sprites() -> void:
+	var area := Node2D.new()
+	area.name = "PartyArea"
+	# Lower in the line draws in front, even mid-walk after a row swap.
+	area.y_sort_enabled = true
+	add_child(area)
+	# Above the background and enemy area, below the message box and menus.
+	move_child(area, $EnemyArea.get_index() + 1)
+	_party_sprites = []
+	_party_last_hp = []
+	_party_ko_shown = []
+	_party_tweens = []
+	for i in _party.size():
+		var member: Combatant = _party[i]
+		var path := "res://assets/sprites/%s_frames.tres" % member.char_class.to_lower()
+		var sprite: AnimatedSprite2D = null
+		if ResourceLoader.exists(path):
+			sprite = AnimatedSprite2D.new()
+			sprite.sprite_frames = load(path)
+			sprite.flip_h = true
+			sprite.play(&"idle_side")
+			sprite.position = _party_home(i)
+			area.add_child(sprite)
+		_party_sprites.append(sprite)
+		_party_last_hp.append(member.hp)
+		_party_ko_shown.append(false)
+		_party_tweens.append(null)
+	_animate_party_hp_changes(true)
+
+
+## Member i's place in the line: front-row members first, then back-row
+## members, each group in party order.
+func _party_slot(i: int) -> int:
+	var slot := 0
+	var row: String = _party[i].row
+	for j in _party.size():
+		var other: String = _party[j].row
+		if (other == "front" and row == "back") or (other == row and j < i):
+			slot += 1
+	return slot
+
+
+## Where member i should stand right now (sprite center), from row and turn.
+func _party_home(i: int) -> Vector2:
+	var member: Combatant = _party[i]
+	var pos := PARTY_ORIGIN + PARTY_STEP * _party_slot(i) + Vector2(8, 16)
+	if member.row == "back":
+		pos.x += PARTY_BACK_ROW_X
+	if member.is_ko:
+		pos.y += 8.0  # lying down: a 32x16 shape resting on the same feet line
+	elif i == _party_acting:
+		pos.x -= PARTY_STEP_FORWARD
+	return pos
+
+
+func _restart_party_tween(i: int) -> Tween:
+	if _party_tweens[i] != null:
+		_party_tweens[i].kill()
+	var t := create_tween()
+	_party_tweens[i] = t
+	return t
+
+
+## Hop toward the enemies and back, for attacks and offensive skills.
+func _anim_party_attack(i: int) -> void:
+	var sprite: AnimatedSprite2D = _party_sprites[i]
+	if sprite == null:
+		return
+	var home := _party_home(i)
+	sprite.position = home
+	var t := _restart_party_tween(i)
+	t.tween_property(sprite, "position", home - Vector2(8, 0), 0.08)
+	t.tween_property(sprite, "position", home, 0.12)
+
+
+## Same HP-diff approach as _animate_enemy_hp_changes(): hits flash and
+## shake, KO tips the sprite over backward and darkens it, and a revive
+## stands it back up. `instant` skips animation (battle start, e.g. a member
+## who was already KO'd going in).
+func _animate_party_hp_changes(instant: bool = false) -> void:
+	for i in mini(_party.size(), _party_sprites.size()):
+		var sprite: AnimatedSprite2D = _party_sprites[i]
+		var member: Combatant = _party[i]
+		if sprite == null:
+			continue
+		if member.is_ko and not _party_ko_shown[i]:
+			_party_ko_shown[i] = true
+			var t := _restart_party_tween(i)
+			sprite.play(&"idle_side")
+			if instant:
+				sprite.rotation = PI / 2.0
+				sprite.modulate = Color(0.45, 0.4, 0.55)
+				sprite.position = _party_home(i)
+			else:
+				Sfx.play("hit")
+				sprite.modulate = Color(2.5, 2.5, 2.5)
+				t.set_parallel(true)
+				t.tween_property(sprite, "rotation", PI / 2.0, 0.25)
+				t.tween_property(sprite, "position", _party_home(i), 0.25)
+				t.tween_property(sprite, "modulate", Color(0.45, 0.4, 0.55), 0.35)
+		elif not member.is_ko and _party_ko_shown[i]:
+			_party_ko_shown[i] = false
+			var t := _restart_party_tween(i)
+			t.set_parallel(true)
+			t.tween_property(sprite, "rotation", 0.0, 0.2)
+			t.tween_property(sprite, "position", _party_home(i), 0.2)
+			t.tween_property(sprite, "modulate", Color.WHITE, 0.2)
+		elif not member.is_ko and member.hp < _party_last_hp[i] and not instant:
+			_tween_hurt(_restart_party_tween(i), sprite, _party_home(i))
+			Sfx.play("hit")
+		_party_last_hp[i] = member.hp
+
+
+## Runs every frame: works out who is stepping forward, then walks any sprite
+## that isn't mid-animation toward where it belongs (so row swaps, Vanish and
+## turn changes all move smoothly without a hook in each of them).
+func _update_party_positions(delta: float) -> void:
+	if state == State.SELECTING:
+		_party_acting = _selecting_index
+	elif state != State.RESOLVING:
+		_party_acting = -1
+	for i in mini(_party.size(), _party_sprites.size()):
+		var sprite: AnimatedSprite2D = _party_sprites[i]
+		if sprite == null:
+			continue
+		var t: Tween = _party_tweens[i]
+		if t != null and t.is_running():
+			continue
+		var target := _party_home(i)
+		if sprite.position.is_equal_approx(target):
+			if not _party[i].is_ko and sprite.animation != &"idle_side":
+				sprite.play(&"idle_side")
+			continue
+		sprite.position = sprite.position.move_toward(target, PARTY_WALK_SPEED * delta)
+		if not _party[i].is_ko:
+			sprite.play(&"walk_side")
+
+
+## Battle sprite for an enemy, from assets/sprites/enemies/<name_in_snake_case>.png
+## (2 idle frames side by side, see assets/sprites/source/build_enemies.py).
+## Returns null when an enemy has no art yet.
+func _make_enemy_sprite(enemy_name: String) -> AnimatedSprite2D:
+	var path := "res://assets/sprites/enemies/%s.png" % enemy_name.to_lower().replace(" ", "_")
+	if not ResourceLoader.exists(path):
+		return null
+	var tex: Texture2D = load(path)
+	var w := int(tex.get_width() / 2.0)
+	var frames := SpriteFrames.new()
+	frames.set_animation_speed(&"default", 2.0)
+	for f in 2:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(f * w, 0, w, tex.get_height())
+		frames.add_frame(&"default", atlas)
+	var sprite := AnimatedSprite2D.new()
+	sprite.sprite_frames = frames
+	# Slightly different pace and phase per enemy, so a group of the same
+	# enemy doesn't breathe in lockstep.
+	sprite.speed_scale = randf_range(0.85, 1.15)
+	sprite.play(&"default")
+	sprite.frame_progress = randf()
+	return sprite
+
+
+func _restart_enemy_tween(i: int) -> Tween:
+	if _enemy_tweens[i] != null:
+		_enemy_tweens[i].kill()
+	var sprite: CanvasItem = _enemy_sprites[i]
+	sprite.position = _enemy_home[i]
+	var t := create_tween()
+	_enemy_tweens[i] = t
+	return t
+
+
+## Short hop toward the party when an enemy takes its turn.
+func _anim_enemy_attack(i: int) -> void:
+	if i < 0 or i >= _enemy_sprites.size():
+		return
+	var home: Vector2 = _enemy_home[i]
+	var t := _restart_enemy_tween(i)
+	t.tween_property(_enemy_sprites[i], "position", home + Vector2(6, 0), 0.08)
+	t.tween_property(_enemy_sprites[i], "position", home, 0.12)
+
+
+## White flash plus a quick side-to-side shake when an enemy loses HP.
+func _anim_enemy_hurt(i: int) -> void:
+	_tween_hurt(_restart_enemy_tween(i), _enemy_sprites[i], _enemy_home[i])
+
+
+## Shared by enemies and party: white flash plus a quick side-to-side shake
+## around `home`, played on the caller's (already reset) tween.
+func _tween_hurt(t: Tween, sprite: CanvasItem, home: Vector2) -> void:
+	sprite.modulate = Color(2.5, 2.5, 2.5)
+	t.set_parallel(true)
+	t.tween_property(sprite, "modulate", Color.WHITE, 0.25)
+	var delay := 0.0
+	for dx: int in [2, -2, 1, 0]:
+		t.tween_property(sprite, "position", home + Vector2(dx, 0), 0.04).set_delay(delay)
+		delay += 0.04
+
+
+## The Unraveling takes it back: flash, then sink while fading to violet.
+func _anim_enemy_death(i: int) -> void:
+	var sprite: CanvasItem = _enemy_sprites[i]
+	var t := _restart_enemy_tween(i)
+	sprite.modulate = Color(2.5, 2.5, 2.5)
+	t.tween_property(sprite, "modulate", Color(0.8, 0.35, 1.0, 1.0), 0.12)
+	t.tween_property(sprite, "modulate", Color(0.8, 0.35, 1.0, 0.0), 0.5)
+	t.parallel().tween_property(sprite, "position", _enemy_home[i] + Vector2(0, 4), 0.5)
+
+
+## Called from _update_enemy_ui(): compares each enemy's HP to what it was on
+## the previous refresh, so every damage source (attacks, skills, poison/
+## burn/bleed ticks, the F3 debug win) animates without hooking each one.
+func _animate_enemy_hp_changes() -> void:
+	for i in mini(_enemies.size(), _enemy_sprites.size()):
+		var enemy: Combatant = _enemies[i]
+		if enemy.is_ko:
+			if not _enemy_death_shown[i]:
+				_enemy_death_shown[i] = true
+				_anim_enemy_death(i)
+		elif enemy.hp < _enemy_last_hp[i]:
+			_anim_enemy_hurt(i)
+		_enemy_last_hp[i] = enemy.hp
 
 
 func _input(event: InputEvent) -> void:
@@ -289,7 +592,8 @@ func _input(event: InputEvent) -> void:
 			_debug_auto_win()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_update_party_positions(delta)
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
@@ -299,6 +603,7 @@ func _process(_delta: float) -> void:
 		State.BATTLE_OVER:
 			if Input.is_action_just_pressed("ui_accept"):
 				if not _level_up_queue.is_empty():
+					Sfx.play("level_up")
 					message_label.text = _level_up_queue.pop_front()
 				else:
 					get_tree().change_scene_to_file(GameManager.current_scene_path)
@@ -331,17 +636,21 @@ func _handle_menu_input() -> void:
 		_handle_ally_target_input()
 		return
 	if Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_action()
 	elif Input.is_action_just_pressed("ui_cancel"):
 		if _menu_state != MenuState.MAIN:
+			Sfx.play("menu_cancel")
 			_open_main_menu()
 			message_label.text = "What will you do?"
 
@@ -359,14 +668,18 @@ func _handle_target_input() -> void:
 		_target_index = alive_idx[0]
 
 	if Input.is_action_just_pressed("ui_right") or Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_enemy_ui()
 	elif Input.is_action_just_pressed("ui_left") or Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_enemy_ui()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_target()
 	elif Input.is_action_just_pressed("ui_cancel"):
+		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = "What will you do?"
 
@@ -384,14 +697,18 @@ func _handle_ally_target_input() -> void:
 		_target_ally_index = alive_idx[0]
 
 	if Input.is_action_just_pressed("ui_down"):
+		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_up"):
+		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_ui()
 	elif Input.is_action_just_pressed("ui_accept"):
+		Sfx.play("menu_confirm")
 		_confirm_ally_target()
 	elif Input.is_action_just_pressed("ui_cancel"):
+		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = "What will you do?"
 
@@ -664,6 +981,7 @@ func _begin_selection() -> void:
 
 func _begin_resolving() -> void:
 	state = State.RESOLVING
+	_party_acting = -1
 	_menu_state = MenuState.MAIN
 	action_menu.visible = false
 	selection_header.text = ""
@@ -698,6 +1016,8 @@ func _execute_next_turn() -> void:
 		_begin_selection()
 		return
 	var combatant: Combatant = _turn_queue.pop_front()
+	# The acting party member steps forward for their turn (enemies: nobody).
+	_party_acting = _party.find(combatant)
 	if combatant.is_stunned:
 		combatant.stun_rounds -= 1
 		if combatant.stun_rounds <= 0:
@@ -731,6 +1051,13 @@ func _get_ally_target(member: Combatant, skill: Dictionary) -> Combatant:
 
 
 func _execute_party_turn(member: Combatant) -> void:
+	var offensive: bool = member.queued_action == "attack" \
+			or (member.queued_action == "skill" and str(member.queued_skill.get("target", "")).begins_with("enemy"))
+	if offensive:
+		_anim_party_attack(_party.find(member))
+	var sound := _party_action_sound(member)
+	if sound != "":
+		Sfx.play(sound)
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -742,6 +1069,23 @@ func _execute_party_turn(member: Combatant) -> void:
 			member.row = "back" if member.row == "front" else "front"
 			_update_ui()
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
+
+
+## Weapon users (Ryn, Silas) sound physical when they hit enemies; everything
+## else a skill does - Vael's holy magic, Lyra's spells, any heal or buff - is
+## a spell. Defend and Swap Row are silent.
+func _party_action_sound(member: Combatant) -> String:
+	match member.queued_action:
+		"attack":
+			return "attack"
+		"item_use":
+			return "item"
+		"skill":
+			var targets_enemy: bool = str(member.queued_skill.get("target", "")).begins_with("enemy")
+			if targets_enemy and member.char_class in ["Ryn", "Silas"]:
+				return "attack"
+			return "spell"
+	return ""
 
 
 func _do_attack(member: Combatant) -> void:
@@ -1313,6 +1657,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
+	_anim_enemy_attack(_enemies.find(enemy))
 
 	var phase_note := ""
 	if enemy.is_boss:
@@ -1450,8 +1795,11 @@ func _end_battle(victory: bool) -> void:
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))
 		_update_ui()
+		Music.stop(0.3)
+		Sfx.play("victory")
 		message_label.text = "Victory! +%d XP\nPress Enter." % total_xp
 	else:
+		Music.stop(1.0)
 		message_label.text = "The party has fallen...\nPress Enter."
 
 
@@ -1507,6 +1855,7 @@ func _update_selection_header() -> void:
 
 
 func _update_enemy_ui() -> void:
+	_animate_enemy_hp_changes()
 	for i in _enemies.size():
 		if i >= _enemy_labels.size():
 			break
@@ -1522,17 +1871,18 @@ func _update_enemy_ui() -> void:
 		elif _menu_state == MenuState.TARGETING and i == _target_index:
 			label.text = "> %s" % enemy.display_name
 			label.modulate = Color(1.0, 1.0, 0.3)
-			bar.size.x = 207.0 * pct
+			bar.size.x = ENEMY_BAR_W * pct
 			bar.color = Color(1.0, 1.0, 0.3, 1)
 		else:
 			label.text = "  %s" % enemy.display_name
 			label.modulate = Color(1.0, 1.0, 1.0)
-			bar.size.x = 207.0 * pct
+			bar.size.x = ENEMY_BAR_W * pct
 			bar.color = Color(0.85, 0.25, 0.25, 1)
 
 
 func _update_ui() -> void:
 	_update_enemy_ui()
+	_animate_party_hp_changes()
 	for i in _party.size():
 		var member: Combatant = _party[i]
 		var label: Label = _party_hp_labels[i]

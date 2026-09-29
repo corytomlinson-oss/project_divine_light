@@ -14,6 +14,21 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The ending movie is part of Act III + Vorath (26)**, not Milestone 19, because it needs the finale's art and story.
 - **Movie art will be built by code generators** (like the battle background), not hand-drawn or AI-generated. That can be revisited scene by scene.
 
+## Milestone 19a — Cutscene system (2026-09-29)
+
+- **Scenes are plain-text script files**, not code or a visual editor. Each line is a command like `say Frank: This way!`. That way you can write and tweak scenes without touching GDScript. *Change:* the format lives in `SceneScript.gd`, whose header comment lists every command.
+- **A scene with any mistake doesn't play at all.** The whole file is checked first, and errors are printed with line numbers, instead of the scene stopping halfway.
+- **Positions can be relative to the player** (`~2,0` = two tiles right of the player) as well as fixed map tiles. This is handy for scenes that can happen wherever you're standing.
+- **Characters without art yet appear as a dark silhouette** of Vael's shape. Frank has no sprite yet, and a hooded mystery figure fits him until his art exists (Act I art, Milestone 21).
+- **Cutscene walking is 64px/s**, slower than the player's 96px/s, so it reads as deliberate. *Change:* `WALK_SPEED` in `Cutscene.gd`.
+- **Dialogue:** typewriter at 45 characters/second; A finishes the page, then turns it; 3 lines per page, split automatically; a soft blip on each page turn. *Change:* `TEXT_SPEED` / `LINES_PER_PAGE`.
+- **Only movies can be skipped** (with Start). In-game scenes can't be skipped: skipping halfway through characters walking around could leave them in the wrong places. You can still speed through text with A.
+- **When a movie is skipped, its story flags and music changes still apply**, so skipping never loses progress.
+- **Movie titles use the same m5x7 font at 2× size**, not a separate title font. *Change:* `_title` in `Cutscene.gd`, or add a font later.
+- **Spawned characters are removed when the scene ends.** Scenes that should leave someone standing on the map will need the map to place them there.
+- **No letterbox bars** during scenes (FF6 doesn't use them).
+- **Debug keys F7/F8** play the two demo scenes on any map.
+
 ## Milestone 17b — SNES-style battle layout (2026-09-29)
 
 - **The left window is 104px wide, not the mock's 84px.** "Corrupted Farmer", the longest enemy name, is 92px in m5x7. *Change:* `LEFT_WINDOW_W` in `Battle.gd`.

@@ -1,0 +1,22 @@
+# Demo of movie mode (Milestone 19a). Press F8 on any map; Start skips.
+# The real intro movie (19b) gets its own generated artwork.
+
+fade out 0.6
+movie start
+music stop 0.6
+image forest res://assets/ui/battle_bg_forest.png at 0,20
+fade in 1.2
+pan forest to 0,-8 over 7 async
+title Divine Light
+wait 2
+title clear
+caption Long ago, the land of Valdris knew only light.
+wait 2.5
+caption Then came the Unraveling.
+wait 2.5
+caption clear
+sync
+fade out 1.0
+movie end
+music overworld
+fade in 0.6

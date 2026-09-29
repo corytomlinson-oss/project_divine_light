@@ -55,6 +55,20 @@ func change_scene(path: String) -> void:
 	await _swap_and_fade_in(path)
 
 
+## Plain fades for cutscenes (19a): the same black overlay, without changing
+## scenes or pausing the tree (actors keep animating behind it).
+func fade_out(duration: float) -> void:
+	var t := create_tween()
+	t.tween_property(_black, "color:a", 1.0, duration)
+	await t.finished
+
+
+func fade_in(duration: float) -> void:
+	var t := create_tween()
+	t.tween_property(_black, "color:a", 0.0, duration)
+	await t.finished
+
+
 func to_battle() -> void:
 	if _busy:
 		return

@@ -1,0 +1,23 @@
+# Demo of the in-engine cutscene system (Milestone 19a). Press F7 on any map.
+# Positions use ~x,y (relative to the player) so it works wherever you stand.
+# Command reference: scripts/cutscene/SceneScript.gd
+
+spawn guest ryn at ~3,0 facing left
+emote player !
+say Ryn: There you are! I've been looking all over for you.
+face player right
+move guest left 1
+emote guest note
+say Ryn: The Cathedral is just past the gate. Stay close, and keep your guard up - they say the Unraveling is spreading through the forest, and nobody who went in has come back out yet.
+
+spawn stranger frank at ~-3,1 facing right
+camera to ~-3,1 over 0.8
+emote stranger ...
+narrate A hooded figure watches from the shadows.
+camera reset over 0.6
+
+emote guest ?
+say Ryn: Did you hear something?
+move guest right 3
+despawn guest
+set demo_seen

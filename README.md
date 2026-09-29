@@ -73,6 +73,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 18d — Status markers & polish, which completes Milestone 18. Tiny pixel icons show poison, burn, bleed, stun, buffs and debuffs (above enemies, and in each party member's row). Poison, burn and bleed puff an effect each time they tick. Items are tossed to whoever they're used on. Bosses visibly enrage at their phase change (flash, shake, thunder) and stay tinted red. Next: Milestone 19 — Cutscenes (19a system + movie mode, 19b intro movie), then Act I content from Milestone 20a (The Cathedral).
 
+**Completed:** Milestone 19a — Cutscene system + movie mode. Cutscenes are plain-text scripts in `data/cutscenes/` (e.g. `say Frank: This way!`, `move frank left 3`): characters walk, turn and emote on the real map, a name-tagged dialogue box types out lines, the camera pans, and the screen fades. Movie mode plays full-screen pixel "movie" shots (pictures, pans, captions, a title card), and Start skips a movie. Scenes can record story flags, which are saved with the game. Try it with F7 (demo scene) and F8 (demo movie) on any map. Next: 19b, the intro movie.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

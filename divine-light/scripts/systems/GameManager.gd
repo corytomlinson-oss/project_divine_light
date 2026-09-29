@@ -17,6 +17,9 @@ var defeated_bosses: Dictionary = {}
 # Set by the pause menu before it opens another screen (Equip), so the map
 # reopens the menu when that screen returns to it.
 var reopen_pause_menu: bool = false
+# Story flags set by cutscenes ("set met_frank"), saved with the game, so a
+# scene can check whether something already happened (Milestone 19a).
+var story_flags: Dictionary = {}
 
 
 func _ready() -> void:
@@ -83,6 +86,7 @@ func save_game(slot: int) -> bool:
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
+		"story_flags": story_flags.duplicate(),
 	}
 	file.store_string(JSON.stringify(data))
 	return true
@@ -111,6 +115,10 @@ func load_game(slot: int) -> bool:
 	defeated_bosses.clear()
 	for location in save_defeated_bosses:
 		defeated_bosses[location] = bool(save_defeated_bosses[location])
+	var save_story_flags: Dictionary = parsed.get("story_flags", {})
+	story_flags.clear()
+	for flag in save_story_flags:
+		story_flags[flag] = bool(save_story_flags[flag])
 	party_loaded.emit()
 	return true
 
@@ -124,6 +132,10 @@ func get_dungeon_seed(location: String) -> int:
 	if not dungeon_seeds.has(location):
 		dungeon_seeds[location] = randi()
 	return dungeon_seeds[location]
+
+
+func has_flag(flag: String) -> bool:
+	return story_flags.get(flag, false)
 
 
 func save_exists(slot: int) -> bool:

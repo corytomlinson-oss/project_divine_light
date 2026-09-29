@@ -8,6 +8,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
+**Milestone 19a (cutscene system + movie mode) is done** and committed locally, not pushed — it needs Cory's playtest (press **F7** on a map for the demo scene, **F8** for the demo movie). Built on my recommendations while he was away; every call is logged in `DECISIONS.md`. **Next up: 19b, the intro movie.** See the Milestone 19 section.
+
+
 **Milestone 18 (Spell & combat VFX) is complete** (2026-09-29): 18a effect system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + polish. Cory approved the scope, then left me to build all four on my recommendations; Cory playtested 18a-18d (sounds included) and approved them; pushed to `cjt`. Every call made without him is logged in `DECISIONS.md`. **Next up: Milestone 19 (Cutscenes)** — 19a cutscene system + movie mode, then 19b the intro movie — and after that Act I content, starting with 20a (The Cathedral) — that's where enemy abilities, real bosses and the enemy-level-scaling question come in (see "Open design questions"); flag it to Cory as a design-heavy milestone before starting.
 
 
@@ -215,6 +218,21 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
+## Milestone 19 — Cutscenes (in progress)
+
+### 19a — cutscene system + movie mode (done, 2026-09-29)
+
+- **Scenes are plain-text files** in `data/cutscenes/*.scene`, one command per line (`say Frank: This way!`, `move frank left 3`, `emote player !`...), parsed by `SceneScript` (`scripts/cutscene/SceneScript.gd` — **the full command reference is in its header comment**). The whole file is checked before anything plays; errors are reported with file:line and the scene doesn't start. Tiles are map coords `x,y`, or `~x,y` relative to the player's tile. `async` on move/emote/camera/pan runs it in the background; `sync` waits for them.
+- **`Cutscene` autoload** (`scripts/systems/Cutscene.gd`, CanvasLayer 50): `await Cutscene.play(path)`; `Cutscene.play_once(path, flag)` for scenes that should only ever happen once; `Cutscene.is_playing()`. The tree keeps running (actors animate); `Player.gd` skips input while a scene plays and joins the `player` group so scenes can find it. Actors: `player` plus anything `spawn`ed (from `assets/sprites/<name>_frames.tres`; **a sprite with no art yet, e.g. Frank, appears as a dark silhouette** of Vael's shape via `self_modulate`, so scenes can be written before the art exists). Spawned actors are removed when the scene ends. Walking is 64px/s along tiles with the walk animations; the player's `_facing` / `_target` are kept in step so control resumes cleanly.
+- **Dialogue box:** 312×52 theme Panel at the bottom, gold name tag (none for `narrate`), typewriter at 45 chars/s, A finishes the page then turns it, 3 lines per page (the text is word-wrapped with the real font and split into pages up front; `\n` in a line forces a break), blinking arrow when waiting, a soft blip on turning.
+- **Emotes:** a small white bubble with a hand-placed 5×5 symbol (`!` `?` `...` `note` `heart`) that pops over the character's head for ~1s.
+- **Camera:** pans the player's Camera2D to a tile and back (`camera reset`). **Fades** reuse `Transition`'s black overlay (new `Transition.fade_out/fade_in`, which don't pause the tree or change scenes).
+- **Movie mode** (`movie start` ... `movie end`): a CanvasLayer (60) over everything but the fade: black background, pictures (`image id path at x,y` in screen pixels, `pan ... over t`), a bottom `caption` that fades in/out, and a centered `title` drawn at 2× (pixel-crisp). **Start skips a movie**: everything up to `movie end` is skipped except `set` and `music` steps.
+- **Story flags:** `set flag` → `GameManager.story_flags` (saved/loaded with the game), `GameManager.has_flag()`.
+- **Demos:** `data/cutscenes/demo.scene` (F7: Ryn appears beside you, talks, a hooded silhouette watches) and `demo_movie.scene` (F8: title card and captions over the forest). They double as format examples.
+- **⚠ For the APK milestone (23):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
+- Verified by a driver playing both demos on the real overworld (parser incl. error reporting, dialogue advance, flags, cleanup, player control returning, movie skip) plus screenshots.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -232,6 +250,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
+- Cutscenes: `divine-light/scripts/systems/Cutscene.gd` (autoload player) + `divine-light/scripts/cutscene/SceneScript.gd` (parser, command reference) + scene files in `divine-light/data/cutscenes/`
 - Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)
 - GitHub: `https://github.com/corytomlinson-oss/project_divine_light`, branch `cjt`
 
@@ -267,7 +286,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 | 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | ✅ (2026-09-29) |
 | 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | ✅ (2026-09-29) |
 | 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | ✅ (2026-09-29) |
-| 19a | Cutscenes — system + movie mode (in-game scripted scenes with a name-tag dialogue box; full-screen pixel "movie" scenes) | Not started |
+| 19a | Cutscenes — system + movie mode (in-game scripted scenes with a name-tag dialogue box; full-screen pixel "movie" scenes) | ✅ (2026-09-29) |
 | 19b | Cutscenes — intro movie (pixel-art opening before the player wakes up captive) | Not started |
 | 20a | Act I — The Cathedral (Vael) | Not started |
 | 20b | Act I — The Monastery (Ryn) | Not started |
@@ -408,6 +427,7 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - Capped at `Combatant.MAX_LEVEL = 35`, floored at 1
 - Use this to jump to a target level and test newly-unlocked skills without grinding
 - **F3** — instantly KO all enemies and win the current battle (`_debug_auto_win()`), granting XP/level-ups the same as a real victory. No-op if the battle is already over. Added during Milestone 13a playtesting to make repeated dungeon-walk/encounter-transition testing fast — without it, every encounter test requires manually fighting to completion.
+- **F7 / F8** — play the demo cutscene / demo movie (`Cutscene.gd` `_input()`, only on a map with the player, not while paused)
 - **F5** — save party + inventory to slot 1 (GameManager.gd `_input()`, works from any scene)
 - **F6** — load slot 1 back into the live party + inventory
 

@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system) is done; see the Milestone 18 section for status and what's next. Cory approved the scope, then left me to build 18a/18b on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing.
+**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system) and 18b (Vael + Ryn) are done; see the Milestone 18 section for status and what's next. Cory approved the scope, then left me to build 18a/18b on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing.
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
@@ -194,6 +194,13 @@ Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/n
 - Damage numbers now stay below the 2-line banner (y >= 40) so they don't collide with it over the top party slot.
 - Verified: every skill of all four classes played in isolation with frames captured mid-cast / at impact / after (scripted, 36 actions, no errors), plus a round of real battle flow.
 
+### 18b — Vael + Ryn (done, 2026-09-29)
+
+All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NAME`:
+- **Vael:** Smite, Consecrate (all enemies, flash) and Divine Strike (shake) are holy pillars from above; Divine Wrath is a holy bolt with a flash and the thunder sound; Holy Light is heal sparkles; Guard, Divine Shield (caster's row only, via `row_only`) and Sanctuary are shield rings; Fortify and Battle Hymn are shield/gold sparkles on everyone; Purify is holy sparkles; Taunt is a red-orange burst on Vael. Holy sound on his magic, heal sound on his heals.
+- **Ryn:** Iron Fist / Crippling Strike are physical bursts; Ki Blast fires a ki orb; Sweep cuts along every enemy's feet; Pressure Point circles stars; Storm Flurry is 5 ki slashes; Ki Burst is a big ki burst with a shake; Dragon's Maw is a fiery burst with a shake; Rising Dragon is a ki pillar rising from the target; Vital Touch / Mending Flow / Healing Wave (all allies, green flash) are heal sparkles.
+- **Next up: 18c (Lyra + Silas).** Their skills already play keyword fallbacks (fire orb + burst, ice burst, lightning bolt, earth quake, poison cloud, shadow slashes, smoke), so 18c is refinement: e.g. Glacier/Blizzard/Inferno/Thunderstrike deserve bigger versions than the single-target ones, and stance switches only get arcane sparkles. Then 18d: status markers on sprites (poison/burn/bleed, stun, buffs/debuffs), item and boss-phase polish.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -243,7 +250,7 @@ Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/n
 | 17c | UI/UX — controller (input map, hold-to-repeat, B/Start pause menu with Equip, battle shortcuts) | ✅ (2026-09-29) |
 | 17d | UI/UX — transitions & feedback (fades, battle-start mosaic, auto-advancing messages, damage numbers) | ✅ (2026-09-29) |
 | 18a | Spell & combat VFX — effect system (BattleFx library, recipe table, impact timing, 7 element sounds, fallbacks for every skill) | ✅ (2026-09-29) |
-| 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | Not started |
+| 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | ✅ (2026-09-29) |
 | 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | Not started |
 | 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | Not started |
 | 19a | Act I — The Cathedral (Vael) | Not started |

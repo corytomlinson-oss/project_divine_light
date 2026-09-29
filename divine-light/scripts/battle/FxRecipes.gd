@@ -22,13 +22,44 @@ const ATTACK := {"cast": "lunge", "impact": "slash", "palette": "physical"}
 const ENEMY_ATTACK := {"cast": "lunge", "impact": "slash", "palette": "enemy"}
 
 const BY_EFFECT := {
+	# ---------------------------------------------------------------- Vael (18b)
+	# Holy magic lands as light: pillars from above, a lightning-like strike
+	# for Divine Wrath. Protection is a shimmering ring; buffs are sparkles.
+	"heal": {"cast": "charge", "impact": "sparkles", "palette": "heal", "sound": "heal"},
+	"holy": {"cast": "charge", "impact": "pillar", "palette": "holy", "sound": "holy"},
+	"guard": {"cast": "charge", "impact": "ring", "palette": "shield", "sound": "holy"},
+	"taunt": {"cast": "none", "impact": "burst", "palette": "taunt", "sound": "", "size": 16.0},
+	"fortify": {"cast": "charge", "impact": "sparkles", "palette": "shield", "sound": "holy"},
+	"divine_shield": {"cast": "charge", "impact": "ring", "palette": "shield", "sound": "holy", "row_only": true},
+	"battle_hymn": {"cast": "charge", "impact": "sparkles", "palette": "buff", "sound": "holy"},
+	"consecrate": {"cast": "charge", "impact": "pillar", "palette": "holy", "sound": "holy", "screen": "flash"},
+	"holy_stun": {"cast": "charge", "impact": "pillar", "palette": "holy", "sound": "holy", "screen": "shake"},
+	"purify": {"cast": "charge", "impact": "sparkles", "palette": "holy", "sound": "heal"},
+	"sanctuary": {"cast": "charge", "impact": "ring", "palette": "holy", "sound": "holy"},
+	"holy_wrath": {"cast": "charge", "impact": "bolt", "palette": "holy", "sound": "thunder", "screen": "flash"},
+	# ---------------------------------------------------------------- Ryn (18b)
+	# Martial arts land as physical bursts and slashes in ki blue; the big
+	# finishers shake the battlefield. Heals are sparkles like Vael's.
+	"cripple": {"cast": "lunge", "impact": "burst", "palette": "physical", "sound": "", "size": 10.0},
+	"sweep": {"cast": "lunge", "impact": "sweep", "palette": "physical", "sound": ""},
+	"stun_phys": {"cast": "lunge", "impact": "stars", "palette": "lightning", "sound": ""},
+	"multi_hit": {"cast": "lunge", "impact": "slash", "palette": "ki", "sound": "", "count": 4},
+	"ki_burst": {"cast": "charge", "impact": "burst", "palette": "ki", "sound": "thunder", "size": 18.0, "screen": "shake"},
+	"heal_all": {"cast": "charge", "impact": "sparkles", "palette": "heal", "sound": "heal", "screen": "flash"},
+	"rising_dragon": {"cast": "lunge", "impact": "rising", "palette": "ki", "sound": "fire", "screen": "shake"},
 	# ------------------------------------------------------ everyone else
 	"physical": {"cast": "lunge", "impact": "slash", "palette": "physical", "sound": ""},
 }
 
-# Skills that share an effect type with something that should look different.
-# (Hand-tuned class entries arrive per class: Vael + Ryn in 18b.)
+# Skills that share an effect type with something that should look different
+# (Ryn's physical skills vs Silas's, Ryn's single heals vs Vael's).
 const BY_NAME := {
+	"Iron Fist": {"cast": "lunge", "impact": "burst", "palette": "physical", "sound": "", "size": 9.0},
+	"Ki Blast": {"cast": "projectile", "impact": "burst", "palette": "ki", "sound": "", "size": 12.0},
+	"Dragon's Maw": {"cast": "lunge", "impact": "burst", "palette": "fire", "sound": "fire", "size": 16.0, "screen": "shake"},
+	"Vital Touch": {"cast": "lunge", "impact": "sparkles", "palette": "heal", "sound": "heal"},
+	"Mending Flow": {"cast": "charge", "impact": "sparkles", "palette": "heal", "sound": "heal"},
+	"Storm Flurry": {"cast": "lunge", "impact": "slash", "palette": "ki", "sound": "", "count": 5},
 	"Flurry": {"cast": "lunge", "impact": "slash", "palette": "shadow", "sound": "", "count": 4},
 }
 

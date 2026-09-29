@@ -67,6 +67,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 18a — Combat effect system. Every action now plays a code-drawn effect: slashes, bursts, projectiles, lightning bolts, light pillars, sparkles, shields, clouds, screen flashes and shakes, each in its element's colors. The effect plays first and the damage lands with it. Seven new synthesized element sounds (fire, ice, thunder, earth, holy, heal, poison). Every skill in the game already has a fitting effect; 18b-18c hand-tune each class.
 
+**Completed:** Milestone 18b — Vael and Ryn effects. All 24 of their skills are hand-tuned: holy pillars, a holy lightning strike, shield rings and sparkling buffs for Vael; ki blasts, flurries of slashes, a sweeping kick, stun stars and a rising dragon pillar for Ryn.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

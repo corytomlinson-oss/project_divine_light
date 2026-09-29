@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. **17b-17d are committed locally but not pushed, and still need Cory's playtest** (and his ear for the new `encounter` sound); push to `cjt` once he's happy. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
+**Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
 - The gamepad bindings are untested on the RP6 itself until the APK milestone (22).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
 - The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.

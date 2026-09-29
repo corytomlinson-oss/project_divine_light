@@ -201,7 +201,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [x] **Thin window frame** (17b) — 16×16 9-slice, 4px border: `assets/ui/source/build_panel_thin.py` -> `assets/ui/panel_thin.png`. The theme's default Panel style; it finally frames the action menu and party panel (the `[x]` items above) in the new SNES battle layout.
 - [x] **Battle background, taller** (17b) — same generator, ground extended to y=112 and trees moved off the fighters.
 - [x] **Scroll arrows** — drawn in code (`scripts/ui/ScrollHint.gd`).
-- [x] **Encounter SFX** (17d) — `encounter` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/encounter.wav`: a rising pitch sweep and whoosh that break into a crash, timed to the battle-start mosaic. **Needs Cory's ear** (Claude can't hear it).
+- [x] **Encounter SFX** (17d) — `encounter` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/encounter.wav`: a rising pitch sweep and whoosh that break into a crash, timed to the battle-start mosaic. Approved by Cory (2026-09-29).
 - [x] **Mosaic shader** (17d) — `assets/shaders/mosaic.gdshader`, the battle-start screen breakup.
 
 ## Deferred to later passes

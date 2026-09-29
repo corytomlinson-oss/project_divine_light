@@ -1,6 +1,6 @@
 # Divine Light — Asset Checklist
 
-Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 19, Act II in 23, Act III in 25). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
+Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 20, Act II in 24, Act III in 26). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
 
 Each entry's prompt is self-contained and ready to paste into an AI image/music tool as-is — no need to remember to append the style guide separately.
 
@@ -82,7 +82,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### Characters
 
-*Scope call (2026-09-27): generating all 4 class-specific overworld sprites now instead of one generic placeholder, since each class's look is already fixed by the design doc. **Full class-selection isn't built** — no starting-class-selection feature exists in code (`GameManager.gd` always creates all 4 party members from the start; nothing marks any one of them as "the player"). Rather than sit unused, Vael's sprite was wired in directly as `Player.tscn`'s current default appearance — a pragmatic single-sprite stand-in, not a real per-class swap system. When the class-selection feature (Act I content work, Milestone 18a+) actually lands, that's the point to make `Player.tscn`'s texture swappable and wire in the other 3.*
+*Scope call (2026-09-27): generating all 4 class-specific overworld sprites now instead of one generic placeholder, since each class's look is already fixed by the design doc. **Full class-selection isn't built** — no starting-class-selection feature exists in code (`GameManager.gd` always creates all 4 party members from the start; nothing marks any one of them as "the player"). Rather than sit unused, Vael's sprite was wired in directly as `Player.tscn`'s current default appearance — a pragmatic single-sprite stand-in, not a real per-class swap system. When the class-selection feature (Act I content work, Milestone 19a+) actually lands, that's the point to make `Player.tscn`'s texture swappable and wire in the other 3.*
 
 - [x] **Vael overworld sprite** *(Templar — tank/buffer/minor healer)*
   Prompt used: *"A holy knight templar, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, wearing plate armor with a shield, warm gold/white holy color accents"*

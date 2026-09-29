@@ -1738,7 +1738,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 ## this turn, so the caller can fold it into whatever message it shows next
 ## instead of the transition note getting silently overwritten a line later.
 ## Milestone 14 test boss just permanently hits harder past the threshold -
-## real bosses (Milestone 19a/22b-d) will want per-phase skill kits, which
+## real bosses (Milestone 19a/23b-d) will want per-phase skill kits, which
 ## needs an enemy-ability dispatch system that doesn't exist yet.
 func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if enemy.boss_phase >= enemy.phase_hp_thresholds.size():

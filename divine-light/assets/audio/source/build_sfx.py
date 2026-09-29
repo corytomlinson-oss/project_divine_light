@@ -226,6 +226,64 @@ def encounter():
     return mix(0.76, (0, rise), (0, whoosh), (0.42, crash), (0.42, thump))
 
 
+# ---------------------------------------------- element impacts (Milestone 18)
+# Played when a skill's effect lands, on top of the generic attack/spell cast
+# sound, so each element has its own voice.
+def fire():
+    # roaring crackle: a bright noise burst dulling down over a low pitch drop
+    roar = noise(0.45, 0.7, rate_hz=slide(9000, 1800, 0.45), env=adsr(0.005, 0.08, 0.6, 0.25))
+    crackle = noise(0.4, 0.35, rate_hz=22000, env=lambda tt, d: (0.5 + 0.5 * ((tt * 31) % 1 < 0.3)) * math.exp(-tt * 5))
+    body = tone('pulse', slide(180, 60, 0.35, 0.7), 0.35, 0.5, 0.5, decay(9))
+    return mix(0.46, (0, roar), (0, crackle), (0, body))
+
+
+def ice():
+    # crystalline: high chime cluster with glassy sparkle
+    chimes, t = seq([('E7', 0.03), ('B6', 0.03), ('G#7', 0.03), ('E7', 0.2)], 'tri', 0.5, env=adsr(0.001, 0.02, 0.7, 0.15))
+    ping = tone('sine', note('B7'), 0.35, 0.3, env=decay(10))
+    glass = noise(0.3, 0.2, rate_hz=32000, env=decay(16))
+    return echo(mix(t + 0.35, (0, chimes), (0.02, ping), (0, glass)), 0.07, 0.3, 2)
+
+
+def thunder():
+    # sharp crack into a rolling low rumble
+    crack = noise(0.08, 1.0, rate_hz=26000, env=decay(40))
+    rumble = noise(0.6, 0.6, rate_hz=slide(1600, 500, 0.6), env=lambda tt, d: min(1, tt * 30) * math.exp(-tt * 4.5))
+    zap = tone('pulse', slide(1400, 300, 0.1, 0.5), 0.1, 0.5, 0.25, decay(30))
+    return mix(0.62, (0, crack), (0, zap), (0.03, rumble))
+
+
+def earth():
+    # heavy thud and gravelly rumble
+    thud = tone('tri', slide(90, 35, 0.35, 0.6), 0.35, 1.0, env=decay(7))
+    gravel = noise(0.5, 0.55, rate_hz=slide(1400, 400, 0.5), env=adsr(0.01, 0.1, 0.6, 0.3))
+    return mix(0.52, (0, thud), (0, gravel))
+
+
+def holy():
+    # bright bell chord that rings out
+    def bell(n, v):
+        return mix(0.6, (0, tone('tri', note(n), 0.6, v, env=decay(5))),
+                   (0, tone('sine', note(n) * 2.01, 0.4, v * 0.35, env=decay(9))))
+    chord = mix(0.66, (0, bell('C6', 0.5)), (0.03, bell('E6', 0.4)), (0.06, bell('G6', 0.4)))
+    return echo(chord, 0.1, 0.3, 2)
+
+
+def heal():
+    # soft, slower rising triangle arpeggio with a shimmer (gentler than level_up)
+    run, t = seq([(n_, 0.07) for n_ in ['G5', 'B5', 'D6', 'G6']], 'tri', 0.55, env=adsr(0.005, 0.03, 0.7, 0.04))
+    shimmer = tone('sine', note('G7'), 0.4, 0.2, env=decay(7), vibrato=0.01)
+    return echo(mix(t + 0.4, (0, run), (t - 0.05, shimmer)), 0.09, 0.3, 2)
+
+
+def poison():
+    # bubbling: low blips at uneven pitches
+    blips = [('C3', 0.05), ('G3', 0.04), ('D#3', 0.06), ('A#3', 0.04), ('F3', 0.07)]
+    bub, t = seq(blips, 'pulse', 0.5, 0.125, adsr(0.002, 0.02, 0.5, 0.02), gap=0.02)
+    hiss = noise(0.3, 0.15, rate_hz=5000, env=decay(8))
+    return mix(t + 0.05, (0, bub), (0, hiss))
+
+
 # Peak level per sound. Menu blips play constantly, so they sit well below
 # the one-off fanfares; the thin, high equip clink needs a push to be heard.
 GAIN = {
@@ -233,6 +291,7 @@ GAIN = {
     'menu_move': 0.35, 'menu_confirm': 0.4, 'menu_cancel': 0.4,
     'victory': 0.75, 'level_up': 0.7, 'item': 0.65, 'equip': 0.9,
     'encounter': 0.75,
+    'fire': 0.7, 'ice': 0.6, 'thunder': 0.8, 'earth': 0.8, 'holy': 0.65, 'heal': 0.6, 'poison': 0.6,
 }
 
 SOUNDS = {
@@ -240,6 +299,7 @@ SOUNDS = {
     'menu_move': menu_move, 'menu_confirm': menu_confirm, 'menu_cancel': menu_cancel,
     'victory': victory, 'level_up': level_up, 'item': item, 'equip': equip,
     'encounter': encounter,
+    'fire': fire, 'ice': ice, 'thunder': thunder, 'earth': earth, 'holy': holy, 'heal': heal, 'poison': poison,
 }
 
 

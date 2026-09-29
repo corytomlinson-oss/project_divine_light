@@ -8,6 +8,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
+**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system) is done; see the Milestone 18 section for status and what's next. Cory approved the scope, then left me to build 18a/18b on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing.
+
+
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
 - The gamepad bindings are untested on the RP6 itself until the APK milestone (22).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
@@ -177,6 +180,20 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - **Damage / heal numbers:** `_popup_hp_change()` floats a number over whoever's HP changed (white damage, green healing, 1px black shadow), called from the same HP-diff passes that drive the hurt/KO animations, so attacks, skills, items and poison ticks all show one.
 - Verified by a driver node on the root (it survives scene changes, unlike a test scene) playing the real flow: encounter → mosaic → battle → 4 attacks → auto-advance → win → map → pause menu → Equip → back to the reopened menu (12 checks + screenshots).
 
+## Milestone 18 — Spell & combat VFX (in progress)
+
+Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/numbers show), **new element sounds**, **status markers in scope (18d)**. Split: 18a system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + item/boss-phase polish. Enemies only have a basic attack until enemy abilities exist (19a), so they get just the attack effect.
+
+### 18a — effect system (done, 2026-09-29)
+
+- **`BattleFx`** (`scripts/battle/BattleFx.gd`, a Node2D above the fighters and below the windows): effects built in code, no art files. Each is a short-lived `Shape` node redrawn from a 0..1 tween progress with whole-pixel rects. Effects: `burst`, `slash` (with `count` for multi-hits), `sweep`, `projectile`, `charge`, `bolt`, `pillar` (down, or `rising`), `sparkles` (up, or down = debuff), `ring`, `cloud`, `stars`, plus battlefield `flash` and `shake` (background art + enemy/party areas, not the windows). Colors come from `PALETTES` (physical, enemy, holy, shield, buff, taunt, ki, heal, mana, fire, ice, lightning, earth, arcane, shadow, poison, debuff). It has its own seeded RNG and never touches the global one combat rolls use.
+- **`FxRecipes`** (`scripts/battle/FxRecipes.gd`): which effect each action plays, as data (`cast`, `impact`, `palette`, `sound`, `screen`, `count`, `size`, `row_only`). Lookup: `BY_NAME` → `BY_EFFECT` → keyword fallback on the effect name (fire/ice/lightning/earth/poison/toxic/smoke/bleed/garrote/shadow/death/expose/vanish/stance) → the caster's class palette. So **every skill already shows a fitting effect**; 18b/18c add hand-tuned entries per class.
+- **Impact timing** (Cory's call): `_execute_party_turn()` / `_execute_enemy_turn()` are coroutines. The wind-up plays first (`await _fx.cast(...)`; the banner shows the skill or item name meanwhile), then the action's logic runs and `_fx.impact(...)` fires at that same moment, so hurt flashes and damage numbers land with the effect. `_fx_targets()` resolves the sprites with the same helpers the logic uses, before it runs. `_advance_turn()` sets `_acting` for the duration: the turn doesn't advance, A is ignored, and F3 is blocked until the action finishes; the auto-advance timer starts after it.
+- **Sounds:** 7 new element impacts in `build_sfx.py` (fire, ice, thunder, earth, holy, heal, poison), played as the effect lands on top of the generic attack/spell cast sound; the 11 existing WAVs rebuilt byte-identical. **Need Cory's ear.**
+- Basic attack: white slash; enemy attack: red claw streak on the target; items: sparkles (heal green, Ether blue, Antidote poison-green).
+- Damage numbers now stay below the 2-line banner (y >= 40) so they don't collide with it over the top party slot.
+- Verified: every skill of all four classes played in isolation with frames captured mid-cast / at impact / after (scripted, 36 actions, no errors), plus a round of real battle flow.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -194,6 +211,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
+- Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)
 - GitHub: `https://github.com/corytomlinson-oss/project_divine_light`, branch `cjt`
 
 ## Implementation status
@@ -224,7 +242,10 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 | 17b | UI/UX — SNES-style battle layout (taller battlefield, message banner, command/enemy/party windows) | ✅ (2026-09-29) |
 | 17c | UI/UX — controller (input map, hold-to-repeat, B/Start pause menu with Equip, battle shortcuts) | ✅ (2026-09-29) |
 | 17d | UI/UX — transitions & feedback (fades, battle-start mosaic, auto-advancing messages, damage numbers) | ✅ (2026-09-29) |
-| 18 | Spell & combat VFX (split out of 17, Cory's call 2026-09-29) | Not started |
+| 18a | Spell & combat VFX — effect system (BattleFx library, recipe table, impact timing, 7 element sounds, fallbacks for every skill) | ✅ (2026-09-29) |
+| 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | Not started |
+| 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | Not started |
+| 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | Not started |
 | 19a | Act I — The Cathedral (Vael) | Not started |
 | 19b | Act I — The Monastery (Ryn) | Not started |
 | 19c | Act I — The Observatory (Lyra) | Not started |

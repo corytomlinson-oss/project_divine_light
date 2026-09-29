@@ -264,6 +264,10 @@ var _scroll_hint := ScrollHint.new()
 var _advance_hint := ScrollHint.new()
 var _blink := 0.0
 var _message_timer := 0.0
+# Combat effects (Milestone 18). While an action's effect plays (_acting), the
+# turn doesn't advance and its damage hasn't been applied yet.
+var _fx := BattleFx.new()
+var _acting := false
 
 
 func _ready() -> void:
@@ -279,6 +283,7 @@ func _ready() -> void:
 	Music.play("boss" if boss_fight else "battle", "battle")
 	_setup_enemy_ui()
 	_setup_party_sprites()
+	_setup_fx()
 	GameManager.party_loaded.connect(_update_ui)
 	_update_ui()
 	_begin_selection()
@@ -445,6 +450,17 @@ func _setup_party_sprites() -> void:
 	_animate_party_hp_changes(true)
 
 
+## Effects draw above the fighters and below the windows; the battlefield
+## (background art, enemies, party) is what shakes.
+func _setup_fx() -> void:
+	add_child(_fx)
+	move_child(_fx, $PartyArea.get_index() + 1)
+	for node_name in ["BackgroundArt", "EnemyArea", "PartyArea"]:
+		var node := get_node_or_null(node_name)
+		if node != null:
+			_fx.shake_nodes.append(node)
+
+
 ## Member i's place in the line: front-row members first, then back-row
 ## members, each group in party order.
 func _party_slot(i: int) -> int:
@@ -597,6 +613,12 @@ func _popup_hp_change(target: CanvasItem, damage: int) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.size = Vector2(40, 10)
 	label.position = (_popup_anchor(target) - Vector2(20, 10)).round()
+	# Keep it clear of the message banner (the top party slot sits under it):
+	# below a 2-line banner (bottom y=31) even after floating up 8px. The
+	# banner may not have resized to this turn's message yet, so don't use
+	# its current size.
+	if message_banner.visible:
+		label.position.y = maxf(label.position.y, 40.0)
 	label.z_index = 5
 	add_child(label)
 	var t := create_tween()
@@ -700,10 +722,10 @@ func _process(delta: float) -> void:
 		State.SELECTING:
 			_handle_menu_input()
 		State.RESOLVING:
-			_message_timer -= delta
-			if Input.is_action_just_pressed("confirm") or _message_timer <= 0.0:
-				_execute_next_turn()
-				_message_timer = _message_time()
+			if not _acting:
+				_message_timer -= delta
+				if Input.is_action_just_pressed("confirm") or _message_timer <= 0.0:
+					_advance_turn()
 		State.BATTLE_OVER:
 			if Input.is_action_just_pressed("confirm"):
 				if not _level_up_queue.is_empty():
@@ -770,7 +792,7 @@ func _debug_level_all(direction: int) -> void:
 
 
 func _debug_auto_win() -> void:
-	if state == State.BATTLE_OVER:
+	if state == State.BATTLE_OVER or _acting:
 		return
 	for e in _enemies:
 		e.receive_damage(e.hp)
@@ -1197,7 +1219,15 @@ func _begin_resolving() -> void:
 			_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
-	_execute_next_turn()
+	_advance_turn()
+
+
+## Runs the next action (its effect, then its result) and starts the message
+## timer once it's done. Nothing advances in between.
+func _advance_turn() -> void:
+	_acting = true
+	await _execute_next_turn()
+	_acting = false
 	_message_timer = _message_time()
 
 
@@ -1229,9 +1259,9 @@ func _execute_next_turn() -> void:
 		message_label.text = "%s is stunned and cannot act!" % combatant.display_name
 		return
 	if combatant.is_enemy:
-		_execute_enemy_turn(combatant)
+		await _execute_enemy_turn(combatant)
 	else:
-		_execute_party_turn(combatant)
+		await _execute_party_turn(combatant)
 
 
 func _get_enemy_target(member: Combatant) -> Combatant:
@@ -1254,14 +1284,30 @@ func _get_ally_target(member: Combatant, skill: Dictionary) -> Combatant:
 	return alive[0] if not alive.is_empty() else member
 
 
+## Milestone 18 impact timing: the effect's wind-up / travel plays first (the
+## banner shows the skill or item name meanwhile), then the action's logic runs
+## - damage, messages, possibly the battle's end - and the impact effect plays
+## at that same moment, so hurt flashes and damage numbers land with it.
+## Targets are worked out before the logic runs, from the same helpers it uses.
 func _execute_party_turn(member: Combatant) -> void:
 	var offensive: bool = member.queued_action == "attack" \
 			or (member.queued_action == "skill" and str(member.queued_skill.get("target", "")).begins_with("enemy"))
+	var recipe: Dictionary = FxRecipes.for_member(member)
+	var targets: Array = _fx_targets(member, recipe)
 	if offensive:
 		_anim_party_attack(_party.find(member))
 	var sound := _party_action_sound(member)
 	if sound != "":
 		Sfx.play(sound)
+	if member.queued_action == "skill" or member.queued_action == "item_use":
+		message_label.text = member.queued_skill.get("name", "")
+	var caster: CanvasItem = _party_sprites[_party.find(member)]
+	if not recipe.is_empty() and caster != null:
+		await _fx.cast(recipe, caster, targets)
+	if not recipe.is_empty():
+		_fx.impact(recipe, targets)
+		if recipe.get("sound", "") != "":
+			Sfx.play(recipe["sound"])
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -1273,6 +1319,46 @@ func _execute_party_turn(member: Combatant) -> void:
 			member.row = "back" if member.row == "front" else "front"
 			_update_ui()
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
+
+
+## The sprites a party member's action will land on, resolved the same way
+## the action's logic resolves them (so before it runs, while every target is
+## still standing).
+func _fx_targets(member: Combatant, recipe: Dictionary) -> Array:
+	var fighters: Array = []
+	match member.queued_action:
+		"attack":
+			fighters = [_get_enemy_target(member)]
+		"item_use":
+			fighters = [_get_ally_target(member, member.queued_skill)]
+		"skill":
+			var skill: Dictionary = member.queued_skill
+			match str(skill.get("target", "")):
+				"enemy":
+					fighters = [_get_enemy_target(member)]
+				"enemy_all":
+					fighters = _enemies.filter(func(e: Combatant) -> bool: return e.is_alive())
+				"ally", "ally_choose":
+					fighters = [_get_ally_target(member, skill)]
+				"ally_all":
+					fighters = _party.filter(func(c: Combatant) -> bool:
+						return c.is_alive() and (not recipe.get("row_only", false) or c.row == member.row))
+				"self":
+					fighters = [member]
+	var sprites: Array = []
+	for f in fighters:
+		if f == null:
+			continue
+		var sprite: CanvasItem = null
+		if f.is_enemy:
+			var i := _enemies.find(f)
+			sprite = _enemy_sprites[i] if i >= 0 and i < _enemy_sprites.size() else null
+		else:
+			var i := _party.find(f)
+			sprite = _party_sprites[i] if i >= 0 and i < _party_sprites.size() else null
+		if sprite != null:
+			sprites.append(sprite)
+	return sprites
 
 
 ## Weapon users (Ryn, Silas) sound physical when they hit enemies; everything
@@ -1876,6 +1962,13 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if target == null:
 		target = targets[randi() % targets.size()]
 
+	# Wind-up (the enemy's hop is already playing), then its claw/blade streak
+	# lands on the target together with the damage below.
+	var enemy_sprite: CanvasItem = _enemy_sprites[_enemies.find(enemy)]
+	var target_sprite: CanvasItem = _party_sprites[_party.find(target)]
+	var hit_targets: Array = [target_sprite] if target_sprite != null else []
+	await _fx.cast(FxRecipes.ENEMY_ATTACK, enemy_sprite, hit_targets)
+
 	# Smoke Bomb: the enemy's own accuracy is lowered
 	if enemy.accuracy_debuff_rounds > 0 and randi() % 100 < 30:
 		_update_ui()
@@ -1895,6 +1988,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 		message_label.text = phase_note + "%s's Sanctuary absorbs\n%s's attack!" % [target.display_name, enemy.display_name]
 		return
 
+	_fx.impact(FxRecipes.ENEMY_ATTACK, hit_targets)
 	var effective_def := target.defense + target.def_buff
 	var def_val := effective_def * 2 if target.defending else effective_def
 	var dmg := maxi(1, enemy.atk - def_val + randi_range(-1, 1))

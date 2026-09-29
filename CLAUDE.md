@@ -8,6 +8,23 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
+**⏵ AUTONOMOUS RUN IN PROGRESS (started 2026-09-29, Cory away on a trip).** Cory asked me to finish Milestone 20 (20b → 20c → 20d) on my own recommendations, step by step, and **stop at the end of Milestone 20**. Rules: finish, test and **commit each step locally (don't push)** before starting the next; **log every judgment call at the bottom of `DECISIONS.md`**; if something genuinely needs Cory's input, **stop and write what's needed here**. Usage limit: the session resets at 6:20 PM CDT; scheduled wake-ups resume the work. Check off steps here as they land:
+
+- 20b The Monastery (Ryn)
+  - [ ] b1 — battle mechanics: counter stance (hits back at physical attacks), berserk (swings at a random target, own allies included), extra actions per round; Monastery enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) + bosses (escape warden "Sparring Master", Corrupted Grandmaster). **Also fix 20a's tuning mistake:** the second dungeon on every route is visited by the starting hero *alone* (nobody's been rescued yet), so the Cathedral rescue + Fallen Guardian must be retuned for one hero around level 5, not two.
+  - [ ] b2 — the Monastery dungeon: recolored tileset, scene, `Dungeon.gd` entry, `ActOne` scene path, encounter tables (escape: lone level-1 Ryn; rescue: lone hero ~5), story scenes (wake / Frank / escaped / rescue); `{next}` substitution in scene text so Frank names the right next dungeon.
+  - [ ] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
+- 20c The Observatory (Lyra)
+  - [ ] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
+  - [ ] c2 — the Observatory dungeon + scenes.
+  - [ ] c3 — Lyra playable; test; docs.
+- 20d The Underground Guild (Silas)
+  - [ ] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
+  - [ ] d2 — the Guild dungeon + scenes.
+  - [ ] d3 — Silas playable; test.
+  - [ ] d4 — Edenmere, the mid-Act I town.
+  - [ ] d5 — the Act I → Act II transition (all four gathered → closing scene; Act II kingdoms "coming later"); final docs. **Then stop.**
+
 **Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps, pushed to `cjt` on Cory's go-ahead (he hasn't playtested it yet): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
 
 

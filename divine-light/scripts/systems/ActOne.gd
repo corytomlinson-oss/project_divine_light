@@ -13,21 +13,25 @@ const DUNGEONS := {
 	"cathedral": {
 		"name": "The Cathedral", "captive": "Vael", "gate": "",
 		"scene": "res://scenes/dungeon/CathedralDungeon.tscn",
+		"where": "on the hill north of Verdance",
 		"gate_text": "",
 	},
 	"monastery": {
 		"name": "The Monastery", "captive": "Ryn", "gate": "Vael",
-		"scene": "",
+		"scene": "res://scenes/dungeon/MonasteryDungeon.tscn",
+		"where": "up in the hills to the north-east",
 		"gate_text": "A seal of pale holy light bars the doors. Only someone who carries holy power could break it.",
 	},
 	"observatory": {
 		"name": "The Observatory", "captive": "Lyra", "gate": "Ryn",
 		"scene": "",
+		"where": "out on the eastern plain",
 		"gate_text": "A great stone slab has fallen across the entrance. It would take real strength to move it.",
 	},
 	"guild": {
 		"name": "The Underground Guild", "captive": "Silas", "gate": "Lyra",
 		"scene": "",
+		"where": "down in the ravine to the south",
 		"gate_text": "Arcane runes crawl across the hatch. Someone versed in magic might be able to read them.",
 	},
 }
@@ -40,9 +44,9 @@ const ROUTES := {
 	"Silas": ["guild", "cathedral", "monastery", "observatory"],
 }
 
-# What's built so far. Only Vael's start (the Cathedral) exists until
-# Milestones 20b-20d add the other dungeons.
-const PLAYABLE_STARTS: Array = ["Vael"]
+# What's built so far: the starting dungeons that exist (Cathedral 20a,
+# Monastery 20b; the Observatory and Guild arrive with 20c-20d).
+const PLAYABLE_STARTS: Array = ["Vael", "Ryn"]
 
 
 static func start_dungeon(cls: String) -> String:

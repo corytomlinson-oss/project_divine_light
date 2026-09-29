@@ -193,6 +193,11 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
+## Milestone 20b — The Monastery
+
+- [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).
+- [~] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — stand-ins: tinted/scaled copies of existing enemy sprites (`EnemyData.STAND_INS`). Milestone 21.
+
 ## Milestone 20a — The Cathedral
 
 - [x] **Overworld tiles** — `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png`: the Milestone 16 grass/trees/gate unchanged, plus a road, a stone arch (dungeon entrances), water and flowers. Code-drawn placeholders.

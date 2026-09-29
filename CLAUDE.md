@@ -12,8 +12,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 - 20b The Monastery (Ryn)
   - [x] b1 — battle mechanics: counter stance (hits back at physical attacks), berserk (swings at a random target, own allies included), extra actions per round; Monastery enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) + bosses (escape warden "Sparring Master", Corrupted Grandmaster). **Also fix 20a's tuning mistake:** the second dungeon on every route is visited by the starting hero *alone* (nobody's been rescued yet), so the Cathedral rescue + Fallen Guardian must be retuned for one hero around level 5, not two.
-  - [ ] b2 — the Monastery dungeon: recolored tileset, scene, `Dungeon.gd` entry, `ActOne` scene path, encounter tables (escape: lone level-1 Ryn; rescue: lone hero ~5), story scenes (wake / Frank / escaped / rescue); `{next}` substitution in scene text so Frank names the right next dungeon.
-  - [ ] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
+  - [x] b2 — the Monastery dungeon: recolored tileset, scene, `Dungeon.gd` entry, `ActOne` scene path, encounter tables (escape: lone level-1 Ryn; rescue: lone hero ~5), story scenes (wake / Frank / escaped / rescue); `{next}` substitution in scene text so Frank names the right next dungeon.
+  - [x] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
 - 20c The Observatory (Lyra)
   - [ ] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
   - [ ] c2 — the Observatory dungeon + scenes.
@@ -289,6 +289,13 @@ Built in four steps, each tested and committed on its own:
 - **Monastery kits:** Corrupted Monk (2-3 hits), Berserk Warrior (30% berserk), Iron Sentinel (DEF-heavy, RES 2: a magic target). **Sparring Master** (escape warden for a Ryn start): two hits a turn, "Iron Guard" counter stance every 3rd turn (every 2nd in phase 2). **Corrupted Grandmaster:** two hits, two actions a round in phase 1, counters every blow in phase 2. Stand-in sprites (tinted Shadow Acolyte / Corrupted Farmer / Cursed Paladin). Kits can give a `short` name for the 104px enemy list ("Grandmaster").
 - **Tuning correction:** the second dungeon on every route is visited by the starting hero *alone*, so rescue tables and bosses are tuned for **one hero around level 5** (Cathedral rescue enemies and the Fallen Guardian toned down: 300 HP, 30 ATK).
 - Verified in real battles (9 checks) + screenshots.
+
+**Steps b2-b3: the Monastery dungeon, Ryn playable (done, 2026-09-29)**
+- **Tileset:** `assets/tilesets/source/build_dungeon_recolors.py` maps the Cathedral's floor/wall/door tiles by brightness onto a per-dungeon palette ramp (`RAMPS`; the runes are copied unchanged) -> `monastery_tiles.png` (warm terracotta/sandstone). 20c/20d add their ramps to the same script.
+- **Scene:** `scenes/dungeon/MonasteryDungeon.tscn` (a copy of the Cathedral's with `dungeon_id = "monastery"`); `Dungeon.DUNGEONS["monastery"]` (same generation template as the Cathedral; four scene files); `ActOne.DUNGEONS` gained its scene path and a `where` string for every dungeon.
+- **`{next}` / `{next_where}` in scene text:** `Cutscene._expand()` (called by `play()` and `play_text()`) fills in the next dungeon on this game's route ("the Observatory", "out on the eastern plain"). The escape-end now sets `cleared_<id>` *before* the escaped scene so `{next}` already points past it. Used by `monastery_escaped.scene` and `verdance_arrival.scene`.
+- **Ryn playable:** `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn"]`. Verdance's arrival fires once the *starting* dungeon is cleared (was hardcoded to the Cathedral); the elder's "after" line is now route-neutral.
+- Verified end to end (12 checks): Ryn's class select -> wake -> Frank -> Sparring Master with Frank's help -> Frank names the Observatory -> overworld at the Monastery's arch -> Verdance arrival names the Observatory; then a Vael game at level 5 with the Cathedral cleared -> Monastery rescue -> Corrupted Grandmaster -> Ryn joins at level 5. Test gotcha: dialogue page text contains line breaks, so match captured text with `\n` replaced by spaces.
 
 ## Milestone 19 — Cutscenes (done)
 

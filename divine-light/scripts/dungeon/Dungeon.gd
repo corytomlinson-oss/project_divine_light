@@ -30,6 +30,14 @@ const DUNGEONS := {
 		"escaped_scene": "res://data/cutscenes/cathedral_escaped.scene",
 		"rescue_scene": "res://data/cutscenes/cathedral_rescue.scene",
 	},
+	"monastery": {
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"scene": "res://scenes/dungeon/MonasteryDungeon.tscn",
+		"wake_scene": "res://data/cutscenes/monastery_wake.scene",
+		"frank_scene": "res://data/cutscenes/monastery_frank.scene",
+		"escaped_scene": "res://data/cutscenes/monastery_escaped.scene",
+		"rescue_scene": "res://data/cutscenes/monastery_rescue.scene",
+	},
 }
 
 const TAG_TO_COORDS := {
@@ -157,8 +165,9 @@ func _play_arrival_story() -> void:
 		await Cutscene.play(_data["wake_scene"])
 	elif _boss_defeated() and not ActOne.is_cleared(dungeon_id):
 		await _after_transition()
-		await Cutscene.play(_data["escaped_scene"])
+		# Cleared before the scene, so {next} in it names the *next* dungeon.
 		GameManager.story_flags["cleared_" + dungeon_id] = true
+		await Cutscene.play(_data["escaped_scene"])
 		GameManager.arrival = dungeon_id
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 

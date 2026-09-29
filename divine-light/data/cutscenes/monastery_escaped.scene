@@ -1,0 +1,13 @@
+# After the Sparring Master falls (Milestone 20b, escape start). Plays when the
+# Monastery reloads after the fight; then the map fades out to the overworld.
+
+spawn frank frank at ~-1,0 facing right
+face player left
+emote frank note
+say Frank: Ha! Down it goes! I've never seen hands move like yours, monk.
+say Frank: Listen - I heard the guards talking. They took three others like you. Souls that still shine clean, the ones the Unraveling can't turn.
+say Frank: So Vorath's people lock them away instead. One is held in {next}, {next_where}.
+emote player !
+say Ryn: Then we go and get them. All three.
+say Frank: Verdance first - the village west of here. You need rest, and I need to see what's left of my stock. Come on - fresh air!
+fade out 1

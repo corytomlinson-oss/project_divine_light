@@ -76,7 +76,7 @@ const TALK := {
 		"say Elder: We keep our doors barred now, and our children close.",
 	],
 	"elder_after": [
-		"say Elder: You came down from the Cathedral? Then there's still some hope left in this world.",
+		"say Elder: You got away from them? Then there's still some hope left in this world.",
 	],
 	"farmer": [
 		"say Farmer: My east field went grey overnight. Nothing grows in it now - not even the weeds.",
@@ -142,7 +142,8 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 ## The first time the player reaches Verdance after escaping the Cathedral,
 ## Frank walks them in and sets up his stall.
 func _arrival_story() -> void:
-	if not ActOne.is_cleared("cathedral") or GameManager.has_flag("verdance_frank"):
+	var start := ActOne.start_dungeon(GameManager.starting_class) if GameManager.starting_class != "" else "cathedral"
+	if not ActOne.is_cleared(start) or GameManager.has_flag("verdance_frank"):
 		return
 	if Transition.is_busy():
 		await Transition.finished
@@ -183,7 +184,7 @@ func interact(cell: Vector2i, facing: String) -> void:
 func _talk(id: String, facing: String) -> void:
 	var opposite := {"up": "down", "down": "up", "left": "right", "right": "left"}
 	var lines: Array = TALK.get(id, [])
-	if ActOne.is_cleared("cathedral") and TALK.has(id + "_after"):
+	if GameManager.has_flag("verdance_frank") and TALK.has(id + "_after"):
 		lines = TALK[id + "_after"]
 	var script := "face %s %s\n%s" % [id, opposite[facing], "\n".join(lines)]
 	await Cutscene.play_text(script)

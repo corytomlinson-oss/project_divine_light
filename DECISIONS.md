@@ -189,3 +189,12 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **All five new enemies use stand-in art:** tinted copies of existing enemy sprites until the Act I art pass (21).
 - **Long boss names get a short form in the enemy list**, e.g. "Grandmaster". Messages still use the full name.
 
+### Steps b2-b3: the Monastery dungeon, Ryn playable
+
+- **The Monastery's tiles are a recolor of the Cathedral's**, not new art: same shapes, warm terracotta and sandstone instead of grey stone. The captive and boss runes stay identical so they read the same everywhere. The Observatory and Guild will get their own colors the same way. Real tiles come with the Act I art pass (21). *Change:* `RAMPS` in `build_dungeon_recolors.py`.
+- **Same layout rules as the Cathedral** (5-8 rooms). The design doc gives the Monastery no special layout mechanic, so I didn't invent one.
+- **All the Monastery dialogue is mine**, pronoun-free as always: `monastery_wake`, `monastery_frank`, `monastery_escaped`, `monastery_rescue` in `data/cutscenes/`. Ryn trained there, so the wake scene leans on that; Frank warns about the Sparring Master's guard stance (the fight's hint).
+- **Frank's "where next" lines fill themselves in.** Scene text can say `{next}` and `{next_where}`, which become the next dungeon on *this* game's route ("the Observatory, out on the eastern plain"). One set of scenes then works for every starting character, instead of four copies. The directions ("on the hill north of Verdance", "up in the hills to the north-east", "out on the eastern plain", "down in the ravine to the south") match the overworld layout I drew in 20a. *Change:* `where` in `ActOne.DUNGEONS`.
+- **Ryn is selectable at the class select.** Lyra and Silas still say "Their story opens in a later update." (I dropped the "For now, Vael awakens first" half, since it's no longer true.)
+- **Verdance's welcome now follows whichever dungeon you escaped**, not just the Cathedral. The elder's line changed from "You came down from the Cathedral?" to "You got away from them?", which fits every start.
+- **Behind the scenes:** the dungeon is marked cleared just *before* the escape scene plays (it used to be just after), so Frank's `{next}` already points to the next dungeon. Nothing visible changes.

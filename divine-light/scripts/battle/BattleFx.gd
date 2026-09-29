@@ -82,20 +82,29 @@ func impact(recipe: Dictionary, targets: Array) -> void:
 		"quake":
 			flash(pal[0], 0.35)
 			shake(4.0, 0.45)
+	# "impact" is one effect name, or a list of them layered together (18c).
+	var kinds = recipe.get("impact", "")
+	if kinds is String:
+		kinds = [kinds]
 	for t: CanvasItem in targets:
-		var at := anchor(t)
-		match recipe.get("impact", ""):
-			"slash": slash(at, pal, recipe.get("count", 1))
-			"burst": burst(at, pal, recipe.get("size", 12.0))
-			"bolt": bolt(at, pal)
-			"pillar": pillar(at, pal)
-			"rising": pillar(at, pal, true)
-			"sweep": sweep(at, pal)
-			"sparkles": sparkles(at, pal)
-			"sinking": sparkles(at, pal, false)
-			"ring": ring(at, pal)
-			"cloud": cloud(at, pal)
-			"stars": stars(at, pal)
+		for kind: String in kinds:
+			_impact_one(kind, recipe, pal, anchor(t))
+
+
+func _impact_one(kind: String, recipe: Dictionary, pal: Array, at: Vector2) -> void:
+	match kind:
+		"slash": slash(at, pal, recipe.get("count", 1))
+		"burst": burst(at, pal, recipe.get("size", 12.0))
+		"bolt": bolt(at, pal)
+		"pillar": pillar(at, pal)
+		"rising": pillar(at, pal, true)
+		"sweep": sweep(at, pal)
+		"sparkles": sparkles(at, pal)
+		"sinking": sparkles(at, pal, false)
+		"ring": ring(at, pal)
+		"cloud": cloud(at, pal)
+		"stars": stars(at, pal)
+		"crystals": crystals(at, pal)
 
 
 func palette(recipe: Dictionary) -> Array:
@@ -293,6 +302,24 @@ func cloud(at: Vector2, pal: Array, duration := 0.65) -> Signal:
 			var size := 3.0 + (i % 3)
 			_px(n, d.x - size / 2.0, d.y - size / 2.0, size, size, Color(pal[0], 0.8 * fade))
 			_px(n, d.x - 1, d.y - 1, 1, 1, Color(pal[1], fade)))
+
+
+## Jagged spikes shooting up around the target's feet, then shattering away
+## (ice for Blizzard/Glacier; with the earth palette, Quake's rock spikes).
+func crystals(at: Vector2, pal: Array, duration := 0.6) -> Signal:
+	var spikes := [Vector2(-10, 7), Vector2(-5, 12), Vector2(0, 17), Vector2(5, 11), Vector2(10, 8)]
+	return _spawn(at + Vector2(0, 16), duration, func(n: CanvasItem, p: float) -> void:
+		var grow := minf(1.0, p * 4.0)
+		var fade := 1.0 if p < 0.6 else 1.0 - (p - 0.6) / 0.4
+		var drop := 0.0 if p < 0.6 else (p - 0.6) * 10.0
+		for sp: Vector2 in spikes:
+			var h := sp.y * grow
+			for row in int(h):
+				var w := 3.0 if row < h * 0.5 else (2.0 if row < h * 0.8 else 1.0)
+				var y := -row + drop
+				_px(n, sp.x - floorf(w / 2.0), y, w, 1, Color(pal[0], fade))
+				if row % 3 == 1:
+					_px(n, sp.x, y, 1, 1, Color(pal[1], fade)))
 
 
 ## Little stars circling the target's head (stuns).

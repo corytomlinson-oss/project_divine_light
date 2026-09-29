@@ -69,6 +69,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 18b — Vael and Ryn effects. All 24 of their skills are hand-tuned: holy pillars, a holy lightning strike, shield rings and sparkling buffs for Vael; ki blasts, flurries of slashes, a sweeping kick, stun stars and a rising dragon pillar for Ryn.
 
+**Completed:** Milestone 18c — Lyra and Silas effects. Lyra's spells escalate in three tiers per element (e.g. Ember → Flare → Inferno), with ice and rock spikes for Blizzard, Glacier and Quake, and stance switches sparkle in the new element's color. Silas gets violet shadow blades, poison clouds, sinking debuffs and a layered Shadowstep finisher. Claude's judgment calls while Cory was away are logged in `DECISIONS.md`.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system) and 18b (Vael + Ryn) are done; see the Milestone 18 section for status and what's next. Cory approved the scope, then left me to build 18a/18b on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing.
+**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system), 18b (Vael + Ryn) and 18c (Lyra + Silas) are done; only 18d (status markers + polish) is left. Cory approved the scope, then left me to build 18a-18c on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing. **Every call made without him is logged in `DECISIONS.md`** for his review.
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
@@ -199,7 +199,14 @@ Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/n
 All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NAME`:
 - **Vael:** Smite, Consecrate (all enemies, flash) and Divine Strike (shake) are holy pillars from above; Divine Wrath is a holy bolt with a flash and the thunder sound; Holy Light is heal sparkles; Guard, Divine Shield (caster's row only, via `row_only`) and Sanctuary are shield rings; Fortify and Battle Hymn are shield/gold sparkles on everyone; Purify is holy sparkles; Taunt is a red-orange burst on Vael. Holy sound on his magic, heal sound on his heals.
 - **Ryn:** Iron Fist / Crippling Strike are physical bursts; Ki Blast fires a ki orb; Sweep cuts along every enemy's feet; Pressure Point circles stars; Storm Flurry is 5 ki slashes; Ki Burst is a big ki burst with a shake; Dragon's Maw is a fiery burst with a shake; Rising Dragon is a ki pillar rising from the target; Vital Touch / Mending Flow / Healing Wave (all allies, green flash) are heal sparkles.
-- **Next up: 18c (Lyra + Silas).** Their skills already play keyword fallbacks (fire orb + burst, ice burst, lightning bolt, earth quake, poison cloud, shadow slashes, smoke), so 18c is refinement: e.g. Glacier/Blizzard/Inferno/Thunderstrike deserve bigger versions than the single-target ones, and stance switches only get arcane sparkles. Then 18d: status markers on sprites (poison/burn/bleed, stun, buffs/debuffs), item and boss-phase polish.
+
+### 18c — Lyra + Silas (done, 2026-09-29)
+
+- **Recipes can layer effects:** `"impact"` may be a list (`["slash", "cloud"]`), played together on each target. New effect `crystals`: jagged spikes growing around the target's feet (ice palette for Blizzard/Glacier, earth palette for Tremor/Quake).
+- **Lyra** escalates in three tiers per element (e.g. Ember → Flare → Inferno: orb, bigger orb + flash, rising flame column + shake); AoE spells hit every enemy + flash. Stance switches (`BY_NAME` "Switch: Fire" etc.) sparkle in the new stance's color.
+- **Silas:** violet shadow blades, poisons add a green cloud, debuffs sink, stuns get stars; Shadowstep layers slashes + cloud + stars with a shake.
+- Full per-skill list is in `DECISIONS.md` (Milestone 18c).
+- **Next up: 18d** — status markers on sprites (poison/burn/bleed, stun, buffs/debuffs) between turns, plus item and boss-phase effect polish. Enemies still only have a basic attack until 19a.
 
 ## Where things live
 
@@ -251,7 +258,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 | 17d | UI/UX — transitions & feedback (fades, battle-start mosaic, auto-advancing messages, damage numbers) | ✅ (2026-09-29) |
 | 18a | Spell & combat VFX — effect system (BattleFx library, recipe table, impact timing, 7 element sounds, fallbacks for every skill) | ✅ (2026-09-29) |
 | 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | ✅ (2026-09-29) |
-| 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | Not started |
+| 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | ✅ (2026-09-29) |
 | 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | Not started |
 | 19a | Act I — The Cathedral (Vael) | Not started |
 | 19b | Act I — The Monastery (Ryn) | Not started |
@@ -413,4 +420,5 @@ No automated tests — this is manual playtesting in the Godot editor. When a mi
 - Always commit + push to `cjt` after a milestone is confirmed working by the user — don't leave work uncommitted between sessions.
 - Update README.md's "Current Status" section (and this file's status table) in the same commit as the milestone.
 - Keep milestone commits scoped to one sub-milestone at a time; don't bundle unrelated changes.
+- **When working without Cory (he's away and said to go with recommendations), log every judgment call in `DECISIONS.md`** — what, why, and where to change it — so he can review later. His own decisions go in the relevant milestone section here instead.
 - Keep this file (CLAUDE.md) current, not just README.md and the status table. Whenever something changes that a fresh session would need to know — new reusable system, a gotcha hit and fixed, a scoping decision (like the rows question below), debug tooling added, a working-agreement change — add or update the relevant section here in the same commit. Treat stale info here as a bug: if something in this file no longer matches the code, fix it rather than leaving it.

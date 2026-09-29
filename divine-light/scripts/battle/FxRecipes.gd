@@ -5,7 +5,8 @@ extends RefCounted
 #   cast    - "none" | "lunge" (short wait for the hop) | "charge" (sparks
 #             gather on the caster) | "projectile" (orb to each target)
 #   impact  - "slash" | "burst" | "bolt" | "pillar" | "rising" | "sweep" |
-#             "sparkles" | "sinking" | "ring" | "cloud" | "stars" | ""
+#             "sparkles" | "sinking" | "ring" | "cloud" | "stars" |
+#             "crystals" | "", or a list of these layered together
 #   palette - a BattleFx.PALETTES key
 #   sound   - Sfx played as the effect lands ("" = none; the generic attack/
 #             spell cast sound still plays when the action starts)
@@ -47,6 +48,29 @@ const BY_EFFECT := {
 	"ki_burst": {"cast": "charge", "impact": "burst", "palette": "ki", "sound": "thunder", "size": 18.0, "screen": "shake"},
 	"heal_all": {"cast": "charge", "impact": "sparkles", "palette": "heal", "sound": "heal", "screen": "flash"},
 	"rising_dragon": {"cast": "lunge", "impact": "rising", "palette": "ki", "sound": "fire", "screen": "shake"},
+	# --------------------------------------------------------------- Lyra (18c)
+	# Each element has three tiers: a single-target spell, a stronger one, and
+	# a big one (bigger, layered, flash/shake). Tremor/Quake are in BY_NAME.
+	"fire": {"cast": "projectile", "impact": "burst", "palette": "fire", "sound": "fire", "size": 12.0},
+	"fire_burn": {"cast": "charge", "impact": ["rising", "burst"], "palette": "fire", "sound": "fire", "size": 18.0, "screen": "shake"},
+	"ice_slow": {"cast": "charge", "impact": ["burst", "sinking"], "palette": "ice", "sound": "ice", "size": 10.0},
+	"ice_freeze": {"cast": "charge", "impact": ["crystals", "burst"], "palette": "ice", "sound": "ice", "size": 12.0},
+	"ice_freeze_aoe": {"cast": "charge", "impact": "crystals", "palette": "ice", "sound": "ice", "screen": "flash"},
+	"lightning": {"cast": "charge", "impact": "bolt", "palette": "lightning", "sound": "thunder"},
+	"lightning_aoe": {"cast": "charge", "impact": "bolt", "palette": "lightning", "sound": "thunder", "screen": "flash"},
+	"lightning_paralyze": {"cast": "charge", "impact": ["bolt", "stars"], "palette": "lightning", "sound": "thunder", "screen": "flash"},
+	"earth_sunder": {"cast": "charge", "impact": ["crystals", "sinking"], "palette": "earth", "sound": "earth", "screen": "quake"},
+	# -------------------------------------------------------------- Silas (18c)
+	# Shadow-violet blades; poisons add a green cloud; debuffs sink.
+	"poison": {"cast": "lunge", "impact": ["slash", "cloud"], "palette": "poison", "sound": "poison"},
+	"vanish": {"cast": "none", "impact": "cloud", "palette": "shadow", "sound": ""},
+	"bleed": {"cast": "lunge", "impact": "slash", "palette": "enemy", "sound": "", "count": 2},
+	"smoke_bomb": {"cast": "none", "impact": "cloud", "palette": "physical", "sound": "", "screen": "flash"},
+	"expose": {"cast": "lunge", "impact": ["slash", "sinking"], "palette": "debuff", "sound": ""},
+	"garrote": {"cast": "lunge", "impact": ["sweep", "stars"], "palette": "shadow", "sound": ""},
+	"toxic_cloud": {"cast": "charge", "impact": "cloud", "palette": "poison", "sound": "poison", "screen": "flash"},
+	"death_mark": {"cast": "charge", "impact": ["ring", "sinking"], "palette": "shadow", "sound": ""},
+	"shadowstep": {"cast": "lunge", "impact": ["slash", "cloud", "stars"], "palette": "shadow", "sound": "poison", "count": 3, "screen": "shake"},
 	# ------------------------------------------------------ everyone else
 	"physical": {"cast": "lunge", "impact": "slash", "palette": "physical", "sound": ""},
 }
@@ -60,6 +84,17 @@ const BY_NAME := {
 	"Vital Touch": {"cast": "lunge", "impact": "sparkles", "palette": "heal", "sound": "heal"},
 	"Mending Flow": {"cast": "charge", "impact": "sparkles", "palette": "heal", "sound": "heal"},
 	"Storm Flurry": {"cast": "lunge", "impact": "slash", "palette": "ki", "sound": "", "count": 5},
+	# Lyra
+	"Flare": {"cast": "projectile", "impact": "burst", "palette": "fire", "sound": "fire", "size": 16.0, "screen": "flash"},
+	"Tremor": {"cast": "charge", "impact": "crystals", "palette": "earth", "sound": "earth", "screen": "shake"},
+	"Tremor (AoE)": {"cast": "charge", "impact": "burst", "palette": "earth", "sound": "earth", "size": 10.0, "screen": "shake"},
+	"Switch: Fire": {"cast": "none", "impact": "sparkles", "palette": "fire", "sound": ""},
+	"Switch: Ice": {"cast": "none", "impact": "sparkles", "palette": "ice", "sound": ""},
+	"Switch: Lightning": {"cast": "none", "impact": "sparkles", "palette": "lightning", "sound": ""},
+	"Switch: Earth": {"cast": "none", "impact": "sparkles", "palette": "earth", "sound": ""},
+	# Silas
+	"Quick Strike": {"cast": "lunge", "impact": "slash", "palette": "physical", "sound": ""},
+	"Shadow Strike": {"cast": "lunge", "impact": ["slash", "burst"], "palette": "shadow", "sound": "", "size": 9.0},
 	"Flurry": {"cast": "lunge", "impact": "slash", "palette": "shadow", "sound": "", "count": 4},
 }
 

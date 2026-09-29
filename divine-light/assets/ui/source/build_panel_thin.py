@@ -2,8 +2,8 @@
 
 Same stone-and-gold palette as the heavier panel_frame.png (build_panel.py),
 cut down to a 4px border so windows fit the 180px screen: outline, bevel
-(light top/left, dark bottom/right), stone, inner outline, then a
-near-opaque dark fill so text reads over the battle background. Gold 2x2
+(light top/left, dark bottom/right), stone, inner outline, then an
+opaque dark fill so text reads over anything behind it. Gold 2x2
 studs sit in the corners. Used as the theme's default Panel/PanelContainer
 style (assets/ui/theme.tres) with 4px texture margins.
 
@@ -19,7 +19,7 @@ BASE = (52, 46, 72, 255)
 HIGHLIGHT = (158, 146, 190, 255)
 SHADOW = (22, 18, 32, 255)
 GOLD = (196, 162, 88, 255)
-FILL = (16, 14, 30, 235)
+FILL = (16, 14, 30, 255)
 
 img = Image.new('RGBA', (SIZE, SIZE))
 px = img.load()

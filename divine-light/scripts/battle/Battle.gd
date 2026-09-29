@@ -220,6 +220,10 @@ var _party_acting: int = -1
 
 # Battle state
 var _selecting_index: int = 0
+# Who has picked an action this round, and in what order - L1/R1 can choose
+# members out of order, and B on the command menu steps back through this.
+var _chosen: Array = []
+var _chosen_order: Array = []
 var _turn_queue: Array = []
 var _level_up_queue: Array = []
 var state: State = State.SELECTING
@@ -249,6 +253,9 @@ var _pending_skill: Dictionary = {}
 
 var _cursor := MenuCursor.new()
 var _scroll_hint := ScrollHint.new()
+# Blinking arrow in the banner's corner while a message waits for A.
+var _advance_hint := ScrollHint.new()
+var _blink := 0.0
 
 
 func _ready() -> void:
@@ -256,6 +263,7 @@ func _ready() -> void:
 	_party = GameManager.party
 	add_child(_cursor)
 	command_window.add_child(_scroll_hint)
+	add_child(_advance_hint)
 	_setup_background()
 	_setup_party_window()
 	_enemies = _generate_encounter()
@@ -639,14 +647,15 @@ func _process(delta: float) -> void:
 	_update_party_positions(delta)
 	_cursor.target = _cursor_target()
 	_update_windows()
+	_update_advance_hint(delta)
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
 		State.RESOLVING:
-			if Input.is_action_just_pressed("ui_accept"):
+			if Input.is_action_just_pressed("confirm"):
 				_execute_next_turn()
 		State.BATTLE_OVER:
-			if Input.is_action_just_pressed("ui_accept"):
+			if Input.is_action_just_pressed("confirm"):
 				if not _level_up_queue.is_empty():
 					Sfx.play("level_up")
 					message_label.text = _level_up_queue.pop_front()
@@ -665,6 +674,17 @@ func _update_windows() -> void:
 	enemy_window.visible = not choosing
 	message_banner.visible = message_label.text != ""
 	message_banner.size = message_banner.get_combined_minimum_size()
+
+
+## The banner's "press A" arrow: blinks in its bottom-right corner whenever a
+## message is waiting for confirm (actions playing out, the battle's end).
+func _update_advance_hint(delta: float) -> void:
+	_blink = fmod(_blink + delta, 0.8)
+	var waiting := state != State.SELECTING and message_banner.visible
+	_advance_hint.visible = waiting and _blink < 0.5
+	_advance_hint.more_below = true
+	_advance_hint.height = 0.0
+	_advance_hint.position = message_banner.position + message_banner.size - Vector2(13, 8)
 
 
 ## What the menu cursor should point at right now (a menu label, a party
@@ -709,24 +729,50 @@ func _handle_menu_input() -> void:
 	if _menu_state == MenuState.ALLY_TARGETING:
 		_handle_ally_target_input()
 		return
-	if Input.is_action_just_pressed("ui_down"):
+	if UiInput.nav(&"down"):
 		Sfx.play("menu_move")
 		message_label.text = ""
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
-	elif Input.is_action_just_pressed("ui_up"):
+	elif UiInput.nav(&"up"):
 		Sfx.play("menu_move")
 		message_label.text = ""
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
-	elif Input.is_action_just_pressed("ui_accept"):
+	elif Input.is_action_just_pressed("confirm"):
 		Sfx.play("menu_confirm")
 		_confirm_action()
-	elif Input.is_action_just_pressed("ui_cancel"):
+	elif Input.is_action_just_pressed("cancel"):
 		if _menu_state != MenuState.MAIN:
 			Sfx.play("menu_cancel")
+			_open_main_menu()
+			message_label.text = ""
+		elif not _chosen_order.is_empty():
+			Sfx.play("menu_cancel")
+			_step_back()
+	elif _menu_state == MenuState.MAIN:
+		_handle_shortcuts()
+
+
+## Command-menu shortcuts from the design doc's controller mapping: X jumps
+## to Items, Y defends at once, L1/R1 switch to another member who hasn't
+## chosen yet (the round resolves once everyone alive has).
+func _handle_shortcuts() -> void:
+	if Input.is_action_just_pressed("item_shortcut"):
+		Sfx.play("menu_confirm")
+		_open_item_menu()
+	elif Input.is_action_just_pressed("defend_shortcut"):
+		Sfx.play("menu_confirm")
+		_party[_selecting_index].queued_action = "defend"
+		_advance_selection()
+	elif Input.is_action_just_pressed("next_member") or Input.is_action_just_pressed("prev_member"):
+		var step := 1 if Input.is_action_just_pressed("next_member") else -1
+		var other := _next_unchosen(_selecting_index, step)
+		if other != -1 and other != _selecting_index:
+			Sfx.play("menu_move")
+			_selecting_index = other
 			_open_main_menu()
 			message_label.text = ""
 
@@ -743,18 +789,18 @@ func _handle_target_input() -> void:
 		pos = 0
 		_target_index = alive_idx[0]
 
-	if Input.is_action_just_pressed("ui_right") or Input.is_action_just_pressed("ui_down"):
+	if UiInput.nav(&"right") or UiInput.nav(&"down"):
 		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_enemy_ui()
-	elif Input.is_action_just_pressed("ui_left") or Input.is_action_just_pressed("ui_up"):
+	elif UiInput.nav(&"left") or UiInput.nav(&"up"):
 		Sfx.play("menu_move")
 		_target_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_enemy_ui()
-	elif Input.is_action_just_pressed("ui_accept"):
+	elif Input.is_action_just_pressed("confirm"):
 		Sfx.play("menu_confirm")
 		_confirm_target()
-	elif Input.is_action_just_pressed("ui_cancel"):
+	elif Input.is_action_just_pressed("cancel"):
 		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = ""
@@ -772,18 +818,18 @@ func _handle_ally_target_input() -> void:
 		pos = 0
 		_target_ally_index = alive_idx[0]
 
-	if Input.is_action_just_pressed("ui_down"):
+	if UiInput.nav(&"down"):
 		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos + 1) % alive_idx.size()]
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_up"):
+	elif UiInput.nav(&"up"):
 		Sfx.play("menu_move")
 		_target_ally_index = alive_idx[(pos - 1 + alive_idx.size()) % alive_idx.size()]
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_accept"):
+	elif Input.is_action_just_pressed("confirm"):
 		Sfx.play("menu_confirm")
 		_confirm_ally_target()
-	elif Input.is_action_just_pressed("ui_cancel"):
+	elif Input.is_action_just_pressed("cancel"):
 		Sfx.play("menu_cancel")
 		_open_main_menu()
 		message_label.text = ""
@@ -1026,25 +1072,53 @@ func _confirm_item() -> void:
 
 
 func _advance_selection() -> void:
-	_selecting_index += 1
-	_skip_ko_members()
-	if _selecting_index >= _party.size():
+	_chosen[_selecting_index] = true
+	_chosen_order.append(_selecting_index)
+	var next := _next_unchosen(_selecting_index, 1)
+	if next == -1:
 		_begin_resolving()
 	else:
+		_selecting_index = next
 		_open_main_menu()
 		message_label.text = ""
 
 
-func _skip_ko_members() -> void:
-	while _selecting_index < _party.size() and _party[_selecting_index].is_ko:
-		_selecting_index += 1
+## B on the command menu: back to whoever chose last, to change their pick.
+## Nothing was spent yet - MP, Qi and items are paid when the action runs.
+func _step_back() -> void:
+	var previous: int = _chosen_order.pop_back()
+	_chosen[previous] = false
+	_party[previous].queued_action = ""
+	_selecting_index = previous
+	_open_main_menu()
+	message_label.text = ""
+
+
+## The next alive member after `from` (stepping by `step`, wrapping around)
+## who hasn't chosen this round, or -1 if nobody is left. Can return `from`
+## itself when it's the only one left.
+func _next_unchosen(from: int, step: int) -> int:
+	var n := _party.size()
+	for k in range(1, n + 1):
+		var i := posmod(from + step * k, n)
+		if _party[i].is_alive() and not _chosen[i]:
+			return i
+	return -1
+
+
+func _reset_choices() -> void:
+	_chosen = []
+	for _member in _party:
+		_chosen.append(false)
+	_chosen_order = []
 
 
 func _begin_selection() -> void:
 	state = State.SELECTING
-	_selecting_index = 0
-	_skip_ko_members()
-	if _selecting_index >= _party.size():
+	_reset_choices()
+	_selecting_index = _next_unchosen(-1, 1)
+	if _selecting_index == -1:
+		_selecting_index = 0
 		_end_battle(false)
 		return
 	action_menu.visible = true
@@ -1067,7 +1141,7 @@ func _begin_resolving() -> void:
 			_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
-	message_label.text = "Press Enter..."
+	_execute_next_turn()
 
 
 func _execute_next_turn() -> void:
@@ -1870,10 +1944,10 @@ func _end_battle(victory: bool) -> void:
 		_update_ui()
 		Music.stop(0.3)
 		Sfx.play("victory")
-		message_label.text = "Victory! +%d XP\nPress Enter." % total_xp
+		message_label.text = "Victory! Gained %d XP." % total_xp
 	else:
 		Music.stop(1.0)
-		message_label.text = "The party has fallen...\nPress Enter."
+		message_label.text = "The party has fallen..."
 
 
 func _build_levelup_text(member: Combatant) -> String:
@@ -1882,7 +1956,7 @@ func _build_levelup_text(member: Combatant) -> String:
 	var line1 := "%s reached Level %d!  HP+%d" % [member.display_name, member.level, g.get("hp", 0)]
 	if g.get("mp", 0) > 0:
 		line1 += " MP+%d" % g.get("mp", 0)
-	var line2 := "ATK+%d DEF+%d INT+%d AGI+%d  Press Enter." % [g.get("atk", 0), g.get("def", 0), g.get("int", 0), g.get("agi", 0)]
+	var line2 := "ATK+%d DEF+%d INT+%d AGI+%d" % [g.get("atk", 0), g.get("def", 0), g.get("int", 0), g.get("agi", 0)]
 	return "%s\n%s" % [line1, line2]
 
 

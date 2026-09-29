@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 17 (UI/UX polish) is in progress, split into 17a-17d.** 17a (pixel rendering + text) and 17b (SNES-style battle layout) are done as of 2026-09-29. **Next up: 17c (controller).** See the Milestone 17 section below for the scope, decisions, and what 17b should pick up.
+**Milestone 17 (UI/UX polish) is in progress, split into 17a-17d.** 17a (pixel rendering + text), 17b (SNES-style battle layout) and 17c (controller + pause menu) are done as of 2026-09-29. **Next up: 17d (transitions & feedback).** See the Milestone 17 section below for the scope, decisions, and what 17b should pick up.
 
 **Milestone 16 (current-content art & music pass) is complete** as of 2026-09-27. Every asset in `ASSETS.md` is done except the action menu and party panel frames, which are deferred until 17b. What Milestone 16 ended up producing, for reference:
 - **All 4 party walk sheets are done (2026-09-27)**, hand-placed pixel grids rather than Retro Diffusion: `assets/sprites/<name>_walk.png` + `<name>_frames.tres` (identical animation names, so swapping characters is just `Player.tscn`'s `sprite_frames`), generators in `assets/sprites/source/`. Only Vael is wired in until class selection exists.
@@ -126,7 +126,7 @@ Scoped 2026-09-29 by auditing what exists against the roadmap's "HUD composition
 
 - **17a — pixel rendering & text (done).** See below.
 - **17b — battle-screen layout (done).** See below.
-- **17c — controller.** Today there is no input map at all, only Godot's default `ui_*` actions, and Equip opens only from keyboard `E` (`Player.gd`), so it's unreachable on the RP6. Build real actions for keyboard + gamepad matching README's Controller Mapping, hold-to-repeat in menus (every menu uses `is_action_just_pressed` today, one press per row), X=Item / Y=Defend / L1-R1 battle shortcuts, and **a simple B pause/main menu** (Cory agreed) with Equip as its first entry, the natural home for Formation/Save later. Replace the "Press Enter." prompts.
+- **17c — controller (done).** See below.
 - **17d — transitions & feedback.** All 7 `change_scene_to_file()` calls are hard cuts: a shared fade (autoload), an FF-style battle-entry effect, message pacing.
 - **Not in 17:** spell/combat VFX became their own milestone (now **18**, right after 17). Equip's *functional* scope is still Milestone 15's, but it inherits the global font/cursor changes.
 
@@ -157,6 +157,15 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - **⚠ Label's default `line_spacing` is 3px**, which made wrapped text 13px a line. The theme now sets `Label/constants/line_spacing = 0`, so every multi-line label uses m5x7's 10px lines.
 - Verified with real screenshots of every state (command, skill list, both targeting modes, Ryn's turn, 1/2/4-line banner, Run scrolled into view, the Cathedral boss).
 
+### 17c — controller & pause menu (done, 2026-09-29)
+
+- **Input map** (`project.godot` `[input]`, generated with `ProjectSettings.set_setting()` + `save()`, not hand-written): `up`/`down`/`left`/`right` (arrows, **WASD**, D-pad, left stick), `confirm` (Enter, Space, Z, A), `cancel` (Esc, Backspace, X, B), `item_shortcut` (C, X button), `defend_shortcut` (V, Y button), `prev_member`/`next_member` (Q/E, L1/R1), `pause` (Tab, Start). Keyboard follows emulator habits (Z = A, X = B). **No code uses the built-in `ui_*` actions anymore.** Gamepad bindings are untested on the RP6 itself until the APK milestone (22).
+- **`UiInput` autoload** (`scripts/systems/UiInput.gd`): `UiInput.nav(&"down")` is true on the press and then every 0.08s after a 0.3s hold. All menus use it for directions; movement on the map uses `Input.is_action_pressed` directly. It runs while paused.
+- **Battle:** X = Items, Y = Defend at once, L1/R1 = switch to another member who hasn't chosen yet, and **B on the command menu steps back** to whoever chose last, to change their pick (safe: MP/Qi/items are paid when the action runs). Selection is tracked by `_chosen` / `_chosen_order`; `_next_unchosen()` replaced `_skip_ko_members()`. The round starts as soon as everyone alive has chosen, and the **first action plays immediately**. Every later message waits for A, with a blinking arrow in the banner's corner (`_advance_hint`, a `ScrollHint`) instead of "Press Enter".
+- **Pause menu** (`scenes/menu/PauseMenu.tscn` + `scripts/menu/PauseMenu.gd`, `class_name PauseMenu`): B or Start on the map (`Player.gd`) calls `PauseMenu.open(player)`, which adds a CanvasLayer over the map and pauses the tree (the menu runs with process mode Always). Left: party summary (standing sprite, class, level, HP, MP or Qi). Right: Equip, Close. **Equip returns to the menu:** the menu sets `GameManager.reopen_pause_menu` before switching scenes, and `Player._ready()` reopens it (deferred, after the map places the player). The old keyboard-only `E` shortcut is gone; E is now R1. The menu ignores input on the frame it opens, since the B that opened it still reads as just pressed.
+- **Window fill is fully opaque now** (`panel_thin.png`); at 235 alpha the map showed through the pause menu.
+- Verified by a scripted run pressing the real actions (14 checks: hold-to-repeat, all shortcuts, step back, round start, advance arrow, menu open/navigate/close, reopen after Equip) plus screenshots.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -172,6 +181,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - Equip screen (first overworld-accessible UI): `divine-light/scripts/equip/Equip.gd` + `divine-light/scenes/equip/Equip.tscn`
 - UI font + theme: `divine-light/assets/fonts/` (m5x7 + `m5x7_ui.tres` variation), `divine-light/assets/ui/theme.tres` (project-wide via `gui/theme/custom`)
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
+- Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - GitHub: `https://github.com/corytomlinson-oss/project_divine_light`, branch `cjt`
 
 ## Implementation status
@@ -200,7 +210,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 | 16 | Current-content art & music pass (Player, Overworld, Cathedral, current enemies, Battle UI, baseline BGM/SFX) | **Done** (2026-09-27) — all party walk cycles, 8 enemies, both tilesets, forest battle background, party shown in battle, 10 SFX, 4 BGM tracks; action menu/party panel frames deferred (see `ASSETS.md`) |
 | 17a | UI/UX — pixel rendering & text (viewport stretch, nearest filtering, m5x7 font, glove cursor) | ✅ (2026-09-29) |
 | 17b | UI/UX — SNES-style battle layout (taller battlefield, message banner, command/enemy/party windows) | ✅ (2026-09-29) |
-| 17c | UI/UX — controller (real input map, hold-to-repeat, simple B pause menu holding Equip, battle shortcuts) | Not started |
+| 17c | UI/UX — controller (input map, hold-to-repeat, B/Start pause menu with Equip, battle shortcuts) | ✅ (2026-09-29) |
 | 17d | UI/UX — transitions & feedback (shared fade, battle-entry effect, message pacing) | Not started |
 | 18 | Spell & combat VFX (split out of 17, Cory's call 2026-09-29) | Not started |
 | 19a | Act I — The Cathedral (Vael) | Not started |

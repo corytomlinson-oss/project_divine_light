@@ -1,10 +1,8 @@
 extends Node2D
 
-# Milestone 15's equip screen. First overworld-accessible UI (opened via a
-# dedicated key from Player.gd, works from both Overworld and dungeons since
-# Player.gd is shared) - deliberately NOT the full "B = main menu" shell the
-# design doc's controller mapping describes, since Formation/Inventory/Party
-# status screens don't exist yet either. Just this one screen for now.
+# Milestone 15's equip screen, opened from the pause menu (Milestone 17c; B or
+# Start on the map). Closing it returns to the map with the pause menu open
+# again, via GameManager.reopen_pause_menu.
 
 enum MenuState { CHARACTER_SELECT, SLOT_SELECT, ITEM_SELECT }
 
@@ -43,21 +41,21 @@ func _process(_delta: float) -> void:
 
 
 func _handle_list_input(count: int, on_confirm: Callable, on_cancel: Callable) -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("cancel"):
 		Sfx.play("menu_cancel")
 		on_cancel.call()
 		return
 	if count == 0:
 		return
-	if Input.is_action_just_pressed("ui_down"):
+	if UiInput.nav(&"down"):
 		Sfx.play("menu_move")
 		_cursor = (_cursor + 1) % count
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_up"):
+	elif UiInput.nav(&"up"):
 		Sfx.play("menu_move")
 		_cursor = (_cursor - 1 + count) % count
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_accept"):
+	elif Input.is_action_just_pressed("confirm"):
 		# Picking the item itself gets the equip clink instead (_confirm_item).
 		if _state != MenuState.ITEM_SELECT:
 			Sfx.play("menu_confirm")

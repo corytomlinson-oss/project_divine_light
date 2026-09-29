@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=4]
+
+[ext_resource type="Script" path="res://scripts/menu/PauseMenu.gd" id="1_pause"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_pause")
+
+[node name="Dim" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 180.0
+color = Color(0, 0, 0, 0.45)
+
+[node name="PartyWindow" type="Panel" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 240.0
+offset_bottom = 176.0
+
+[node name="CommandWindow" type="Panel" parent="."]
+offset_left = 244.0
+offset_top = 4.0
+offset_right = 316.0
+offset_bottom = 32.0
+
+[node name="Options" type="VBoxContainer" parent="CommandWindow"]
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 68.0
+offset_bottom = 24.0
+theme_override_constants/separation = 0
+
+[node name="Equip" type="Label" parent="CommandWindow/Options"]
+text = "  Equip"
+
+[node name="Close" type="Label" parent="CommandWindow/Options"]
+text = "  Close"

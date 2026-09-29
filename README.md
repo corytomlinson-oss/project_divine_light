@@ -61,6 +61,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 17b — SNES-style battle layout. The battlefield is taller, with enemies on the left and the party on the right standing on the same ground. Messages appear in a banner across the top only while there's something to say. The bottom has three framed windows: commands (or the enemy list while targeting), and party HP/MP/Qi for everyone. The glove points at the enemy sprite itself when targeting, and long lists show scroll arrows.
 
+**Completed:** Milestone 17c — Controller & pause menu. A real input map for keyboard and gamepad (WASD now works too), hold-to-repeat in every menu, and a pause menu on B/Start with a party summary and Equip. In battle: X opens Items, Y defends, L1/R1 switch between members who haven't chosen, and B steps back to change the previous member's choice. The first action of a round plays right away, and a blinking arrow replaces the "Press Enter" prompts.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.
@@ -1068,6 +1070,8 @@ Verdance is never corrupted but evolves across the game:
 | **Start** | Pause / options |
 
 A always confirms, B always cancels — consistent across exploration and battle.
+
+**Keyboard (for PC development), built in Milestone 17c:** arrows or WASD = D-pad, Z / Enter / Space = A, X / Esc / Backspace = B, C = X button, V = Y button, Q / E = L1 / R1, Tab = Start. Select (Formation) and Y on the map (World map) aren't bound yet, since those screens don't exist.
 
 ---
 

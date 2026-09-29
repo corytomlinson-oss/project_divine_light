@@ -19,19 +19,11 @@ var _facing: String = "down"
 func _ready() -> void:
 	_target = position
 	_reset_encounter_counter()
-
-
-## Milestone 15's equip screen entry point. Lives here (not Overworld.gd or
-## Dungeon.gd) since Player.gd is already shared between every map scene, so
-## this works from both Overworld and dungeons for free. Not the full "B =
-## main menu" shell the design doc's controller mapping describes - there's
-## no Formation/Inventory/Party status screen to put alongside it yet, so
-## this is a single-purpose key straight to the one screen that exists.
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
-		GameManager.pending_spawn_position = position
-		GameManager.has_pending_spawn = true
-		get_tree().change_scene_to_file("res://scenes/equip/Equip.tscn")
+	if GameManager.reopen_pause_menu:
+		# Back from a screen the pause menu opened (Equip): show the menu again.
+		# Deferred so the map controller has placed the player first.
+		GameManager.reopen_pause_menu = false
+		PauseMenu.open.call_deferred(self, 0)
 
 
 func _process(delta: float) -> void:
@@ -41,20 +33,30 @@ func _process(delta: float) -> void:
 			position = _target
 			_moving = false
 			_on_tile_entered()
+	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
+		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
+		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
+		_open_pause_menu()
 	else:
 		_handle_input()
+
+
+func _open_pause_menu() -> void:
+	_play_anim("idle")
+	Sfx.play("menu_confirm")
+	PauseMenu.open(self)
 
 
 func _handle_input() -> void:
 	var dir := Vector2.ZERO
 
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("right"):
 		dir = Vector2.RIGHT
-	elif Input.is_action_pressed("ui_left"):
+	elif Input.is_action_pressed("left"):
 		dir = Vector2.LEFT
-	elif Input.is_action_pressed("ui_down"):
+	elif Input.is_action_pressed("down"):
 		dir = Vector2.DOWN
-	elif Input.is_action_pressed("ui_up"):
+	elif Input.is_action_pressed("up"):
 		dir = Vector2.UP
 
 	if dir == Vector2.ZERO:

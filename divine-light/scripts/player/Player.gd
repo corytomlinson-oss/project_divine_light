@@ -17,6 +17,7 @@ var _facing: String = "down"
 
 
 func _ready() -> void:
+	add_to_group("player")  # how cutscenes find the player (Milestone 19a)
 	_target = position
 	_reset_encounter_counter()
 	if GameManager.reopen_pause_menu:
@@ -31,6 +32,8 @@ func _process(delta: float) -> void:
 			position = _target
 			_moving = false
 			_on_tile_entered()
+	elif Cutscene.is_playing():
+		pass  # a cutscene is moving the player; no input until it ends
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
 		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
 		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.

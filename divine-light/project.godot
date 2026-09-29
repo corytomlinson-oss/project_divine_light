@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="divine_light"
-run/main_scene="uid://dvvtvbraj0o2r"
+run/main_scene="res://scenes/title/Title.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,7 @@ Sfx="*res://scripts/systems/Sfx.gd"
 Music="*res://scripts/systems/Music.gd"
 UiInput="*res://scripts/systems/UiInput.gd"
 Transition="*res://scripts/systems/Transition.gd"
+Cutscene="*res://scripts/systems/Cutscene.gd"
 
 [display]
 

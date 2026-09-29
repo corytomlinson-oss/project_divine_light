@@ -67,6 +67,16 @@ var counter_rounds: int = 0
 var counter_from_phase: int = -1
 var extra_actions: int = 0
 var extra_actions_max_phase: int = 99
+# Milestone 20c: Silence (the member's next turn can't use skills), an
+# elemental aura that cycles each time it casts (aura_cycle / aura_index; with
+# aura_weakness it's weak to whatever beats its current aura), and elements
+# it's immune to (a boss can gain one from boss phase immune_from_phase).
+var silence_rounds: int = 0
+var aura_cycle: Array = []
+var aura_index: int = 0
+var aura_weakness: bool = false
+var immune: Array = []
+var immune_from_phase: int = -1
 var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 
@@ -87,6 +97,11 @@ func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,
 	if p_class == "Ryn":
 		max_qi = 6
 		qi = 0
+
+
+## The element of its current aura, or "" if it has none.
+func aura() -> String:
+	return "" if aura_cycle.is_empty() else String(aura_cycle[aura_index % aura_cycle.size()])
 
 
 func is_alive() -> bool:

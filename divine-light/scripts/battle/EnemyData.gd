@@ -8,7 +8,8 @@ extends RefCounted
 #   attack    - modifiers on its basic attack: hits (swings; hits_max for a
 #               random 2-3), target ("back_row" = prefers the back row),
 #               poison_chance/_power/_rounds, stun_chance, berserk (percent
-#               chance to hit one of its own allies instead)
+#               chance to hit one of its own allies instead), random_status
+#               (percent chance of poison / silence / DEF down / stun)
 #   actions   - actions per round (default 1); actions_max_phase limits it
 #   counter_from_phase - boss phase from which it counters every physical
 #               attack (the counter_stance ability does it for a few rounds)
@@ -18,7 +19,15 @@ extends RefCounted
 #               (boss phases it's allowed in), power, rounds, mult, palette.
 #               Kinds: party_def_down, ally_atk_up, self_def_up, charge (a
 #               telegraphed heavy blow next turn), counter_stance (hits back
-#               at physical attacks for `rounds`), magic_single, magic_all.
+#               at physical attacks for `rounds`), magic_single, magic_all,
+#               silence (one party member can't use skills on their next
+#               turn), aura_bolt / aura_storm (one target / everyone, in the
+#               element of its current aura, which then moves on).
+#   aura      - elements its aura cycles through, one step per aura spell;
+#               aura_weakness: true makes it weak to whatever beats the
+#               current one (fire <-> ice, lightning <-> earth)
+#   immune_from_phase - boss phase from which it's immune to one element
+#               (one the party can actually deal, if any)
 #   weak      - elements that deal 1.5x damage to it (holy, fire, ice,
 #               lightning, earth)
 #   int / res - magic stats (enemy spells use int; party spells hit res)
@@ -59,6 +68,30 @@ const KITS := {
 	# The Monastery's boss (holds Ryn): acts twice a round, then in phase 2
 	# counters every physical blow. Weakness: magic - spells aren't countered.
 	"Corrupted Grandmaster": {"short": "Grandmaster", "attack": {"hits": 2}, "actions": 2, "actions_max_phase": 0, "counter_from_phase": 1},
+	# The Observatory (20c)
+	"Void Mage": {"int": 12, "res": 10, "aura": ["fire", "ice", "lightning"], "aura_weakness": true, "abilities": [
+		{"name": "Void Bolt", "kind": "aura_bolt", "chance": 70, "power": 12},
+	]},
+	"Astral Familiar": {"res": 12, "attack": {"random_status": 40}},
+	"Corrupted Scholar": {"int": 10, "res": 10, "abilities": [
+		{"name": "Hush", "kind": "silence", "chance": 45},
+	]},
+	# The Observatory's escape warden (a Lyra start): a spell-casting construct,
+	# near-immune to blows but brittle to magic and weak to fire - Lyra's Ember
+	# is the answer. It gathers the void a turn before a heavy blast.
+	"Void Sentinel": {"int": 12, "res": 0, "weak": ["fire"], "abilities": [
+		{"name": "Void Nova", "kind": "charge", "every": 3, "max_phase": 0, "mult": 2.2, "tell": "draws the void into itself!"},
+		{"name": "Void Nova", "kind": "charge", "every": 2, "phase": 1, "mult": 2.2, "tell": "draws the void into itself!"},
+		{"name": "Void Bolt", "kind": "magic_single", "chance": 40, "power": 20, "palette": "arcane"},
+	]},
+	# The Observatory's boss (holds Lyra): its spells cycle fire -> ice ->
+	# lightning; in phase 2 it becomes immune to an element the party uses.
+	# Weak to earth.
+	"Void Archmage": {"short": "Archmage", "int": 24, "res": 14, "weak": ["earth"], "aura": ["fire", "ice", "lightning"], "immune_from_phase": 1, "abilities": [
+		{"name": "Void Storm", "kind": "aura_storm", "every": 3, "power": 14},
+		{"name": "Void Bolt", "kind": "aura_bolt", "chance": 75, "max_phase": 0, "power": 22},
+		{"name": "Void Bolt", "kind": "aura_bolt", "chance": 85, "phase": 1, "power": 30},
+	]},
 	# The Cathedral's boss (holds Vael): hardens its armor, then turns dark
 	# versions of Vael's own holy magic on the party. Weak to holy.
 	"Fallen Guardian": {"int": 22, "res": 10, "weak": ["holy"], "abilities": [
@@ -146,6 +179,30 @@ const MONASTERY_ENCOUNTERS: Array = [
 	 {"name": "Iron Sentinel",   "hp": 85, "atk": 28, "def": 22, "agi": 3,  "xp": 60}],
 ]
 
+# The Observatory as a starting dungeon: a lone level-1 Lyra (fragile, but
+# her Ember hits hard).
+const OBSERVATORY_ESCAPE_ENCOUNTERS: Array = [
+	[{"name": "Void Mage",         "hp": 26, "atk": 9,  "def": 3, "agi": 7,  "xp": 22}],
+	[{"name": "Astral Familiar",   "hp": 20, "atk": 10, "def": 2, "agi": 18, "xp": 22}],
+	[{"name": "Corrupted Scholar", "hp": 30, "atk": 11, "def": 4, "agi": 5,  "xp": 25}],
+	[{"name": "Void Mage",         "hp": 26, "atk": 9,  "def": 3, "agi": 7,  "xp": 22},
+	 {"name": "Astral Familiar",   "hp": 20, "atk": 10, "def": 2, "agi": 18, "xp": 22}],
+	[{"name": "Corrupted Scholar", "hp": 30, "atk": 11, "def": 4, "agi": 5,  "xp": 25},
+	 {"name": "Astral Familiar",   "hp": 20, "atk": 10, "def": 2, "agi": 18, "xp": 22}],
+]
+
+# The Observatory when you come to rescue Lyra (a lone hero around 5 at worst).
+const OBSERVATORY_ENCOUNTERS: Array = [
+	[{"name": "Void Mage",         "hp": 55, "atk": 24, "def": 7,  "agi": 12, "xp": 45}],
+	[{"name": "Astral Familiar",   "hp": 45, "atk": 26, "def": 6,  "agi": 24, "xp": 45}],
+	[{"name": "Corrupted Scholar", "hp": 65, "atk": 28, "def": 9,  "agi": 9,  "xp": 50}],
+	[{"name": "Void Mage",         "hp": 55, "atk": 24, "def": 7,  "agi": 12, "xp": 45},
+	 {"name": "Corrupted Scholar", "hp": 65, "atk": 28, "def": 9,  "agi": 9,  "xp": 50}],
+	[{"name": "Astral Familiar",   "hp": 45, "atk": 26, "def": 6,  "agi": 24, "xp": 45},
+	 {"name": "Void Mage",         "hp": 55, "atk": 24, "def": 7,  "agi": 12, "xp": 45},
+	 {"name": "Corrupted Scholar", "hp": 65, "atk": 28, "def": 9,  "agi": 9,  "xp": 50}],
+]
+
 # Location -> table. "cathedral_escape" is the Cathedral as a starting dungeon.
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
@@ -153,6 +210,8 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"cathedral_escape": CATHEDRAL_ESCAPE_ENCOUNTERS,
 	"monastery": MONASTERY_ENCOUNTERS,
 	"monastery_escape": MONASTERY_ESCAPE_ENCOUNTERS,
+	"observatory": OBSERVATORY_ENCOUNTERS,
+	"observatory_escape": OBSERVATORY_ESCAPE_ENCOUNTERS,
 }
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
@@ -168,6 +227,15 @@ const BOSSES := {
 	# The Monastery's escape warden, tuned for a lone Ryn around level 2-3.
 	"sparring_master": {
 		"name": "Sparring Master", "hp": 110, "atk": 18, "def": 5, "agi": 12, "xp": 150,
+		"phase_hp_thresholds": [0.5],
+	},
+	# The Observatory's escape warden, tuned for a lone Lyra around level 2-3.
+	"void_sentinel": {
+		"name": "Void Sentinel", "hp": 150, "atk": 18, "def": 16, "agi": 5, "xp": 150,
+		"phase_hp_thresholds": [0.5],
+	},
+	"void_archmage": {
+		"name": "Void Archmage", "hp": 270, "atk": 24, "def": 10, "agi": 11, "xp": 400,
 		"phase_hp_thresholds": [0.5],
 	},
 	"corrupted_grandmaster": {
@@ -186,6 +254,11 @@ const STAND_INS := {
 	"Iron Sentinel": {"sprite": "cursed_paladin", "tint": Color(0.62, 0.66, 0.78)},
 	"Sparring Master": {"sprite": "shadow_acolyte", "tint": Color(0.75, 0.9, 1.0)},
 	"Corrupted Grandmaster": {"sprite": "shadow_acolyte", "scale": 2, "tint": Color(0.95, 0.6, 0.35)},
+	"Void Mage": {"sprite": "fallen_priest", "tint": Color(0.6, 0.5, 1.0)},
+	"Astral Familiar": {"sprite": "shade_wisp", "tint": Color(0.7, 0.9, 1.0)},
+	"Corrupted Scholar": {"sprite": "fallen_priest", "tint": Color(0.85, 0.8, 0.55)},
+	"Void Sentinel": {"sprite": "hollow_warden", "tint": Color(0.55, 0.45, 0.9)},
+	"Void Archmage": {"sprite": "fallen_priest", "scale": 2, "tint": Color(0.5, 0.35, 0.9)},
 }
 
 

@@ -24,6 +24,16 @@ const ICONS := {
 	"evade": [".....", ".#...", "#.#.#", "...#.", "....."],
 	"blind": ["#...#", ".#.#.", "..#..", ".#.#.", "#...#"],
 	"counter": ["#####", "#.#.#", "#####", ".###.", "..#.."],
+	"silence": [".....", "#...#", ".###.", "#...#", "....."],
+	"aura_fire": ["..#..", ".#.#.", "#...#", ".#.#.", "..#.."],
+	"aura_ice": ["..#..", ".#.#.", "#...#", ".#.#.", "..#.."],
+	"aura_lightning": ["..#..", ".#.#.", "#...#", ".#.#.", "..#.."],
+	"aura_earth": ["..#..", ".#.#.", "#...#", ".#.#.", "..#.."],
+	"immune_holy": ["#####", "#...#", "#.#.#", "#...#", ".###."],
+	"immune_fire": ["#####", "#...#", "#.#.#", "#...#", ".###."],
+	"immune_ice": ["#####", "#...#", "#.#.#", "#...#", ".###."],
+	"immune_lightning": ["#####", "#...#", "#.#.#", "#...#", ".###."],
+	"immune_earth": ["#####", "#...#", "#.#.#", "#...#", ".###."],
 }
 const COLORS := {
 	"poison": Color(0.45, 0.9, 0.3),
@@ -39,6 +49,16 @@ const COLORS := {
 	"evade": Color(0.75, 0.75, 0.85),
 	"blind": Color(0.7, 0.7, 0.75),
 	"counter": Color(1.0, 0.55, 0.2),
+	"silence": Color(0.6, 0.75, 1.0),
+	"aura_fire": Color(1.0, 0.45, 0.2),
+	"aura_ice": Color(0.55, 0.85, 1.0),
+	"aura_lightning": Color(1.0, 0.95, 0.35),
+	"aura_earth": Color(0.75, 0.55, 0.3),
+	"immune_holy": Color(1.0, 0.95, 0.6),
+	"immune_fire": Color(1.0, 0.45, 0.2),
+	"immune_ice": Color(0.55, 0.85, 1.0),
+	"immune_lightning": Color(1.0, 0.95, 0.35),
+	"immune_earth": Color(0.75, 0.55, 0.3),
 }
 const BACKING := Color(0.05, 0.04, 0.1, 0.75)
 
@@ -70,6 +90,10 @@ static func statuses(c: Combatant) -> Array:
 	if c.evasion_rounds > 0: out.append("evade")
 	if c.accuracy_debuff_rounds > 0: out.append("blind")
 	if c.counter_rounds > 0: out.append("counter")
+	if c.silence_rounds > 0: out.append("silence")
+	if c.aura() != "": out.append("aura_" + c.aura())
+	for element: String in c.immune:
+		out.append("immune_" + element)
 	return out
 
 

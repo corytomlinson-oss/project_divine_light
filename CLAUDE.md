@@ -15,7 +15,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
   - [x] b2 — the Monastery dungeon: recolored tileset, scene, `Dungeon.gd` entry, `ActOne` scene path, encounter tables (escape: lone level-1 Ryn; rescue: lone hero ~5), story scenes (wake / Frank / escaped / rescue); `{next}` substitution in scene text so Frank names the right next dungeon.
   - [x] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
 - 20c The Observatory (Lyra)
-  - [ ] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
+  - [x] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
   - [ ] c2 — the Observatory dungeon + scenes.
   - [ ] c3 — Lyra playable; test; docs.
 - 20d The Underground Guild (Silas)
@@ -296,6 +296,16 @@ Built in four steps, each tested and committed on its own:
 - **`{next}` / `{next_where}` in scene text:** `Cutscene._expand()` (called by `play()` and `play_text()`) fills in the next dungeon on this game's route ("the Observatory", "out on the eastern plain"). The escape-end now sets `cleared_<id>` *before* the escaped scene so `{next}` already points past it. Used by `monastery_escaped.scene` and `verdance_arrival.scene`.
 - **Ryn playable:** `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn"]`. Verdance's arrival fires once the *starting* dungeon is cleared (was hardcoded to the Cathedral); the elder's "after" line is now route-neutral.
 - Verified end to end (12 checks): Ryn's class select -> wake -> Frank -> Sparring Master with Frank's help -> Frank names the Observatory -> overworld at the Monastery's arch -> Verdance arrival names the Observatory; then a Vael game at level 5 with the Cathedral cleared -> Monastery rescue -> Corrupted Grandmaster -> Ryn joins at level 5. Test gotcha: dialogue page text contains line breaks, so match captured text with `\n` replaced by spaces.
+
+### 20c — The Observatory (in progress)
+
+**Step c1: battle mechanics + Observatory enemies (done, 2026-09-29)**
+- **Silence:** `Combatant.silence_rounds` counts the member's *own* turns (1 = their next turn). While it's up, Skill is greyed in the main menu (`_option_disabled()`) and refuses to open; a skill queued before the silence landed fizzles ("X is silenced! Y fails."). Used up at the start of the member's turn (a stunned turn uses it up too). Enemy ability kind `silence` picks someone not already silenced and is skipped when everyone is. Blue icon.
+- **Auras:** kit `aura` (element list) → `Combatant.aura_cycle` / `aura_index` / `aura()`. Ability kinds `aura_bolt` (one target) and `aura_storm` (whole party) cast in the current aura's element (`AURA_SPELLS` names: Void Flame / Frost / Spark / Stone), then advance it. With `aura_weakness: true` the enemy is weak to whatever beats its current aura (`AURA_WEAKNESS`: fire <-> ice, lightning <-> earth) via `_is_weak()`. Aura icon in the element's colour.
+- **Immunity:** `Combatant.immune`; `_hit()` deals 0 and adds " Immune!". Kit `immune_from_phase`: on that phase change the boss becomes immune to an element from `_party_elements()` (what the living party can deal now, minus its own weaknesses), falling back to fire/ice/lightning. Shield icon in the element's colour.
+- **Random status** (`attack.random_status`, percent): poison / silence / DEF down (2x weight each) or stun (1x).
+- **Kits:** Void Mage (aura fire→ice→lightning, weak to what beats it), Astral Familiar (very fast, random status 40%), Corrupted Scholar (Hush 45%). **Void Sentinel** (escape warden for a Lyra start: DEF 16 / RES 0, weak to fire, Void Nova charge every 3rd turn / 2nd in phase 2, Void Bolt). **Void Archmage** (short "Archmage"; aura spells, Void Storm every 3rd turn, immune to one party element from phase 2, weak to earth). Stand-ins: tinted Fallen Priest / Shade Wisp / Hollow Warden. Tables `OBSERVATORY_ESCAPE_ENCOUNTERS` (lone L1 Lyra) and `OBSERVATORY_ENCOUNTERS` (lone hero ~5); `LOCATION_BOSSES` has both.
+- Verified (17 checks) by driving the mechanics in real battles + screenshots.
 
 ## Milestone 19 — Cutscenes (done)
 

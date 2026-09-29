@@ -5,6 +5,7 @@ const MOVE_SPEED: float = 96.0
 const WALL_ATLAS_COORDS := Vector2i(1, 0)
 const DOOR_ATLAS_COORDS := Vector2i(2, 0)
 const BOSS_ATLAS_COORDS := Vector2i(4, 0)
+const CAPTIVE_ATLAS_COORDS := Vector2i(3, 0)
 
 var _moving: bool = false
 var _target: Vector2
@@ -19,6 +20,12 @@ var _facing: String = "down"
 func _ready() -> void:
 	add_to_group("player")  # how cutscenes find the player (Milestone 19a)
 	_target = position
+	# On the map you see the party's leader - whoever you started as
+	# (Milestone 20a; Player.tscn's default is Vael's walk sheet).
+	if not GameManager.party.is_empty():
+		var path := "res://assets/sprites/%s_frames.tres" % GameManager.party[0].char_class.to_lower()
+		if ResourceLoader.exists(path):
+			_sprite.sprite_frames = load(path)
 	_reset_encounter_counter()
 	if GameManager.reopen_pause_menu:
 		GameManager.reopen_pause_menu = false
@@ -38,8 +45,20 @@ func _process(delta: float) -> void:
 		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
 		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
 		_open_pause_menu()
+	elif Input.is_action_just_pressed("confirm"):
+		_interact()
 	else:
 		_handle_input()
+
+
+## A talks to whatever is on the tile you're facing (Milestone 20a): the map
+## decides what that means (a villager, the innkeeper, Frank's stall).
+func _interact() -> void:
+	var dirs := {"up": Vector2i.UP, "down": Vector2i.DOWN, "left": Vector2i.LEFT, "right": Vector2i.RIGHT}
+	var front: Vector2i = _tile_map.local_to_map(position) + dirs[_facing]
+	var map_root: Node = _tile_map.get_parent()
+	if map_root.has_method("interact"):
+		map_root.interact(front, _facing)
 
 
 ## Back from a screen the pause menu opened (Equip): show the menu again once
@@ -111,17 +130,28 @@ func _play_anim(kind: String) -> void:
 
 func _is_walkable(world_pos: Vector2) -> bool:
 	var cell: Vector2i = _tile_map.local_to_map(world_pos)
-	return _tile_map.get_cell_atlas_coords(cell) != WALL_ATLAS_COORDS
+	if _tile_map.get_cell_atlas_coords(cell) == WALL_ATLAS_COORDS:
+		return false
+	# Maps can block more: water, buildings, people standing there (20a).
+	var map_root: Node = _tile_map.get_parent()
+	return not (map_root.has_method("is_blocked") and map_root.is_blocked(cell))
 
 
 func _on_tile_entered() -> void:
 	var cell: Vector2i = _tile_map.local_to_map(position)
 	var coords: Vector2i = _tile_map.get_cell_atlas_coords(cell)
-	if coords == DOOR_ATLAS_COORDS:
+	var map_root: Node = _tile_map.get_parent()
+	# The gate tile is always a door; maps can declare others (the overworld's
+	# stone arches into dungeons).
+	if coords == DOOR_ATLAS_COORDS or (map_root.has_method("is_door") and map_root.is_door(cell)):
 		_use_door(cell)
 		return
 	if coords == BOSS_ATLAS_COORDS:
 		_trigger_boss_battle()
+		return
+	if coords == CAPTIVE_ATLAS_COORDS and map_root.has_method("on_captive_tile"):
+		# A captive's rune (Milestone 20a): the dungeon decides what happens.
+		map_root.on_captive_tile(cell)
 		return
 	_check_encounter()
 
@@ -131,7 +161,14 @@ func _use_door(cell: Vector2i) -> void:
 	if not map_root.has_method("get_door_destination"):
 		return
 	var dest: Dictionary = map_root.get_door_destination(cell)
-	if not dest.is_empty():
+	if dest.get("boss", false):
+		# A door guarded by a boss (an escape warden): walking up to it starts
+		# the fight.
+		_trigger_boss_battle()
+	elif dest.has("blocked"):
+		# A gated or unfinished door (Milestone 20a): say why, stay put.
+		Cutscene.play_text("narrate " + String(dest["blocked"]))
+	elif not dest.is_empty():
 		Transition.change_scene(dest["scene"])
 
 
@@ -151,6 +188,11 @@ func _trigger_boss_battle() -> void:
 	GameManager.has_pending_spawn = true
 	GameManager.pending_boss_battle = true
 	Transition.to_battle()
+
+
+## For map scripts that start the boss fight themselves (a captive's jailer).
+func start_boss_battle() -> void:
+	_trigger_boss_battle()
 
 
 func _reset_encounter_counter() -> void:

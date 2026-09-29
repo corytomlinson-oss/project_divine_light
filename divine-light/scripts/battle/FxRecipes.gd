@@ -21,6 +21,8 @@ extends RefCounted
 
 const ATTACK := {"cast": "lunge", "impact": "slash", "palette": "physical"}
 const ENEMY_ATTACK := {"cast": "lunge", "impact": "slash", "palette": "enemy"}
+# A telegraphed heavy blow (the Hollow Warden's Crushing Blow).
+const ENEMY_HEAVY := {"cast": "lunge", "impact": ["burst", "slash"], "palette": "enemy", "size": 18.0, "screen": "shake"}
 
 const BY_EFFECT := {
 	# ---------------------------------------------------------------- Vael (18b)

@@ -5,7 +5,17 @@ signal party_loaded
 const SAVE_DIR: String = "user://saves/"
 const SAVE_SLOTS: int = 3
 
+# Everyone who exists in the story (Milestone 20a), by class name, and the
+# party: who's actually with you, in the order they joined. A new game starts
+# with only the chosen character; the others join when rescued (recruit()).
+const CLASSES: Array = ["Vael", "Ryn", "Lyra", "Silas"]
+var roster: Dictionary = {}
 var party: Array = []
+var starting_class: String = ""
+var gold: int = 0
+# Which overworld entrance to appear at next (Milestone 20a): set when leaving
+# a town or dungeon, e.g. "cathedral", "verdance".
+var arrival: String = ""
 var inventory: Dictionary = {}
 var current_location: String = "overworld"
 var current_scene_path: String = "res://scenes/overworld/Overworld.tscn"
@@ -20,20 +30,20 @@ var reopen_pause_menu: bool = false
 # Story flags set by cutscenes ("set met_frank"), saved with the game, so a
 # scene can check whether something already happened (Milestone 19a).
 var story_flags: Dictionary = {}
+# Development/testing: when set (a list of enemy dicts, EnemyData format), the
+# next battle fights exactly this group - bosses too, via "is_boss" and
+# "phase_hp_thresholds" - then it's cleared (Milestone 20a).
+var debug_encounter: Array = []
 
 
 func _ready() -> void:
+	# Launching straight into a map (F6 in the editor) skips the title screen,
+	# so the game starts with everyone and the Milestone 15 test gear - handy
+	# for development. A real New Game goes through start_new_game() instead.
 	if party.is_empty():
-		party = [
-			Combatant.new("Vael",  150, 10, 12,  6, false, 30, "Vael",  8, 8),
-			Combatant.new("Ryn",   100, 14,  8, 10, false,  0, "Ryn",   3, 5),
-			Combatant.new("Lyra",   70,  5,  4,  8, false, 50, "Lyra", 15, 8),
-			Combatant.new("Silas",  90, 12,  7, 14, false, 30, "Silas",  4, 5),
-		]
-		party[0].row = "front"  # Vael
-		party[1].row = "front"  # Ryn
-		party[2].row = "back"   # Lyra
-		party[3].row = "back"   # Silas
+		_build_roster()
+		for cls: String in CLASSES:
+			party.append(roster[cls])
 	if inventory.is_empty():
 		inventory = {
 			"Potion": 10,
@@ -57,6 +67,56 @@ func _ready() -> void:
 			"Leather Hood": 1,
 			"Traveler's Ring": 1,
 		}
+
+
+func _build_roster() -> void:
+	roster = {
+		"Vael": Combatant.new("Vael",  150, 10, 12,  6, false, 30, "Vael",  8, 8),
+		"Ryn": Combatant.new("Ryn",   100, 14,  8, 10, false,  0, "Ryn",   3, 5),
+		"Lyra": Combatant.new("Lyra",   70,  5,  4,  8, false, 50, "Lyra", 15, 8),
+		"Silas": Combatant.new("Silas",  90, 12,  7, 14, false, 30, "Silas",  4, 5),
+	}
+	roster["Vael"].row = "front"
+	roster["Ryn"].row = "front"
+	roster["Lyra"].row = "back"
+	roster["Silas"].row = "back"
+
+
+## A fresh game as `cls`: alone, level 1, a few potions, no gear, nothing done.
+func start_new_game(cls: String) -> void:
+	_build_roster()
+	party = [roster[cls]]
+	starting_class = cls
+	inventory = {"Potion": 3, "Antidote": 1}
+	story_flags = {}
+	dungeon_seeds = {}
+	defeated_bosses = {}
+	gold = 0
+	arrival = ""
+	has_pending_spawn = false
+	pending_boss_battle = false
+
+
+## A rescued character joins the party. They catch up to the party's average
+## level first, so they're useful straight away rather than a level-1 burden.
+func recruit(cls: String) -> void:
+	var member: Combatant = roster[cls]
+	if member in party:
+		return
+	var total := 0
+	for m: Combatant in party:
+		total += m.level
+	var target := roundi(float(total) / maxi(1, party.size()))
+	while member.level < target:
+		member.level_up()
+	member.hp = member.max_hp
+	member.mp = member.max_mp
+	party.append(member)
+	story_flags["recruited_" + cls.to_lower()] = true
+
+
+func has_member(cls: String) -> bool:
+	return party.any(func(m: Combatant) -> bool: return m.char_class == cls)
 
 
 func _input(event: InputEvent) -> void:
@@ -83,6 +143,10 @@ func save_game(slot: int) -> bool:
 		return false
 	var data := {
 		"party": party.map(func(c: Combatant) -> Dictionary: return c.to_save_dict()),
+		"roster": _roster_save(),
+		"party_order": party.map(func(c: Combatant) -> String: return c.char_class),
+		"starting_class": starting_class,
+		"gold": gold,
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
@@ -100,9 +164,24 @@ func load_game(slot: int) -> bool:
 	var parsed = JSON.parse_string(file.get_as_text())
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return false
-	var save_party: Array = parsed.get("party", [])
-	for i in mini(save_party.size(), party.size()):
-		party[i].load_save_dict(save_party[i])
+	_build_roster()
+	# Saves from before 20a have only "party" (always all four); newer ones
+	# also have the full roster and who's in the party, in order.
+	var saved_roster: Dictionary = parsed.get("roster", {})
+	for data: Dictionary in parsed.get("party", []):
+		var cls := String(data.get("char_class", ""))
+		if roster.has(cls) and not saved_roster.has(cls):
+			saved_roster[cls] = data
+	for cls: String in saved_roster:
+		if roster.has(cls):
+			roster[cls].load_save_dict(saved_roster[cls])
+	var order: Array = parsed.get("party_order", saved_roster.keys())
+	party = []
+	for cls in order:
+		if roster.has(cls):
+			party.append(roster[cls])
+	starting_class = String(parsed.get("starting_class", ""))
+	gold = int(parsed.get("gold", 0))
 	var save_inventory: Dictionary = parsed.get("inventory", {})
 	inventory.clear()
 	for item_name in save_inventory:
@@ -132,6 +211,13 @@ func get_dungeon_seed(location: String) -> int:
 	if not dungeon_seeds.has(location):
 		dungeon_seeds[location] = randi()
 	return dungeon_seeds[location]
+
+
+func _roster_save() -> Dictionary:
+	var out := {}
+	for cls: String in roster:
+		out[cls] = roster[cls].to_save_dict()
+	return out
 
 
 func has_flag(flag: String) -> bool:

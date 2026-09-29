@@ -1,11 +1,11 @@
 extends Node2D
 
 # The title screen (Milestone 19b) - the game's main scene now. New Game plays
-# the intro movie, then starts on the overworld. Continue loads save slot 1
+# the intro movie, then the class select (20a). Continue loads save slot 1
 # (the F5 debug save until Milestone 22 builds real save slots); it's greyed
 # out when there's no save.
 
-const FIRST_SCENE := "res://scenes/overworld/Overworld.tscn"
+const CLASS_SELECT := "res://scenes/title/ClassSelect.tscn"
 const INTRO := "res://data/cutscenes/intro.scene"
 
 var _index := 0
@@ -48,8 +48,7 @@ func _new_game() -> void:
 	await Transition.fade_out(0.8)
 	_cursor.target = null
 	await Cutscene.play(INTRO)
-	GameManager.story_flags["intro_seen"] = true
-	Transition.change_scene(FIRST_SCENE)
+	Transition.change_scene(CLASS_SELECT)
 
 
 func _continue() -> void:

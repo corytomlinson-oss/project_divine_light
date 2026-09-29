@@ -1,0 +1,15 @@
+# Finding Frank in the Cathedral's cells (Milestone 20a, escape start).
+# Plays on stepping onto the rune in front of his cell.
+
+face player up
+emote frank !
+say Frank: Oh, thank the Light - somebody's awake! You there, the knight. Get me out of here?
+narrate The lock is old and crusted with something dark. It gives way.
+face frank down
+say Frank: Frank. Just Frank. A traveling merchant - or I was, before they dragged me in here with the rest of their... collection.
+emote player ?
+say Frank: The only way out is past the great doors, and there's a warden on them. Big. Slow. Hits like a falling bell.
+say Frank: If it raises that hammer, brace yourself - Defend, and let the blow glance off. I'll be right behind you. I've still got a few tricks in my pack.
+set met_frank
+narrate Frank falls in behind you.
+despawn frank

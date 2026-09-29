@@ -1,66 +1,124 @@
 extends Node2D
 
-const CATHEDRAL_DOOR_CELL := Vector2i(8, 5)
-const CATHEDRAL_SCENE_PATH := "res://scenes/dungeon/CathedralDungeon.tscn"
+# The Forest Heartlands - Act I's overworld (Milestone 20a), painted from the
+# text map below every time the scene loads (the scene file's own tile data is
+# cleared first). Edit MAP to change the land.
+#
+#   .  grass      T  trees (wall)    =  road       ~  water (blocked)
+#   *  flowers    V  Verdance        E  Edenmere   (town gates)
+#   C  The Cathedral   M  The Monastery   O  The Observatory
+#   G  The Underground Guild                        (dungeon arches)
+#
+# Leaving a town or dungeon sets GameManager.arrival, and the player appears
+# just outside that entrance. Returning from a battle uses the saved spot.
 
-# The Milestone 1 hand-painted floor patch turns out to be a clean rectangle
-# (confirmed by inspecting the actual tile_map_data). It had zero wall tiles
-# anywhere - a gap flagged back in Milestone 13a - since there was no reason
-# to paint walls before the wall tile had real art. Now that it does
-# (Milestone 16), it's worth finally closing that gap.
-const FLOOR_MIN := Vector2i(-4, -9)
-const FLOOR_MAX := Vector2i(8, 10)
-const WALL_COORDS := Vector2i(1, 0)
-
-# The player's spawn cell (10,5) sits outside the floor rectangle in empty
-# space - also flagged back in 13a as "harmless since empty cells are
-# walkable, but worth knowing if that ever changes." It just changed: a full
-# wall border would trap the player outside it. These cells stay open as the
-# entry point from spawn into the floor area, instead of moving spawn.
-# Deliberately excludes row 5 (the door's own row) - an earlier version only
-# opened row 5 and funneled the player straight onto the door tile the
-# instant they walked in, making the grass interior itself unreachable.
-# A single-row gap one row off fixed that but turned out hard to actually
-# find with no diagonal movement (found via playtesting) - a few rows wide
-# is far more forgiving to walk into by eye.
-const ENTRY_GAP_ROWS: Array = [2, 3, 4, 6, 7, 8]
-const ENTRY_GAP_X := 9
+const MAP := [
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTT",
+	"TTTTTT...C....TTTTTTTTT....M....TTTT",
+	"TTTTT....=.....TTTTTTT...*.=.....TTT",
+	"TTTT.....=.....TTTTTTT.....=.....TTT",
+	"TTTTT*...=.....TTTTTTT.....=.....TTT",
+	"TTTTTT...=...TTTTTTTTTT....=....TTTT",
+	"TTTTTTT.T=.TTTTTTTTTTTTTTTT=TTTTTTTT",
+	"TTTTT....=.*.TTTT.TTTTTTTTT=T.TTTTTT",
+	"TTTT.....=..............TT.=.....TTT",
+	"TTT......=..............T..=...*..TT",
+	"TTT......=........==============..TT",
+	"TTT......V=========............=O..T",
+	"TTT...............=...TTT.........TT",
+	"TTT~~~~~........TT=TTTTTT.........TT",
+	"TTT~~~~~......TTTT===========...TTTT",
+	"TTT~~~~~.....TTTTT=TTTTTTTTT=TTTTTTT",
+	"TTTTTTTTTTTTT.....=...TTTTTT=TTTTTTT",
+	"TTTTTTTTTTTT......=.*...T...=...TTTT",
+	"TTTTTTTTTTT.......=.........===..TTT",
+	"TTTTTTTTTTT.......=...........=E.TTT",
+	"TTTTTTTTTTTTT.....G..TTT.........TTT",
+	"TTTTTTTTTTTTTTTTT.TTTTTTT.......TTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+]
+const TILES := {".": Vector2i(0, 0), "T": Vector2i(1, 0), "=": Vector2i(3, 0), "~": Vector2i(5, 0), "*": Vector2i(6, 0)}
+const GATE := Vector2i(2, 0)
+const ARCH := Vector2i(4, 0)
+const WATER := Vector2i(5, 0)
+const ENTRANCES := {
+	"V": "verdance", "E": "edenmere",
+	"C": "cathedral", "M": "monastery", "O": "observatory", "G": "guild",
+}
+const TOWNS := {
+	"verdance": {"name": "Verdance", "scene": "res://scenes/town/Verdance.tscn"},
+	"edenmere": {"name": "Edenmere", "scene": ""},
+}
 
 @onready var _tile_map: TileMapLayer = $TileMapLayer
 @onready var _player: Node2D = $TileMapLayer/Player
+
+var _entrances: Dictionary = {}  # cell -> entrance id
 
 
 func _ready() -> void:
 	GameManager.current_location = "overworld"
 	GameManager.current_scene_path = "res://scenes/overworld/Overworld.tscn"
 	Music.play("overworld")
-	_paint_wall_border()
-	_tile_map.set_cell(CATHEDRAL_DOOR_CELL, 0, Vector2i(2, 0))
+	_tile_map.y_sort_enabled = true  # characters lower on screen draw in front
+	_paint()
 	if GameManager.has_pending_spawn:
 		_player.snap_to(GameManager.pending_spawn_position)
 		GameManager.has_pending_spawn = false
+	else:
+		var id := GameManager.arrival if GameManager.arrival != "" else "verdance"
+		_player.snap_to(_tile_map.map_to_local(_outside(id)))
+	GameManager.arrival = ""
 
 
-func _paint_wall_border() -> void:
-	var min_x: int = FLOOR_MIN.x - 1
-	var max_x: int = FLOOR_MAX.x + 1
-	var min_y: int = FLOOR_MIN.y - 1
-	var max_y: int = FLOOR_MAX.y + 1
-	for x in range(min_x, max_x + 1):
-		_paint_wall(Vector2i(x, min_y))
-		_paint_wall(Vector2i(x, max_y))
-	for y in range(min_y, max_y + 1):
-		_paint_wall(Vector2i(min_x, y))
-		_paint_wall(Vector2i(max_x, y))
+func _paint() -> void:
+	_tile_map.clear()
+	for y in MAP.size():
+		var row: String = MAP[y]
+		for x in row.length():
+			var ch := row[x]
+			var cell := Vector2i(x, y)
+			if ENTRANCES.has(ch):
+				var id: String = ENTRANCES[ch]
+				_entrances[cell] = id
+				_tile_map.set_cell(cell, 0, GATE if TOWNS.has(id) else ARCH)
+			else:
+				_tile_map.set_cell(cell, 0, TILES.get(ch, TILES["T"]))
 
 
-func _paint_wall(cell: Vector2i) -> void:
-	if cell.x == ENTRY_GAP_X and ENTRY_GAP_ROWS.has(cell.y):
-		return
-	_tile_map.set_cell(cell, 0, WALL_COORDS)
+## The walkable tile just outside an entrance (south first, then the rest).
+func _outside(id: String) -> Vector2i:
+	for cell: Vector2i in _entrances:
+		if _entrances[cell] != id:
+			continue
+		for d: Vector2i in [Vector2i.DOWN, Vector2i.UP, Vector2i.RIGHT, Vector2i.LEFT]:
+			var n := cell + d
+			if _tile_map.get_cell_atlas_coords(n) in [TILES["."], TILES["="], TILES["*"]]:
+				return n
+	return Vector2i(9, 13)
+
+
+func is_door(cell: Vector2i) -> bool:
+	return _entrances.has(cell)
+
+
+func is_blocked(cell: Vector2i) -> bool:
+	return _tile_map.get_cell_atlas_coords(cell) == WATER
 
 
 func get_door_destination(cell: Vector2i) -> Dictionary:
-	if cell == CATHEDRAL_DOOR_CELL:
-		return {"scene": CATHEDRAL_SCENE_PATH}
-	return {}
+	var id: String = _entrances.get(cell, "")
+	if id == "":
+		return {}
+	if TOWNS.has(id):
+		var town: Dictionary = TOWNS[id]
+		if town["scene"] == "":
+			return {"blocked": "The road to %s is still overgrown. (Coming in a later update.)" % town["name"]}
+		return {"scene": town["scene"]}
+	var dungeon: Dictionary = ActOne.DUNGEONS[id]
+	if not ActOne.can_enter(id):
+		return {"blocked": dungeon["gate_text"]}
+	if dungeon["scene"] == "":
+		return {"blocked": "%s lies ahead, but the way isn't open yet. (Coming in a later update.)" % dungeon["name"]}
+	return {"scene": dungeon["scene"]}

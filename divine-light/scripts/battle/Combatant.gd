@@ -54,6 +54,12 @@ var queued_target: int = 0
 var is_boss: bool = false
 var boss_phase: int = 0
 var phase_hp_thresholds: Array = []
+# Enemy behavior (Milestone 20a), filled from EnemyData's kit for its name.
+var abilities: Array = []
+var attack_mods: Dictionary = {}
+var weak: Array = []
+var turns_taken: int = 0
+var charging: Dictionary = {}  # the telegraphed ability it will unleash next turn
 var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 

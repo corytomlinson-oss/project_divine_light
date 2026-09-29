@@ -44,6 +44,18 @@ func _ready() -> void:
 	for i in GameManager.party.size():
 		_add_party_row(GameManager.party[i], 5.0 + i * ROW_H)
 	_cursor.target = _options[_index]
+	# Gold under the commands (Milestone 20a).
+	var gold_box := Panel.new()
+	gold_box.position = Vector2(244, 34)
+	gold_box.size = Vector2(72, 18)
+	add_child(gold_box)
+	var gold := Label.new()
+	gold.text = "%d gold" % GameManager.gold
+	gold.position = Vector2(8, 4)
+	gold.size = Vector2(56, 10)
+	gold.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	gold.add_theme_color_override("font_color", Color(0.91, 0.77, 0.35))
+	gold_box.add_child(gold)
 
 
 func _process(_delta: float) -> void:

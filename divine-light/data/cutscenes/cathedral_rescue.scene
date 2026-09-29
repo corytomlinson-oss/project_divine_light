@@ -1,0 +1,14 @@
+# Rescuing Vael from the Cathedral (Milestone 20a, any other start). Plays on
+# reaching Vael's rune after the Fallen Guardian is beaten.
+
+face player up
+emote vael !
+say Vael: You... you came. The Guardian wore the Cathedral's own crest. I watched its light go out.
+say Vael: If you've come this far, there are others still locked away. Frank told you?
+emote vael note
+say Vael: Then my shield is yours. Let's bring the light back to this place.
+join vael
+despawn vael
+sound level_up
+narrate Vael joins the party!
+set cleared_cathedral

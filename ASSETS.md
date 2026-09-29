@@ -202,7 +202,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [x] **Battle background, taller** (17b) — same generator, ground extended to y=112 and trees moved off the fighters.
 - [x] **Scroll arrows** — drawn in code (`scripts/ui/ScrollHint.gd`).
 - [x] **Encounter SFX** (17d) — `encounter` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/encounter.wav`: a rising pitch sweep and whoosh that break into a crash, timed to the battle-start mosaic. Approved by Cory (2026-09-29).
-- [x] **Element impact SFX** (18a) — `fire`, `ice`, `thunder`, `earth`, `holy`, `heal`, `poison` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/`. **Need Cory's ear.**
+- [x] **Element impact SFX** (18a) — `fire`, `ice`, `thunder`, `earth`, `holy`, `heal`, `poison` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/`. Approved by Cory (2026-09-29).
 - [x] **Combat effects** (18a) — no art files: drawn in code by `scripts/battle/BattleFx.gd`.
 - [x] **Mosaic shader** (17d) — `assets/shaders/mosaic.gdshader`, the battle-start screen breakup.
 

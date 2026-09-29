@@ -219,3 +219,15 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **All the Observatory dialogue is mine** (pronoun-free): `observatory_wake`, `observatory_frank`, `observatory_escaped`, `observatory_rescue`. Lyra comes across as sharp and curious: the scratched-out star charts, "they took my focus stone but left me my spells". Frank's hint for the Void Sentinel: blades skip off it, it's uneasy near fire, and brace when it draws the dark in.
 - **Lyra is selectable at the class select.** Only Silas is still "a later update".
 - **Known gap until 20d:** on Lyra's route the next dungeon is the Underground Guild, which isn't built yet, so after Verdance her story stops at the Guild's "coming in a later update" entrance. 20d fills it in.
+
+## Milestone 20d — The Underground Guild (2026-09-29)
+
+### Step d1: battle mechanics and the Guild's enemies
+
+- **Stolen items come back if you win.** A Shadow Thief pockets one random consumable per successful steal (35% of its hits). Beat it, or anyone in that fight, and everything stolen is returned ("Recovered 1 stolen item."). Run away and it's gone. Equipment is never stolen in Act I (the design doc saves that for the Desert's Dune Marauder).
+- **The Venomous Cutthroat's "poison and bleed in a single turn"** is its Twin Fangs move: 35% of its turns, one hit that always does both. Its normal hits can poison too.
+- **The Hired Muscle is plain stats**: big HP and attack, very slow. The design doc's "soaks damage while others attack" is about its bulk, so there's no special move.
+- **The Corrupted Enforcer (Silas's escape warden)** fights dirty, as the design doc says: poisoned knuckles, a Gut Punch it telegraphs a turn early ("cracks its knuckles and grins..."), and a Dirty Trick that poisons and bleeds. Silas starts with one Antidote; Frank's potion helps too.
+- **The Shadow Lord's summons:** in phase 2 it whistles in two Shadow Thieves (they can steal too). It calls more only once both are down, and not within 3 of its turns of the last call. Summoned thieves give no XP, so the fight can't be farmed. **When the Shadow Lord falls, the fight ends** and any thieves still standing slip away. Killing the boss is a valid way to win, which fits the design doc's "kill adds or burn the boss".
+- **Phase 1 status effects** use the same random-status roll as the Astral Familiar (30% of its double strikes).
+- **All five new enemies use stand-in art** until the Act I art pass (21).

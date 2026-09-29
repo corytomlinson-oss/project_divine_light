@@ -77,6 +77,12 @@ var aura_index: int = 0
 var aura_weakness: bool = false
 var immune: Array = []
 var immune_from_phase: int = -1
+# Milestone 20d: items this enemy has stolen (recovered on victory), whether it
+# was summoned mid-fight (adds flee when their summoner falls and give no XP),
+# and the turn it last summoned.
+var stolen: Array = []
+var summoned: bool = false
+var last_summon_turn: int = -99
 var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 

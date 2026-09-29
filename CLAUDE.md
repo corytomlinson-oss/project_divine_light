@@ -19,7 +19,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
   - [x] c2 — the Observatory dungeon + scenes.
   - [x] c3 — Lyra playable; test; docs.
 - 20d The Underground Guild (Silas)
-  - [ ] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
+  - [x] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
   - [ ] d2 — the Guild dungeon + scenes.
   - [ ] d3 — Silas playable; test.
   - [ ] d4 — Edenmere, the mid-Act I town.
@@ -311,6 +311,15 @@ Built in four steps, each tested and committed on its own:
 - Same pattern as the Monastery: `observatory` ramp (deep navy -> star-silver) in `build_dungeon_recolors.py` -> `observatory_tiles.png`; `scenes/dungeon/ObservatoryDungeon.tscn`; `Dungeon.DUNGEONS["observatory"]`; `ActOne` scene path; scenes `observatory_wake / _frank / _escaped / _rescue`. The `guild` ramp and `guild_tiles.png` were generated too, ready for 20d.
 - `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn", "Lyra"]`.
 - Verified end to end (12 checks): Lyra's class select -> wake -> Frank -> Void Sentinel with Frank's help -> Frank names the Underground Guild -> overworld at the Observatory's arch (32,13) -> Verdance arrival names the Guild; then a Ryn game at level 5 with the Monastery cleared -> Observatory rescue -> Void Archmage -> Lyra joins at level 5. (On Lyra's route the Guild isn't built yet, so its entrance still says "coming in a later update" until 20d.)
+
+### 20d — The Underground Guild (in progress)
+
+**Step d1: battle mechanics + Guild enemies (done, 2026-09-29)**
+- **Stealing** (`attack.steal`, percent): `_steal()` takes one random consumable (an `ITEM_DEFS` item the party owns) into the enemy's `stolen` list. On victory `_end_battle` puts everything back ("Recovered N stolen items."). Running away loses them.
+- **Poison + bleed:** basic attacks now also read `bleed_chance/_power/_rounds`; `_enemy_attack()` takes `extra_mods` merged over the kit's. Ability kind `dot_strike` = one hit that always poisons and bleeds.
+- **Summoning:** ability kind `summon` (list of stat dicts in `enemies`) fires only when none of its adds are alive and 3+ of its turns have passed (`last_summon_turn`). `_summon()` drops the fallen, appends the adds (`summoned`, 0 XP, max 3 enemies total), frees and rebuilds the enemy row via `_setup_enemy_ui()` and restores the boss's enraged tint. **Victory** is now `_foes_defeated()` (replacing all 24 `_enemies.filter(...).is_empty()` checks): true when no non-summoned enemy stands; leftover adds are knocked out and hidden.
+- **Kits:** Shadow Thief (steal 35%), Venomous Cutthroat (poison 30%, Twin Fangs dot_strike 35%), Hired Muscle (stats only: big HP/ATK, slow). **Corrupted Enforcer** (escape warden for a Silas start, short "Enforcer": poisoned knuckles 25%, telegraphed Gut Punch every 3rd turn / 2nd in phase 2, Dirty Trick dot_strike 30%). **Shadow Lord** (weak to holy; two hits with 30% random status; phase 2 summons two Shadow Thieves). Stand-ins: tinted Hollow Archer / Shadow Acolyte / Corrupted Farmer / Cursed Paladin. Tables `GUILD_ESCAPE_ENCOUNTERS`, `GUILD_ENCOUNTERS`; `LOCATION_BOSSES` has both.
+- Verified (12 checks) in real battles + screenshots.
 
 ## Milestone 19 — Cutscenes (done)
 

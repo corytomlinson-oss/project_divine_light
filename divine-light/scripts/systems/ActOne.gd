@@ -24,7 +24,7 @@ const DUNGEONS := {
 	},
 	"observatory": {
 		"name": "The Observatory", "captive": "Lyra", "gate": "Ryn",
-		"scene": "",
+		"scene": "res://scenes/dungeon/ObservatoryDungeon.tscn",
 		"where": "out on the eastern plain",
 		"gate_text": "A great stone slab has fallen across the entrance. It would take real strength to move it.",
 	},
@@ -45,8 +45,8 @@ const ROUTES := {
 }
 
 # What's built so far: the starting dungeons that exist (Cathedral 20a,
-# Monastery 20b; the Observatory and Guild arrive with 20c-20d).
-const PLAYABLE_STARTS: Array = ["Vael", "Ryn"]
+# Monastery 20b, Observatory 20c; the Guild arrives with 20d).
+const PLAYABLE_STARTS: Array = ["Vael", "Ryn", "Lyra"]
 
 
 static func start_dungeon(cls: String) -> String:

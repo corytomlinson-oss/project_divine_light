@@ -1,0 +1,14 @@
+# Lyra wakes up captive in the Observatory (Milestone 20c, escape start).
+# Plays once, the first time the Observatory loads on Lyra's game.
+
+wait 0.6
+emote player ...
+narrate Cold starlight through a cracked dome. The great brass lens hangs crooked, pointed at nothing.
+face player left
+wait 0.4
+face player right
+wait 0.4
+face player down
+say Lyra: The star charts... someone has scratched through every constellation. The whole sky, crossed out.
+say Lyra: They took my focus stone but left me my spells. Whoever they are, they don't understand magic very well.
+narrate From deeper in the halls comes a muffled voice, calling for help.

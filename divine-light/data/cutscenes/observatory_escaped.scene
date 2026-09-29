@@ -1,0 +1,13 @@
+# After the Void Sentinel falls (Milestone 20c, escape start). Plays when the
+# Observatory reloads after the fight; then the map fades out to the overworld.
+
+spawn frank frank at ~-1,0 facing right
+face player left
+emote frank note
+say Frank: Ha! Down it goes! Cracked like an egg. Remind me never to get on your bad side, mage.
+say Frank: Listen - I heard the guards talking. They took three others like you. Souls that still shine clean, the ones the Unraveling can't turn.
+say Frank: So Vorath's people lock them away instead. One is held in {next}, {next_where}.
+emote player !
+say Lyra: Then we free them. All three. I'd like a few answers from Vorath's people while we're at it.
+say Frank: Verdance first - the village west of here. You need rest, and I need to see what's left of my stock. Come on - fresh air!
+fade out 1

@@ -211,3 +211,11 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The Void Archmage's phase-2 immunity picks an element the party can actually use.** The design doc says it "forces Lyra to switch stances", but Lyra is never in this fight: she's the one it holds prisoner. So on entering phase 2 it becomes immune to an element the current party deals (in practice Vael's holy magic), or, if nobody deals any, to a random one of fire / ice / lightning. It's immune rather than absorbing, so a mistaken spell wastes a turn but doesn't heal it. Earth (its weakness) is never picked.
 - **The Archmage's phase 1** casts single-target aura spells (fire → ice → lightning) and a party-wide Void Storm every 3rd turn; phase 2 hits harder. 270 HP, tuned for a lone hero around level 5 like the other rescue bosses.
 - **All five new enemies use stand-in art** (tinted Fallen Priest, Shade Wisp and Hollow Warden sprites) until the Act I art pass (21).
+
+### Steps c2-c3: the Observatory dungeon, Lyra playable
+
+- **The Observatory's tiles are another recolor** of the Cathedral's, in deep navy and star-silver. I also made the Guild's (dark mossy greens) at the same time, to use in 20d.
+- **Same layout rules as the other dungeons** (5-8 rooms); the design doc gives the Observatory no special layout mechanic.
+- **All the Observatory dialogue is mine** (pronoun-free): `observatory_wake`, `observatory_frank`, `observatory_escaped`, `observatory_rescue`. Lyra comes across as sharp and curious: the scratched-out star charts, "they took my focus stone but left me my spells". Frank's hint for the Void Sentinel: blades skip off it, it's uneasy near fire, and brace when it draws the dark in.
+- **Lyra is selectable at the class select.** Only Silas is still "a later update".
+- **Known gap until 20d:** on Lyra's route the next dungeon is the Underground Guild, which isn't built yet, so after Verdance her story stops at the Guild's "coming in a later update" entrance. 20d fills it in.

@@ -193,6 +193,12 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
+## Milestone 20c — The Observatory
+
+- [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).
+- [~] **Guild tiles** — same script -> `guild_tiles.png` (dark moss/sewer greens), made ahead for 20d.
+- [~] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — stand-ins: tinted/scaled Fallen Priest, Shade Wisp and Hollow Warden sprites (`EnemyData.STAND_INS`). Milestone 21.
+
 ## Milestone 20b — The Monastery
 
 - [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).

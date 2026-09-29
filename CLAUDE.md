@@ -16,8 +16,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
   - [x] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
 - 20c The Observatory (Lyra)
   - [x] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
-  - [ ] c2 — the Observatory dungeon + scenes.
-  - [ ] c3 — Lyra playable; test; docs.
+  - [x] c2 — the Observatory dungeon + scenes.
+  - [x] c3 — Lyra playable; test; docs.
 - 20d The Underground Guild (Silas)
   - [ ] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
   - [ ] d2 — the Guild dungeon + scenes.
@@ -297,7 +297,7 @@ Built in four steps, each tested and committed on its own:
 - **Ryn playable:** `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn"]`. Verdance's arrival fires once the *starting* dungeon is cleared (was hardcoded to the Cathedral); the elder's "after" line is now route-neutral.
 - Verified end to end (12 checks): Ryn's class select -> wake -> Frank -> Sparring Master with Frank's help -> Frank names the Observatory -> overworld at the Monastery's arch -> Verdance arrival names the Observatory; then a Vael game at level 5 with the Cathedral cleared -> Monastery rescue -> Corrupted Grandmaster -> Ryn joins at level 5. Test gotcha: dialogue page text contains line breaks, so match captured text with `\n` replaced by spaces.
 
-### 20c — The Observatory (in progress)
+### 20c — The Observatory (done, 2026-09-29)
 
 **Step c1: battle mechanics + Observatory enemies (done, 2026-09-29)**
 - **Silence:** `Combatant.silence_rounds` counts the member's *own* turns (1 = their next turn). While it's up, Skill is greyed in the main menu (`_option_disabled()`) and refuses to open; a skill queued before the silence landed fizzles ("X is silenced! Y fails."). Used up at the start of the member's turn (a stunned turn uses it up too). Enemy ability kind `silence` picks someone not already silenced and is skipped when everyone is. Blue icon.
@@ -306,6 +306,11 @@ Built in four steps, each tested and committed on its own:
 - **Random status** (`attack.random_status`, percent): poison / silence / DEF down (2x weight each) or stun (1x).
 - **Kits:** Void Mage (aura fire→ice→lightning, weak to what beats it), Astral Familiar (very fast, random status 40%), Corrupted Scholar (Hush 45%). **Void Sentinel** (escape warden for a Lyra start: DEF 16 / RES 0, weak to fire, Void Nova charge every 3rd turn / 2nd in phase 2, Void Bolt). **Void Archmage** (short "Archmage"; aura spells, Void Storm every 3rd turn, immune to one party element from phase 2, weak to earth). Stand-ins: tinted Fallen Priest / Shade Wisp / Hollow Warden. Tables `OBSERVATORY_ESCAPE_ENCOUNTERS` (lone L1 Lyra) and `OBSERVATORY_ENCOUNTERS` (lone hero ~5); `LOCATION_BOSSES` has both.
 - Verified (17 checks) by driving the mechanics in real battles + screenshots.
+
+**Steps c2-c3: the Observatory dungeon, Lyra playable (done, 2026-09-29)**
+- Same pattern as the Monastery: `observatory` ramp (deep navy -> star-silver) in `build_dungeon_recolors.py` -> `observatory_tiles.png`; `scenes/dungeon/ObservatoryDungeon.tscn`; `Dungeon.DUNGEONS["observatory"]`; `ActOne` scene path; scenes `observatory_wake / _frank / _escaped / _rescue`. The `guild` ramp and `guild_tiles.png` were generated too, ready for 20d.
+- `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn", "Lyra"]`.
+- Verified end to end (12 checks): Lyra's class select -> wake -> Frank -> Void Sentinel with Frank's help -> Frank names the Underground Guild -> overworld at the Observatory's arch (32,13) -> Verdance arrival names the Guild; then a Ryn game at level 5 with the Monastery cleared -> Observatory rescue -> Void Archmage -> Lyra joins at level 5. (On Lyra's route the Guild isn't built yet, so its entrance still says "coming in a later update" until 20d.)
 
 ## Milestone 19 — Cutscenes (done)
 

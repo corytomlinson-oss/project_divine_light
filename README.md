@@ -81,6 +81,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 20b — The Monastery. Ryn is now playable: wake in the corrupted Monastery, free Frank, and get past the Sparring Master, who settles into a counter stance (strike into it and get hit back). On other routes the Monastery holds Ryn captive behind the Corrupted Grandmaster, who acts twice a round and later counters every physical blow. New enemy behaviors: counter stances, berserk warriors who hit their own allies, and multi-hit monks. Frank's lines now name whichever dungeon comes next on your route. Next: 20c, The Observatory.
 
+**Completed:** Milestone 20c — The Observatory. Lyra is now playable: wake beneath a cracked star-dome, free Frank, and burn through the Void Sentinel, a construct that shrugs off blows but can't stand fire. On other routes the Observatory holds Lyra captive behind the Void Archmage, whose spells cycle through fire, ice and lightning and who becomes immune to your strongest element halfway through. New enemy behaviors: Silence (no skills for a turn), Void Mages whose shifting aura changes their weakness, and fast familiars that inflict random ailments. Next: 20d, The Underground Guild.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

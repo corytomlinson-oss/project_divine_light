@@ -1,10 +1,8 @@
 extends Node2D
 
-# Milestone 15's equip screen. First overworld-accessible UI (opened via a
-# dedicated key from Player.gd, works from both Overworld and dungeons since
-# Player.gd is shared) - deliberately NOT the full "B = main menu" shell the
-# design doc's controller mapping describes, since Formation/Inventory/Party
-# status screens don't exist yet either. Just this one screen for now.
+# Milestone 15's equip screen, opened from the pause menu (Milestone 17c; B or
+# Start on the map). Closing it returns to the map with the pause menu open
+# again, via GameManager.reopen_pause_menu.
 
 enum MenuState { CHARACTER_SELECT, SLOT_SELECT, ITEM_SELECT }
 
@@ -20,12 +18,13 @@ var _item_options: Array = []  # item names; "" means "Unequip"
 @onready var option_list: VBoxContainer = $OptionList
 
 var _option_labels: Array = []
+var _menu_cursor := MenuCursor.new()
 
 
 func _ready() -> void:
+	add_child(_menu_cursor)
 	for i in 5:
 		var label := Label.new()
-		label.add_theme_font_size_override("font_size", 8)
 		option_list.add_child(label)
 		_option_labels.append(label)
 	_update_ui()
@@ -42,21 +41,21 @@ func _process(_delta: float) -> void:
 
 
 func _handle_list_input(count: int, on_confirm: Callable, on_cancel: Callable) -> void:
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("cancel"):
 		Sfx.play("menu_cancel")
 		on_cancel.call()
 		return
 	if count == 0:
 		return
-	if Input.is_action_just_pressed("ui_down"):
+	if UiInput.nav(&"down"):
 		Sfx.play("menu_move")
 		_cursor = (_cursor + 1) % count
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_up"):
+	elif UiInput.nav(&"up"):
 		Sfx.play("menu_move")
 		_cursor = (_cursor - 1 + count) % count
 		_update_ui()
-	elif Input.is_action_just_pressed("ui_accept"):
+	elif Input.is_action_just_pressed("confirm"):
 		# Picking the item itself gets the equip clink instead (_confirm_item).
 		if _state != MenuState.ITEM_SELECT:
 			Sfx.play("menu_confirm")
@@ -105,7 +104,7 @@ func _confirm_item() -> void:
 
 
 func _exit_to_map() -> void:
-	get_tree().change_scene_to_file(GameManager.current_scene_path)
+	Transition.change_scene(GameManager.current_scene_path)
 
 
 ## Shows partial progress ("2/4 equipped"), not just the fully-active state -
@@ -129,6 +128,7 @@ func _set_progress_text(member: Combatant, set_id: String, set_name: String) -> 
 func _update_ui() -> void:
 	for label in _option_labels:
 		label.visible = false
+	_menu_cursor.target = _option_labels[_cursor]
 
 	match _state:
 		MenuState.CHARACTER_SELECT:
@@ -138,7 +138,7 @@ func _update_ui() -> void:
 			var party: Array = GameManager.party
 			for i in party.size():
 				var member: Combatant = party[i]
-				_option_labels[i].text = ("> " if i == _cursor else "  ") + "%s  Lv%d %s" % [member.display_name, member.level, member.char_class]
+				_option_labels[i].text = "  " + "%s  Lv%d %s" % [member.display_name, member.level, member.char_class]
 				_option_labels[i].visible = true
 
 		MenuState.SLOT_SELECT:
@@ -152,7 +152,7 @@ func _update_ui() -> void:
 				var slot: String = Equipment.SLOTS[i]
 				var equipped: String = member.equipment.get(slot, "")
 				var shown: String = equipped if equipped != "" else "-- empty --"
-				_option_labels[i].text = ("> " if i == _cursor else "  ") + "%s: %s" % [slot.capitalize(), shown]
+				_option_labels[i].text = "  " + "%s: %s" % [slot.capitalize(), shown]
 				_option_labels[i].visible = true
 
 		MenuState.ITEM_SELECT:
@@ -162,6 +162,7 @@ func _update_ui() -> void:
 			help_label.text = "Up/Down: Select   A: Equip   B: Back"
 			if _item_options.is_empty():
 				_option_labels[0].text = "No equippable items."
+				_menu_cursor.target = null
 				_option_labels[0].visible = true
 			else:
 				for i in _item_options.size():
@@ -174,5 +175,5 @@ func _update_ui() -> void:
 						var set_id: String = Equipment.DEFS.get(item_name, {}).get("set_id", "")
 						if set_id != "":
 							shown += " [%s]" % Equipment.SET_BONUSES.get(set_id, {}).get("name", set_id)
-					_option_labels[i].text = ("> " if i == _cursor else "  ") + shown
+					_option_labels[i].text = "  " + shown
 					_option_labels[i].visible = true

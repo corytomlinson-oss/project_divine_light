@@ -19,19 +19,9 @@ var _facing: String = "down"
 func _ready() -> void:
 	_target = position
 	_reset_encounter_counter()
-
-
-## Milestone 15's equip screen entry point. Lives here (not Overworld.gd or
-## Dungeon.gd) since Player.gd is already shared between every map scene, so
-## this works from both Overworld and dungeons for free. Not the full "B =
-## main menu" shell the design doc's controller mapping describes - there's
-## no Formation/Inventory/Party status screen to put alongside it yet, so
-## this is a single-purpose key straight to the one screen that exists.
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
-		GameManager.pending_spawn_position = position
-		GameManager.has_pending_spawn = true
-		get_tree().change_scene_to_file("res://scenes/equip/Equip.tscn")
+	if GameManager.reopen_pause_menu:
+		GameManager.reopen_pause_menu = false
+		_reopen_pause_menu()
 
 
 func _process(delta: float) -> void:
@@ -41,20 +31,41 @@ func _process(delta: float) -> void:
 			position = _target
 			_moving = false
 			_on_tile_entered()
+	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
+		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
+		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
+		_open_pause_menu()
 	else:
 		_handle_input()
+
+
+## Back from a screen the pause menu opened (Equip): show the menu again once
+## the fade-in is done - the transition unpauses the tree when it finishes,
+## which would otherwise leave the menu open over a running map.
+func _reopen_pause_menu() -> void:
+	if Transition.is_busy():
+		await Transition.finished
+	else:
+		await get_tree().process_frame  # let the map controller place the player
+	PauseMenu.open(self)
+
+
+func _open_pause_menu() -> void:
+	_play_anim("idle")
+	Sfx.play("menu_confirm")
+	PauseMenu.open(self)
 
 
 func _handle_input() -> void:
 	var dir := Vector2.ZERO
 
-	if Input.is_action_pressed("ui_right"):
+	if Input.is_action_pressed("right"):
 		dir = Vector2.RIGHT
-	elif Input.is_action_pressed("ui_left"):
+	elif Input.is_action_pressed("left"):
 		dir = Vector2.LEFT
-	elif Input.is_action_pressed("ui_down"):
+	elif Input.is_action_pressed("down"):
 		dir = Vector2.DOWN
-	elif Input.is_action_pressed("ui_up"):
+	elif Input.is_action_pressed("up"):
 		dir = Vector2.UP
 
 	if dir == Vector2.ZERO:
@@ -118,7 +129,7 @@ func _use_door(cell: Vector2i) -> void:
 		return
 	var dest: Dictionary = map_root.get_door_destination(cell)
 	if not dest.is_empty():
-		get_tree().change_scene_to_file(dest["scene"])
+		Transition.change_scene(dest["scene"])
 
 
 func _check_encounter() -> void:
@@ -127,7 +138,7 @@ func _check_encounter() -> void:
 		_reset_encounter_counter()
 		GameManager.pending_spawn_position = position
 		GameManager.has_pending_spawn = true
-		get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
+		Transition.to_battle()
 
 
 ## Fixed, visible encounter (Milestone 14) - unlike _check_encounter()'s random
@@ -136,7 +147,7 @@ func _trigger_boss_battle() -> void:
 	GameManager.pending_spawn_position = position
 	GameManager.has_pending_spawn = true
 	GameManager.pending_boss_battle = true
-	get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
+	Transition.to_battle()
 
 
 func _reset_encounter_counter() -> void:

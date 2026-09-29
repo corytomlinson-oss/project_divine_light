@@ -1,6 +1,6 @@
 # Divine Light — Asset Checklist
 
-Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 19, Act II in 23, Act III in 25). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
+Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 20, Act II in 24, Act III in 26). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
 
 Each entry's prompt is self-contained and ready to paste into an AI image/music tool as-is — no need to remember to append the style guide separately.
 
@@ -82,7 +82,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ### Characters
 
-*Scope call (2026-09-27): generating all 4 class-specific overworld sprites now instead of one generic placeholder, since each class's look is already fixed by the design doc. **Full class-selection isn't built** — no starting-class-selection feature exists in code (`GameManager.gd` always creates all 4 party members from the start; nothing marks any one of them as "the player"). Rather than sit unused, Vael's sprite was wired in directly as `Player.tscn`'s current default appearance — a pragmatic single-sprite stand-in, not a real per-class swap system. When the class-selection feature (Act I content work, Milestone 18a+) actually lands, that's the point to make `Player.tscn`'s texture swappable and wire in the other 3.*
+*Scope call (2026-09-27): generating all 4 class-specific overworld sprites now instead of one generic placeholder, since each class's look is already fixed by the design doc. **Full class-selection isn't built** — no starting-class-selection feature exists in code (`GameManager.gd` always creates all 4 party members from the start; nothing marks any one of them as "the player"). Rather than sit unused, Vael's sprite was wired in directly as `Player.tscn`'s current default appearance — a pragmatic single-sprite stand-in, not a real per-class swap system. When the class-selection feature (Act I content work, Milestone 19a+) actually lands, that's the point to make `Player.tscn`'s texture swappable and wire in the other 3.*
 
 - [x] **Vael overworld sprite** *(Templar — tank/buffer/minor healer)*
   Prompt used: *"A holy knight templar, front-facing, simple walk-ready pose, top-down RPG proportions like a classic Final Fantasy overworld sprite, wearing plate armor with a shield, warm gold/white holy color accents"*
@@ -141,12 +141,13 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
   Prompt: *"16-bit SNES-era JRPG UI dialogue box frame, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, ready to tile/stretch, muted high-fantasy palette, transparent center"*
   **Made differently than the rest of this list:** hand-coded pixel art (Python + PIL), not AI-generated — see the "Code-based pixel art" note in CLAUDE.md's Milestone 16 section. `assets/ui/panel_frame.png` (32×32, 11px solid border, 10px transparent stretchable center), generator script kept at `assets/ui/source/build_panel.py`. Wired into `Battle.tscn`'s `MessageBox` panel as a `StyleBoxTexture` (`texture_margin_*` = 11), verified headlessly.
 
-- [~] **Action menu panel** *(144×56px area — provide as a 9-slice border texture, can reuse the message box style)*
+- [x] **Action menu panel** *(144×56px area — provide as a 9-slice border texture, can reuse the message box style)*
   Prompt: *"16-bit SNES-era JRPG UI menu panel frame, matching the game's dialogue box style, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
   **Tried, then reverted — genuinely doesn't fit.** Framed with the shared panel texture the same way as the message box, but this panel's actual content (5 menu options) needs a minimum 55-59px of vertical room, and the 144×56 footprint only has 56px total — an 11px top+bottom border leaves no room at all. Confirmed via Cory's playtest (the 5th option, "Run," was pushed off the bottom of the screen entirely) and via headless measurement of the real rendered minimum size. Reverted to a plain unframed `VBoxContainer`, same as before this pass. See CLAUDE.md's Milestone 16 section for the full story — this isn't a fit for the current battle screen's vertical budget without either shrinking content further or reworking the layout, so it stays unchecked.
   **Deferred:** the bottom of the 180px battle screen has no room for an 11px border without reworking the whole layout (see the 2026-09-27 VBoxContainer overflow note in CLAUDE.md). Not blocking Milestone 16.
+  **Revisit in 17b:** with the m5x7 font (17a) the 5 options need 50px, not 55-59px.
 
-- [~] **Party panel frame** *(157×64px area — can reuse the action menu style)*
+- [x] **Party panel frame** *(157×64px area — can reuse the action menu style)*
   Prompt: *"16-bit SNES-era JRPG UI status panel frame, matching the game's menu panel style, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
   **Same problem as the action menu, worse.** 4 party members (label + HP bar each) need a minimum 64-71px, and the 157×64 footprint only has 64px total with zero border overhead available. Silas's HP bar was pushed off-screen in Cory's playtest. Reverted to unframed. Also surfaced a real pre-existing bug independent of this pass: even without any border, this panel's content was already ~5px taller than its allotted space (nobody had noticed since nothing revealed the exact cutoff) — fixed by removing the 1px inter-item separation, which was enough to bring it back within the screen either way.
   **Deferred:** the bottom of the 180px battle screen has no room for an 11px border without reworking the whole layout (see the 2026-09-27 VBoxContainer overflow note in CLAUDE.md). Not blocking Milestone 16.
@@ -191,6 +192,17 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [x] **Equip/unequip** — "16-bit JRPG equipment change sound, metallic clink"
 
 ---
+
+## Milestone 17 — UI/UX polish
+
+- [x] **UI font** — m5x7 by Daniel Linssen (CC0), `assets/fonts/m5x7.ttf`. Not generated; picked from free pixel fonts after a side-by-side on the battle screen. See CLAUDE.md's 17a section for import settings and the 10px line setup.
+- [x] **Menu cursor** — 8×7 pointing glove, hand-placed: `assets/ui/source/build_cursor.py` -> `assets/ui/cursor.png`.
+- [x] **Qi pips** — drawn in code at runtime (`scripts/ui/QiPips.gd`), no texture.
+- [x] **Thin window frame** (17b) — 16×16 9-slice, 4px border: `assets/ui/source/build_panel_thin.py` -> `assets/ui/panel_thin.png`. The theme's default Panel style; it finally frames the action menu and party panel (the `[x]` items above) in the new SNES battle layout.
+- [x] **Battle background, taller** (17b) — same generator, ground extended to y=112 and trees moved off the fighters.
+- [x] **Scroll arrows** — drawn in code (`scripts/ui/ScrollHint.gd`).
+- [x] **Encounter SFX** (17d) — `encounter` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/encounter.wav`: a rising pitch sweep and whoosh that break into a crash, timed to the battle-start mosaic. Approved by Cory (2026-09-29).
+- [x] **Mosaic shader** (17d) — `assets/shaders/mosaic.gdshader`, the battle-start screen breakup.
 
 ## Deferred to later passes
 

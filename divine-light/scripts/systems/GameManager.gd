@@ -14,6 +14,9 @@ var has_pending_spawn: bool = false
 var dungeon_seeds: Dictionary = {}
 var pending_boss_battle: bool = false
 var defeated_bosses: Dictionary = {}
+# Set by the pause menu before it opens another screen (Equip), so the map
+# reopens the menu when that screen returns to it.
+var reopen_pause_menu: bool = false
 
 
 func _ready() -> void:

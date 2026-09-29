@@ -61,6 +61,23 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The map sprite is whoever you started as**, i.e. the party's first member, FF-style.
 - **Characters lower on the screen draw in front** (y-sorting on the maps).
 
+### Step 4: Verdance and the Forest Heartlands
+
+- **The overworld layout is mine.** Verdance is in the west, with the Cathedral north of it, the Monastery north-east, the Observatory east, the Underground Guild south and Edenmere south-east, all joined by roads, plus a lake. It's a text map at the top of `Overworld.gd`, easy to redraw.
+- **Entrances that aren't built yet say so plainly** ("…the way isn't open yet. (Coming in a later update.)") instead of pretending in-world. That's easy to change once the dungeons exist.
+- **Verdance's layout and people are mine:** an elder, a farmer, a child, a gate guard and an innkeeper. Their lines follow the design doc's "small, quiet, fearful" first state, and a couple change once the Cathedral is cleared. All of it lives in `Verdance.gd`.
+- **Villagers borrow Ryn's and Lyra's sprites, tinted**, until real NPC art (Milestone 21). Vael's sprite isn't used, since you're playing Vael.
+- **The inn costs 10 gold and restores HP/MP, but doesn't revive fallen allies.** The design doc says revival comes only from Frank and items.
+- **Frank's stall:** Buy, or Revive at 50 gold per ally, who come back at half HP.
+  - **His Act I stock:** Potion 20, Antidote 15, Ether 60, Elixir 150, one weapon per class at 120, Leather Hood 80, Traveler's Ring 150.
+  - Prices are mine. *Change:* `FRANK_STOCK` / `REVIVE_PRICE` in `Verdance.gd`.
+- **Gold = half of each enemy's XP.** The Hollow Warden pays 75, a wolf 11. *Change:* the `/ 2` in `_end_battle()`.
+- **The Forest's enemies were rebalanced for a lone hero around level 3**, the state you're in when you leave the Cathedral. The old numbers were for a four-person party and did 1 damage.
+- **Verdance uses the overworld music**, since there's no town theme until the Act I art & music pass (Milestone 21).
+- **The tiles are code-drawn placeholders** (road, stone arch, water, flowers, and the village set), to be replaced in Milestone 21.
+- **After escaping, you come out on the overworld next to the Cathedral**, not straight into Verdance. Frank's line points you to the village, and his arrival scene plays the first time you walk in.
+- **Talking uses A while facing someone**, and people turn to face you. **Buildings aren't enterable.** House doors are barred ("Nobody answers"), and the inn works from its front door.
+
 ## Milestone 19b — Intro movie & title screen (2026-09-29)
 
 - **I added a title screen**, which wasn't in the plan. The intro needed a place to start from, and "New Game plays the intro" is the classic flow. It has New Game and Continue; Continue loads the F5 debug save and is greyed out when there isn't one. **It's now the game's main scene**, so running the project shows it first. To test a map directly, run that scene on its own (F6 in the editor). *Change:* `run/main_scene` in `project.godot`.

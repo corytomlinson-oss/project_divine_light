@@ -1,0 +1,11 @@
+# Arriving in Verdance after the Cathedral escape (Milestone 20a). Frank walks
+# the player in, then heads off to set up his stall by the pond. Plays once.
+
+spawn guide frank at ~1,0 facing left
+face player right
+say Frank: Verdance. Quiet as a held breath - but the roofs are still standing, and that's something.
+say Frank: I'll set up my stall down by the pond. Come see me for supplies. And if anyone falls, bring them to me - I know a trick or two.
+say Frank: The inn will put you up for the night. After that, the Monastery, north-east. A holy seal on its doors, they say. You're the one who can break it.
+move guide to 15,13
+despawn guide
+set verdance_frank

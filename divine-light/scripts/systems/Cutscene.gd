@@ -39,6 +39,11 @@ var _text_label := Label.new()
 var _arrow := ScrollHint.new()
 var _blink := 0.0
 
+# choices (ask())
+var _choice_panel := Panel.new()
+var _choice_labels: Array = []
+var _choice_cursor := MenuCursor.new()
+
 # movie mode
 var _movie := CanvasLayer.new()
 var _movie_bg := ColorRect.new()
@@ -268,11 +273,72 @@ func _build_dialogue_box() -> void:
 	_box.add_child(_name_label)
 	_text_label.position = Vector2(8, 14)
 	_text_label.size = Vector2(TEXT_WIDTH, 30)
+	# Scene lines are split into pages up front; this only matters for ask().
+	_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_box.add_child(_text_label)
 	_arrow.more_below = false
 	_arrow.height = 0.0
 	_arrow.position = Vector2(299, 45)
 	_box.add_child(_arrow)
+	_choice_panel.visible = false
+	add_child(_choice_panel)
+	add_child(_choice_cursor)
+
+
+## Asks a question in the dialogue box with a small list of answers above it
+## (Milestone 20a: the inn, Frank's stall). Returns the chosen index; B picks
+## the last option (make that the "no" / "leave" one). Blocks player input
+## while open, like a scene.
+func ask(question: String, options: Array, speaker := "") -> int:
+	var was_playing := _playing
+	_playing = true
+	_box.visible = true
+	_name_label.text = speaker
+	_text_label.position.y = 14.0 if speaker != "" else 9.0
+	_text_label.text = question
+	_text_label.visible_characters = -1
+	_arrow.more_below = false
+	for label: Node in _choice_labels:
+		label.queue_free()
+	_choice_labels = []
+	var width := 0.0
+	var font: Font = _text_label.get_theme_font("font")
+	var size: int = _text_label.get_theme_font_size("font_size")
+	for option: String in options:
+		width = maxf(width, font.get_string_size("  " + option, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x)
+	var h := 8.0 + 10.0 * options.size()
+	_choice_panel.size = Vector2(ceilf(width) + 16.0, h)
+	_choice_panel.position = Vector2(316.0 - _choice_panel.size.x, 122.0 - h)
+	for i in options.size():
+		var label := Label.new()
+		label.text = "  " + String(options[i])
+		label.position = Vector2(8, 4 + i * 10)
+		label.size = Vector2(width, 10)
+		_choice_panel.add_child(label)
+		_choice_labels.append(label)
+	_choice_panel.visible = true
+	var index := 0
+	_choice_cursor.target = _choice_labels[0]
+	await get_tree().process_frame  # the press that opened this isn't an answer
+	while true:
+		await get_tree().process_frame
+		if UiInput.nav(&"down") or UiInput.nav(&"up"):
+			Sfx.play("menu_move")
+			index = posmod(index + (1 if UiInput.nav(&"down") else -1), options.size())
+			_choice_cursor.target = _choice_labels[index]
+		elif Input.is_action_just_pressed("confirm"):
+			Sfx.play("menu_confirm")
+			break
+		elif Input.is_action_just_pressed("cancel"):
+			Sfx.play("menu_cancel")
+			index = options.size() - 1
+			break
+	_choice_panel.visible = false
+	_choice_cursor.target = null
+	_box.visible = false
+	await get_tree().process_frame
+	_playing = was_playing
+	return index
 
 
 ## Types a line into the box, page by page (3 lines each); A finishes the page

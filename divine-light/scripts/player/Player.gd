@@ -45,8 +45,20 @@ func _process(delta: float) -> void:
 		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
 		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
 		_open_pause_menu()
+	elif Input.is_action_just_pressed("confirm"):
+		_interact()
 	else:
 		_handle_input()
+
+
+## A talks to whatever is on the tile you're facing (Milestone 20a): the map
+## decides what that means (a villager, the innkeeper, Frank's stall).
+func _interact() -> void:
+	var dirs := {"up": Vector2i.UP, "down": Vector2i.DOWN, "left": Vector2i.LEFT, "right": Vector2i.RIGHT}
+	var front: Vector2i = _tile_map.local_to_map(position) + dirs[_facing]
+	var map_root: Node = _tile_map.get_parent()
+	if map_root.has_method("interact"):
+		map_root.interact(front, _facing)
 
 
 ## Back from a screen the pause menu opened (Equip): show the menu again once
@@ -118,23 +130,28 @@ func _play_anim(kind: String) -> void:
 
 func _is_walkable(world_pos: Vector2) -> bool:
 	var cell: Vector2i = _tile_map.local_to_map(world_pos)
-	return _tile_map.get_cell_atlas_coords(cell) != WALL_ATLAS_COORDS
+	if _tile_map.get_cell_atlas_coords(cell) == WALL_ATLAS_COORDS:
+		return false
+	# Maps can block more: water, buildings, people standing there (20a).
+	var map_root: Node = _tile_map.get_parent()
+	return not (map_root.has_method("is_blocked") and map_root.is_blocked(cell))
 
 
 func _on_tile_entered() -> void:
 	var cell: Vector2i = _tile_map.local_to_map(position)
 	var coords: Vector2i = _tile_map.get_cell_atlas_coords(cell)
-	if coords == DOOR_ATLAS_COORDS:
+	var map_root: Node = _tile_map.get_parent()
+	# The gate tile is always a door; maps can declare others (the overworld's
+	# stone arches into dungeons).
+	if coords == DOOR_ATLAS_COORDS or (map_root.has_method("is_door") and map_root.is_door(cell)):
 		_use_door(cell)
 		return
 	if coords == BOSS_ATLAS_COORDS:
 		_trigger_boss_battle()
 		return
-	if coords == CAPTIVE_ATLAS_COORDS:
+	if coords == CAPTIVE_ATLAS_COORDS and map_root.has_method("on_captive_tile"):
 		# A captive's rune (Milestone 20a): the dungeon decides what happens.
-		var map_root: Node = _tile_map.get_parent()
-		if map_root.has_method("on_captive_tile"):
-			map_root.on_captive_tile(cell)
+		map_root.on_captive_tile(cell)
 		return
 	_check_encounter()
 

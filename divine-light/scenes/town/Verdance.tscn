@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=4]
+
+[ext_resource type="Script" path="res://scripts/town/Verdance.gd" id="1_town"]
+[ext_resource type="Texture2D" path="res://assets/tilesets/town_tiles.png" id="2_tiles"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_town"]
+texture = ExtResource("2_tiles")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
+11:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_town"]
+sources/0 = SubResource("TileSetAtlasSource_town")
+
+[node name="Verdance" type="Node2D"]
+script = ExtResource("1_town")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_set = SubResource("TileSet_town")
+
+[node name="Player" parent="TileMapLayer" instance=ExtResource("3_player")]

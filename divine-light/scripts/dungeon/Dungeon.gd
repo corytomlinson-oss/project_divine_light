@@ -159,6 +159,7 @@ func _play_arrival_story() -> void:
 		await _after_transition()
 		await Cutscene.play(_data["escaped_scene"])
 		GameManager.story_flags["cleared_" + dungeon_id] = true
+		GameManager.arrival = dungeon_id
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 
@@ -173,4 +174,5 @@ func get_door_destination(cell: Vector2i) -> Dictionary:
 	if _escape and not _boss_defeated():
 		# The warden bars the only way out: walking up to the door starts it.
 		return {"boss": true}
+	GameManager.arrival = dungeon_id
 	return {"scene": OVERWORLD_SCENE_PATH}

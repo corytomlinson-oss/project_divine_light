@@ -2319,8 +2319,10 @@ func _end_battle(victory: bool) -> void:
 	if victory:
 		_level_up_queue = []
 		var total_xp: int = 0
+		var total_gold: int = 0
 		for e in _enemies:
 			total_xp += e.xp_reward
+			total_gold += e.xp_reward / 2  # gold: half an enemy's XP (20a)
 			if e.is_boss:
 				GameManager.defeated_bosses[GameManager.current_location] = true
 		for member in _party:
@@ -2329,7 +2331,8 @@ func _end_battle(victory: bool) -> void:
 		_update_ui()
 		Music.stop(0.3)
 		Sfx.play("victory")
-		message_label.text = "Victory! Gained %d XP." % total_xp
+		GameManager.gold += total_gold
+		message_label.text = "Victory! Gained %d XP and %d gold." % [total_xp, total_gold]
 	else:
 		Music.stop(1.0)
 		message_label.text = "The party has fallen..."

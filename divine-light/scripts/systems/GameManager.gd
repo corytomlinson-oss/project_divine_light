@@ -12,6 +12,10 @@ const CLASSES: Array = ["Vael", "Ryn", "Lyra", "Silas"]
 var roster: Dictionary = {}
 var party: Array = []
 var starting_class: String = ""
+var gold: int = 0
+# Which overworld entrance to appear at next (Milestone 20a): set when leaving
+# a town or dungeon, e.g. "cathedral", "verdance".
+var arrival: String = ""
 var inventory: Dictionary = {}
 var current_location: String = "overworld"
 var current_scene_path: String = "res://scenes/overworld/Overworld.tscn"
@@ -87,6 +91,8 @@ func start_new_game(cls: String) -> void:
 	story_flags = {}
 	dungeon_seeds = {}
 	defeated_bosses = {}
+	gold = 0
+	arrival = ""
 	has_pending_spawn = false
 	pending_boss_battle = false
 
@@ -140,6 +146,7 @@ func save_game(slot: int) -> bool:
 		"roster": _roster_save(),
 		"party_order": party.map(func(c: Combatant) -> String: return c.char_class),
 		"starting_class": starting_class,
+		"gold": gold,
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
@@ -174,6 +181,7 @@ func load_game(slot: int) -> bool:
 		if roster.has(cls):
 			party.append(roster[cls])
 	starting_class = String(parsed.get("starting_class", ""))
+	gold = int(parsed.get("gold", 0))
 	var save_inventory: Dictionary = parsed.get("inventory", {})
 	inventory.clear()
 	for item_name in save_inventory:

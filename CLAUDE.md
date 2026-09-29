@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Act I (Milestone 20a, The Cathedral) is in progress**, built on my recommendations while Cory is away (he said to log every call in `DECISIONS.md`). 20a is being done in four steps, each committed locally (not pushed): **step 1 foundations (done)**, **step 2 enemy abilities (done)**, **step 3 the Cathedral's two variants (done)**, step 4 Verdance + overworld. See the Milestone 20 section.
+**Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps committed locally (not pushed; needs Cory's playtest): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
 
 
 **Milestone 19 (Cutscenes) is complete** (2026-09-29): 19a cutscene system + movie mode, 19b intro movie + title screen. Cory playtested and approved both (intro theme included); pushed to `cjt`. The game starts on the title screen (New Game plays the intro); F7/F8 play the demo scene/movie on a map. Built on my recommendations while he was away; every call is logged in `DECISIONS.md`. **Next up: Act I content, starting with 20a (The Cathedral)**. It's design-heavy (enemy abilities, real bosses, enemy level scaling, the Act I opening scenes), so talk it through with Cory before building.
@@ -223,9 +223,9 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 20 — Act I content (in progress)
+## Milestone 20 — Act I content (in progress: 20a done)
 
-### 20a — The Cathedral (in progress)
+### 20a — The Cathedral (done, 2026-09-29)
 
 Built in four steps, each tested and committed on its own:
 
@@ -253,6 +253,16 @@ Built in four steps, each tested and committed on its own:
 - **Game Over:** losing a battle now returns to the title screen (it used to drop a fully KO'd party back on the map). Continue loads the last save.
 - **The map sprite is the party leader** (`Player._ready()` loads `party[0]`'s walk sheet), and map layers are **y-sorted** so characters lower on screen draw in front.
 - Verified by a driver playing both variants end to end (12 checks: wake, Frank, warden + both Frank moves, escape → overworld, rescue → Vael joins at the party's level, Game Over) plus screenshots.
+
+**Step 4: Verdance + the Forest Heartlands (done, 2026-09-29)**
+- **The overworld is painted from a text map** (`Overworld.gd` `MAP`, 36×24; the scene's old tile data is cleared at load): clearings and roads connecting Verdance (V), the Cathedral (C), the Monastery (M), the Observatory (O), the Underground Guild (G) and Edenmere (E), plus a lake. Towns use the gate tile, dungeons a stone arch. `is_door()` lets Player.gd treat arches as doors; `is_blocked()` blocks water. An entrance gives its gate text when the gate isn't met, a "coming in a later update" line when its scene doesn't exist yet, otherwise the scene. **`GameManager.arrival`** (set when leaving a town/dungeon) puts the player on the walkable tile just outside that entrance; a battle return uses the saved spot as before.
+- **Tiles:** `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png` (the original grass/trees/gate copied in unchanged + road, stone arch, water, flowers; registered as atlas tiles 3-6 in `Overworld.tscn`) and a new `town_tiles.png` (grass, trees, gate, road, timber wall, roof, door, water, fence, flowers, Frank's awning, the inn sign). Code-drawn placeholders for the Act I art pass (21).
+- **Verdance** (`scenes/town/Verdance.tscn` + `scripts/town/Verdance.gd`, also a text map): villagers placed as `npc` actors (Ryn's/Lyra's sheets tinted, until real NPC art) with Act I "fearful" lines in `TALK` (a `<id>_after` variant once the Cathedral is cleared); the inn (face its door, 10 gold, restores HP/MP of those still standing; revival stays Frank's); Frank's stall once he's arrived (`verdance_arrival.scene` the first visit after the escape, flag `verdance_frank`): Buy (`ShopMenu`) or Revive (50 gold each, back at half HP); barred house doors; the gate out.
+- **Talking:** A on a map calls `map.interact(front_cell, facing)` (Player.gd `_interact()`); NPCs turn to face you. Maps can also block tiles (`is_blocked`) for buildings, water and people.
+- **`Cutscene.ask(question, options, speaker)`** → chosen index: the question in the dialogue box, a small choice window above it; B picks the last option. It ignores the frame it opens on (the press that opened it).
+- **`ShopMenu`** (`scripts/menu/ShopMenu.gd`, `await ShopMenu.open(self, stock)`): item list with prices (unaffordable ones greyed), your gold and how many you own, a one-line description (consumable text or the gear's stats and who can use it); A buys one, B leaves. Pauses the map underneath.
+- **Gold:** each enemy gives half its XP in gold ("Victory! Gained 22 XP and 11 gold."); `GameManager.gold` is saved; the pause menu shows it. **The Forest's enemies were retuned** for a lone hero around level 3 (they were built for the old four-person party).
+- Verified by a driver (11 checks): leaving the Cathedral lands outside its arch; gated / unbuilt entrances explain themselves; Verdance arrival + Frank's stall; the elder's post-Cathedral line; a night at the inn; buying a Potion; reviving Ryn; leaving Verdance; gold from a battle; plus screenshots.
 
 ## Milestone 19 — Cutscenes (done)
 
@@ -297,6 +307,7 @@ Built in four steps, each tested and committed on its own:
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
 - Enemy stats, behavior kits, encounter tables, bosses: `divine-light/scripts/battle/EnemyData.gd`
 - Act I data (dungeons, captives, gates, routes): `divine-light/scripts/systems/ActOne.gd`; class select: `divine-light/scenes/title/ClassSelect.tscn` + `divine-light/scripts/title/ClassSelect.gd`
+- Verdance: `divine-light/scenes/town/Verdance.tscn` + `divine-light/scripts/town/Verdance.gd`; shop screen: `divine-light/scripts/menu/ShopMenu.gd`; Act I map tiles: `divine-light/assets/tilesets/source/build_act1_tiles.py`
 - Title screen: `divine-light/scenes/title/Title.tscn` + `divine-light/scripts/title/Title.gd` (the main scene); intro movie art: `divine-light/assets/movie/` (generator in `source/`)
 - Cutscenes: `divine-light/scripts/systems/Cutscene.gd` (autoload player) + `divine-light/scripts/cutscene/SceneScript.gd` (parser, command reference) + scene files in `divine-light/data/cutscenes/`
 - Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)
@@ -336,7 +347,7 @@ Built in four steps, each tested and committed on its own:
 | 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | ✅ (2026-09-29) |
 | 19a | Cutscenes — system + movie mode (in-game scripted scenes with a name-tag dialogue box; full-screen pixel "movie" scenes) | ✅ (2026-09-29) |
 | 19b | Cutscenes — intro movie (pixel-art opening before the player wakes up captive) | ✅ (2026-09-29) |
-| 20a | Act I — The Cathedral (Vael) | Not started |
+| 20a | Act I — The Cathedral (Vael) | ✅ (2026-09-29) — class select, start-alone party, gates/routes, enemy abilities, both Cathedral variants, Verdance, the Forest Heartlands overworld, gold/inn/shop |
 | 20b | Act I — The Monastery (Ryn) | Not started |
 | 20c | Act I — The Observatory (Lyra) | Not started |
 | 20d | Act I — The Underground Guild (Silas) | Not started |

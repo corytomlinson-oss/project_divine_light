@@ -1,0 +1,15 @@
+# Rescuing Silas from the Guild (Milestone 20d, any other start). Plays on
+# reaching Silas's rune after the Shadow Lord is beaten.
+
+face player up
+emote silas !
+say Silas: The Shadow Lord, beaten? Huh. I had a plan for getting out of here, you know. It was a good plan.
+say Silas: That thing used to be the guildmaster. Ran the best crew in the kingdom. Whatever Vorath did to it... it wasn't anyone I knew anymore.
+say Silas: Frank sent you? Then there are more of us, and you'll need someone who can open a lock.
+emote silas note
+say Silas: Count me in. Point me at the next locked door.
+join silas
+despawn silas
+sound level_up
+narrate Silas joins the party!
+set cleared_guild

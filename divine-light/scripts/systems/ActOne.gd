@@ -30,7 +30,7 @@ const DUNGEONS := {
 	},
 	"guild": {
 		"name": "The Underground Guild", "captive": "Silas", "gate": "Lyra",
-		"scene": "",
+		"scene": "res://scenes/dungeon/GuildDungeon.tscn",
 		"where": "down in the ravine to the south",
 		"gate_text": "Arcane runes crawl across the hatch. Someone versed in magic might be able to read them.",
 	},
@@ -44,9 +44,9 @@ const ROUTES := {
 	"Silas": ["guild", "cathedral", "monastery", "observatory"],
 }
 
-# What's built so far: the starting dungeons that exist (Cathedral 20a,
-# Monastery 20b, Observatory 20c; the Guild arrives with 20d).
-const PLAYABLE_STARTS: Array = ["Vael", "Ryn", "Lyra"]
+# Every starting dungeon exists (Cathedral 20a, Monastery 20b, Observatory
+# 20c, Guild 20d), so every class can start.
+const PLAYABLE_STARTS: Array = ["Vael", "Ryn", "Lyra", "Silas"]
 
 
 static func start_dungeon(cls: String) -> String:

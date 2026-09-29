@@ -193,6 +193,11 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
+## Milestone 20d — The Underground Guild
+
+- [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
+- [~] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — stand-ins: tinted/scaled Hollow Archer, Shadow Acolyte, Corrupted Farmer and Cursed Paladin sprites (`EnemyData.STAND_INS`). Milestone 21.
+
 ## Milestone 20c — The Observatory
 
 - [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).

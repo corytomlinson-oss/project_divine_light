@@ -20,8 +20,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
   - [x] c3 — Lyra playable; test; docs.
 - 20d The Underground Guild (Silas)
   - [x] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
-  - [ ] d2 — the Guild dungeon + scenes.
-  - [ ] d3 — Silas playable; test.
+  - [x] d2 — the Guild dungeon + scenes.
+  - [x] d3 — Silas playable; test.
   - [ ] d4 — Edenmere, the mid-Act I town.
   - [ ] d5 — the Act I → Act II transition (all four gathered → closing scene; Act II kingdoms "coming later"); final docs. **Then stop.**
 
@@ -320,6 +320,11 @@ Built in four steps, each tested and committed on its own:
 - **Summoning:** ability kind `summon` (list of stat dicts in `enemies`) fires only when none of its adds are alive and 3+ of its turns have passed (`last_summon_turn`). `_summon()` drops the fallen, appends the adds (`summoned`, 0 XP, max 3 enemies total), frees and rebuilds the enemy row via `_setup_enemy_ui()` and restores the boss's enraged tint. **Victory** is now `_foes_defeated()` (replacing all 24 `_enemies.filter(...).is_empty()` checks): true when no non-summoned enemy stands; leftover adds are knocked out and hidden.
 - **Kits:** Shadow Thief (steal 35%), Venomous Cutthroat (poison 30%, Twin Fangs dot_strike 35%), Hired Muscle (stats only: big HP/ATK, slow). **Corrupted Enforcer** (escape warden for a Silas start, short "Enforcer": poisoned knuckles 25%, telegraphed Gut Punch every 3rd turn / 2nd in phase 2, Dirty Trick dot_strike 30%). **Shadow Lord** (weak to holy; two hits with 30% random status; phase 2 summons two Shadow Thieves). Stand-ins: tinted Hollow Archer / Shadow Acolyte / Corrupted Farmer / Cursed Paladin. Tables `GUILD_ESCAPE_ENCOUNTERS`, `GUILD_ENCOUNTERS`; `LOCATION_BOSSES` has both.
 - Verified (12 checks) in real battles + screenshots.
+
+**Steps d2-d3: the Guild dungeon, Silas playable (done, 2026-09-29)**
+- Same pattern again: `guild_tiles.png` (made in 20c), `scenes/dungeon/GuildDungeon.tscn`, `Dungeon.DUNGEONS["guild"]`, the `ActOne` scene path, scenes `guild_wake / _frank / _escaped / _rescue`. `ActOne.PLAYABLE_STARTS` is now all four classes, so the class select has no locked entries left.
+- Every dungeon now exists, so all four routes can be played start to finish through Act I's four dungeons.
+- Verified end to end (12 checks): Silas's class select -> wake -> Frank -> Corrupted Enforcer with Frank's help -> Frank names the Cathedral -> overworld at the Guild's arch (18,20) -> Verdance arrival names the Cathedral; then a Lyra game at level 5 with the Observatory cleared -> Guild rescue -> Shadow Lord -> Silas joins at level 5.
 
 ## Milestone 19 — Cutscenes (done)
 

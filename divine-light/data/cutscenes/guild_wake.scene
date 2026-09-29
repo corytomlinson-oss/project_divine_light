@@ -1,0 +1,14 @@
+# Silas wakes up captive in the Underground Guild (Milestone 20d, escape
+# start). Plays once, the first time the Guild loads on Silas's game.
+
+wait 0.6
+emote player ...
+narrate Dripping stone. Lamp smoke. Somewhere close, dice rattle across a table - and stop.
+face player left
+wait 0.4
+face player right
+wait 0.4
+face player down
+say Silas: The Guild's own cellars. I used to run jobs out of these tunnels. Now they've got me locked in one.
+say Silas: They took the knives from my belt... and missed the one in my boot. Sloppy. The old Guild would never.
+narrate From deeper in the tunnels comes a muffled voice, calling for help.

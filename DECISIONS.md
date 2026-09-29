@@ -231,3 +231,9 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The Shadow Lord's summons:** in phase 2 it whistles in two Shadow Thieves (they can steal too). It calls more only once both are down, and not within 3 of its turns of the last call. Summoned thieves give no XP, so the fight can't be farmed. **When the Shadow Lord falls, the fight ends** and any thieves still standing slip away. Killing the boss is a valid way to win, which fits the design doc's "kill adds or burn the boss".
 - **Phase 1 status effects** use the same random-status roll as the Astral Familiar (30% of its double strikes).
 - **All five new enemies use stand-in art** until the Act I art pass (21).
+
+### Steps d2-d3: the Guild dungeon, Silas playable
+
+- **The Guild's tiles are the dark-moss recolor** made in 20c. Same 5-8 room layout as the others.
+- **All the Guild dialogue is mine** (pronoun-free): `guild_wake`, `guild_frank`, `guild_escaped`, `guild_rescue`. Silas is dry and practical: used to run jobs out of these tunnels, spots the knife they missed, and "breaking people out of places is sort of my specialty". The Shadow Lord was once the guildmaster. Frank warns about the Enforcer's poison and its telegraphed punch.
+- **Silas is selectable**, so all four characters can now start the game.

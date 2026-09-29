@@ -46,6 +46,14 @@ const DUNGEONS := {
 		"escaped_scene": "res://data/cutscenes/observatory_escaped.scene",
 		"rescue_scene": "res://data/cutscenes/observatory_rescue.scene",
 	},
+	"guild": {
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"scene": "res://scenes/dungeon/GuildDungeon.tscn",
+		"wake_scene": "res://data/cutscenes/guild_wake.scene",
+		"frank_scene": "res://data/cutscenes/guild_frank.scene",
+		"escaped_scene": "res://data/cutscenes/guild_escaped.scene",
+		"rescue_scene": "res://data/cutscenes/guild_rescue.scene",
+	},
 }
 
 const TAG_TO_COORDS := {

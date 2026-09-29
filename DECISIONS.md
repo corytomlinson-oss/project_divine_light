@@ -173,3 +173,19 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The tiles are code-drawn placeholders** (road, stone arch, water, flowers, and the village set), to be replaced in Milestone 21.
 - **After escaping, you come out on the overworld next to the Cathedral**, not straight into Verdance. Frank's line points you to the village, and his arrival scene plays the first time you walk in.
 - **Talking uses A while facing someone**, and people turn to face you. **Buildings aren't enterable.** House doors are barred ("Nobody answers"), and the inn works from its front door.
+
+## Milestone 20b — The Monastery (2026-09-29)
+
+### Step b1: battle mechanics and the Monastery's enemies
+
+- **Correction to 20a:** I'd tuned the Cathedral's rescue for "two heroes around level 5 (Silas's route)". Wrong: the second dungeon on any route is visited by the starting hero **alone**, since nobody's been rescued yet. Rescue dungeons are now tuned for **one hero around level 5**. The Cathedral's rescue enemies were toned down, and the Fallen Guardian went from 420 HP / 34 ATK to 300 / 30.
+- **How counter stance works:**
+  - Only physical actions get countered: Attack, or any skill aimed at enemies with no element. Spells never are, which follows the design doc ("cannot counter spells").
+  - A counter hits back **once per action**, even against a multi-hit skill, for 80% of a normal enemy hit.
+  - *Change:* `_maybe_counter()` in `Battle.gd`.
+- **The Sparring Master's "parry timing" lesson is a guarding stance, not a timed button press.** Every 3rd turn it announces "settles into a guarding stance!". Strike into it and you're countered, so the right play is Defend, heal or build Qi until it drops. In phase 2 it does this every 2nd turn.
+- **The Corrupted Grandmaster** acts twice a round in phase 1 ("acts multiple times per round"), and from phase 2 counters every physical blow for the rest of the fight. Lyra's spells, or Vael's holy magic, are the answer.
+- **The Berserk Warrior hits one of its own allies 30% of the time.** The Corrupted Monk hits 2-3 times. The Iron Sentinel is an armored wall with almost no magic defense.
+- **All five new enemies use stand-in art:** tinted copies of existing enemy sprites until the Act I art pass (21).
+- **Long boss names get a short form in the enemy list**, e.g. "Grandmaster". Messages still use the full name.
+

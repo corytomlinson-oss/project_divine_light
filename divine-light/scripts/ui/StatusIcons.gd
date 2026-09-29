@@ -23,6 +23,7 @@ const ICONS := {
 	"taunt": ["..#..", "..#..", "..#..", ".....", "..#.."],
 	"evade": [".....", ".#...", "#.#.#", "...#.", "....."],
 	"blind": ["#...#", ".#.#.", "..#..", ".#.#.", "#...#"],
+	"counter": ["#####", "#.#.#", "#####", ".###.", "..#.."],
 }
 const COLORS := {
 	"poison": Color(0.45, 0.9, 0.3),
@@ -37,6 +38,7 @@ const COLORS := {
 	"taunt": Color(1.0, 0.35, 0.25),
 	"evade": Color(0.75, 0.75, 0.85),
 	"blind": Color(0.7, 0.7, 0.75),
+	"counter": Color(1.0, 0.55, 0.2),
 }
 const BACKING := Color(0.05, 0.04, 0.1, 0.75)
 
@@ -67,6 +69,7 @@ static func statuses(c: Combatant) -> Array:
 	if c.taunt_rounds > 0: out.append("taunt")
 	if c.evasion_rounds > 0: out.append("evade")
 	if c.accuracy_debuff_rounds > 0: out.append("blind")
+	if c.counter_rounds > 0: out.append("counter")
 	return out
 
 

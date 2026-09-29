@@ -60,6 +60,13 @@ var attack_mods: Dictionary = {}
 var weak: Array = []
 var turns_taken: int = 0
 var charging: Dictionary = {}  # the telegraphed ability it will unleash next turn
+# Milestone 20b: a counter stance (rounds left; hits back at physical attacks),
+# the boss phase from which it's always countering (-1 = never), and extra
+# actions per round (up to boss phase extra_actions_max_phase).
+var counter_rounds: int = 0
+var counter_from_phase: int = -1
+var extra_actions: int = 0
+var extra_actions_max_phase: int = 99
 var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 

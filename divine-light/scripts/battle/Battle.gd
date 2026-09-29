@@ -86,6 +86,8 @@ const ITEM_DEFS: Dictionary = {
 const LOCATION_BOSSES := {
 	"cathedral": "fallen_guardian",
 	"cathedral_escape": "hollow_warden",
+	"monastery": "corrupted_grandmaster",
+	"monastery_escape": "sparring_master",
 }
 
 const BATTLE_BACKGROUNDS: Dictionary = {
@@ -219,6 +221,9 @@ var _skill_element := ""
 var _weak_hit := false
 # Frank's help in an escape warden fight (Milestone 20a): a blinding vial at
 # the start, one potion when a hero is about to fall.
+var _actor: Combatant = null     # the party member whose action is resolving
+var _physical := false           # whether that action is a physical attack
+var _counter_note := ""          # "X counters! Y takes N!" when a counter landed
 var _frank_helps := false
 var _frank_healed := false
 var _victory := false
@@ -321,6 +326,9 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	e.weak = kit.get("weak", [])
 	e.int_stat = int(kit.get("int", 0))
 	e.res_stat = int(kit.get("res", 0))
+	e.counter_from_phase = int(kit.get("counter_from_phase", -1))
+	e.extra_actions = int(kit.get("actions", 1)) - 1
+	e.extra_actions_max_phase = int(kit.get("actions_max_phase", 99))
 	return e
 
 
@@ -427,7 +435,7 @@ func _setup_enemy_ui() -> void:
 		# Enemy window row: name with the HP bar under it.
 		var y := 4.0 + i * 16.0
 		var label := _window_label(enemy_window, Vector2(8, y), ENEMY_LIST_BAR_W)
-		label.text = _enemies[i].display_name
+		label.text = EnemyData.kit(_enemies[i].display_name).get("short", _enemies[i].display_name)
 		_enemy_labels.append(label)
 		_enemy_hp_bars.append(_window_bar(enemy_window, Vector2(8, y + 10), ENEMY_LIST_BAR_W, ENEMY_RED))
 
@@ -1264,6 +1272,10 @@ func _begin_resolving() -> void:
 	for enemy in _enemies:
 		if enemy.is_alive():
 			_turn_queue.append(enemy)
+			# Some enemies act more than once a round (20b: the Grandmaster).
+			if enemy.boss_phase <= enemy.extra_actions_max_phase:
+				for k in enemy.extra_actions:
+					_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
 	_advance_turn()
@@ -1357,6 +1369,9 @@ func _execute_party_turn(member: Combatant) -> void:
 			Sfx.play(recipe["sound"])
 	_skill_element = _element_of(member)
 	_weak_hit = false
+	_actor = member
+	_counter_note = ""
+	_physical = member.queued_action == "attack" or (member.queued_action == "skill" and _skill_element == "" 			and str(member.queued_skill.get("target", "")).begins_with("enemy"))
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -1370,7 +1385,11 @@ func _execute_party_turn(member: Combatant) -> void:
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
 	if _weak_hit:
 		message_label.text += " Weak!"
+	if _counter_note != "":
+		message_label.text += "
+" + _counter_note
 	_skill_element = ""
+	_actor = null
 
 
 ## The element a party action deals ("" for plain physical), from the skill's
@@ -1394,7 +1413,24 @@ func _hit(target: Combatant, dmg: int) -> int:
 		dmg = roundi(dmg * 1.5)
 		_weak_hit = true
 	target.receive_damage(dmg)
+	_maybe_counter(target)
 	return dmg
+
+
+## A counter stance (20b) hits back at a physical attack - once per action,
+## however many times the action struck. Spells are never countered.
+func _maybe_counter(target: Combatant) -> void:
+	if not (target.is_enemy and target.is_alive() and target.counter_rounds > 0):
+		return
+	if not _physical or _actor == null or _counter_note != "" or not _actor.is_alive():
+		return
+	var effective_def := _actor.defense + _actor.def_buff
+	var dmg := maxi(1, roundi((target.atk + target.atk_buff - effective_def) * 0.8))
+	_actor.receive_damage(dmg)
+	var sprite := _sprite_of(_actor)
+	if sprite != null:
+		_fx.impact(FxRecipes.ENEMY_ATTACK, [sprite])
+	_counter_note = "%s counters! %s takes %d!" % [target.display_name, _actor.display_name, dmg]
 
 
 ## The sprites a party member's action will land on, resolved the same way
@@ -2043,7 +2079,9 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not ability.is_empty():
 		await _enemy_ability(enemy, ability, targets, phase_note)
 		return
-	await _enemy_attack(enemy, targets, phase_note, {}, int(enemy.attack_mods.get("hits", 1)))
+	var hits := int(enemy.attack_mods.get("hits", 1))
+	hits = randi_range(hits, maxi(hits, int(enemy.attack_mods.get("hits_max", hits))))
+	await _enemy_attack(enemy, targets, phase_note, {}, hits)
 
 
 ## The first ability whose boss phase and timing allow it this turn, or {}.
@@ -2078,6 +2116,10 @@ func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged: Dictionary, hits := 1) -> void:
 	_anim_enemy_attack(_enemies.find(enemy))
 	var target := _pick_target(enemy, targets)
+	# Berserk (20b): sometimes it lashes out at one of its own side instead.
+	var others := _enemies.filter(func(e: Combatant) -> bool: return e != enemy and e.is_alive())
+	if charged.is_empty() and not others.is_empty() and randi() % 100 < int(enemy.attack_mods.get("berserk", 0)):
+		target = others[randi() % others.size()]
 	var recipe: Dictionary = FxRecipes.ENEMY_ATTACK if charged.is_empty() else FxRecipes.ENEMY_HEAVY
 	var enemy_sprite: CanvasItem = _sprite_of(enemy)
 	var target_sprite: CanvasItem = _sprite_of(target)
@@ -2177,6 +2219,12 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			_fx_on(enemy, "ring", "shield")
 			Sfx.play("holy")
 			message_label.text = phase_note + "%s uses %s!\nIts armor hardens!" % [enemy.display_name, ability_name]
+		"counter_stance":
+			# Rounds count down at each round's end, so 2 = the rest of this
+			# round and all of the next: the player sees it coming.
+			enemy.counter_rounds = int(a.get("rounds", 2))
+			_fx_on(enemy, "ring", "taunt")
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "takes a guarding stance!")]
 		"charge":
 			enemy.charging = a
 			_fx_on(enemy, "stars", "enemy")
@@ -2224,6 +2272,9 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if hp_frac > enemy.phase_hp_thresholds[enemy.boss_phase]:
 		return ""
 	enemy.boss_phase += 1
+	if enemy.counter_from_phase >= 0 and enemy.boss_phase >= enemy.counter_from_phase:
+		enemy.counter_rounds = 999  # from here on it's always countering (20b)
+		return "%s enters a new phase! It will counter every blow!\n" % enemy.display_name
 	return "%s enters a new phase!\n" % enemy.display_name
 
 
@@ -2274,6 +2325,8 @@ func _tick_buffs() -> void:
 			c.evasion_rounds -= 1
 		if c.accuracy_debuff_rounds > 0:
 			c.accuracy_debuff_rounds -= 1
+		if c.counter_rounds > 0 and c.counter_rounds < 900:
+			c.counter_rounds -= 1
 
 
 ## Poison / burn / bleed damage at the end of a round. Each tick also puffs a

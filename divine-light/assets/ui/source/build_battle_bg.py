@@ -5,10 +5,10 @@ layers with a fixed seed (same output every run): dithered sky -> moon ->
 far pine treeline -> mist -> clearing ground with moss, tufts and corruption
 veins -> dead framing trees -> dark undergrowth. Every color comes from PAL.
 
-The scene lives in the top 72px (the enemy panel band). Below that the battle
-UI draws white text straight over the background (the panels have transparent
-centers), so y >= 72 fades to near-black undergrowth to keep text readable.
-Enemies stand on y=61, so the clearing floor is kept calm around that line.
+The scene fills the top 112px (Milestone 17b's SNES layout: enemies and party
+stand on the same ground, feet around y=94-110). The bottom windows cover
+y >= 112, which fades to near-black undergrowth. It was 72px tall before 17b;
+only the HORIZON/GROUND_END constants and the scatter counts changed.
 
 Usage: python build_battle_bg.py <out.png>
 """
@@ -58,7 +58,7 @@ def dither(x, y, a, b, t):
 
 
 # ---------------------------------------------------------------- sky
-HORIZON = 44
+HORIZON = 56
 SKY = ['s0', 's1', 's2', 's3', 's4', 's5', 's6']
 for y in range(HORIZON):
     f = (y / (HORIZON - 1)) ** 1.35 * (len(SKY) - 1)
@@ -109,7 +109,7 @@ for x in range(W):
     put(x, far_top[x], 'far_rim' if x % 3 else 'far')
 
 # ---------------------------------------------------------------- ground
-GROUND_END = 72
+GROUND_END = 112
 for y in range(HORIZON + 3, H):
     for x in range(W):
         if y < GROUND_END:
@@ -134,7 +134,7 @@ for y in range(HORIZON - 4, HORIZON + 6):
             put(x, y, 'mist')
 
 # moss patches (blobby, denser toward the front)
-for _ in range(38):
+for _ in range(70):
     cx, cy = rng.randint(0, W), rng.randint(HORIZON + 5, GROUND_END + 6)
     rx, ry = rng.randint(4, 14), rng.randint(1, 3)
     for y in range(cy - ry, cy + ry + 1):
@@ -144,7 +144,7 @@ for _ in range(38):
                 put(x, y, 'moss')
 
 # grass tufts
-for _ in range(90):
+for _ in range(170):
     x, y = rng.randint(0, W - 1), rng.randint(HORIZON + 6, GROUND_END + 4)
     shade = 'moss2' if y < GROUND_END else 'moss'
     put(x, y, shade)
@@ -154,7 +154,7 @@ for _ in range(90):
         put(x, y - 1, shade)
 
 # corruption veins: glowing cracks wandering across the clearing
-for _ in range(6):
+for _ in range(10):
     x, y = rng.randint(0, W), rng.randint(HORIZON + 8, GROUND_END + 8)
     for step in range(rng.randint(14, 34)):
         put(x, y, 'V' if step % 5 else 'X')
@@ -206,9 +206,11 @@ def dead_tree(base_x, top_y, trunk_w, branches, cracks):
                 put(x + direction, y - 2, 'tree')
 
 
-dead_tree(305, 0, 13, [(20, -1, 38), (36, -1, 24), (12, 1, 10), (50, -1, 14), (28, 1, 8)], 4)
-dead_tree(112, 16, 6, [(30, -1, 12), (24, 1, 14), (40, 1, 8)], 2)
-dead_tree(216, 26, 4, [(36, 1, 10), (42, -1, 8)], 1)
+# Trunks stay out of where fighters stand (enemies x 12-150, party x 214-314):
+# one frames the right edge, one fills the gap between the sides, one the left edge.
+dead_tree(316, 0, 13, [(20, -1, 38), (36, -1, 24), (50, -1, 14)], 4)
+dead_tree(178, 16, 6, [(30, -1, 12), (24, 1, 14), (40, 1, 8)], 2)
+dead_tree(6, 26, 4, [(36, 1, 10), (42, 1, 8)], 1)
 
 # hanging wisps of corruption drifting in the air (sparse motes)
 for _ in range(26):

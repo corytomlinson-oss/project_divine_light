@@ -140,20 +140,40 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	"overworld": "res://assets/ui/battle_bg_forest.png",
 }
 
-# Enemy name/HP bar width. Was 207 (the whole right side) before the party
-# sprites moved into the right of the top band.
-const ENEMY_BAR_W := 92.0
+# Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on
+# the right stand on the same ground, above the windows that start at y=112.
+# Enemies spread evenly across ENEMY_FIELD_X (left, right edge), feet on
+# ENEMY_FEET_Y; odd slots stand a step further back so a group reads as a
+# formation instead of a lineup.
+const ENEMY_FIELD_X := Vector2(12, 150)
+const ENEMY_FEET_Y := 102.0
+const ENEMY_BACK_STAGGER := 8.0
 
-# Party formation in the top band: a diagonal line, FF6-style, stepping down
-# and right per slot so 32px-tall sprites fit in 72px. Slots are grouped by
+# Bottom windows. The left one (commands, or the enemy list) is at least
+# LEFT_WINDOW_W wide - "Corrupted Farmer" is 92px - and the command window
+# widens past it for long skill/item lists, over the party window.
+const LEFT_WINDOW_W := 104.0
+const ENEMY_LIST_BAR_W := 88.0
+const HP_BAR_W := 50.0
+const MP_BAR_W := 34.0
+const BAR_TRACK := Color(0.16, 0.15, 0.22)
+const HP_GREEN := Color(0.3, 0.9, 0.3)
+const ENEMY_RED := Color(0.85, 0.25, 0.25)
+const MP_TEXT := Color(0.67, 0.75, 1.0)
+const MP_BLUE := Color(0.43, 0.55, 1.0)
+const ROW_GREY := Color(0.63, 0.61, 0.72)
+const TARGET_YELLOW := Color(1.0, 1.0, 0.3)
+
+# Party formation: a diagonal line, FF6-style, stepping down and right per
+# slot across the battlefield's right side. Slots are grouped by
 # row - front-row members take the upper-left slots, back-row members the
 # lower-right ones - so the back-row shift only ever widens the gap between the
 # two groups. (Shifting back-row members within a fixed party-order line made
 # them collide with whoever came next; any shift big enough to notice a row
 # swap was bigger than the spacing.) The acting member steps toward the
 # enemies. Values are each sprite's top-left corner.
-const PARTY_ORIGIN := Vector2(210, 0)
-const PARTY_STEP := Vector2(24, 13)
+const PARTY_ORIGIN := Vector2(214, 30)
+const PARTY_STEP := Vector2(22, 16)
 const PARTY_BACK_ROW_X := 18.0
 const PARTY_STEP_FORWARD := 5.0
 const PARTY_WALK_SPEED := 60.0
@@ -167,8 +187,14 @@ const BOSS_ENCOUNTERS: Dictionary = {
 
 # Party
 var _party: Array = []
+# Party window rows, one entry per member (null where a member has no MP or Qi).
+var _party_name_labels: Array = []
+var _party_row_labels: Array = []
 var _party_hp_labels: Array = []
 var _party_hp_bars: Array = []
+var _party_mp_labels: Array = []
+var _party_mp_bars: Array = []
+var _party_qi_pips: Array = []
 
 # Enemies (built dynamically each battle)
 var _enemies: Array = []
@@ -213,34 +239,25 @@ var _target_ally_index: int = 0
 var _pending_action: String = ""
 var _pending_skill: Dictionary = {}
 
-@onready var message_label: Label = $MessageBox/MessageLabel
-@onready var selection_header: Label = $SelectionArea/SelectionHeader
-@onready var action_menu: VBoxContainer = $SelectionArea/ActionMenu
+@onready var message_label: Label = $MessageBanner/MessageLabel
+@onready var message_banner: PanelContainer = $MessageBanner
+@onready var command_window: Panel = $CommandWindow
+@onready var command_title: Label = $CommandWindow/Title
+@onready var action_menu: VBoxContainer = $CommandWindow/ActionMenu
+@onready var enemy_window: Panel = $EnemyWindow
+@onready var party_window: Panel = $PartyWindow
 
 var _cursor := MenuCursor.new()
-var _qi_pips := QiPips.new()
-var _qi_header_text := ""  # the header text the Qi pips belong beside
+var _scroll_hint := ScrollHint.new()
 
 
 func _ready() -> void:
-	_option_labels = [
-		$SelectionArea/ActionMenu/Option0,
-		$SelectionArea/ActionMenu/Option1,
-		$SelectionArea/ActionMenu/Option2,
-		$SelectionArea/ActionMenu/Option3,
-		$SelectionArea/ActionMenu/Option4,
-	]
-	_party_hp_labels = [
-		$PartyPanel/HP_Vael,
-		$PartyPanel/HP_Ryn,
-		$PartyPanel/HP_Lyra,
-		$PartyPanel/HP_Silas,
-	]
+	_option_labels = action_menu.get_children()
 	_party = GameManager.party
 	add_child(_cursor)
-	$SelectionArea.add_child(_qi_pips)
+	command_window.add_child(_scroll_hint)
 	_setup_background()
-	_setup_party_bars()
+	_setup_party_window()
 	_enemies = _generate_encounter()
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
 	Music.play("boss" if boss_fight else "battle", "battle")
@@ -274,50 +291,84 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	return e
 
 
-func _setup_party_bars() -> void:
-	var panel: VBoxContainer = $PartyPanel
-	_party_hp_bars = []
-	for _i in _party.size():
-		var bar := ProgressBar.new()
-		bar.custom_minimum_size = Vector2(0, 4)
-		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		bar.max_value = 100.0
-		bar.value = 100.0
-		bar.show_percentage = false
-		panel.add_child(bar)
-		_party_hp_bars.append(bar)
-	for i in _party_hp_bars.size():
-		panel.move_child(_party_hp_bars[i], i * 2 + 1)
+## One row per member: name, row, HP numbers over a bar, then MP numbers over
+## a bar or Ryn's Qi pips. Positions are local to the party window; the name
+## keeps a two-space indent so the glove fits in front of it for ally targeting.
+func _setup_party_window() -> void:
+	for i in _party.size():
+		var member: Combatant = _party[i]
+		var y := 4.0 + i * 15.0
+		_party_name_labels.append(_window_label(party_window, Vector2(8, y), 38))
+		var row_label := _window_label(party_window, Vector2(46, y), 10)
+		row_label.modulate = ROW_GREY
+		_party_row_labels.append(row_label)
+		_party_hp_labels.append(_window_label(party_window, Vector2(50, y), 60, HORIZONTAL_ALIGNMENT_RIGHT))
+		_party_hp_bars.append(_window_bar(party_window, Vector2(60, y + 10), HP_BAR_W, HP_GREEN))
+		if member.max_qi > 0:
+			var pips := QiPips.new()
+			pips.position = Vector2(166, y + 2)
+			party_window.add_child(pips)
+			_party_qi_pips.append(pips)
+			_party_mp_labels.append(null)
+			_party_mp_bars.append(null)
+		else:
+			_party_qi_pips.append(null)
+			var mp_label := _window_label(party_window, Vector2(148, y), 60, HORIZONTAL_ALIGNMENT_RIGHT)
+			mp_label.modulate = MP_TEXT
+			_party_mp_labels.append(mp_label)
+			_party_mp_bars.append(_window_bar(party_window, Vector2(174, y + 10), MP_BAR_W, MP_BLUE))
+
+
+func _window_label(parent: Control, pos: Vector2, width: float, align := HORIZONTAL_ALIGNMENT_LEFT) -> Label:
+	var label := Label.new()
+	label.position = pos
+	label.size = Vector2(width, 10)
+	label.horizontal_alignment = align
+	parent.add_child(label)
+	return label
+
+
+## A 3px bar (dark track + fill) inside a window. Returns the fill, whose
+## width the caller sets from the value it shows.
+func _window_bar(parent: Control, pos: Vector2, width: float, color: Color) -> ColorRect:
+	var track := ColorRect.new()
+	track.position = pos
+	track.size = Vector2(width, 3)
+	track.color = BAR_TRACK
+	parent.add_child(track)
+	var fill := ColorRect.new()
+	fill.position = pos
+	fill.size = Vector2(width, 3)
+	fill.color = color
+	parent.add_child(fill)
+	return fill
 
 
 func _setup_enemy_ui() -> void:
 	_enemy_labels = []
 	_enemy_hp_bars = []
 	_enemy_sprites = []
-	var count: int = _enemies.size()
-	var gap := 4.0
-	var sprite_w := (78.0 - gap * (count - 1)) / count
-	var row_h := 22.0
-
 	_enemy_home = []
 	_enemy_last_hp = []
 	_enemy_death_shown = []
 	_enemy_tweens = []
+	var count: int = _enemies.size()
+	var slot_w: float = (ENEMY_FIELD_X.y - ENEMY_FIELD_X.x) / count
 	for i in count:
-		var sx := 16.0 + i * (sprite_w + gap)
+		var cx: float = ENEMY_FIELD_X.x + slot_w * (i + 0.5)
+		var feet: float = ENEMY_FEET_Y - (ENEMY_BACK_STAGGER if i % 2 == 1 else 0.0)
 		var sprite: CanvasItem = _make_enemy_sprite(_enemies[i].display_name)
 		if sprite == null:
 			# No art for this enemy yet - keep the old placeholder block.
 			var rect := ColorRect.new()
-			rect.position = Vector2(sx, 11)
-			rect.size = Vector2(sprite_w, 50)
+			rect.size = Vector2(24, 40)
+			rect.position = Vector2(cx - 12.0, feet - 40.0)
 			rect.color = Color(0.55, 0.12, 0.12, 1)
 			sprite = rect
 		else:
-			# Centered sprite, standing on the same ground line (y=61) the
-			# placeholder blocks used, so every size lines up at the feet.
+			# Centered sprite standing on its feet line, whatever its height.
 			var h: float = (sprite as AnimatedSprite2D).sprite_frames.get_frame_texture(&"default", 0).get_height()
-			sprite.position = Vector2(sx + sprite_w / 2.0, 61.0 - h / 2.0)
+			sprite.position = Vector2(cx, feet - h / 2.0)
 		$EnemyArea.add_child(sprite)
 		_enemy_sprites.append(sprite)
 		_enemy_home.append(sprite.position)
@@ -325,25 +376,12 @@ func _setup_enemy_ui() -> void:
 		_enemy_death_shown.append(false)
 		_enemy_tweens.append(null)
 
-		var label := Label.new()
-		label.position = Vector2(108, 5 + i * row_h)
-		label.size = Vector2(ENEMY_BAR_W, 14)
-		label.text = "  " + _enemies[i].display_name
-		$EnemyArea.add_child(label)
+		# Enemy window row: name with the HP bar under it.
+		var y := 4.0 + i * 16.0
+		var label := _window_label(enemy_window, Vector2(8, y), ENEMY_LIST_BAR_W)
+		label.text = _enemies[i].display_name
 		_enemy_labels.append(label)
-
-		var bar_bg := ColorRect.new()
-		bar_bg.position = Vector2(108, 5 + i * row_h + 14)
-		bar_bg.size = Vector2(ENEMY_BAR_W, 4)
-		bar_bg.color = Color(0.2, 0.05, 0.05, 1)
-		$EnemyArea.add_child(bar_bg)
-
-		var bar_fill := ColorRect.new()
-		bar_fill.position = Vector2(108, 5 + i * row_h + 14)
-		bar_fill.size = Vector2(ENEMY_BAR_W, 4)
-		bar_fill.color = Color(0.85, 0.25, 0.25, 1)
-		$EnemyArea.add_child(bar_fill)
-		_enemy_hp_bars.append(bar_fill)
+		_enemy_hp_bars.append(_window_bar(enemy_window, Vector2(8, y + 10), ENEMY_LIST_BAR_W, ENEMY_RED))
 
 
 func _setup_background() -> void:
@@ -600,9 +638,7 @@ func _input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	_update_party_positions(delta)
 	_cursor.target = _cursor_target()
-	# Other menus reuse the header ("Target?", "-- Skills --"), so the pips
-	# show only while it still holds Ryn's line.
-	_qi_pips.visible = _qi_header_text != "" and selection_header.text == _qi_header_text
+	_update_windows()
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
@@ -618,15 +654,29 @@ func _process(delta: float) -> void:
 					get_tree().change_scene_to_file(GameManager.current_scene_path)
 
 
-## The label the menu cursor should point at right now, or null to hide it.
-func _cursor_target() -> Control:
+## Which bottom-left window is up: the commands while a member is choosing
+## (picking an ally included), the enemy list otherwise (picking an enemy,
+## actions playing out, battle over). The banner shows whenever there's a
+## message and is resized to fit it, so a 3-line message just grows it.
+func _update_windows() -> void:
+	var choosing := state == State.SELECTING and _menu_state != MenuState.TARGETING
+	command_window.visible = choosing
+	_scroll_hint.visible = action_menu.visible
+	enemy_window.visible = not choosing
+	message_banner.visible = message_label.text != ""
+	message_banner.size = message_banner.get_combined_minimum_size()
+
+
+## What the menu cursor should point at right now (a menu label, a party
+## name, or an enemy sprite), or null to hide it.
+func _cursor_target() -> CanvasItem:
 	if state != State.SELECTING:
 		return null
 	match _menu_state:
 		MenuState.TARGETING:
-			return _enemy_labels[_target_index] if _target_index < _enemy_labels.size() else null
+			return _enemy_sprites[_target_index] if _target_index < _enemy_sprites.size() else null
 		MenuState.ALLY_TARGETING:
-			return _party_hp_labels[_target_ally_index] if _target_ally_index < _party_hp_labels.size() else null
+			return _party_name_labels[_target_ally_index] if _target_ally_index < _party_name_labels.size() else null
 	if not action_menu.visible:
 		return null
 	var row: int = _menu_cursor - _list_scroll
@@ -661,11 +711,13 @@ func _handle_menu_input() -> void:
 		return
 	if Input.is_action_just_pressed("ui_down"):
 		Sfx.play("menu_move")
+		message_label.text = ""
 		_menu_cursor = (_menu_cursor + 1) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
 	elif Input.is_action_just_pressed("ui_up"):
 		Sfx.play("menu_move")
+		message_label.text = ""
 		_menu_cursor = (_menu_cursor - 1 + _menu_options.size()) % _menu_options.size()
 		_clamp_list_scroll()
 		_update_menu()
@@ -676,7 +728,7 @@ func _handle_menu_input() -> void:
 		if _menu_state != MenuState.MAIN:
 			Sfx.play("menu_cancel")
 			_open_main_menu()
-			message_label.text = "What will you do?"
+			message_label.text = ""
 
 
 func _handle_target_input() -> void:
@@ -705,7 +757,7 @@ func _handle_target_input() -> void:
 	elif Input.is_action_just_pressed("ui_cancel"):
 		Sfx.play("menu_cancel")
 		_open_main_menu()
-		message_label.text = "What will you do?"
+		message_label.text = ""
 
 
 func _handle_ally_target_input() -> void:
@@ -734,7 +786,7 @@ func _handle_ally_target_input() -> void:
 	elif Input.is_action_just_pressed("ui_cancel"):
 		Sfx.play("menu_cancel")
 		_open_main_menu()
-		message_label.text = "What will you do?"
+		message_label.text = ""
 
 
 func _confirm_action() -> void:
@@ -813,7 +865,7 @@ func _open_main_menu() -> void:
 	_menu_cursor = 0
 	_list_scroll = 0
 	_update_menu()
-	_update_selection_header()
+	_update_command_title()
 	_update_ui()
 
 
@@ -837,7 +889,7 @@ func _open_skill_menu(member: Combatant) -> void:
 		_menu_options.append("%s %s" % [skill["name"], cost_label])
 	_menu_cursor = 0
 	_update_menu()
-	selection_header.text = "-- Skills --"
+	command_title.text = "Skills"
 
 
 func _open_lyra_skill_menu(member: Combatant) -> void:
@@ -872,7 +924,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 			_menu_options.append("%s (%dMP)" % [skill["name"], skill["cost"]])
 	_menu_cursor = 0
 	_update_menu()
-	selection_header.text = "-- %s Stance --" % current_stance
+	command_title.text = "%s Stance" % current_stance
 
 
 func _open_item_menu() -> void:
@@ -893,7 +945,7 @@ func _open_item_menu() -> void:
 		_menu_options.append("%s x%d" % [item_name, count])
 	_menu_cursor = 0
 	_update_menu()
-	selection_header.text = "-- Items --"
+	command_title.text = "Items"
 
 
 func _enter_targeting(action: String, skill: Dictionary) -> void:
@@ -906,9 +958,7 @@ func _enter_targeting(action: String, skill: Dictionary) -> void:
 			_target_index = i
 			break
 	action_menu.visible = false
-	selection_header.text = "Target?"
 	_update_enemy_ui()
-	message_label.text = "Select a target."
 
 
 func _enter_ally_targeting(action: String, skill: Dictionary) -> void:
@@ -921,9 +971,8 @@ func _enter_ally_targeting(action: String, skill: Dictionary) -> void:
 			_target_ally_index = i
 			break
 	action_menu.visible = false
-	selection_header.text = "Target Ally?"
+	command_title.text = "Use on?"
 	_update_ui()
-	message_label.text = "Select an ally."
 
 
 func _confirm_target() -> void:
@@ -983,7 +1032,7 @@ func _advance_selection() -> void:
 		_begin_resolving()
 	else:
 		_open_main_menu()
-		message_label.text = "What will you do?"
+		message_label.text = ""
 
 
 func _skip_ko_members() -> void:
@@ -1000,7 +1049,7 @@ func _begin_selection() -> void:
 		return
 	action_menu.visible = true
 	_open_main_menu()
-	message_label.text = "What will you do?"
+	message_label.text = ""
 
 
 func _begin_resolving() -> void:
@@ -1008,7 +1057,7 @@ func _begin_resolving() -> void:
 	_party_acting = -1
 	_menu_state = MenuState.MAIN
 	action_menu.visible = false
-	selection_header.text = ""
+	command_title.text = ""
 	_turn_queue = []
 	for member in _party:
 		if member.is_alive():
@@ -1807,7 +1856,7 @@ func _tick_dot() -> void:
 func _end_battle(victory: bool) -> void:
 	state = State.BATTLE_OVER
 	action_menu.visible = false
-	selection_header.text = ""
+	command_title.text = ""
 	if victory:
 		_level_up_queue = []
 		var total_xp: int = 0
@@ -1859,29 +1908,33 @@ func _update_menu() -> void:
 		else:
 			_option_labels[i].text = ""
 			_option_labels[i].visible = false
+	command_window.size.x = _command_window_width()
+	# Arrows beside the first and last visible rows when the list continues.
+	_scroll_hint.position = Vector2(command_window.size.x - 11.0, 16.0)
+	_scroll_hint.height = 42.0
+	_scroll_hint.more_above = scrollable and _list_scroll > 0
+	_scroll_hint.more_below = scrollable and _list_scroll + page < _menu_options.size()
 
 
-func _update_selection_header() -> void:
+## At least LEFT_WINDOW_W; wider when a skill/item name needs it (the widest,
+## "Shadow Strike (12MP)", is 110px plus the cursor indent), leaving room on
+## the right for the scroll arrows.
+func _command_window_width() -> float:
+	var font: Font = command_title.get_theme_font("font")
+	var font_size: int = command_title.get_theme_font_size("font_size")
+	var widest := font.get_string_size(command_title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	for option: String in _menu_options:
+		widest = maxf(widest, font.get_string_size("  " + option, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x)
+	return maxf(LEFT_WINDOW_W, ceilf(widest) + 24.0)
+
+
+func _update_command_title() -> void:
 	if _selecting_index >= _party.size():
 		return
 	var member: Combatant = _party[_selecting_index]
-	var row_label: String = "Front" if member.row == "front" else "Back"
-	_qi_header_text = ""
-	if member.char_class == "Ryn":
-		selection_header.text = "%s (%s):" % [member.display_name, row_label]
-		_qi_header_text = selection_header.text
-		_qi_pips.qi = member.qi
-		_qi_pips.max_qi = member.max_qi
-		var font: Font = selection_header.get_theme_font("font")
-		var text_w: float = font.get_string_size(selection_header.text, HORIZONTAL_ALIGNMENT_LEFT, -1, selection_header.get_theme_font_size("font_size")).x
-		# 2px down centers the 5px pips on the 7px capitals.
-		_qi_pips.position = selection_header.position + Vector2(text_w + 4, 2)
-	elif member.char_class == "Lyra":
-		selection_header.text = "%s (%s) [%s]: %d/%d MP" % [member.display_name, row_label, member.stance, member.mp, member.max_mp]
-	elif member.max_mp > 0:
-		selection_header.text = "%s (%s): %d/%d MP" % [member.display_name, row_label, member.mp, member.max_mp]
-	else:
-		selection_header.text = "%s (%s):" % [member.display_name, row_label]
+	command_title.text = member.display_name
+	if member.char_class == "Lyra":
+		command_title.text += " [%s]" % member.stance
 
 
 func _update_enemy_ui() -> void:
@@ -1893,21 +1946,15 @@ func _update_enemy_ui() -> void:
 		var label: Label = _enemy_labels[i]
 		var bar: ColorRect = _enemy_hp_bars[i]
 		var pct: float = float(enemy.hp) / float(enemy.max_hp) if not enemy.is_ko else 0.0
-
+		bar.size.x = ENEMY_LIST_BAR_W * pct
 		if enemy.is_ko:
-			label.text = "  %s  ---" % enemy.display_name
 			label.modulate = Color(0.5, 0.5, 0.5)
-			bar.size.x = 0.0
 		elif _menu_state == MenuState.TARGETING and i == _target_index:
-			label.text = "  %s" % enemy.display_name
-			label.modulate = Color(1.0, 1.0, 0.3)
-			bar.size.x = ENEMY_BAR_W * pct
-			bar.color = Color(1.0, 1.0, 0.3, 1)
+			label.modulate = TARGET_YELLOW
+			bar.color = TARGET_YELLOW
 		else:
-			label.text = "  %s" % enemy.display_name
-			label.modulate = Color(1.0, 1.0, 1.0)
-			bar.size.x = ENEMY_BAR_W * pct
-			bar.color = Color(0.85, 0.25, 0.25, 1)
+			label.modulate = Color.WHITE
+			bar.color = ENEMY_RED
 
 
 func _update_ui() -> void:
@@ -1915,38 +1962,37 @@ func _update_ui() -> void:
 	_animate_party_hp_changes()
 	for i in _party.size():
 		var member: Combatant = _party[i]
-		var label: Label = _party_hp_labels[i]
 		var pct: float = float(member.hp) / float(member.max_hp) if member.max_hp > 0 else 0.0
-		var label_tint: Color
+		var tint: Color
 		var bar_tint: Color
-
-		var name_str: String
-		if _menu_state == MenuState.ALLY_TARGETING:
-			name_str = "  " + member.display_name
-		else:
-			name_str = member.display_name
-		var row_tag: String = "F" if member.row == "front" else "B"
-
 		if member.is_ko:
-			label.text = "%s %s L%d  --/--" % [name_str, row_tag, member.level]
-			label_tint = Color(0.5, 0.5, 0.5)
-			bar_tint   = Color(0.5, 0.5, 0.5)
+			tint = Color(0.5, 0.5, 0.5)
+			bar_tint = tint
+		elif pct > 0.5:
+			tint = Color.WHITE
+			bar_tint = HP_GREEN
+		elif pct > 0.25:
+			tint = Color(1.0, 0.85, 0.1)
+			bar_tint = tint
 		else:
-			label.text = "%s %s L%d  %d/%d" % [name_str, row_tag, member.level, member.hp, member.max_hp]
-			if pct > 0.5:
-				label_tint = Color(1.0, 1.0, 1.0)
-				bar_tint   = Color(0.3, 0.9, 0.3)
-			elif pct > 0.25:
-				label_tint = Color(1.0, 0.85, 0.1)
-				bar_tint   = Color(1.0, 0.85, 0.1)
-			else:
-				label_tint = Color(1.0, 0.35, 0.35)
-				bar_tint   = Color(1.0, 0.35, 0.35)
-
+			tint = Color(1.0, 0.35, 0.35)
+			bar_tint = tint
+		var name_label: Label = _party_name_labels[i]
+		name_label.text = "  " + member.display_name
+		name_label.modulate = tint
 		if _menu_state == MenuState.ALLY_TARGETING and i == _target_ally_index and not member.is_ko:
-			label_tint = Color(1.0, 1.0, 0.3)
-
-		label.modulate = label_tint
-		if i < _party_hp_bars.size():
-			_party_hp_bars[i].value    = pct * 100.0
-			_party_hp_bars[i].modulate = bar_tint
+			name_label.modulate = TARGET_YELLOW
+		_party_row_labels[i].text = "F" if member.row == "front" else "B"
+		_party_hp_labels[i].text = "--/--" if member.is_ko else "%d/%d" % [member.hp, member.max_hp]
+		_party_hp_labels[i].modulate = tint
+		_party_hp_bars[i].size.x = 0.0 if member.is_ko else HP_BAR_W * pct
+		_party_hp_bars[i].color = bar_tint
+		if _party_qi_pips[i] != null:
+			_party_qi_pips[i].max_qi = member.max_qi
+			_party_qi_pips[i].qi = member.qi
+		elif member.max_mp > 0:
+			_party_mp_labels[i].text = "%d/%d" % [member.mp, member.max_mp]
+			_party_mp_bars[i].size.x = MP_BAR_W * float(member.mp) / float(member.max_mp)
+		else:
+			_party_mp_labels[i].text = ""
+			_party_mp_bars[i].size.x = 0.0

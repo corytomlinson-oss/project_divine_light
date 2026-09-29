@@ -1,7 +1,22 @@
 [gd_resource type="Theme" format=3]
 
 [ext_resource type="FontVariation" path="res://assets/fonts/m5x7_ui.tres" id="1_6cha6"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_thin.png" id="1_ib6tx"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fenpc"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+texture = ExtResource("1_ib6tx")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
 
 [resource]
 default_font = ExtResource("1_6cha6")
 default_font_size = 16
+Label/constants/line_spacing = 0
+Panel/styles/panel = SubResource("StyleBoxTexture_fenpc")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_fenpc")

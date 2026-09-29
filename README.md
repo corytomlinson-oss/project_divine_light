@@ -59,6 +59,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 17a — Pixel rendering & text (first of four UI/UX polish slices). The game now renders at a true 320×180 and scales by whole pixels (6× on the RP6), with sharp texture filtering. All text uses the m5x7 pixel font. A pointing-glove cursor replaces the typed `>` in every menu. Ryn's Qi pips are drawn as pixel dots, and the level-up message fits the message box. Next: 17b (battle-screen layout), 17c (controller + pause menu), 17d (transitions). Spell & combat effects were split out into their own milestone, now Milestone 18.
 
+**Completed:** Milestone 17b — SNES-style battle layout. The battlefield is taller, with enemies on the left and the party on the right standing on the same ground. Messages appear in a banner across the top only while there's something to say. The bottom has three framed windows: commands (or the enemy list while targeting), and party HP/MP/Qi for everyone. The glove points at the enemy sprite itself when targeting, and long lists show scroll arrows.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

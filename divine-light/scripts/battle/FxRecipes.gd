@@ -98,10 +98,11 @@ const BY_NAME := {
 	"Flurry": {"cast": "lunge", "impact": "slash", "palette": "shadow", "sound": "", "count": 4},
 }
 
+# Items are tossed to the target (18d); used on yourself, the toss is skipped.
 const ITEMS := {
-	"item_heal": {"impact": "sparkles", "palette": "heal", "sound": "heal"},
-	"item_restore_mp": {"impact": "sparkles", "palette": "mana", "sound": "heal"},
-	"item_cure_poison": {"impact": "sparkles", "palette": "poison", "sound": "heal"},
+	"item_heal": {"cast": "projectile", "impact": "sparkles", "palette": "heal", "sound": "heal"},
+	"item_restore_mp": {"cast": "projectile", "impact": "sparkles", "palette": "mana", "sound": "heal"},
+	"item_cure_poison": {"cast": "projectile", "impact": "sparkles", "palette": "poison", "sound": "heal"},
 }
 
 # Keyword fallbacks for effect names without an entry, checked in order.

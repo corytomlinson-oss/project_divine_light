@@ -65,10 +65,15 @@ func cast(recipe: Dictionary, caster: CanvasItem, targets: Array) -> void:
 		"charge":
 			await charge(anchor(caster), pal)
 		"projectile":
+			# Nothing to throw at yourself (an item used on its user).
 			var last: Signal
+			var thrown := false
 			for t: CanvasItem in targets:
+				if anchor(caster).distance_to(anchor(t)) < 4.0:
+					continue
 				last = projectile(anchor(caster), anchor(t), pal)
-			if not targets.is_empty():
+				thrown = true
+			if thrown:
 				await last
 
 

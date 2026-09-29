@@ -209,5 +209,5 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.
-- **Boss phase-2 visual variant** (Hollow Warden) — would need a code change to actually swap the texture on phase transition, not just new art; not scoped into this pass.
+- **Boss phase-2 visual variant** (Hollow Warden) — would need a code change to actually swap the texture on phase transition, not just new art; not scoped into this pass. **Done differently in 18d:** no new art; the boss gets a lasting reddish tint plus a flash/shake/thunder effect at the phase change.
 - **Per-class player sprites** — blocked on a starting-class-selection feature that doesn't exist in code yet.

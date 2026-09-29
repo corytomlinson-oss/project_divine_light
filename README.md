@@ -71,6 +71,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 18c — Lyra and Silas effects. Lyra's spells escalate in three tiers per element (e.g. Ember → Flare → Inferno), with ice and rock spikes for Blizzard, Glacier and Quake, and stance switches sparkle in the new element's color. Silas gets violet shadow blades, poison clouds, sinking debuffs and a layered Shadowstep finisher. Claude's judgment calls while Cory was away are logged in `DECISIONS.md`.
 
+**Completed:** Milestone 18d — Status markers & polish, which completes Milestone 18. Tiny pixel icons show poison, burn, bleed, stun, buffs and debuffs (above enemies, and in each party member's row). Poison, burn and bleed puff an effect each time they tick. Items are tossed to whoever they're used on. Bosses visibly enrage at their phase change (flash, shake, thunder) and stay tinted red. Next: Act I content, starting with Milestone 19a (The Cathedral).
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

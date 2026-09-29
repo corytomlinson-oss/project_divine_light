@@ -63,3 +63,13 @@ These are calls Claude made without asking, while Cory was away. For each one: w
 - **Some Silas skills layer several effects at once:** Envenom (slash + poison cloud), Shadow Strike (violet slash + burst), Expose (slash + falling motes), Garrote (a low wire cut + stun stars, since it stuns), Death Mark (ring + falling motes), Shadowstep (3 slashes + cloud + stun stars + shake, with the poison sound).
 - **Smoke Bomb** puffs grey smoke on every enemy with a white flash. **Vanish** is a violet puff on Silas.
 - **The new "crystals" effect is shared:** ice spikes for Lyra's ice spells and rock spikes for Tremor and Quake, the same shape in different colors.
+
+## Milestone 18d — Status markers & polish (2026-09-29)
+
+- **Party status icons are in the party window, not above the sprites.** Vael's top slot sits under the message banner, which would hide them. Enemy icons do sit above the enemy sprites. *Change:* `_setup_party_window()` / `_setup_enemy_ui()` in `Battle.gd`.
+- **Death Mark shows as the DEF-down icon.** That's what it does underneath; there's no separate mark flag. **The Defend action and Silas's row change get no icon**, since they only last the current turn.
+- **Icon set and colors** (all hand-placed 5×5 pixels in `StatusIcons.gd`): green drop = poison, orange flame = burn, red drop = bleed, yellow star = stun, gold up-arrow = ATK up, blue up-arrow = DEF up, violet down-arrow = DEF down, light-blue down-arrow = AGI down, shield = Sanctuary, red ! = Taunt, grey ~ = evasion, grey X = accuracy down.
+- **Damage-over-time ticks** play one fire or poison sound per round, not one per afflicted fighter, so a poisoned group doesn't make a wall of noise. Bleed ticks are silent.
+- **Items are tossed as a small orb** from the user to the target, skipped when you use one on yourself.
+- **The boss enrage** is a violet flash, a big shake, thunder and a "X is enraged!" banner, then a **permanent reddish tint** for the rest of the fight. That stands in for a phase-2 sprite, so no new art was needed. *Change:* `_play_boss_phase_change()`.
+- **Damage numbers now draw under the message banner.** A very long message (e.g. a boss phase note plus a Sanctuary block) now covers a number instead of having it printed over the text.

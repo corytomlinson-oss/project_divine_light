@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 18 (Spell & combat VFX) is in progress, split into 18a-18d** (scoped with Cory 2026-09-29). 18a (effect system), 18b (Vael + Ryn) and 18c (Lyra + Silas) are done; only 18d (status markers + polish) is left. Cory approved the scope, then left me to build 18a-18c on my recommendations; they're committed locally and need his playtest (and his ear for 7 new sounds) before pushing. **Every call made without him is logged in `DECISIONS.md`** for his review.
+**Milestone 18 (Spell & combat VFX) is complete** (2026-09-29): 18a effect system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + polish. Cory approved the scope, then left me to build all four on my recommendations; **18a-18d are committed locally and need his playtest (and his ear for 7 new sounds) before pushing.** Every call made without him is logged in `DECISIONS.md`. **Next up: Act I content, starting with 19a (The Cathedral)** — that's where enemy abilities, real bosses and the enemy-level-scaling question come in (see "Open design questions"); flag it to Cory as a design-heavy milestone before starting.
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
@@ -180,7 +180,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - **Damage / heal numbers:** `_popup_hp_change()` floats a number over whoever's HP changed (white damage, green healing, 1px black shadow), called from the same HP-diff passes that drive the hurt/KO animations, so attacks, skills, items and poison ticks all show one.
 - Verified by a driver node on the root (it survives scene changes, unlike a test scene) playing the real flow: encounter → mosaic → battle → 4 attacks → auto-advance → win → map → pause menu → Equip → back to the reopened menu (12 checks + screenshots).
 
-## Milestone 18 — Spell & combat VFX (in progress)
+## Milestone 18 — Spell & combat VFX (done)
 
 Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/numbers show), **new element sounds**, **status markers in scope (18d)**. Split: 18a system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + item/boss-phase polish. Enemies only have a basic attack until enemy abilities exist (19a), so they get just the attack effect.
 
@@ -206,7 +206,14 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Lyra** escalates in three tiers per element (e.g. Ember → Flare → Inferno: orb, bigger orb + flash, rising flame column + shake); AoE spells hit every enemy + flash. Stance switches (`BY_NAME` "Switch: Fire" etc.) sparkle in the new stance's color.
 - **Silas:** violet shadow blades, poisons add a green cloud, debuffs sink, stuns get stars; Shadowstep layers slashes + cloud + stars with a shake.
 - Full per-skill list is in `DECISIONS.md` (Milestone 18c).
-- **Next up: 18d** — status markers on sprites (poison/burn/bleed, stun, buffs/debuffs) between turns, plus item and boss-phase effect polish. Enemies still only have a basic attack until 19a.
+
+### 18d — status markers & polish (done, 2026-09-29)
+
+- **`StatusIcons`** (`scripts/ui/StatusIcons.gd`): a row of hand-placed 5×5 pixel icons for everything the Combatant tracks (poison, burn, bleed, stun, ATK up, DEF up, DEF down — Death Mark is a DEF debuff underneath —, AGI down, Sanctuary, Taunt, evasion, accuracy down). It reads the fields every frame and redraws only on change, so no battle code notifies it. **Enemies:** above the sprite, as its child (shakes and fades with it). **Party:** in the party-window row between the HP and MP columns (x 113), because the top party slot sits under the message banner.
+- **DoT ticks** (`_tick_dot()`) puff an effect on each afflicted fighter (burn burst, poison cloud, bleed drips) with one fire/poison sound per tick type.
+- **Items are tossed** to the target as a small orb (skipped when used on yourself: `BattleFx.cast` ignores projectiles to the caster's own position).
+- **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
+- **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
 ## Where things live
 
@@ -259,7 +266,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 | 18a | Spell & combat VFX — effect system (BattleFx library, recipe table, impact timing, 7 element sounds, fallbacks for every skill) | ✅ (2026-09-29) |
 | 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | ✅ (2026-09-29) |
 | 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | ✅ (2026-09-29) |
-| 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | Not started |
+| 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | ✅ (2026-09-29) |
 | 19a | Act I — The Cathedral (Vael) | Not started |
 | 19b | Act I — The Monastery (Ryn) | Not started |
 | 19c | Act I — The Observatory (Lyra) | Not started |

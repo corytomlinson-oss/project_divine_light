@@ -325,6 +325,11 @@ func _setup_party_window() -> void:
 		_party_row_labels.append(row_label)
 		_party_hp_labels.append(_window_label(party_window, Vector2(50, y), 60, HORIZONTAL_ALIGNMENT_RIGHT))
 		_party_hp_bars.append(_window_bar(party_window, Vector2(60, y + 10), HP_BAR_W, HP_GREEN))
+		# Status icons (18d) in the gap between the HP and MP columns.
+		var icons := StatusIcons.new()
+		icons.combatant = member
+		icons.position = Vector2(113, y + 3)
+		party_window.add_child(icons)
 		if member.max_qi > 0:
 			var pips := QiPips.new()
 			pips.position = Vector2(166, y + 2)
@@ -391,6 +396,16 @@ func _setup_enemy_ui() -> void:
 			var h: float = (sprite as AnimatedSprite2D).sprite_frames.get_frame_texture(&"default", 0).get_height()
 			sprite.position = Vector2(cx, feet - h / 2.0)
 		$EnemyArea.add_child(sprite)
+		# Status icons (18d) just above the sprite, riding along with it.
+		var icons := StatusIcons.new()
+		icons.combatant = _enemies[i]
+		icons.centered = true
+		if sprite is AnimatedSprite2D:
+			var top: float = (sprite as AnimatedSprite2D).sprite_frames.get_frame_texture(&"default", 0).get_height() / 2.0
+			icons.position = Vector2(0, -top - 8.0)
+		else:
+			icons.position = Vector2(12, -8)
+		sprite.add_child(icons)
 		_enemy_sprites.append(sprite)
 		_enemy_home.append(sprite.position)
 		_enemy_last_hp.append(_enemies[i].hp)
@@ -619,8 +634,10 @@ func _popup_hp_change(target: CanvasItem, damage: int) -> void:
 	# its current size.
 	if message_banner.visible:
 		label.position.y = maxf(label.position.y, 40.0)
-	label.z_index = 5
 	add_child(label)
+	# Drawn under the (opaque) banner, so a number that ends up behind a tall
+	# message is hidden rather than printed over the text.
+	move_child(label, message_banner.get_index())
 	var t := create_tween()
 	t.tween_property(label, "position:y", label.position.y - 8.0, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	t.tween_interval(0.45)
@@ -1347,18 +1364,20 @@ func _fx_targets(member: Combatant, recipe: Dictionary) -> Array:
 					fighters = [member]
 	var sprites: Array = []
 	for f in fighters:
-		if f == null:
-			continue
-		var sprite: CanvasItem = null
-		if f.is_enemy:
-			var i := _enemies.find(f)
-			sprite = _enemy_sprites[i] if i >= 0 and i < _enemy_sprites.size() else null
-		else:
-			var i := _party.find(f)
-			sprite = _party_sprites[i] if i >= 0 and i < _party_sprites.size() else null
+		var sprite := _sprite_of(f)
 		if sprite != null:
 			sprites.append(sprite)
 	return sprites
+
+
+func _sprite_of(c: Combatant) -> CanvasItem:
+	if c == null:
+		return null
+	if c.is_enemy:
+		var i := _enemies.find(c)
+		return _enemy_sprites[i] if i >= 0 and i < _enemy_sprites.size() else null
+	var j := _party.find(c)
+	return _party_sprites[j] if j >= 0 and j < _party_sprites.size() else null
 
 
 ## Weapon users (Ryn, Silas) sound physical when they hit enemies; everything
@@ -1947,11 +1966,12 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
-	_anim_enemy_attack(_enemies.find(enemy))
-
 	var phase_note := ""
 	if enemy.is_boss:
 		phase_note = _check_boss_phase_transition(enemy)
+		if phase_note != "":
+			await _play_boss_phase_change(enemy)
+	_anim_enemy_attack(_enemies.find(enemy))
 
 	# Taunt forces all enemies to target the taunting member
 	var target: Combatant = null
@@ -2025,6 +2045,22 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	return "%s enters a new phase! Its attacks grow fiercer!\n" % enemy.display_name
 
 
+## The boss powering up (18d): violet flash, a big shake and a thunder crack,
+## then a lasting reddish tint so the stronger phase is visible. The tint is
+## on self_modulate, which the hurt/death tweens (on modulate) don't touch.
+func _play_boss_phase_change(enemy: Combatant) -> void:
+	var sprite := _sprite_of(enemy)
+	if sprite == null:
+		return
+	message_label.text = "%s is enraged!" % enemy.display_name
+	Sfx.play("thunder")
+	_fx.flash(BattleFx.PALETTES["debuff"][0], 0.5, 0.4)
+	_fx.shake(4.0, 0.5)
+	_fx.burst(BattleFx.anchor(sprite), BattleFx.PALETTES["debuff"], 22.0, 0.5)
+	sprite.self_modulate = Color(1.25, 0.72, 0.8)
+	await _fx.create_tween().tween_interval(0.6).finished
+
+
 ## Milestone 15's one wired-up Full Set Bonus: Vael's Holy Guardian Set
 ## ("all buff skills last 1 extra round"). The other 11 sets in the design
 ## doc each change a different, specific skill's behavior and aren't
@@ -2058,8 +2094,21 @@ func _tick_buffs() -> void:
 			c.accuracy_debuff_rounds -= 1
 
 
+## Poison / burn / bleed damage at the end of a round. Each tick also puffs a
+## small effect on the fighter (18d); the numbers come from _update_ui().
 func _tick_dot() -> void:
+	var sounds := {}
 	for c in _party + _enemies:
+		var sprite := _sprite_of(c)
+		if sprite != null and c.is_alive():
+			if c.burn_rounds > 0:
+				_fx.burst(BattleFx.anchor(sprite), BattleFx.PALETTES["fire"], 8.0)
+				sounds["fire"] = true
+			if c.poison_rounds > 0:
+				_fx.cloud(BattleFx.anchor(sprite), BattleFx.PALETTES["poison"])
+				sounds["poison"] = true
+			if c.bleed_rounds > 0:
+				_fx.sparkles(BattleFx.anchor(sprite), BattleFx.PALETTES["enemy"], false)
 		if c.burn_rounds > 0 and c.is_alive():
 			c.receive_damage(c.burn_power)
 			c.burn_rounds -= 1
@@ -2075,6 +2124,8 @@ func _tick_dot() -> void:
 			c.bleed_rounds -= 1
 			if c.bleed_rounds <= 0:
 				c.bleed_power = 0
+	for sound: String in sounds:
+		Sfx.play(sound)
 	_update_ui()
 
 

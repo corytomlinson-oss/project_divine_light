@@ -26,6 +26,10 @@ var reopen_pause_menu: bool = false
 # Story flags set by cutscenes ("set met_frank"), saved with the game, so a
 # scene can check whether something already happened (Milestone 19a).
 var story_flags: Dictionary = {}
+# Development/testing: when set (a list of enemy dicts, EnemyData format), the
+# next battle fights exactly this group - bosses too, via "is_boss" and
+# "phase_hp_thresholds" - then it's cleared (Milestone 20a).
+var debug_encounter: Array = []
 
 
 func _ready() -> void:

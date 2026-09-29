@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Act I (Milestone 20a, The Cathedral) is in progress**, built on my recommendations while Cory is away (he said to log every call in `DECISIONS.md`). 20a is being done in four steps, each committed locally (not pushed): **step 1 foundations (done)**, step 2 enemy abilities, step 3 the Cathedral's two variants, step 4 Verdance + overworld. See the Milestone 20 section.
+**Act I (Milestone 20a, The Cathedral) is in progress**, built on my recommendations while Cory is away (he said to log every call in `DECISIONS.md`). 20a is being done in four steps, each committed locally (not pushed): **step 1 foundations (done)**, **step 2 enemy abilities (done)**, step 3 the Cathedral's two variants, step 4 Verdance + overworld. See the Milestone 20 section.
 
 
 **Milestone 19 (Cutscenes) is complete** (2026-09-29): 19a cutscene system + movie mode, 19b intro movie + title screen. Cory playtested and approved both (intro theme included); pushed to `cjt`. The game starts on the title screen (New Game plays the intro); F7/F8 play the demo scene/movie on a map. Built on my recommendations while he was away; every call is logged in `DECISIONS.md`. **Next up: Act I content, starting with 20a (The Cathedral)**. It's design-heavy (enemy abilities, real bosses, enemy level scaling, the Act I opening scenes), so talk it through with Cory before building.
@@ -238,6 +238,14 @@ Built in four steps, each tested and committed on its own:
 - **Doors can refuse:** a map's `get_door_destination()` may return `{"blocked": "text"}`; `Player._use_door()` then shows the line via **`Cutscene.play_text()`** (scene commands from a string instead of a file) and stays put.
 - **Enemy level scaling: decided, no scaling** (see "Open design questions").
 
+**Step 2: enemy abilities (done, 2026-09-29)**
+- **`EnemyData`** (`scripts/battle/EnemyData.gd`): every encounter table (`FOREST_ENCOUNTERS`, `CATHEDRAL_ESCAPE_ENCOUNTERS` for the lone level-1 start, `CATHEDRAL_ENCOUNTERS` for the rescue, tuned for ~2 heroes at level 5), `ENCOUNTER_TABLES` by location, `BOSSES` by id, and **`KITS`: behavior by enemy name** (so an enemy acts the same everywhere). A kit has `attack` modifiers (`hits`, `target: back_row`, `poison_*`, `stun_chance`), `abilities` (checked in order each turn: `every` N turns or `chance` %, gated by boss `phase` / `max_phase`; kinds `party_def_down`, `ally_atk_up`, `self_def_up`, `charge` (a telegraphed blow next turn, with a `tell` line and `mult`), `magic_single`, `magic_all`), `weak` elements, `int`/`res`. `STAND_INS` lend a sprite (scaled up by resizing the image, not the node, so status icons stay normal size; tinted via `self_modulate`) to enemies without art. Battle.gd's old tables are gone; `Battle.LOCATION_BOSSES` picks the boss per location (`cathedral` → Fallen Guardian, `cathedral_escape` → Hollow Warden).
+- **The enemy turn** (`_execute_enemy_turn` → `_choose_ability` / `_enemy_attack` / `_enemy_ability`, `_pick_target`): a charged blow from last turn lands first; otherwise the first qualifying ability; otherwise the basic attack with the kit's modifiers. Enemy damage now includes `atk_buff`. The Milestone 14 stand-in phase behavior (+6 ATK, every hit lowers DEF) is gone; bosses change per phase through their kits.
+- **Behaviors (from the design doc):** Blighted Wolf hits twice; Hollow Archer prefers the back row (75%); Shade Wisp poisons (40%); Cursed Paladin stuns (20%); Fallen Priest's Dark Litany lowers the whole party's DEF; Shadow Acolyte's Unholy Blessing raises its allies' ATK. **Hollow Warden** (now the Cathedral's escape warden: "armored and slow, but punishes mistakes") raises its hammer every 3rd turn (every 2nd in phase 2) and lands Crushing Blow (2.5×) the next turn, so Defend is the answer. **Fallen Guardian**: phase 1 Iron Faith (DEF +8) every 3rd turn; phase 2 Profane Consecrate (all) every 3rd turn and Dark Smite (45%); weak to holy.
+- **Weaknesses:** every damage call from a party action goes through `_hit()`, which applies 1.5× when the action's element (`_element_of()`: holy / fire / ice / lightning / earth from the skill's effect name) is in the enemy's `weak` list, and the message gets " Weak!".
+- **`GameManager.debug_encounter`**: set it to a list of enemy dicts and the next battle fights exactly that group (bosses via `is_boss` / `phase_hp_thresholds`). Handy for testing content.
+- Verified in real battles: every behavior above (11 checks) plus screenshots.
+
 ## Milestone 19 — Cutscenes (done)
 
 ### 19a — cutscene system + movie mode (done, 2026-09-29)
@@ -279,6 +287,7 @@ Built in four steps, each tested and committed on its own:
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
+- Enemy stats, behavior kits, encounter tables, bosses: `divine-light/scripts/battle/EnemyData.gd`
 - Act I data (dungeons, captives, gates, routes): `divine-light/scripts/systems/ActOne.gd`; class select: `divine-light/scenes/title/ClassSelect.tscn` + `divine-light/scripts/title/ClassSelect.gd`
 - Title screen: `divine-light/scenes/title/Title.tscn` + `divine-light/scripts/title/Title.gd` (the main scene); intro movie art: `divine-light/assets/movie/` (generator in `source/`)
 - Cutscenes: `divine-light/scripts/systems/Cutscene.gd` (autoload player) + `divine-light/scripts/cutscene/SceneScript.gd` (parser, command reference) + scene files in `divine-light/data/cutscenes/`

@@ -79,63 +79,15 @@ const ITEM_DEFS: Dictionary = {
 	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
 }
 
-const ENCOUNTERS: Array = [
-	# Singles (2/10 = 20%)
-	[{"name": "Blighted Wolf",    "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25}],
-	[{"name": "Corrupted Farmer", "hp": 80, "atk": 12, "def": 5, "agi":  4, "xp": 35}],
-	# Pairs (5/10 = 50%)
-	[{"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25},
-	 {"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25}],
-	[{"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20},
-	 {"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18}],
-	[{"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25},
-	 {"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20}],
-	[{"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18},
-	 {"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18}],
-	[{"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20},
-	 {"name": "Corrupted Farmer", "hp": 80, "atk": 12, "def": 5, "agi": 4, "xp": 35}],
-	# Triples (3/10 = 30%)
-	[{"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18},
-	 {"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18},
-	 {"name": "Corrupted Farmer", "hp": 80, "atk": 12, "def": 5, "agi": 4, "xp": 35}],
-	[{"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25},
-	 {"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20},
-	 {"name": "Shade Wisp",    "hp": 30, "atk": 5,  "def": 1, "agi": 11, "xp": 18}],
-	[{"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25},
-	 {"name": "Blighted Wolf", "hp": 50, "atk": 8,  "def": 3, "agi": 12, "xp": 25},
-	 {"name": "Hollow Archer", "hp": 40, "atk": 7,  "def": 2, "agi":  9, "xp": 20}],
-]
+# Enemy stats, kits (abilities, attack modifiers, weaknesses) and encounter
+# tables live in EnemyData.gd (Milestone 20a).
 
-# Placeholder stat-only roster for the Milestone 13a test dungeon (The Cathedral).
-# The README's Fallen Priest/Cursed Paladin/Shadow Acolyte roles (debuff DEF,
-# stun, buff allies) need an enemy-ability system that doesn't exist yet, so
-# these are differentiated by stats only for now. Full behavior is Milestone
-# 19a's job when the Cathedral's real content gets built.
-const CATHEDRAL_ENCOUNTERS: Array = [
-	[{"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30}],
-	[{"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40}],
-	[{"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28},
-	 {"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28}],
-	[{"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30},
-	 {"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40}],
-	[{"name": "Cursed Paladin", "hp": 90, "atk": 10, "def": 9, "agi":  5, "xp": 40},
-	 {"name": "Shadow Acolyte", "hp": 40, "atk": 6,  "def": 4, "agi": 10, "xp": 28},
-	 {"name": "Fallen Priest",  "hp": 45, "atk": 9,  "def": 3, "agi":  8, "xp": 30}],
-]
-
-const ENCOUNTER_TABLES: Dictionary = {
-	"overworld": ENCOUNTERS,
-	"cathedral": CATHEDRAL_ENCOUNTERS,
+# Milestone 14's boss system: EnemyData.BOSSES by id, picked per location.
+const LOCATION_BOSSES := {
+	"cathedral": "fallen_guardian",
+	"cathedral_escape": "hollow_warden",
 }
 
-# Milestone 14 test boss for the Cathedral's generated boss room. A stand-in,
-# not the real Fallen Guardian (that's Milestone 20a's job, with its own
-# 2-phase kit: physical+self-DEF-buff -> corrupted holy magic). This one
-# exists to prove the generic system - visible/fixed encounter, phase
-# transition, escape lockout, bonus XP - works end to end.
-# Battle background art per location (320x180, drawn over the plain Background
-# ColorRect). Locations without an entry keep the plain color - e.g. the
-# Cathedral, where a forest backdrop would be wrong.
 const BATTLE_BACKGROUNDS: Dictionary = {
 	"overworld": "res://assets/ui/battle_bg_forest.png",
 }
@@ -184,13 +136,6 @@ const PARTY_WALK_SPEED := 60.0
 const MESSAGE_BASE_TIME := 0.8
 const MESSAGE_TIME_PER_CHAR := 0.02
 const MESSAGE_MAX_TIME := 2.6
-
-const BOSS_ENCOUNTERS: Dictionary = {
-	"cathedral": {
-		"name": "Hollow Warden", "hp": 220, "atk": 14, "def": 8, "agi": 9, "xp": 300,
-		"phase_hp_thresholds": [0.5],
-	},
-}
 
 # Party
 var _party: Array = []
@@ -268,6 +213,10 @@ var _message_timer := 0.0
 # turn doesn't advance and its damage hasn't been applied yet.
 var _fx := BattleFx.new()
 var _acting := false
+# The element of the party action being resolved ("" = physical) and whether
+# it just hit a weakness (Milestone 20a).
+var _skill_element := ""
+var _weak_hit := false
 
 
 func _ready() -> void:
@@ -290,15 +239,24 @@ func _ready() -> void:
 
 
 func _generate_encounter() -> Array:
+	if not GameManager.debug_encounter.is_empty():
+		var forced: Array = []
+		for data: Dictionary in GameManager.debug_encounter:
+			var e := _build_enemy(data)
+			e.is_boss = data.get("is_boss", false)
+			e.phase_hp_thresholds = data.get("phase_hp_thresholds", []).duplicate()
+			forced.append(e)
+		GameManager.debug_encounter = []
+		return forced
 	if GameManager.pending_boss_battle:
 		GameManager.pending_boss_battle = false
-		var boss_data: Dictionary = BOSS_ENCOUNTERS.get(GameManager.current_location, {})
+		var boss_data: Dictionary = EnemyData.BOSSES.get(LOCATION_BOSSES.get(GameManager.current_location, ""), {})
 		if not boss_data.is_empty():
 			var boss: Combatant = _build_enemy(boss_data)
 			boss.is_boss = true
 			boss.phase_hp_thresholds = boss_data.get("phase_hp_thresholds", []).duplicate()
 			return [boss]
-	var table: Array = ENCOUNTER_TABLES.get(GameManager.current_location, ENCOUNTERS)
+	var table: Array = EnemyData.ENCOUNTER_TABLES.get(GameManager.current_location, EnemyData.FOREST_ENCOUNTERS)
 	# Groups sized to the party (Milestone 20a): at most one enemy more than
 	# there are party members, so a lone hero at the start of Act I isn't
 	# thrown against three at once.
@@ -315,6 +273,12 @@ func _generate_encounter() -> Array:
 func _build_enemy(data: Dictionary) -> Combatant:
 	var e := Combatant.new(data["name"], int(data["hp"]), int(data["atk"]), int(data["def"]), int(data["agi"]), true)
 	e.xp_reward = int(data["xp"])
+	var kit: Dictionary = EnemyData.kit(e.display_name)
+	e.abilities = kit.get("abilities", [])
+	e.attack_mods = kit.get("attack", {})
+	e.weak = kit.get("weak", [])
+	e.int_stat = int(kit.get("int", 0))
+	e.res_stat = int(kit.get("res", 0))
 	return e
 
 
@@ -597,9 +561,20 @@ func _update_party_positions(delta: float) -> void:
 ## Returns null when an enemy has no art yet.
 func _make_enemy_sprite(enemy_name: String) -> AnimatedSprite2D:
 	var path := "res://assets/sprites/enemies/%s.png" % enemy_name.to_lower().replace(" ", "_")
+	var stand_in: Dictionary = {}
 	if not ResourceLoader.exists(path):
-		return null
+		stand_in = EnemyData.STAND_INS.get(enemy_name, {})
+		if stand_in.is_empty():
+			return null
+		path = "res://assets/sprites/enemies/%s.png" % stand_in["sprite"]
 	var tex: Texture2D = load(path)
+	if stand_in.has("scale"):
+		# Scale the image itself (not the node), so status icons and effect
+		# positions attached to the sprite stay normal size.
+		var k: int = stand_in["scale"]
+		var img := tex.get_image()
+		img.resize(img.get_width() * k, img.get_height() * k, Image.INTERPOLATE_NEAREST)
+		tex = ImageTexture.create_from_image(img)
 	var w := int(tex.get_width() / 2.0)
 	var frames := SpriteFrames.new()
 	frames.set_animation_speed(&"default", 2.0)
@@ -615,6 +590,8 @@ func _make_enemy_sprite(enemy_name: String) -> AnimatedSprite2D:
 	sprite.speed_scale = randf_range(0.85, 1.15)
 	sprite.play(&"default")
 	sprite.frame_progress = randf()
+	if stand_in.has("tint"):
+		sprite.self_modulate = stand_in["tint"]
 	return sprite
 
 
@@ -1331,6 +1308,8 @@ func _execute_party_turn(member: Combatant) -> void:
 		_fx.impact(recipe, targets)
 		if recipe.get("sound", "") != "":
 			Sfx.play(recipe["sound"])
+	_skill_element = _element_of(member)
+	_weak_hit = false
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -1342,6 +1321,33 @@ func _execute_party_turn(member: Combatant) -> void:
 			member.row = "back" if member.row == "front" else "front"
 			_update_ui()
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
+	if _weak_hit:
+		message_label.text += " Weak!"
+	_skill_element = ""
+
+
+## The element a party action deals ("" for plain physical), from the skill's
+## effect name - the same words FxRecipes keys off.
+func _element_of(member: Combatant) -> String:
+	if member.queued_action != "skill":
+		return ""
+	var effect: String = member.queued_skill.get("effect", "")
+	if effect.begins_with("holy") or effect == "consecrate":
+		return "holy"
+	for element: String in ["fire", "ice", "lightning", "earth"]:
+		if effect.contains(element):
+			return element
+	return ""
+
+
+## Deals damage from a party action, 1.5x if the enemy is weak to the
+## action's element. Returns what was actually dealt (for the message).
+func _hit(target: Combatant, dmg: int) -> int:
+	if target.is_enemy and _skill_element != "" and _skill_element in target.weak:
+		dmg = roundi(dmg * 1.5)
+		_weak_hit = true
+	target.receive_damage(dmg)
+	return dmg
 
 
 ## The sprites a party member's action will land on, resolved the same way
@@ -1412,7 +1418,7 @@ func _do_attack(member: Combatant) -> void:
 	var crit := _roll_crit(member)
 	if crit:
 		dmg *= 2
-	target.receive_damage(dmg)
+	dmg = _hit(target, dmg)
 	if member.max_qi > 0:
 		member.qi = mini(member.max_qi, member.qi + 1)
 	_update_ui()
@@ -1447,7 +1453,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
@@ -1462,7 +1468,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			var stunned := false
 			if not target.is_ko and randi() % 100 < 40:
 				target.is_stunned = true
@@ -1482,7 +1488,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.is_stunned = true
 				target.stun_rounds = 1
@@ -1538,7 +1544,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take holy damage!" % [member.display_name, skill["name"]]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
@@ -1570,7 +1576,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
@@ -1584,7 +1590,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take damage!" % [member.display_name, skill["name"]]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
@@ -1609,7 +1615,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
@@ -1630,7 +1636,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					if _roll_crit(member):
 						dmg *= 2
 						any_crit = true
-					target.receive_damage(dmg)
+					dmg = _hit(target, dmg)
 					total += dmg
 			_update_ui()
 			var crit_tag := " CRIT!" if any_crit else ""
@@ -1647,7 +1653,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.agi_debuff = target.agi / 2
 				target.agi_debuff_rounds = 2
@@ -1674,7 +1680,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.is_stunned = true
 				target.stun_rounds = 1
@@ -1697,7 +1703,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			var burned := false
 			if not target.is_ko:
 				target.burn_rounds = 3
@@ -1717,7 +1723,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.agi_debuff = target.agi / 2
 				target.agi_debuff_rounds = 1
@@ -1735,7 +1741,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			var frozen := false
 			if not target.is_ko and randi() % 100 < 40:
 				target.is_stunned = true
@@ -1753,7 +1759,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 				if not enemy.is_ko and randi() % 100 < 40:
 					enemy.is_stunned = true
 					enemy.stun_rounds = 1
@@ -1768,7 +1774,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take lightning damage!" % [member.display_name, skill["name"]]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
@@ -1782,7 +1788,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.is_stunned = true
 				target.stun_rounds = 1
@@ -1798,7 +1804,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 				if not enemy.is_ko:
 					enemy.def_buff = -12
 					enemy.def_buff_rounds = 2
@@ -1813,7 +1819,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take reduced earth damage!" % [member.display_name, skill["name"]]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
@@ -1828,7 +1834,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.poison_rounds = 3
 				target.poison_power = 8 + member.atk / 6
@@ -1847,7 +1853,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.bleed_rounds = 4
 				target.bleed_power = 10 + member.atk / 5
@@ -1897,7 +1903,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
-				enemy.receive_damage(dmg)
+				dmg = _hit(enemy, dmg)
 				if not enemy.is_ko:
 					enemy.poison_rounds = 3
 					enemy.poison_power = 8 + member.atk / 6
@@ -1925,7 +1931,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
-			target.receive_damage(dmg)
+			dmg = _hit(target, dmg)
 			if not target.is_ko:
 				target.poison_rounds = 3
 				target.poison_power = 10 + member.atk / 6
@@ -1968,45 +1974,79 @@ func _do_item(member: Combatant, item_def: Dictionary) -> void:
 			message_label.text = "%s uses %s on %s!\nPoison cured!" % [member.display_name, item_name, target.display_name]
 
 
+## An enemy's turn (Milestone 20a): a blow it telegraphed last turn lands now;
+## otherwise the first ability in its kit that qualifies this turn; otherwise
+## its basic attack (with the kit's attack modifiers). Kits: EnemyData.gd.
 func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
+	enemy.turns_taken += 1
 	var phase_note := ""
 	if enemy.is_boss:
 		phase_note = _check_boss_phase_transition(enemy)
 		if phase_note != "":
 			await _play_boss_phase_change(enemy)
+	if not enemy.charging.is_empty():
+		var charged: Dictionary = enemy.charging
+		enemy.charging = {}
+		await _enemy_attack(enemy, targets, phase_note, charged)
+		return
+	var ability := _choose_ability(enemy)
+	if not ability.is_empty():
+		await _enemy_ability(enemy, ability, targets, phase_note)
+		return
+	await _enemy_attack(enemy, targets, phase_note, {}, int(enemy.attack_mods.get("hits", 1)))
+
+
+## The first ability whose boss phase and timing allow it this turn, or {}.
+## "every": N fires on every Nth turn; otherwise "chance" is a percent roll.
+func _choose_ability(enemy: Combatant) -> Dictionary:
+	for a: Dictionary in enemy.abilities:
+		if enemy.boss_phase < int(a.get("phase", 0)) or enemy.boss_phase > int(a.get("max_phase", 99)):
+			continue
+		if a.has("every"):
+			if enemy.turns_taken % int(a["every"]) == 0:
+				return a
+		elif randi() % 100 < int(a.get("chance", 0)):
+			return a
+	return {}
+
+
+## Taunt wins; back-row hunters (Hollow Archer) pick the back row 75% of the
+## time when anyone's there; otherwise anyone.
+func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
+	for m: Combatant in targets:
+		if m.taunt_rounds > 0:
+			return m
+	if enemy.attack_mods.get("target", "") == "back_row":
+		var back := targets.filter(func(m: Combatant) -> bool: return m.row == "back")
+		if not back.is_empty() and randi() % 100 < 75:
+			return back[randi() % back.size()]
+	return targets[randi() % targets.size()]
+
+
+## A basic attack - `hits` swings (Blighted Wolf: 2) - or, with `charged`,
+## the heavy blow it telegraphed last turn (damage x its "mult").
+func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged: Dictionary, hits := 1) -> void:
 	_anim_enemy_attack(_enemies.find(enemy))
-
-	# Taunt forces all enemies to target the taunting member
-	var target: Combatant = null
-	for m in _party:
-		if m.is_alive() and m.taunt_rounds > 0:
-			target = m
-			break
-	if target == null:
-		target = targets[randi() % targets.size()]
-
-	# Wind-up (the enemy's hop is already playing), then its claw/blade streak
-	# lands on the target together with the damage below.
-	var enemy_sprite: CanvasItem = _enemy_sprites[_enemies.find(enemy)]
-	var target_sprite: CanvasItem = _party_sprites[_party.find(target)]
+	var target := _pick_target(enemy, targets)
+	var recipe: Dictionary = FxRecipes.ENEMY_ATTACK if charged.is_empty() else FxRecipes.ENEMY_HEAVY
+	var enemy_sprite: CanvasItem = _sprite_of(enemy)
+	var target_sprite: CanvasItem = _sprite_of(target)
 	var hit_targets: Array = [target_sprite] if target_sprite != null else []
-	await _fx.cast(FxRecipes.ENEMY_ATTACK, enemy_sprite, hit_targets)
+	await _fx.cast(recipe, enemy_sprite, hit_targets)
 
 	# Smoke Bomb: the enemy's own accuracy is lowered
 	if enemy.accuracy_debuff_rounds > 0 and randi() % 100 < 30:
 		_update_ui()
 		message_label.text = phase_note + "%s's attack misses!" % enemy.display_name
 		return
-
 	# Vanish: target has increased evasion this round
 	if target.evasion_rounds > 0 and randi() % 100 < 50:
 		_update_ui()
 		message_label.text = phase_note + "%s dodges %s's attack!" % [target.display_name, enemy.display_name]
 		return
-
 	# Sanctuary nullifies the hit entirely
 	if target.sanctuary:
 		target.sanctuary = false
@@ -2014,21 +2054,112 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 		message_label.text = phase_note + "%s's Sanctuary absorbs\n%s's attack!" % [target.display_name, enemy.display_name]
 		return
 
-	_fx.impact(FxRecipes.ENEMY_ATTACK, hit_targets)
-	var effective_def := target.defense + target.def_buff
-	var def_val := effective_def * 2 if target.defending else effective_def
-	var dmg := maxi(1, enemy.atk - def_val + randi_range(-1, 1))
-	dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target)))
-	target.receive_damage(dmg)
-	var suffix := " (reduced!)" if target.defending else ""
-	if enemy.is_boss and enemy.boss_phase >= 1:
-		target.def_buff = -4
-		target.def_buff_rounds = 2
-		suffix += " DEF lowered!"
+	var mult: float = float(charged.get("mult", 1.0))
+	var total := 0
+	var swings := 0
+	for h in hits:
+		if not target.is_alive():
+			break
+		if h > 0:
+			await _fx.create_tween().tween_interval(0.18).finished
+			_anim_enemy_attack(_enemies.find(enemy))
+		_fx.impact(recipe, hit_targets)
+		if not charged.is_empty():
+			Sfx.play("earth")
+		var effective_def := target.defense + target.def_buff
+		var def_val := effective_def * 2 if target.defending else effective_def
+		var dmg := maxi(1, enemy.atk + enemy.atk_buff - def_val + randi_range(-1, 1))
+		dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target) * mult))
+		target.receive_damage(dmg)
+		total += dmg
+		swings += 1
+		_update_ui()
+
+	var reduced := " (reduced)" if target.defending else ""
+	var status := ""
+	var mods := enemy.attack_mods
+	if target.is_alive() and randi() % 100 < int(mods.get("poison_chance", 0)):
+		target.poison_rounds = int(mods.get("poison_rounds", 3))
+		target.poison_power = int(mods.get("poison_power", 4))
+		status += " Poisoned!"
+	if target.is_alive() and randi() % 100 < int(mods.get("stun_chance", 0)):
+		target.is_stunned = true
+		target.stun_rounds = 1
+		status += " Stunned!"
 	_update_ui()
-	message_label.text = phase_note + "%s hits %s for %d%s!" % [enemy.display_name, target.display_name, dmg, suffix]
+	if not charged.is_empty():
+		message_label.text = phase_note + "%s unleashes %s!\n%s takes %d%s!%s" % [enemy.display_name, charged.get("name", "a heavy blow"), target.display_name, total, reduced, status]
+	elif swings > 1:
+		message_label.text = phase_note + "%s strikes %s %d times for %d%s!%s" % [enemy.display_name, target.display_name, swings, total, reduced, status]
+	else:
+		message_label.text = phase_note + "%s hits %s for %d%s!%s" % [enemy.display_name, target.display_name, total, reduced, status]
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+## A special move from the enemy's kit. The banner names it while the enemy
+## gathers power, then it resolves.
+func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note: String) -> void:
+	var ability_name: String = a.get("name", "")
+	var pal: Array = BattleFx.PALETTES.get(a.get("palette", "debuff"), BattleFx.PALETTES["debuff"])
+	var enemy_sprite: CanvasItem = _sprite_of(enemy)
+	message_label.text = phase_note + "%s uses %s!" % [enemy.display_name, ability_name]
+	if enemy_sprite != null:
+		await _fx.charge(BattleFx.anchor(enemy_sprite), pal)
+	var power: int = int(a.get("power", 0))
+	var rounds: int = int(a.get("rounds", 2))
+	match str(a.get("kind", "")):
+		"party_def_down":
+			for m: Combatant in targets:
+				m.def_buff = -power
+				m.def_buff_rounds = rounds
+				_fx_on(m, "sinking", "debuff")
+			Sfx.play("spell")
+			message_label.text = phase_note + "%s chants %s!\nThe party's DEF falls!" % [enemy.display_name, ability_name]
+		"ally_atk_up":
+			for e: Combatant in _enemies:
+				if e.is_alive():
+					e.atk_buff = power
+					e.atk_buff_rounds = rounds
+					_fx_on(e, "sparkles", "debuff")
+			Sfx.play("spell")
+			message_label.text = phase_note + "%s casts %s!\nThe enemies' ATK rises!" % [enemy.display_name, ability_name]
+		"self_def_up":
+			enemy.def_buff = power
+			enemy.def_buff_rounds = rounds
+			_fx_on(enemy, "ring", "shield")
+			Sfx.play("holy")
+			message_label.text = phase_note + "%s uses %s!\nIts armor hardens!" % [enemy.display_name, ability_name]
+		"charge":
+			enemy.charging = a
+			_fx_on(enemy, "stars", "enemy")
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "gathers its strength...")]
+		"magic_single":
+			var target := _pick_target(enemy, targets)
+			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			_fx_on(target, "pillar", a.get("palette", "debuff"))
+			Sfx.play("holy")
+			target.receive_damage(dmg)
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!\n%s takes %d!" % [enemy.display_name, ability_name, target.display_name, dmg]
+		"magic_all":
+			_fx.flash(pal[0], 0.4)
+			Sfx.play("thunder")
+			for m: Combatant in targets:
+				_fx_on(m, "burst", a.get("palette", "debuff"))
+				m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!\nThe whole party is struck!" % [enemy.display_name, ability_name]
+	_update_ui()
+	if _party.filter(func(c): return c.is_alive()).is_empty():
+		_end_battle(false)
+
+
+## One BattleFx impact of `kind` in `palette` on a fighter.
+func _fx_on(c: Combatant, kind: String, palette: String) -> void:
+	var sprite := _sprite_of(c)
+	if sprite != null:
+		_fx.impact({"impact": kind, "palette": palette, "size": 12.0}, [sprite])
 
 
 ## Boss fights get harder as they take damage, checked once per boss turn
@@ -2037,9 +2168,8 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 ## Returns a message prefix (with trailing newline) if a transition happened
 ## this turn, so the caller can fold it into whatever message it shows next
 ## instead of the transition note getting silently overwritten a line later.
-## Milestone 14 test boss just permanently hits harder past the threshold -
-## real bosses (Milestone 20a/24b-d) will want per-phase skill kits, which
-## needs an enemy-ability dispatch system that doesn't exist yet.
+## What changes per phase is the boss's kit (abilities with "phase" /
+## "max_phase" in EnemyData.gd, Milestone 20a).
 func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if enemy.boss_phase >= enemy.phase_hp_thresholds.size():
 		return ""
@@ -2047,8 +2177,7 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if hp_frac > enemy.phase_hp_thresholds[enemy.boss_phase]:
 		return ""
 	enemy.boss_phase += 1
-	enemy.atk += 6
-	return "%s enters a new phase! Its attacks grow fiercer!\n" % enemy.display_name
+	return "%s enters a new phase!\n" % enemy.display_name
 
 
 ## The boss powering up (18d): violet flash, a big shake and a thunder crack,

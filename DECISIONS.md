@@ -27,6 +27,19 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **Gates are flavor text on the door, not puzzles**: "A seal of pale holy light bars the doors…". The text is mine. *Change:* `gate_text` in `ActOne.gd`.
 - **The intro no longer sets an `intro_seen` flag**, since a new game clears all flags anyway. Nothing used it.
 
+### Step 2: enemy abilities
+
+- **Enemy behavior is attached by name**, so a Fallen Priest acts the same wherever it appears, including in the weaker escape version. *Change:* `KITS` in `EnemyData.gd`.
+- **The Hollow Warden (the existing Milestone 14 boss art) is now the Cathedral's escape warden**, the "fallen doorkeeper" from the design doc. That saved making new art. **Its lesson is Defend:** every 3rd turn it raises its hammer, and the next turn Crushing Blow does 2.5× damage. In phase 2 it does this every 2nd turn.
+- **The Fallen Guardian's two phases:** phase 1 hits hard and hardens its armor (DEF +8) every 3rd turn. Phase 2 drops the armor move and turns dark holy magic on you: Profane Consecrate hits everyone every 3rd turn, and Dark Smite hits one target 45% of the time. It's weak to holy (Smite, Divine Strike, Divine Wrath, Consecrate).
+- **Weakness = 1.5× damage**, with "Weak!" added to the message. *Change:* `_hit()` in `Battle.gd`.
+- **Behavior odds and numbers** (all mine): Hollow Archer picks the back row 75% of the time; Shade Wisp poisons 40% (4 damage a round for 3 rounds); Cursed Paladin stuns 20%; Dark Litany (45%) lowers everyone's DEF by 4 for 2 rounds; Unholy Blessing (40%) raises enemies' ATK by 4 for 2 rounds. *Change:* the numbers in `KITS`.
+- **Two versions of the Cathedral's enemies:** weaker ones (same names and behaviors) for when you wake up there alone at level 1, and the real garrison for the rescue, **tuned for two heroes around level 5**. That matches Silas's route, where the Cathedral is the second dungeon. Routes that arrive later will find it easier, which follows from "no level scaling".
+- **The Fallen Guardian uses stand-in art**: the Cursed Paladin sprite at 2× in a dark gold tint, until the Act I art pass (Milestone 21). *Change:* `STAND_INS` in `EnemyData.gd`.
+- **Enemy debuffs share the single buff slot** that party skills use. A Dark Litany replaces an active Guard/Fortify DEF bonus, rather than stacking with it.
+- **The Forest Heartlands (overworld) enemies got their behaviors, but their stats are unchanged.** They were tuned for the old four-person party and are too weak for a solo hero past level 3. Rebalancing them belongs with the overworld work in step 4.
+- **A testing hook, `GameManager.debug_encounter`**, forces the next battle's enemies.
+
 ## Milestone 19b — Intro movie & title screen (2026-09-29)
 
 - **I added a title screen**, which wasn't in the plan. The intro needed a place to start from, and "New Game plays the intro" is the classic flow. It has New Game and Continue; Continue loads the F5 debug save and is greyed out when there isn't one. **It's now the game's main scene**, so running the project shows it first. To test a map directly, run that scene on its own (F6 in the editor). *Change:* `run/main_scene` in `project.godot`.

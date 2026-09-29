@@ -8,6 +8,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
+**Milestone 18 (Spell & combat VFX) is complete** (2026-09-29): 18a effect system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + polish. Cory approved the scope, then left me to build all four on my recommendations; Cory playtested 18a-18d (sounds included) and approved them; pushed to `cjt`. Every call made without him is logged in `DECISIONS.md`. **Next up: Act I content, starting with 19a (The Cathedral)** — that's where enemy abilities, real bosses and the enemy-level-scaling question come in (see "Open design questions"); flag it to Cory as a design-heavy milestone before starting.
+
+
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
 - The gamepad bindings are untested on the RP6 itself until the APK milestone (22).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
@@ -177,6 +180,41 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - **Damage / heal numbers:** `_popup_hp_change()` floats a number over whoever's HP changed (white damage, green healing, 1px black shadow), called from the same HP-diff passes that drive the hurt/KO animations, so attacks, skills, items and poison ticks all show one.
 - Verified by a driver node on the root (it survives scene changes, unlike a test scene) playing the real flow: encounter → mosaic → battle → 4 attacks → auto-advance → win → map → pause menu → Equip → back to the reopened menu (12 checks + screenshots).
 
+## Milestone 18 — Spell & combat VFX (done)
+
+Scoped 2026-09-29. Cory's calls: **impact timing** (effects land before damage/numbers show), **new element sounds**, **status markers in scope (18d)**. Split: 18a system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + item/boss-phase polish. Enemies only have a basic attack until enemy abilities exist (19a), so they get just the attack effect.
+
+### 18a — effect system (done, 2026-09-29)
+
+- **`BattleFx`** (`scripts/battle/BattleFx.gd`, a Node2D above the fighters and below the windows): effects built in code, no art files. Each is a short-lived `Shape` node redrawn from a 0..1 tween progress with whole-pixel rects. Effects: `burst`, `slash` (with `count` for multi-hits), `sweep`, `projectile`, `charge`, `bolt`, `pillar` (down, or `rising`), `sparkles` (up, or down = debuff), `ring`, `cloud`, `stars`, plus battlefield `flash` and `shake` (background art + enemy/party areas, not the windows). Colors come from `PALETTES` (physical, enemy, holy, shield, buff, taunt, ki, heal, mana, fire, ice, lightning, earth, arcane, shadow, poison, debuff). It has its own seeded RNG and never touches the global one combat rolls use.
+- **`FxRecipes`** (`scripts/battle/FxRecipes.gd`): which effect each action plays, as data (`cast`, `impact`, `palette`, `sound`, `screen`, `count`, `size`, `row_only`). Lookup: `BY_NAME` → `BY_EFFECT` → keyword fallback on the effect name (fire/ice/lightning/earth/poison/toxic/smoke/bleed/garrote/shadow/death/expose/vanish/stance) → the caster's class palette. So **every skill already shows a fitting effect**; 18b/18c add hand-tuned entries per class.
+- **Impact timing** (Cory's call): `_execute_party_turn()` / `_execute_enemy_turn()` are coroutines. The wind-up plays first (`await _fx.cast(...)`; the banner shows the skill or item name meanwhile), then the action's logic runs and `_fx.impact(...)` fires at that same moment, so hurt flashes and damage numbers land with the effect. `_fx_targets()` resolves the sprites with the same helpers the logic uses, before it runs. `_advance_turn()` sets `_acting` for the duration: the turn doesn't advance, A is ignored, and F3 is blocked until the action finishes; the auto-advance timer starts after it.
+- **Sounds:** 7 new element impacts in `build_sfx.py` (fire, ice, thunder, earth, holy, heal, poison), played as the effect lands on top of the generic attack/spell cast sound; the 11 existing WAVs rebuilt byte-identical. Approved by Cory by ear.
+- Basic attack: white slash; enemy attack: red claw streak on the target; items: sparkles (heal green, Ether blue, Antidote poison-green).
+- Damage numbers now stay below the 2-line banner (y >= 40) so they don't collide with it over the top party slot.
+- Verified: every skill of all four classes played in isolation with frames captured mid-cast / at impact / after (scripted, 36 actions, no errors), plus a round of real battle flow.
+
+### 18b — Vael + Ryn (done, 2026-09-29)
+
+All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NAME`:
+- **Vael:** Smite, Consecrate (all enemies, flash) and Divine Strike (shake) are holy pillars from above; Divine Wrath is a holy bolt with a flash and the thunder sound; Holy Light is heal sparkles; Guard, Divine Shield (caster's row only, via `row_only`) and Sanctuary are shield rings; Fortify and Battle Hymn are shield/gold sparkles on everyone; Purify is holy sparkles; Taunt is a red-orange burst on Vael. Holy sound on his magic, heal sound on his heals.
+- **Ryn:** Iron Fist / Crippling Strike are physical bursts; Ki Blast fires a ki orb; Sweep cuts along every enemy's feet; Pressure Point circles stars; Storm Flurry is 5 ki slashes; Ki Burst is a big ki burst with a shake; Dragon's Maw is a fiery burst with a shake; Rising Dragon is a ki pillar rising from the target; Vital Touch / Mending Flow / Healing Wave (all allies, green flash) are heal sparkles.
+
+### 18c — Lyra + Silas (done, 2026-09-29)
+
+- **Recipes can layer effects:** `"impact"` may be a list (`["slash", "cloud"]`), played together on each target. New effect `crystals`: jagged spikes growing around the target's feet (ice palette for Blizzard/Glacier, earth palette for Tremor/Quake).
+- **Lyra** escalates in three tiers per element (e.g. Ember → Flare → Inferno: orb, bigger orb + flash, rising flame column + shake); AoE spells hit every enemy + flash. Stance switches (`BY_NAME` "Switch: Fire" etc.) sparkle in the new stance's color.
+- **Silas:** violet shadow blades, poisons add a green cloud, debuffs sink, stuns get stars; Shadowstep layers slashes + cloud + stars with a shake.
+- Full per-skill list is in `DECISIONS.md` (Milestone 18c).
+
+### 18d — status markers & polish (done, 2026-09-29)
+
+- **`StatusIcons`** (`scripts/ui/StatusIcons.gd`): a row of hand-placed 5×5 pixel icons for everything the Combatant tracks (poison, burn, bleed, stun, ATK up, DEF up, DEF down — Death Mark is a DEF debuff underneath —, AGI down, Sanctuary, Taunt, evasion, accuracy down). It reads the fields every frame and redraws only on change, so no battle code notifies it. **Enemies:** above the sprite, as its child (shakes and fades with it). **Party:** in the party-window row between the HP and MP columns (x 113), because the top party slot sits under the message banner.
+- **DoT ticks** (`_tick_dot()`) puff an effect on each afflicted fighter (burn burst, poison cloud, bleed drips) with one fire/poison sound per tick type.
+- **Items are tossed** to the target as a small orb (skipped when used on yourself: `BattleFx.cast` ignores projectiles to the caster's own position).
+- **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
+- **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -194,6 +232,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
+- Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)
 - GitHub: `https://github.com/corytomlinson-oss/project_divine_light`, branch `cjt`
 
 ## Implementation status
@@ -224,7 +263,10 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 | 17b | UI/UX — SNES-style battle layout (taller battlefield, message banner, command/enemy/party windows) | ✅ (2026-09-29) |
 | 17c | UI/UX — controller (input map, hold-to-repeat, B/Start pause menu with Equip, battle shortcuts) | ✅ (2026-09-29) |
 | 17d | UI/UX — transitions & feedback (fades, battle-start mosaic, auto-advancing messages, damage numbers) | ✅ (2026-09-29) |
-| 18 | Spell & combat VFX (split out of 17, Cory's call 2026-09-29) | Not started |
+| 18a | Spell & combat VFX — effect system (BattleFx library, recipe table, impact timing, 7 element sounds, fallbacks for every skill) | ✅ (2026-09-29) |
+| 18b | Spell & combat VFX — Vael + Ryn hand-tuned effects | ✅ (2026-09-29) |
+| 18c | Spell & combat VFX — Lyra + Silas hand-tuned effects | ✅ (2026-09-29) |
+| 18d | Spell & combat VFX — status markers on sprites, item/boss-phase polish | ✅ (2026-09-29) |
 | 19a | Act I — The Cathedral (Vael) | Not started |
 | 19b | Act I — The Monastery (Ryn) | Not started |
 | 19c | Act I — The Observatory (Lyra) | Not started |
@@ -385,4 +427,5 @@ No automated tests — this is manual playtesting in the Godot editor. When a mi
 - Always commit + push to `cjt` after a milestone is confirmed working by the user — don't leave work uncommitted between sessions.
 - Update README.md's "Current Status" section (and this file's status table) in the same commit as the milestone.
 - Keep milestone commits scoped to one sub-milestone at a time; don't bundle unrelated changes.
+- **When working without Cory (he's away and said to go with recommendations), log every judgment call in `DECISIONS.md`** — what, why, and where to change it — so he can review later. His own decisions go in the relevant milestone section here instead.
 - Keep this file (CLAUDE.md) current, not just README.md and the status table. Whenever something changes that a fresh session would need to know — new reusable system, a gotcha hit and fixed, a scoping decision (like the rows question below), debug tooling added, a working-agreement change — add or update the relevant section here in the same commit. Treat stale info here as a bug: if something in this file no longer matches the code, fix it rather than leaving it.

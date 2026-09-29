@@ -63,6 +63,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 17c — Controller & pause menu. A real input map for keyboard and gamepad (WASD now works too), hold-to-repeat in every menu, and a pause menu on B/Start with a party summary and Equip. In battle: X opens Items, Y defends, L1/R1 switch between members who haven't chosen, and B steps back to change the previous member's choice. The first action of a round plays right away, and a blinking arrow replaces the "Press Enter" prompts.
 
+**Completed:** Milestone 17d — Transitions & feedback, which completes Milestone 17 (UI/UX polish). Every scene change fades through black. Random encounters and bosses start with an FF-style effect: two flashes, then the screen breaks into a mosaic and goes dark, with a new encounter sound. Battle messages move on by themselves (A skips ahead), and damage and healing numbers float over whoever was hit or healed. Next: Milestone 18 — Spell & combat VFX.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

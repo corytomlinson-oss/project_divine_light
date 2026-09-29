@@ -178,6 +178,13 @@ const PARTY_BACK_ROW_X := 18.0
 const PARTY_STEP_FORWARD := 5.0
 const PARTY_WALK_SPEED := 60.0
 
+# Battle messages advance on their own (Milestone 17d), like the SNES games:
+# a base pause plus a little per character, capped; A skips ahead. The
+# end-of-battle messages (victory, level-ups) still wait for A.
+const MESSAGE_BASE_TIME := 0.8
+const MESSAGE_TIME_PER_CHAR := 0.02
+const MESSAGE_MAX_TIME := 2.6
+
 const BOSS_ENCOUNTERS: Dictionary = {
 	"cathedral": {
 		"name": "Hollow Warden", "hp": 220, "atk": 14, "def": 8, "agi": 9, "xp": 300,
@@ -256,6 +263,7 @@ var _scroll_hint := ScrollHint.new()
 # Blinking arrow in the banner's corner while a message waits for A.
 var _advance_hint := ScrollHint.new()
 var _blink := 0.0
+var _message_timer := 0.0
 
 
 func _ready() -> void:
@@ -517,6 +525,8 @@ func _animate_party_hp_changes(instant: bool = false) -> void:
 		elif not member.is_ko and member.hp < _party_last_hp[i] and not instant:
 			_tween_hurt(_restart_party_tween(i), sprite, _party_home(i))
 			Sfx.play("hit")
+		if not instant:
+			_popup_hp_change(sprite, _party_last_hp[i] - member.hp)
 		_party_last_hp[i] = member.hp
 
 
@@ -569,6 +579,43 @@ func _make_enemy_sprite(enemy_name: String) -> AnimatedSprite2D:
 	sprite.play(&"default")
 	sprite.frame_progress = randf()
 	return sprite
+
+
+## Floating number over a fighter whose HP just changed (Milestone 17d): white
+## for damage, green for healing. Called from the same HP-diff passes that
+## drive the hurt/KO animations, so every source (attacks, skills, items,
+## poison ticks) shows one without a hook of its own.
+func _popup_hp_change(target: CanvasItem, damage: int) -> void:
+	if damage == 0 or target == null:
+		return
+	var label := Label.new()
+	label.text = str(absi(damage))
+	label.add_theme_color_override("font_color", Color.WHITE if damage > 0 else Color(0.45, 1.0, 0.45))
+	label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.size = Vector2(40, 10)
+	label.position = (_popup_anchor(target) - Vector2(20, 10)).round()
+	label.z_index = 5
+	add_child(label)
+	var t := create_tween()
+	t.tween_property(label, "position:y", label.position.y - 8.0, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	t.tween_interval(0.45)
+	t.tween_property(label, "modulate:a", 0.0, 0.25)
+	t.tween_callback(label.queue_free)
+
+
+## Just above the top of a fighter's sprite (centered sprites) or placeholder
+## block (ColorRect, top-left positioned).
+func _popup_anchor(target: CanvasItem) -> Vector2:
+	if target is Control:
+		var rect := target as Control
+		return rect.position + Vector2(rect.size.x / 2.0, 0)
+	var sprite := target as AnimatedSprite2D
+	var tex: Texture2D = sprite.sprite_frames.get_frame_texture(sprite.animation, 0)
+	var half_h := tex.get_height() / 2.0 if tex != null else 16.0
+	return sprite.position - Vector2(0, half_h)
 
 
 func _restart_enemy_tween(i: int) -> Tween:
@@ -630,6 +677,7 @@ func _animate_enemy_hp_changes() -> void:
 				_anim_enemy_death(i)
 		elif enemy.hp < _enemy_last_hp[i]:
 			_anim_enemy_hurt(i)
+		_popup_hp_change(_enemy_sprites[i], _enemy_last_hp[i] - enemy.hp)
 		_enemy_last_hp[i] = enemy.hp
 
 
@@ -652,15 +700,17 @@ func _process(delta: float) -> void:
 		State.SELECTING:
 			_handle_menu_input()
 		State.RESOLVING:
-			if Input.is_action_just_pressed("confirm"):
+			_message_timer -= delta
+			if Input.is_action_just_pressed("confirm") or _message_timer <= 0.0:
 				_execute_next_turn()
+				_message_timer = _message_time()
 		State.BATTLE_OVER:
 			if Input.is_action_just_pressed("confirm"):
 				if not _level_up_queue.is_empty():
 					Sfx.play("level_up")
 					message_label.text = _level_up_queue.pop_front()
 				else:
-					get_tree().change_scene_to_file(GameManager.current_scene_path)
+					Transition.change_scene(GameManager.current_scene_path)
 
 
 ## Which bottom-left window is up: the commands while a member is choosing
@@ -676,11 +726,17 @@ func _update_windows() -> void:
 	message_banner.size = message_banner.get_combined_minimum_size()
 
 
-## The banner's "press A" arrow: blinks in its bottom-right corner whenever a
-## message is waiting for confirm (actions playing out, the battle's end).
+## How long the current message stays up before the next action plays.
+func _message_time() -> float:
+	return minf(MESSAGE_MAX_TIME, MESSAGE_BASE_TIME + MESSAGE_TIME_PER_CHAR * message_label.text.length())
+
+
+## The banner's "press A" arrow: blinks in its bottom-right corner while an
+## end-of-battle message waits for confirm (action messages move on by
+## themselves, see _message_time()).
 func _update_advance_hint(delta: float) -> void:
 	_blink = fmod(_blink + delta, 0.8)
-	var waiting := state != State.SELECTING and message_banner.visible
+	var waiting := state == State.BATTLE_OVER and message_banner.visible
 	_advance_hint.visible = waiting and _blink < 0.5
 	_advance_hint.more_below = true
 	_advance_hint.height = 0.0
@@ -878,7 +934,7 @@ func _attempt_escape() -> void:
 	var avg_enemy: float = float(enemy_total) / max(1, enemy_count)
 	var chance: int = clampi(50 + roundi((avg_party - avg_enemy) * 2.0), 10, 90)
 	if randi() % 100 < chance:
-		get_tree().change_scene_to_file(GameManager.current_scene_path)
+		Transition.change_scene(GameManager.current_scene_path)
 	else:
 		message_label.text = "Couldn't escape!"
 
@@ -1142,6 +1198,7 @@ func _begin_resolving() -> void:
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
 	_execute_next_turn()
+	_message_timer = _message_time()
 
 
 func _execute_next_turn() -> void:

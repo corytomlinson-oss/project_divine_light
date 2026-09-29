@@ -8,7 +8,10 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**Milestone 17 (UI/UX polish) is in progress, split into 17a-17d.** 17a (pixel rendering + text), 17b (SNES-style battle layout) and 17c (controller + pause menu) are done as of 2026-09-29. **Next up: 17d (transitions & feedback).** See the Milestone 17 section below for the scope, decisions, and what 17b should pick up.
+**Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. **17b-17d are committed locally but not pushed, and still need Cory's playtest** (and his ear for the new `encounter` sound); push to `cjt` once he's happy. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
+- The gamepad bindings are untested on the RP6 itself until the APK milestone (22).
+- The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
+- The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.
 
 **Milestone 16 (current-content art & music pass) is complete** as of 2026-09-27. Every asset in `ASSETS.md` is done except the action menu and party panel frames, which are deferred until 17b. What Milestone 16 ended up producing, for reference:
 - **All 4 party walk sheets are done (2026-09-27)**, hand-placed pixel grids rather than Retro Diffusion: `assets/sprites/<name>_walk.png` + `<name>_frames.tres` (identical animation names, so swapping characters is just `Player.tscn`'s `sprite_frames`), generators in `assets/sprites/source/`. Only Vael is wired in until class selection exists.
@@ -127,7 +130,7 @@ Scoped 2026-09-29 by auditing what exists against the roadmap's "HUD composition
 - **17a — pixel rendering & text (done).** See below.
 - **17b — battle-screen layout (done).** See below.
 - **17c — controller (done).** See below.
-- **17d — transitions & feedback.** All 7 `change_scene_to_file()` calls are hard cuts: a shared fade (autoload), an FF-style battle-entry effect, message pacing.
+- **17d — transitions & feedback (done).** See below.
 - **Not in 17:** spell/combat VFX became their own milestone (now **18**, right after 17). Equip's *functional* scope is still Milestone 15's, but it inherits the global font/cursor changes.
 
 ### 17a — pixel rendering & text (done, 2026-09-29)
@@ -166,6 +169,14 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - **Window fill is fully opaque now** (`panel_thin.png`); at 235 alpha the map showed through the pause menu.
 - Verified by a scripted run pressing the real actions (14 checks: hold-to-repeat, all shortcuts, step back, round start, advance arrow, menu open/navigate/close, reopen after Equip) plus screenshots.
 
+### 17d — transitions & feedback (done, 2026-09-29)
+
+- **`Transition` autoload** (`scripts/systems/Transition.gd`, a CanvasLayer on layer 100): every scene change goes through `Transition.change_scene(path)` (0.18s fade to black, swap, 0.22s fade in) or `Transition.to_battle()`. **Nothing calls `change_scene_to_file` directly anymore.** The tree is paused for the whole transition so the player can't take another step into a second door or encounter. `is_busy()` and a `finished` signal let callers wait (the pause menu reopening after Equip waits for `finished`, because the transition unpauses the tree when it ends).
+- **Battle start:** the frozen screen flashes twice, then breaks into a mosaic (`assets/shaders/mosaic.gdshader`, block size 1 → 24) while going dark, with a new `encounter` sound (`build_sfx.py`, 0.76s rising sweep into a crash; the other 10 WAVs rebuilt byte-identical) and the map music fading out.
+- **Message pacing:** action messages advance on their own after 0.8s + 0.02s per character (max 2.6s), and A skips ahead. Victory and level-up messages still wait for A, with the blinking arrow.
+- **Damage / heal numbers:** `_popup_hp_change()` floats a number over whoever's HP changed (white damage, green healing, 1px black shadow), called from the same HP-diff passes that drive the hurt/KO animations, so attacks, skills, items and poison ticks all show one.
+- Verified by a driver node on the root (it survives scene changes, unlike a test scene) playing the real flow: encounter → mosaic → battle → 4 attacks → auto-advance → win → map → pause menu → Equip → back to the reopened menu (12 checks + screenshots).
+
 ## Where things live
 
 - Godot project: `c:\vs_workspace\games\project_divine_light\divine-light\`
@@ -182,6 +193,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 - UI font + theme: `divine-light/assets/fonts/` (m5x7 + `m5x7_ui.tres` variation), `divine-light/assets/ui/theme.tres` (project-wide via `gui/theme/custom`)
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
+- Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
 - GitHub: `https://github.com/corytomlinson-oss/project_divine_light`, branch `cjt`
 
 ## Implementation status
@@ -211,7 +223,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 | 17a | UI/UX — pixel rendering & text (viewport stretch, nearest filtering, m5x7 font, glove cursor) | ✅ (2026-09-29) |
 | 17b | UI/UX — SNES-style battle layout (taller battlefield, message banner, command/enemy/party windows) | ✅ (2026-09-29) |
 | 17c | UI/UX — controller (input map, hold-to-repeat, B/Start pause menu with Equip, battle shortcuts) | ✅ (2026-09-29) |
-| 17d | UI/UX — transitions & feedback (shared fade, battle-entry effect, message pacing) | Not started |
+| 17d | UI/UX — transitions & feedback (fades, battle-start mosaic, auto-advancing messages, damage numbers) | ✅ (2026-09-29) |
 | 18 | Spell & combat VFX (split out of 17, Cory's call 2026-09-29) | Not started |
 | 19a | Act I — The Cathedral (Vael) | Not started |
 | 19b | Act I — The Monastery (Ryn) | Not started |
@@ -365,6 +377,8 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 No automated tests — this is manual playtesting in the Godot editor. When a milestone's skills are implemented, walk through a test scenario per skill/system (level gating, buff application + expiry, targeting UI, edge cases like KO'd allies or already-dead enemies). Use F1 to skip the grind to reach higher-level skills.
 
 **Real screenshots without the editor (used for 17a):** a throwaway scene (e.g. `res://_tmp_shot/Shot.tscn` + script) run **non-headless** with `Godot_console.exe --path . res://_tmp_shot/Shot.tscn -- <out_dir>` renders in a real window, so it can instance Battle/Equip/maps, call their functions to reach a state, `await RenderingServer.frame_post_draw`, and save `get_viewport().get_texture().get_image()`: native 320×180 PNGs Claude can view. Run an editor import pass first if assets are new, confirm the editor is closed, and delete the temp folder afterwards. Headless runs can't render, so they're only for logic and sizes (`get_combined_minimum_size()`). `Label.get_line_count()` read right after setting text can be stale; measure wrapping with PIL and the font file instead.
+
+**Testing across scene changes (used for 17d):** a test scene is itself the current scene, so any `change_scene_to_file` frees it. Instead, the temp scene adds a driver node to the root (`get_tree().root.add_child.call_deferred(driver)`), then changes to the real map; the driver survives every scene change and can press real actions with `Input.action_press()`/`action_release()` right after `await get_tree().process_frame`, and wait on `Transition.finished`.
 
 ## Working agreement
 

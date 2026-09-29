@@ -20,10 +20,8 @@ func _ready() -> void:
 	_target = position
 	_reset_encounter_counter()
 	if GameManager.reopen_pause_menu:
-		# Back from a screen the pause menu opened (Equip): show the menu again.
-		# Deferred so the map controller has placed the player first.
 		GameManager.reopen_pause_menu = false
-		PauseMenu.open.call_deferred(self, 0)
+		_reopen_pause_menu()
 
 
 func _process(delta: float) -> void:
@@ -39,6 +37,17 @@ func _process(delta: float) -> void:
 		_open_pause_menu()
 	else:
 		_handle_input()
+
+
+## Back from a screen the pause menu opened (Equip): show the menu again once
+## the fade-in is done - the transition unpauses the tree when it finishes,
+## which would otherwise leave the menu open over a running map.
+func _reopen_pause_menu() -> void:
+	if Transition.is_busy():
+		await Transition.finished
+	else:
+		await get_tree().process_frame  # let the map controller place the player
+	PauseMenu.open(self)
 
 
 func _open_pause_menu() -> void:
@@ -120,7 +129,7 @@ func _use_door(cell: Vector2i) -> void:
 		return
 	var dest: Dictionary = map_root.get_door_destination(cell)
 	if not dest.is_empty():
-		get_tree().change_scene_to_file(dest["scene"])
+		Transition.change_scene(dest["scene"])
 
 
 func _check_encounter() -> void:
@@ -129,7 +138,7 @@ func _check_encounter() -> void:
 		_reset_encounter_counter()
 		GameManager.pending_spawn_position = position
 		GameManager.has_pending_spawn = true
-		get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
+		Transition.to_battle()
 
 
 ## Fixed, visible encounter (Milestone 14) - unlike _check_encounter()'s random
@@ -138,7 +147,7 @@ func _trigger_boss_battle() -> void:
 	GameManager.pending_spawn_position = position
 	GameManager.has_pending_spawn = true
 	GameManager.pending_boss_battle = true
-	get_tree().change_scene_to_file("res://scenes/battle/Battle.tscn")
+	Transition.to_battle()
 
 
 func _reset_encounter_counter() -> void:

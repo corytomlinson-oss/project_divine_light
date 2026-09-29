@@ -104,7 +104,7 @@ func _confirm_item() -> void:
 
 
 func _exit_to_map() -> void:
-	get_tree().change_scene_to_file(GameManager.current_scene_path)
+	Transition.change_scene(GameManager.current_scene_path)
 
 
 ## Shows partial progress ("2/4 equipped"), not just the fully-active state -

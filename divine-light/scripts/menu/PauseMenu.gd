@@ -71,11 +71,10 @@ func _close() -> void:
 
 
 func _open_equip() -> void:
-	get_tree().paused = false
 	GameManager.pending_spawn_position = _player.position
 	GameManager.has_pending_spawn = true
 	GameManager.reopen_pause_menu = true
-	get_tree().change_scene_to_file("res://scenes/equip/Equip.tscn")
+	Transition.change_scene("res://scenes/equip/Equip.tscn")
 
 
 ## One member: their standing sprite, name / class / level on the first line,

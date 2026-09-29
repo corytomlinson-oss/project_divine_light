@@ -216,18 +216,30 @@ def equip():
     return mix(0.3, (0, clink(1.0)), (0.075, clink(0.55)))
 
 
+def encounter():
+    # battle start (Milestone 17d), timed to the screen effect: a rising pitch
+    # sweep and whoosh that break into a crash as the screen goes dark
+    rise = tone('pulse', slide(110, 880, 0.42, 1.4), 0.42, 0.5, 0.25, adsr(0.01, 0.1, 0.8, 0.02), vibrato=0.03)
+    whoosh = noise(0.42, 0.35, rate_hz=slide(2500, 26000, 0.42), env=lambda tt, d: tt / d)
+    crash = noise(0.32, 0.8, rate_hz=slide(14000, 2000, 0.32), env=decay(10))
+    thump = tone('tri', slide(160, 40, 0.22, 0.5), 0.22, 0.8, env=decay(14))
+    return mix(0.76, (0, rise), (0, whoosh), (0.42, crash), (0.42, thump))
+
+
 # Peak level per sound. Menu blips play constantly, so they sit well below
 # the one-off fanfares; the thin, high equip clink needs a push to be heard.
 GAIN = {
     'attack': 0.8, 'spell': 0.7, 'hit': 0.8,
     'menu_move': 0.35, 'menu_confirm': 0.4, 'menu_cancel': 0.4,
     'victory': 0.75, 'level_up': 0.7, 'item': 0.65, 'equip': 0.9,
+    'encounter': 0.75,
 }
 
 SOUNDS = {
     'attack': attack, 'spell': spell, 'hit': hit,
     'menu_move': menu_move, 'menu_confirm': menu_confirm, 'menu_cancel': menu_cancel,
     'victory': victory, 'level_up': level_up, 'item': item, 'equip': equip,
+    'encounter': encounter,
 }
 
 

@@ -21,6 +21,7 @@ GameManager="*res://scripts/systems/GameManager.gd"
 Sfx="*res://scripts/systems/Sfx.gd"
 Music="*res://scripts/systems/Music.gd"
 UiInput="*res://scripts/systems/UiInput.gd"
+Transition="*res://scripts/systems/Transition.gd"
 
 [display]
 

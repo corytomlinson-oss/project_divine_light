@@ -14,6 +14,19 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The ending movie is part of Act III + Vorath (26)**, not Milestone 19, because it needs the finale's art and story.
 - **Movie art will be built by code generators** (like the battle background), not hand-drawn or AI-generated. That can be revisited scene by scene.
 
+## Milestone 20a — The Cathedral (2026-09-29)
+
+### Step 1: foundations
+
+- **Enemy level scaling: no scaling.** This was the open design question. Difficulty stays set by region, as the design doc's Enemy Design section describes, and over-leveling stays the classic FF reward for grinding. Easy to revisit if Act I fights go trivial too fast.
+- **Rescued characters join at the party's average level**, with full HP and MP. Otherwise a level-1 recruit would join a level-6 party and just die. *Change:* `recruit()` in `GameManager.gd`.
+- **A new game starts with 3 Potions, 1 Antidote, no equipment and no gold.** You were captured, after all. The Milestone 15 test gear only appears when launching a map directly (F6) for development.
+- **The class select shows all four, but only Vael can be picked** until the other three starting dungeons exist (20b-20d). The others are dimmed, with "Their story opens in a later update." *Change:* `ActOne.PLAYABLE_STARTS`.
+- **The class blurbs are mine**, written from the design doc's class mechanics, and they avoid pronouns. *Change:* `BLURBS` in `ClassSelect.gd`.
+- **Encounter size follows party size:** at most one enemy more than you have party members. That's 1-2 enemies while solo, and the full tables once there are three or more of you.
+- **Gates are flavor text on the door, not puzzles**: "A seal of pale holy light bars the doors…". The text is mine. *Change:* `gate_text` in `ActOne.gd`.
+- **The intro no longer sets an `intro_seen` flag**, since a new game clears all flags anyway. Nothing used it.
+
 ## Milestone 19b — Intro movie & title screen (2026-09-29)
 
 - **I added a title screen**, which wasn't in the plan. The intro needed a place to start from, and "New Game plays the intro" is the classic flow. It has New Game and Continue; Continue loads the F5 debug save and is greyed out when there isn't one. **It's now the game's main scene**, so running the project shows it first. To test a map directly, run that scene on its own (F6 in the editor). *Change:* `run/main_scene` in `project.godot`.

@@ -299,6 +299,12 @@ func _generate_encounter() -> Array:
 			boss.phase_hp_thresholds = boss_data.get("phase_hp_thresholds", []).duplicate()
 			return [boss]
 	var table: Array = ENCOUNTER_TABLES.get(GameManager.current_location, ENCOUNTERS)
+	# Groups sized to the party (Milestone 20a): at most one enemy more than
+	# there are party members, so a lone hero at the start of Act I isn't
+	# thrown against three at once.
+	var fitting: Array = table.filter(func(g: Array) -> bool: return g.size() <= _party.size() + 1)
+	if not fitting.is_empty():
+		table = fitting
 	var group: Array = table[randi() % table.size()]
 	var result: Array = []
 	for data in group:

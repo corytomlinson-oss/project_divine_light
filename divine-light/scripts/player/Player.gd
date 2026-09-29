@@ -131,7 +131,10 @@ func _use_door(cell: Vector2i) -> void:
 	if not map_root.has_method("get_door_destination"):
 		return
 	var dest: Dictionary = map_root.get_door_destination(cell)
-	if not dest.is_empty():
+	if dest.has("blocked"):
+		# A gated or unfinished door (Milestone 20a): say why, stay put.
+		Cutscene.play_text("narrate " + String(dest["blocked"]))
+	elif not dest.is_empty():
 		Transition.change_scene(dest["scene"])
 
 

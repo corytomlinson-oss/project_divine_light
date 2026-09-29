@@ -61,10 +61,19 @@ func is_playing() -> bool:
 ## Plays a scene file to the end. Parse errors are reported (with line
 ## numbers) and nothing plays.
 func play(path: String) -> void:
+	await _play_parsed(SceneScript.parse_file(path), path)
+
+
+## Plays scene commands given as text instead of a file - for short one-off
+## lines a map shows itself, e.g. a sealed door (Milestone 20a).
+func play_text(text: String) -> void:
+	await _play_parsed(SceneScript.parse(text, "inline"), "inline")
+
+
+func _play_parsed(parsed: Dictionary, path: String) -> void:
 	if _playing:
 		push_warning("Cutscene: '%s' requested while another scene is playing" % path)
 		return
-	var parsed := SceneScript.parse_file(path)
 	if not parsed["errors"].is_empty():
 		for e: String in parsed["errors"]:
 			push_error("Cutscene: " + e)

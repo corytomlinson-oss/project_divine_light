@@ -8,6 +8,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
+**Act I (Milestone 20a, The Cathedral) is in progress**, built on my recommendations while Cory is away (he said to log every call in `DECISIONS.md`). 20a is being done in four steps, each committed locally (not pushed): **step 1 foundations (done)**, step 2 enemy abilities, step 3 the Cathedral's two variants, step 4 Verdance + overworld. See the Milestone 20 section.
+
+
 **Milestone 19 (Cutscenes) is complete** (2026-09-29): 19a cutscene system + movie mode, 19b intro movie + title screen. Cory playtested and approved both (intro theme included); pushed to `cjt`. The game starts on the title screen (New Game plays the intro); F7/F8 play the demo scene/movie on a map. Built on my recommendations while he was away; every call is logged in `DECISIONS.md`. **Next up: Act I content, starting with 20a (The Cathedral)**. It's design-heavy (enemy abilities, real bosses, enemy level scaling, the Act I opening scenes), so talk it through with Cory before building.
 
 
@@ -30,7 +33,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## ⚠ Open design questions (discuss before implementing)
 
-**1. Enemy level scaling** — *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-24d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
+**1. Enemy level scaling** — **decided 2026-09-29 (Claude, while Cory was away; see DECISIONS.md): no level scaling.** Difficulty stays set by region, as the README's Enemy Design section already describes. Over-leveling is the classic FF reward for grinding, and scaling would undercut it. Revisit if Act I playtesting shows fights going trivial too fast.
+
+Original note: *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-24d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
 
 ## Dungeon generation — decided (2026-08-06)
 
@@ -218,7 +223,22 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 19 — Cutscenes (in progress)
+## Milestone 20 — Act I content (in progress)
+
+### 20a — The Cathedral (in progress)
+
+Built in four steps, each tested and committed on its own:
+
+**Step 1: foundations (done, 2026-09-29)**
+- **Roster vs party:** `GameManager.roster` holds all four characters by class name; `GameManager.party` is who's actually with you, in join order. `start_new_game(cls)` = the chosen character alone, level 1, 3 Potions + 1 Antidote, no gear, every flag/seed/boss cleared. `recruit(cls)` adds a rescued character **caught up to the party's average level** (full HP/MP) and sets `recruited_<cls>`. `has_member(cls)`. Launching straight into a map (F6) still gives the old all-four party + Milestone 15 test gear, for development.
+- **Saves** now store `roster` (everyone), `party_order` and `starting_class`; saves from before 20a (party only) still load as all four.
+- **`ActOne`** (`scripts/systems/ActOne.gd`): the design doc's Act I as data: `DUNGEONS` (name, captive, gate class, scene, the gate's flavor text), `ROUTES` (starting class → dungeon order), `PLAYABLE_STARTS` (only Vael until 20b-20d). `can_enter(id)` (gate met when that class is in the party; your own start dungeon has no gate), `is_cleared(id)` (`cleared_<id>` flag), `next_dungeon()`.
+- **Class select** (`scenes/title/ClassSelect.tscn` + `scripts/title/ClassSelect.gd`): after the intro. All four shown at 2× with class and a one-line blurb; characters whose start dungeon isn't built are dimmed and locked. Picking one calls `start_new_game()` and goes to their start dungeon.
+- **Encounters fit the party:** `_generate_encounter()` only picks groups of at most party size + 1, so a lone hero meets 1-2 enemies.
+- **Doors can refuse:** a map's `get_door_destination()` may return `{"blocked": "text"}`; `Player._use_door()` then shows the line via **`Cutscene.play_text()`** (scene commands from a string instead of a file) and stays put.
+- **Enemy level scaling: decided, no scaling** (see "Open design questions").
+
+## Milestone 19 — Cutscenes (done)
 
 ### 19a — cutscene system + movie mode (done, 2026-09-29)
 
@@ -235,7 +255,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 
 ### 19b — intro movie + title screen (done, 2026-09-29)
 
-- **The game now starts on a title screen** (`scenes/title/Title.tscn` + `scripts/title/Title.gd`, set as `run/main_scene`): the starfield, a 2× gold "Divine Light", New Game / Continue with the glove cursor, and the intro theme playing. **New Game** fades out, plays `data/cutscenes/intro.scene`, sets `intro_seen`, then `Transition.change_scene()` to the overworld. **Continue** (greyed out without a save) loads slot 1 (the F5 debug save) and goes to `GameManager.current_scene_path`; the save doesn't record location yet (Milestone 22). To jump straight into a map while developing, run that scene directly (F6 in the editor).
+- **The game now starts on a title screen** (`scenes/title/Title.tscn` + `scripts/title/Title.gd`, set as `run/main_scene`): the starfield, a 2× gold "Divine Light", New Game / Continue with the glove cursor, and the intro theme playing. **New Game** fades out, plays `data/cutscenes/intro.scene`, then goes to the class select (20a; it used to go straight to the overworld and set an `intro_seen` flag, both since removed). **Continue** (greyed out without a save) loads slot 1 (the F5 debug save) and goes to `GameManager.current_scene_path`; the save doesn't record location yet (Milestone 22). To jump straight into a map while developing, run that scene directly (F6 in the editor).
 - **The intro movie** (~60s, Start skips it) has six shots with captions, following the design doc's lore: the Light and the four souls of each cycle → Valdris at dawn (wide pan) → Vorath revealed under a cracking sky (tall pan) + a "Vorath, the Architect" title → the Unraveling (reusing the battle forest) → the four heroes at sunset → the "Divine Light" title. The script is plain text, so the wording is easy to change.
 - **Artwork:** `assets/movie/source/build_intro.py` → `assets/movie/intro_{cosmos,valdris,vorath,four,title}.png`, built by code like the battle background (seeded, dithered gradients, glows, silhouettes). The four heroes are their real idle frames at 2×.
 - **Music:** a new `intro` track in `build_music.py` (D minor, 72 BPM, 18 bars = 60s, following the movie's four movements, with a G → D major cadence under the title). It plays on the title screen and under the movie. The other 4 tracks were rebuilt byte-identical. Approved by Cory.
@@ -259,6 +279,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
+- Act I data (dungeons, captives, gates, routes): `divine-light/scripts/systems/ActOne.gd`; class select: `divine-light/scenes/title/ClassSelect.tscn` + `divine-light/scripts/title/ClassSelect.gd`
 - Title screen: `divine-light/scenes/title/Title.tscn` + `divine-light/scripts/title/Title.gd` (the main scene); intro movie art: `divine-light/assets/movie/` (generator in `source/`)
 - Cutscenes: `divine-light/scripts/systems/Cutscene.gd` (autoload player) + `divine-light/scripts/cutscene/SceneScript.gd` (parser, command reference) + scene files in `divine-light/data/cutscenes/`
 - Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)

@@ -1,0 +1,14 @@
+# Vael wakes up captive in the Cathedral (Milestone 20a, escape start).
+# Plays once, the first time the Cathedral loads on Vael's game.
+
+wait 0.6
+emote player ...
+narrate Cold stone. Candle smoke, and something rotten underneath it.
+face player left
+wait 0.4
+face player right
+wait 0.4
+face player down
+say Vael: The Cathedral... but it's wrong. The light in here has gone dark.
+say Vael: They didn't even chain me. Whoever put me here never expected me to wake.
+narrate Somewhere deeper in the halls, a voice is calling for help.

@@ -40,6 +40,27 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The Forest Heartlands (overworld) enemies got their behaviors, but their stats are unchanged.** They were tuned for the old four-person party and are too weak for a solo hero past level 3. Rebalancing them belongs with the overworld work in step 4.
 - **A testing hook, `GameManager.debug_encounter`**, forces the next battle's enemies.
 
+### Step 3: the Cathedral's two variants
+
+- **Both variants use the same generated layout, rearranged.**
+  - **Escape:** you wake in a cell in the deepest room, Frank is in the captive room partway out, and the warden waits by the only exit.
+  - **Rescue:** the captive is held in the deepest room, behind the boss.
+  - **In both,** the deepest room's second door is removed, so the entrance is the only way in or out.
+- **Walking up to the exit starts the warden fight.** There's no way to sneak past it; the crimson warden tile by the door triggers it too.
+- **In the rescue, stepping on the captive's rune before the boss is beaten starts the boss fight.** You can't free them without facing their jailer.
+- **Frank's help in the warden fight** follows the design doc:
+  - **The blinding vial**, at the start: the warden misses 30% of the time and has -6 ATK for 3 rounds.
+  - **A potion**, once, when a hero drops below 30% HP: it heals 60% of max HP.
+  - *Change:* `_frank_blinding_vial()` / `_frank_check_potion()` in `Battle.gd`.
+- **Frank's advice teaches the warden fight:** "If it raises that hammer… Defend".
+- **All the dialogue is mine**, avoids pronouns for everyone, and is easy to edit:
+  - `data/cutscenes/cathedral_wake.scene`, `cathedral_frank.scene`, `cathedral_escaped.scene`, `cathedral_rescue.scene`.
+  - Frank calls himself "a traveling merchant", as the design doc's cover story has it.
+- **After the escape, Frank sends you to Verdance first, then the Monastery.** Step 4 builds Verdance.
+- **Losing a battle is now Game Over, back to the title.** Before, you'd land back on the map with everyone knocked out. Continue loads your last save. This will feel harsh until real save points exist (Milestone 22).
+- **The map sprite is whoever you started as**, i.e. the party's first member, FF-style.
+- **Characters lower on the screen draw in front** (y-sorting on the maps).
+
 ## Milestone 19b — Intro movie & title screen (2026-09-29)
 
 - **I added a title screen**, which wasn't in the plan. The intro needed a place to start from, and "New Game plays the intro" is the classic flow. It has New Game and Continue; Continue loads the F5 debug save and is greyed out when there isn't one. **It's now the game's main scene**, so running the project shows it first. To test a map directly, run that scene on its own (F6 in the editor). *Change:* `run/main_scene` in `project.godot`.

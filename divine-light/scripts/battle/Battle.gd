@@ -217,6 +217,11 @@ var _acting := false
 # it just hit a weakness (Milestone 20a).
 var _skill_element := ""
 var _weak_hit := false
+# Frank's help in an escape warden fight (Milestone 20a): a blinding vial at
+# the start, one potion when a hero is about to fall.
+var _frank_helps := false
+var _frank_healed := false
+var _victory := false
 
 
 func _ready() -> void:
@@ -235,7 +240,44 @@ func _ready() -> void:
 	_setup_fx()
 	GameManager.party_loaded.connect(_update_ui)
 	_update_ui()
+	_frank_helps = boss_fight and GameManager.current_location.ends_with("_escape") and GameManager.has_flag("met_frank")
 	_begin_selection()
+	if _frank_helps:
+		_frank_blinding_vial()
+
+
+## Frank's opening move (from the design doc): a blinding vial that leaves the
+## warden missing often and hitting softer for the first few rounds.
+func _frank_blinding_vial() -> void:
+	var boss: Combatant = _enemies[0]
+	boss.accuracy_debuff_rounds = 3
+	boss.atk_buff = -6
+	boss.atk_buff_rounds = 3
+	var sprite := _sprite_of(boss)
+	if sprite != null:
+		_fx.projectile(Vector2(330, 50), BattleFx.anchor(sprite), BattleFx.PALETTES["physical"])
+		_fx.impact({"impact": "cloud", "palette": "physical"}, [sprite])
+	Sfx.play("item")
+	message_label.text = "Frank hurls a blinding vial! %s reels, half-blind!" % boss.display_name
+
+
+## Frank's second move: once per fight, a potion for a hero below 30% HP.
+func _frank_check_potion() -> void:
+	if not _frank_helps or _frank_healed:
+		return
+	for m: Combatant in _party:
+		if m.is_alive() and m.hp < m.max_hp * 0.3:
+			_frank_healed = true
+			var amount := roundi(m.max_hp * 0.6)
+			m.hp = mini(m.max_hp, m.hp + amount)
+			var sprite := _sprite_of(m)
+			if sprite != null:
+				_fx.projectile(Vector2(330, 50), BattleFx.anchor(sprite), BattleFx.PALETTES["heal"])
+				_fx.impact({"impact": "sparkles", "palette": "heal"}, [sprite])
+			Sfx.play("heal")
+			_update_ui()
+			message_label.text = "Frank throws a potion! %s recovers %d HP!" % [m.display_name, amount]
+			return
 
 
 func _generate_encounter() -> Array:
@@ -731,8 +773,12 @@ func _process(delta: float) -> void:
 				if not _level_up_queue.is_empty():
 					Sfx.play("level_up")
 					message_label.text = _level_up_queue.pop_front()
-				else:
+				elif _victory:
 					Transition.change_scene(GameManager.current_scene_path)
+				else:
+					# Game over (Milestone 20a): back to the title screen, where
+					# Continue loads the last save.
+					Transition.change_scene("res://scenes/title/Title.tscn")
 
 
 ## Which bottom-left window is up: the commands while a member is choosing
@@ -1202,6 +1248,7 @@ func _begin_selection() -> void:
 	action_menu.visible = true
 	_open_main_menu()
 	message_label.text = ""
+	_frank_check_potion()
 
 
 func _begin_resolving() -> void:
@@ -2266,6 +2313,7 @@ func _tick_dot() -> void:
 
 func _end_battle(victory: bool) -> void:
 	state = State.BATTLE_OVER
+	_victory = victory
 	action_menu.visible = false
 	command_title.text = ""
 	if victory:

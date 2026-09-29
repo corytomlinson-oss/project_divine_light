@@ -28,6 +28,8 @@ extends RefCounted
 #                                battle, boss) or fade it out
 #   sound name                   play an Sfx sound
 #   set flag                     record a story flag (saved with the game)
+#   join class                   a character joins the party (Vael, Ryn, Lyra,
+#                                Silas), caught up to the party's level
 #
 # Movie mode - full-screen pixel "movie" shots over everything:
 #   movie start / movie end
@@ -161,6 +163,10 @@ static func _parse_line(raw: String) -> Variant:
 			if words.size() != 1:
 				return "sound needs a name"
 			return {"cmd": "sound", "name": words[0].to_lower()}
+		"join":
+			if words.size() != 1 or String(words[0]).capitalize() not in ["Vael", "Ryn", "Lyra", "Silas"]:
+				return "join needs a character: Vael, Ryn, Lyra or Silas"
+			return {"cmd": "join", "who": String(words[0]).capitalize()}
 		"set":
 			if words.size() != 1:
 				return "set needs one flag name"

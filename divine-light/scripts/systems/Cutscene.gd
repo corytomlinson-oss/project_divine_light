@@ -83,6 +83,11 @@ func _play_parsed(parsed: Dictionary, path: String) -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null:
 		_actors["player"] = player
+	# Characters a map placed itself (group "npc", meta "actor_id") can act in
+	# scenes too - e.g. a captive standing in their cell (Milestone 20a).
+	for npc: Node in get_tree().get_nodes_in_group("npc"):
+		if npc.has_meta("actor_id"):
+			_actors[String(npc.get_meta("actor_id"))] = npc
 	for step: Dictionary in parsed["steps"]:
 		if _skip_movie and step["cmd"] not in ["movie_end", "set", "music", "music_stop"]:
 			continue
@@ -146,9 +151,12 @@ func _run(step: Dictionary) -> void:
 			_spawn(step["id"], step["sprite"], _resolve(step), step["facing"])
 		"despawn":
 			var actor: Node2D = _actors.get(step["id"])
-			if actor != null and actor in _spawned:
+			if actor != null and actor != _actors.get("player"):
 				actor.queue_free()
 				_actors.erase(step["id"])
+				_spawned.erase(actor)
+		"join":
+			GameManager.recruit(step["who"])
 		"move":
 			await _maybe_wait(_walk(step["id"], [[step["dir"], step["tiles"]]]), step["async"])
 		"move_to":
@@ -360,6 +368,18 @@ func _tile_of(actor: Node2D) -> Vector2i:
 ## A sprite with no art yet (e.g. Frank) appears as a dark silhouette of Vael's
 ## shape, so scenes can be written before the art exists.
 func _spawn(id: String, sprite_name: String, tile: Vector2i, facing: String) -> void:
+	var sprite := make_character(sprite_name)
+	sprite.position = _world_of(tile)
+	_map().add_child(sprite)
+	_actors[id] = sprite
+	_spawned.append(sprite)
+	_animate(sprite, facing, false)
+
+
+## A character sprite from its walk sheet, idle and facing down - or a dark
+## silhouette of Vael's shape when there's no art yet. Maps use this too for
+## characters they place themselves (Dungeon.gd's captives).
+func make_character(sprite_name: String) -> AnimatedSprite2D:
 	var path := "res://assets/sprites/%s_frames.tres" % sprite_name
 	var sprite := AnimatedSprite2D.new()
 	if ResourceLoader.exists(path):
@@ -368,11 +388,8 @@ func _spawn(id: String, sprite_name: String, tile: Vector2i, facing: String) -> 
 		sprite.sprite_frames = load("res://assets/sprites/vael_frames.tres")
 		# self_modulate: only the sprite goes dark, not its emote bubbles.
 		sprite.self_modulate = SILHOUETTE
-	sprite.position = _world_of(tile)
-	_map().add_child(sprite)
-	_actors[id] = sprite
-	_spawned.append(sprite)
-	_animate(sprite, facing, false)
+	sprite.play(&"idle_down")
+	return sprite
 
 
 ## Plays walk_/idle_ + down/up/side (left = side mirrored), the same animation

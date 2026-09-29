@@ -34,6 +34,7 @@ func _ready() -> void:
 	GameManager.current_location = "overworld"
 	GameManager.current_scene_path = "res://scenes/overworld/Overworld.tscn"
 	Music.play("overworld")
+	_tile_map.y_sort_enabled = true  # characters lower on screen draw in front
 	_paint_wall_border()
 	_tile_map.set_cell(CATHEDRAL_DOOR_CELL, 0, Vector2i(2, 0))
 	if GameManager.has_pending_spawn:

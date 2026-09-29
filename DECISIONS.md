@@ -6,6 +6,14 @@ These are calls Claude made without asking, while Cory was away. For each one: w
 
 ---
 
+## Roadmap — Cutscenes as Milestone 19 (2026-09-29)
+
+Cory chose the placement (before Act I), in-engine scenes and name tags, and asked for intro and ending movies. These parts were Claude's proposal:
+
+- **The milestone is split into 19a (system + movie mode) and 19b (the intro movie).** The intro doesn't depend on any Act I content, so it can be built right away.
+- **The ending movie is part of Act III + Vorath (26)**, not Milestone 19, because it needs the finale's art and story.
+- **Movie art will be built by code generators** (like the battle background), not hand-drawn or AI-generated. That can be revisited scene by scene.
+
 ## Milestone 17b — SNES-style battle layout (2026-09-29)
 
 - **The left window is 104px wide, not the mock's 84px.** "Corrupted Farmer", the longest enemy name, is 92px in m5x7. *Change:* `LEFT_WINDOW_W` in `Battle.gd`.

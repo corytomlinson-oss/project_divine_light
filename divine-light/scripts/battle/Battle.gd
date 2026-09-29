@@ -129,7 +129,7 @@ const ENCOUNTER_TABLES: Dictionary = {
 }
 
 # Milestone 14 test boss for the Cathedral's generated boss room. A stand-in,
-# not the real Fallen Guardian (that's Milestone 19a's job, with its own
+# not the real Fallen Guardian (that's Milestone 20a's job, with its own
 # 2-phase kit: physical+self-DEF-buff -> corrupted holy magic). This one
 # exists to prove the generic system - visible/fixed encounter, phase
 # transition, escape lockout, bonus XP - works end to end.
@@ -2032,7 +2032,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 ## this turn, so the caller can fold it into whatever message it shows next
 ## instead of the transition note getting silently overwritten a line later.
 ## Milestone 14 test boss just permanently hits harder past the threshold -
-## real bosses (Milestone 19a/23b-d) will want per-phase skill kits, which
+## real bosses (Milestone 20a/24b-d) will want per-phase skill kits, which
 ## needs an enemy-ability dispatch system that doesn't exist yet.
 func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if enemy.boss_phase >= enemy.phase_hp_thresholds.size():

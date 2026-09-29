@@ -27,8 +27,12 @@ window/size/viewport_width=320
 window/size/viewport_height=180
 window/size/window_width_override=960
 window/size/window_height_override=540
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom="res://assets/ui/theme.tres"
 
 [physics]
 
@@ -36,5 +40,7 @@ window/stretch/aspect="expand"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+2d/snap/snap_2d_transforms_to_pixel=true

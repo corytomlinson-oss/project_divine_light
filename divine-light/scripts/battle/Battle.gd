@@ -217,6 +217,10 @@ var _pending_skill: Dictionary = {}
 @onready var selection_header: Label = $SelectionArea/SelectionHeader
 @onready var action_menu: VBoxContainer = $SelectionArea/ActionMenu
 
+var _cursor := MenuCursor.new()
+var _qi_pips := QiPips.new()
+var _qi_header_text := ""  # the header text the Qi pips belong beside
+
 
 func _ready() -> void:
 	_option_labels = [
@@ -233,6 +237,8 @@ func _ready() -> void:
 		$PartyPanel/HP_Silas,
 	]
 	_party = GameManager.party
+	add_child(_cursor)
+	$SelectionArea.add_child(_qi_pips)
 	_setup_background()
 	_setup_party_bars()
 	_enemies = _generate_encounter()
@@ -322,7 +328,6 @@ func _setup_enemy_ui() -> void:
 		var label := Label.new()
 		label.position = Vector2(108, 5 + i * row_h)
 		label.size = Vector2(ENEMY_BAR_W, 14)
-		label.add_theme_font_size_override("font_size", 8)
 		label.text = "  " + _enemies[i].display_name
 		$EnemyArea.add_child(label)
 		_enemy_labels.append(label)
@@ -594,6 +599,10 @@ func _input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	_update_party_positions(delta)
+	_cursor.target = _cursor_target()
+	# Other menus reuse the header ("Target?", "-- Skills --"), so the pips
+	# show only while it still holds Ryn's line.
+	_qi_pips.visible = _qi_header_text != "" and selection_header.text == _qi_header_text
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
@@ -607,6 +616,21 @@ func _process(delta: float) -> void:
 					message_label.text = _level_up_queue.pop_front()
 				else:
 					get_tree().change_scene_to_file(GameManager.current_scene_path)
+
+
+## The label the menu cursor should point at right now, or null to hide it.
+func _cursor_target() -> Control:
+	if state != State.SELECTING:
+		return null
+	match _menu_state:
+		MenuState.TARGETING:
+			return _enemy_labels[_target_index] if _target_index < _enemy_labels.size() else null
+		MenuState.ALLY_TARGETING:
+			return _party_hp_labels[_target_ally_index] if _target_ally_index < _party_hp_labels.size() else null
+	if not action_menu.visible:
+		return null
+	var row: int = _menu_cursor - _list_scroll
+	return _option_labels[row] if row >= 0 and row < _option_labels.size() else null
 
 
 func _debug_level_all(direction: int) -> void:
@@ -1319,7 +1343,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					total += dmg
 			_update_ui()
 			var crit_tag := " CRIT!" if any_crit else ""
-			message_label.text = "%s uses %s!\n%d hits on %s — %d total!%s" % [member.display_name, skill["name"], hits, target.display_name, total, crit_tag]
+			message_label.text = "%s uses %s!\n%d hits on %s - %d total!%s" % [member.display_name, skill["name"], hits, target.display_name, total, crit_tag]
 			if _enemies.filter(func(e): return e.is_alive()).is_empty():
 				_end_battle(true)
 
@@ -1563,7 +1587,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				target.def_buff = -int(power)
 				target.def_buff_rounds = 3
 			_update_ui()
-			message_label.text = "%s exposes %s's weak point!\nDEF lowered — party deals bonus damage!" % [member.display_name, target.display_name]
+			message_label.text = "%s exposes %s's weak point!\nDEF lowered - party deals bonus damage!" % [member.display_name, target.display_name]
 
 		"garrote":
 			var target: Combatant = _get_enemy_target(member)
@@ -1805,11 +1829,12 @@ func _end_battle(victory: bool) -> void:
 
 func _build_levelup_text(member: Combatant) -> String:
 	var g: Dictionary = Combatant.LEVEL_GAINS.get(member.char_class, {})
-	var line2 := "HP+%d ATK+%d DEF+%d AGI+%d" % [g.get("hp", 0), g.get("atk", 0), g.get("def", 0), g.get("agi", 0)]
-	var line3 := "INT+%d" % g.get("int", 0)
+	# Two lines: the message box only has room for two.
+	var line1 := "%s reached Level %d!  HP+%d" % [member.display_name, member.level, g.get("hp", 0)]
 	if g.get("mp", 0) > 0:
-		line3 = "MP+%d %s" % [g.get("mp", 0), line3]
-	return "%s reached Level %d!\n%s\n%s  Press Enter." % [member.display_name, member.level, line2, line3]
+		line1 += " MP+%d" % g.get("mp", 0)
+	var line2 := "ATK+%d DEF+%d INT+%d AGI+%d  Press Enter." % [g.get("atk", 0), g.get("def", 0), g.get("int", 0), g.get("agi", 0)]
+	return "%s\n%s" % [line1, line2]
 
 
 func _clamp_list_scroll() -> void:
@@ -1829,7 +1854,7 @@ func _update_menu() -> void:
 	for i in page:
 		var idx: int = (_list_scroll + i) if scrollable else i
 		if idx < _menu_options.size():
-			_option_labels[i].text = ("> " if idx == _menu_cursor else "  ") + _menu_options[idx]
+			_option_labels[i].text = "  " + _menu_options[idx]
 			_option_labels[i].visible = true
 		else:
 			_option_labels[i].text = ""
@@ -1841,11 +1866,16 @@ func _update_selection_header() -> void:
 		return
 	var member: Combatant = _party[_selecting_index]
 	var row_label: String = "Front" if member.row == "front" else "Back"
+	_qi_header_text = ""
 	if member.char_class == "Ryn":
-		var pips := ""
-		for i in member.max_qi:
-			pips += "●" if i < member.qi else "○"
-		selection_header.text = "%s (%s): %s" % [member.display_name, row_label, pips]
+		selection_header.text = "%s (%s):" % [member.display_name, row_label]
+		_qi_header_text = selection_header.text
+		_qi_pips.qi = member.qi
+		_qi_pips.max_qi = member.max_qi
+		var font: Font = selection_header.get_theme_font("font")
+		var text_w: float = font.get_string_size(selection_header.text, HORIZONTAL_ALIGNMENT_LEFT, -1, selection_header.get_theme_font_size("font_size")).x
+		# 2px down centers the 5px pips on the 7px capitals.
+		_qi_pips.position = selection_header.position + Vector2(text_w + 4, 2)
 	elif member.char_class == "Lyra":
 		selection_header.text = "%s (%s) [%s]: %d/%d MP" % [member.display_name, row_label, member.stance, member.mp, member.max_mp]
 	elif member.max_mp > 0:
@@ -1869,7 +1899,7 @@ func _update_enemy_ui() -> void:
 			label.modulate = Color(0.5, 0.5, 0.5)
 			bar.size.x = 0.0
 		elif _menu_state == MenuState.TARGETING and i == _target_index:
-			label.text = "> %s" % enemy.display_name
+			label.text = "  %s" % enemy.display_name
 			label.modulate = Color(1.0, 1.0, 0.3)
 			bar.size.x = ENEMY_BAR_W * pct
 			bar.color = Color(1.0, 1.0, 0.3, 1)
@@ -1892,7 +1922,7 @@ func _update_ui() -> void:
 
 		var name_str: String
 		if _menu_state == MenuState.ALLY_TARGETING:
-			name_str = ("> " if i == _target_ally_index else "  ") + member.display_name
+			name_str = "  " + member.display_name
 		else:
 			name_str = member.display_name
 		var row_tag: String = "F" if member.row == "front" else "B"

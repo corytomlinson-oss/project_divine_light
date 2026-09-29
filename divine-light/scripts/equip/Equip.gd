@@ -20,12 +20,13 @@ var _item_options: Array = []  # item names; "" means "Unequip"
 @onready var option_list: VBoxContainer = $OptionList
 
 var _option_labels: Array = []
+var _menu_cursor := MenuCursor.new()
 
 
 func _ready() -> void:
+	add_child(_menu_cursor)
 	for i in 5:
 		var label := Label.new()
-		label.add_theme_font_size_override("font_size", 8)
 		option_list.add_child(label)
 		_option_labels.append(label)
 	_update_ui()
@@ -129,6 +130,7 @@ func _set_progress_text(member: Combatant, set_id: String, set_name: String) -> 
 func _update_ui() -> void:
 	for label in _option_labels:
 		label.visible = false
+	_menu_cursor.target = _option_labels[_cursor]
 
 	match _state:
 		MenuState.CHARACTER_SELECT:
@@ -138,7 +140,7 @@ func _update_ui() -> void:
 			var party: Array = GameManager.party
 			for i in party.size():
 				var member: Combatant = party[i]
-				_option_labels[i].text = ("> " if i == _cursor else "  ") + "%s  Lv%d %s" % [member.display_name, member.level, member.char_class]
+				_option_labels[i].text = "  " + "%s  Lv%d %s" % [member.display_name, member.level, member.char_class]
 				_option_labels[i].visible = true
 
 		MenuState.SLOT_SELECT:
@@ -152,7 +154,7 @@ func _update_ui() -> void:
 				var slot: String = Equipment.SLOTS[i]
 				var equipped: String = member.equipment.get(slot, "")
 				var shown: String = equipped if equipped != "" else "-- empty --"
-				_option_labels[i].text = ("> " if i == _cursor else "  ") + "%s: %s" % [slot.capitalize(), shown]
+				_option_labels[i].text = "  " + "%s: %s" % [slot.capitalize(), shown]
 				_option_labels[i].visible = true
 
 		MenuState.ITEM_SELECT:
@@ -162,6 +164,7 @@ func _update_ui() -> void:
 			help_label.text = "Up/Down: Select   A: Equip   B: Back"
 			if _item_options.is_empty():
 				_option_labels[0].text = "No equippable items."
+				_menu_cursor.target = null
 				_option_labels[0].visible = true
 			else:
 				for i in _item_options.size():
@@ -174,5 +177,5 @@ func _update_ui() -> void:
 						var set_id: String = Equipment.DEFS.get(item_name, {}).get("set_id", "")
 						if set_id != "":
 							shown += " [%s]" % Equipment.SET_BONUSES.get(set_id, {}).get("name", set_id)
-					_option_labels[i].text = ("> " if i == _cursor else "  ") + shown
+					_option_labels[i].text = "  " + shown
 					_option_labels[i].visible = true

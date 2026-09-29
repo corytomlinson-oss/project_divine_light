@@ -15,7 +15,6 @@ offset_left = 8.0
 offset_top = 6.0
 offset_right = 312.0
 offset_bottom = 18.0
-theme_override_font_sizes/font_size = 9
 text = "Equip"
 
 [node name="OptionList" type="VBoxContainer" parent="."]
@@ -30,7 +29,6 @@ offset_left = 8.0
 offset_top = 108.0
 offset_right = 312.0
 offset_bottom = 150.0
-theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 text = ""
 
@@ -39,5 +37,4 @@ offset_left = 8.0
 offset_top = 164.0
 offset_right = 312.0
 offset_bottom = 178.0
-theme_override_font_sizes/font_size = 7
 text = ""

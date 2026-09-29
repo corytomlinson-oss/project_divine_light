@@ -145,6 +145,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
   Prompt: *"16-bit SNES-era JRPG UI menu panel frame, matching the game's dialogue box style, ornate but simple carved-stone or dark-metal border, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
   **Tried, then reverted — genuinely doesn't fit.** Framed with the shared panel texture the same way as the message box, but this panel's actual content (5 menu options) needs a minimum 55-59px of vertical room, and the 144×56 footprint only has 56px total — an 11px top+bottom border leaves no room at all. Confirmed via Cory's playtest (the 5th option, "Run," was pushed off the bottom of the screen entirely) and via headless measurement of the real rendered minimum size. Reverted to a plain unframed `VBoxContainer`, same as before this pass. See CLAUDE.md's Milestone 16 section for the full story — this isn't a fit for the current battle screen's vertical budget without either shrinking content further or reworking the layout, so it stays unchecked.
   **Deferred:** the bottom of the 180px battle screen has no room for an 11px border without reworking the whole layout (see the 2026-09-27 VBoxContainer overflow note in CLAUDE.md). Not blocking Milestone 16.
+  **Revisit in 17b:** with the m5x7 font (17a) the 5 options need 50px, not 55-59px.
 
 - [~] **Party panel frame** *(157×64px area — can reuse the action menu style)*
   Prompt: *"16-bit SNES-era JRPG UI status panel frame, matching the game's menu panel style, seamless 9-slice-ready panel texture, muted high-fantasy palette, transparent center"*
@@ -191,6 +192,12 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [x] **Equip/unequip** — "16-bit JRPG equipment change sound, metallic clink"
 
 ---
+
+## Milestone 17 — UI/UX polish
+
+- [x] **UI font** — m5x7 by Daniel Linssen (CC0), `assets/fonts/m5x7.ttf`. Not generated; picked from free pixel fonts after a side-by-side on the battle screen. See CLAUDE.md's 17a section for import settings and the 10px line setup.
+- [x] **Menu cursor** — 8×7 pointing glove, hand-placed: `assets/ui/source/build_cursor.py` -> `assets/ui/cursor.png`.
+- [x] **Qi pips** — drawn in code at runtime (`scripts/ui/QiPips.gd`), no texture.
 
 ## Deferred to later passes
 

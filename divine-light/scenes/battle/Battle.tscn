@@ -39,7 +39,6 @@ offset_left = 11.0
 offset_top = 11.0
 offset_right = 309.0
 offset_bottom = 31.0
-theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 text = ""
 
@@ -50,7 +49,6 @@ offset_left = 6.0
 offset_top = 114.0
 offset_right = 150.0
 offset_bottom = 124.0
-theme_override_font_sizes/font_size = 8
 text = ""
 
 [node name="ActionMenu" type="VBoxContainer" parent="SelectionArea"]
@@ -61,23 +59,18 @@ offset_bottom = 180.0
 theme_override_constants/separation = 0
 
 [node name="Option0" type="Label" parent="SelectionArea/ActionMenu"]
-theme_override_font_sizes/font_size = 7
 text = "> Attack"
 
 [node name="Option1" type="Label" parent="SelectionArea/ActionMenu"]
-theme_override_font_sizes/font_size = 7
 text = "  Skill"
 
 [node name="Option2" type="Label" parent="SelectionArea/ActionMenu"]
-theme_override_font_sizes/font_size = 7
 text = "  Item"
 
 [node name="Option3" type="Label" parent="SelectionArea/ActionMenu"]
-theme_override_font_sizes/font_size = 7
 text = "  Defend"
 
 [node name="Option4" type="Label" parent="SelectionArea/ActionMenu"]
-theme_override_font_sizes/font_size = 7
 text = "  Run"
 
 [node name="PartyPanel" type="VBoxContainer" parent="."]
@@ -88,17 +81,13 @@ offset_bottom = 178.0
 theme_override_constants/separation = 0
 
 [node name="HP_Vael" type="Label" parent="PartyPanel"]
-theme_override_font_sizes/font_size = 8
 text = "Vael   150/150"
 
 [node name="HP_Ryn" type="Label" parent="PartyPanel"]
-theme_override_font_sizes/font_size = 8
 text = "Ryn    100/100"
 
 [node name="HP_Lyra" type="Label" parent="PartyPanel"]
-theme_override_font_sizes/font_size = 8
 text = "Lyra    70/ 70"
 
 [node name="HP_Silas" type="Label" parent="PartyPanel"]
-theme_override_font_sizes/font_size = 8
 text = "Silas   90/ 90"

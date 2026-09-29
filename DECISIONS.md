@@ -237,3 +237,14 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The Guild's tiles are the dark-moss recolor** made in 20c. Same 5-8 room layout as the others.
 - **All the Guild dialogue is mine** (pronoun-free): `guild_wake`, `guild_frank`, `guild_escaped`, `guild_rescue`. Silas is dry and practical: used to run jobs out of these tunnels, spots the knife they missed, and "breaking people out of places is sort of my specialty". The Shadow Lord was once the guildmaster. Frank warns about the Enforcer's poison and its telegraphed punch.
 - **Silas is selectable**, so all four characters can now start the game.
+
+### Step d4: Edenmere
+
+- **Edenmere follows the design doc's standard town layout**: an inn, an item shop, an armory, a shrine and a town square, plus Frank wandering the square. It's bigger and busier than Verdance: a market crossroads where "the four roads still meet".
+- **The shrine restores HP and MP for free once per dungeon visit**, as the design doc says. It resets whenever you enter any dungeon. Like the inn, it doesn't revive the fallen; that stays with Frank and items.
+- **The inn costs 15 gold** (Verdance's is 10): "Edenmere prices".
+- **The armory sells Act I's second tier of gear**, a step up from Frank's iron: Steel Sword, Steel Claws, Oak Staff and Steel Daggers at 320 gold, plus Monk Wraps and Scholar's Robe (they already existed but weren't sold anywhere) and a new Amber Charm (RES +3, any class). The numbers are mine. The Holy Guardian set stays out of shops; it's meant as loot. *Change:* `ARMORY_STOCK` in `Edenmere.gd`, stats in `Equipment.gd`.
+- **The item shop sells the same four consumables as Frank**, at the same prices. There are no other consumables in the game yet.
+- **The townsfolk and their lines are mine** (pronoun-free): a shopkeeper, innkeeper, smith, priestess, mayor, traveler, child and guard. The mayor and traveler say something new once you've cleared two of Act I's dungeons. The traveler's gossip hints at the Guild and the Observatory.
+- **Edenmere is open from the start.** The design doc calls it a waypoint, so there's no reason to lock it.
+- **Behind the scenes:** what Verdance and Edenmere share (inn, Frank's stall, talking, drawing the map) moved into one shared `Town.gd`, so Act II's towns can reuse it. Frank's stock and revive price now live there, not in `Verdance.gd` as the 20a notes say. Verdance plays exactly as before.

@@ -22,7 +22,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
   - [x] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
   - [x] d2 — the Guild dungeon + scenes.
   - [x] d3 — Silas playable; test.
-  - [ ] d4 — Edenmere, the mid-Act I town.
+  - [x] d4 — Edenmere, the mid-Act I town.
   - [ ] d5 — the Act I → Act II transition (all four gathered → closing scene; Act II kingdoms "coming later"); final docs. **Then stop.**
 
 **Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps, pushed to `cjt` on Cory's go-ahead (he hasn't playtested it yet): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
@@ -325,6 +325,13 @@ Built in four steps, each tested and committed on its own:
 - Same pattern again: `guild_tiles.png` (made in 20c), `scenes/dungeon/GuildDungeon.tscn`, `Dungeon.DUNGEONS["guild"]`, the `ActOne` scene path, scenes `guild_wake / _frank / _escaped / _rescue`. `ActOne.PLAYABLE_STARTS` is now all four classes, so the class select has no locked entries left.
 - Every dungeon now exists, so all four routes can be played start to finish through Act I's four dungeons.
 - Verified end to end (12 checks): Silas's class select -> wake -> Frank -> Corrupted Enforcer with Frank's help -> Frank names the Cathedral -> overworld at the Guild's arch (18,20) -> Verdance arrival names the Cathedral; then a Lyra game at level 5 with the Observatory cleared -> Guild rescue -> Shadow Lord -> Silas joins at level 5.
+
+**Step d4: Edenmere (done, 2026-09-29)**
+- **`scripts/town/Town.gd` (class `Town`)** now holds what towns share: the town tile letters (`TOWN_TILES`, `BLOCKED_TILES`), `_paint(map)`, `_add_npc()`, `_place_player(entry)`, `is_blocked()`, `_talk_lines()`, `_inn(price)`, `_restore_party()`, `_frank()` (+ `FRANK_STOCK`, `REVIVE_PRICE`). `Verdance.gd` extends it (behavior unchanged; re-verified). Act II's towns should extend it too.
+- **`scripts/town/Edenmere.gd` + `scenes/town/Edenmere.tscn`**: 28x18 text map around a cobbled square. Item shop (door (5,3), `ITEM_STOCK`), inn (door (14,3), 15 gold), armory (door (23,3), `ARMORY_STOCK`), shrine (14,8): free HP/MP for everyone standing, once per dungeon visit (flag `edenmere_shrine_used`, erased by `Dungeon._ready()`). Eight townsfolk (tinted hero sheets) with `<id>_late` lines once 2+ Act I dungeons are cleared; Frank stands in the square (same stall) once `verdance_frank` is set. Entry (14,16), gate (14,17); the overworld's `E` gate now leads here (`Overworld.TOWNS`).
+- **Town atlas** grew 4 tiles (12 cobbles, 13 shrine, 14 item-shop sign, 15 armory sign) in `build_act1_tiles.py`; the first 12 are byte-identical. Both town scenes register all 16.
+- **New gear** (`Equipment.DEFS`): Steel Sword (Vael, ATK 13), Steel Claws (Ryn, ATK 11), Oak Staff (Lyra, ATK 4 / INT 9), Steel Daggers (Silas, ATK 12), Amber Charm (any, RES 3).
+- Verified (16 checks): gate, townsfolk + Frank, shrine once per visit and reset by a dungeon, inn, both shops, late lines, class-locked gear, and Verdance's NPCs / inn / walls after the refactor.
 
 ## Milestone 19 — Cutscenes (done)
 

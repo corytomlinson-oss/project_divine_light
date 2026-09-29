@@ -81,6 +81,7 @@ func _ready() -> void:
 	_escape = ActOne.is_start_dungeon(dungeon_id)
 	GameManager.current_location = dungeon_id + ("_escape" if _escape else "")
 	GameManager.current_scene_path = _data["scene"]
+	GameManager.story_flags.erase("edenmere_shrine_used")  # once per dungeon visit (20d)
 	Music.play("dungeon")
 	# Characters lower on screen draw in front (a captive standing just above
 	# the player, cutscene actors walking past each other).

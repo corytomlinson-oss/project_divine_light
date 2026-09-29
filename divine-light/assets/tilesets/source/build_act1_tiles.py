@@ -11,6 +11,8 @@ atlas coordinates keep working.
   town_tiles.png       0 grass  1 trees  2 gate  3 road  4 wall (timber)
                        5 roof   6 door   7 water 8 fence 9 flowers
                        10 awning (Frank's stall)  11 inn sign wall
+                       12 cobbles  13 shrine  14 item-shop sign wall
+                       15 armory sign wall   (12-15: Edenmere, 20d)
 
 Usage: python build_act1_tiles.py
 """
@@ -162,6 +164,53 @@ def inn_sign():
     return im
 
 
+def cobbles():
+    im = tile()
+    for y in range(16):
+        for x in range(16):
+            im.putpixel((x, y), (150, 146, 138, 255))
+    for y0 in range(0, 16, 4):  # staggered stones with dark joints
+        off = 0 if (y0 // 4) % 2 == 0 else 2
+        rect(im, 0, y0 + 3, 15, y0 + 3, (104, 100, 96))
+        for x in range(off, 16, 4):
+            rect(im, x, y0, x, y0 + 2, (104, 100, 96))
+            im.putpixel(((x + 1) % 16, y0), (178, 174, 166, 255))
+    return im
+
+
+def shrine():
+    im = cobbles()  # a small stone altar with a steady light above it
+    rect(im, 3, 9, 12, 14, (120, 118, 128))
+    rect(im, 3, 9, 12, 9, (170, 168, 180))
+    rect(im, 5, 11, 10, 12, (96, 94, 104))
+    rect(im, 7, 2, 8, 7, (255, 240, 170))
+    rect(im, 6, 4, 9, 5, (255, 240, 170))
+    im.putpixel((7, 1), (255, 255, 220, 255))
+    im.putpixel((8, 8), (255, 250, 200, 255))
+    return im
+
+
+def shop_sign():
+    im = wall()
+    rect(im, 3, 3, 12, 10, (96, 64, 40))
+    rect(im, 4, 4, 11, 9, (200, 160, 90))
+    rect(im, 7, 4, 8, 5, (240, 240, 230))          # a potion flask
+    rect(im, 6, 6, 9, 9, (220, 60, 70))
+    rect(im, 6, 6, 9, 6, (240, 240, 230))
+    return im
+
+
+def armory_sign():
+    im = wall()
+    rect(im, 3, 3, 12, 10, (96, 64, 40))
+    rect(im, 4, 4, 11, 9, (200, 160, 90))
+    for k in range(5, 10):                          # a sword, point up-right
+        im.putpixel((k + 1, 13 - k), (220, 224, 235, 255))
+    rect(im, 5, 7, 7, 7, (96, 64, 40))              # crossguard
+    im.putpixel((5, 9), (96, 64, 40, 255))
+    return im
+
+
 def strip(tiles, name):
     out = Image.new('RGBA', (16 * len(tiles), 16))
     for i, t in enumerate(tiles):
@@ -172,4 +221,5 @@ def strip(tiles, name):
 
 if __name__ == '__main__':
     strip([GRASS, TREES, GATE, road(), arch(), water(), flowers()], 'overworld_tiles.png')
-    strip([GRASS, TREES, GATE, road(), wall(), roof(), door(), water(), fence(), flowers(), awning(), inn_sign()], 'town_tiles.png')
+    strip([GRASS, TREES, GATE, road(), wall(), roof(), door(), water(), fence(), flowers(), awning(), inn_sign(),
+           cobbles(), shrine(), shop_sign(), armory_sign()], 'town_tiles.png')

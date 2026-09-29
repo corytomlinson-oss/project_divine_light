@@ -198,6 +198,9 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 - [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
 - [~] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — stand-ins: tinted/scaled Hollow Archer, Shadow Acolyte, Corrupted Farmer and Cursed Paladin sprites (`EnemyData.STAND_INS`). Milestone 21.
 
+- [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
+- [~] **Edenmere townsfolk** — placeholders: the heroes' walk sheets, tinted. Milestone 21.
+
 ## Milestone 20c — The Observatory
 
 - [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).

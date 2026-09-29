@@ -1,0 +1,74 @@
+# The intro movie (Milestone 19b). Plays on New Game from the title screen;
+# Start skips it. Artwork: assets/movie/source/build_intro.py. Music: "intro"
+# (assets/audio/source/build_music.py), 16 bars that follow the four
+# movements below: the Light, Valdris, Vorath and the Unraveling, the four.
+
+movie start
+music intro
+
+# --- the Light and the cycle of rebirth
+image cosmos res://assets/movie/intro_cosmos.png at 0,0
+fade in 1.5
+caption Every age of Valdris ends, and is born again.
+wait 3
+caption With each new age, four pure souls awaken to keep the world in balance.
+wait 3.5
+caption clear
+fade out 0.8
+remove cosmos
+
+# --- Valdris at dawn
+image valdris res://assets/movie/intro_valdris.png at 0,0
+fade in 0.8
+pan valdris to -160,0 over 9 async
+caption Their light has guarded Valdris through age after age.
+wait 4
+caption clear
+sync
+fade out 0.8
+remove valdris
+
+# --- Vorath
+image vorath res://assets/movie/intro_vorath.png at 0,0
+fade in 0.8
+pan vorath to 0,-120 over 6 async
+caption But one soul of an older age refused to return...
+wait 3
+caption clear
+sync
+title Vorath, the Architect
+wait 2.5
+title clear
+fade out 0.8
+remove vorath
+
+# --- the Unraveling
+image forest res://assets/ui/battle_bg_forest.png at 0,0
+fade in 0.8
+caption From the Blighted Maw he spreads the Unraveling, a sickness that corrupts every soul reborn.
+wait 4
+caption Kingdom by kingdom, the land falls grey and silent.
+wait 3.5
+caption clear
+fade out 0.8
+remove forest
+
+# --- the four
+image four res://assets/movie/intro_four.png at 0,0
+fade in 1
+caption In this age, only four pure souls remain.
+wait 3.5
+caption And Vorath has already come for them.
+wait 3.5
+caption clear
+fade out 1
+remove four
+
+# --- title
+image stars res://assets/movie/intro_title.png at 0,0
+fade in 1
+title Divine Light
+wait 3.5
+music stop 1.5
+fade out 1.5
+movie end

@@ -411,7 +411,47 @@ BOSS = dict(
     ],
 )
 
-TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS}
+# Intro movie (Milestone 19b): D minor, 72 BPM, 18 bars (60s) following the
+# movie's four movements: the Light and the cycle (organ alone, a sparse
+# melody), Valdris at dawn (arpeggio enters, the melody lifts), Vorath and the
+# Unraveling (a low kick like distant drums, darker chords), and the four
+# heroes (climbing to a hopeful D major), then a G -> D cadence under the title.
+INTRO = dict(
+    bpm=72, peak=0.75, loop_from_bar=0,
+    lead_vol=0.24, lead_duty=0.25, arp_vol=0.04, arp_div=2, arp_from=4,
+    pad=True, pad_vol=0.06, bass_vol=0.34, drum_vol=0.14, drums_from=8, hats=False,
+    bass_pattern=['R', '-', '-', '-', 'F', '-', '-', '-'],
+    kick=[0, 8], snare=[],
+    chords=(
+        ['Dm', 'Bb', 'F', 'C'] +          # the Light
+        ['Dm', 'Bb', 'F', 'C'] +          # Valdris
+        ['Dm', 'Bb', 'Gm', 'A'] +         # Vorath, the Unraveling
+        ['Bb', 'C', 'F', 'D'] +           # the four, rising to D major
+        ['G', 'D']                        # the title card
+    ),
+    lead=[
+        [('r', 16)],
+        [('r', 8), ('F5', 4), ('D5', 4)],
+        [('C5', 12), ('r', 4)],
+        [('E5', 8), ('G5', 8)],
+        [('A5', 12), ('F5', 4)],
+        [('G5', 8), ('F5', 4), ('D5', 4)],
+        [('C5', 4), ('F5', 4), ('A5', 8)],
+        [('G5', 12), ('r', 4)],
+        [('D5', 8), ('F5', 4), ('E5', 4)],
+        [('D5', 12), ('r', 4)],
+        [('A#4', 8), ('D5', 4), ('G5', 4)],
+        [('C#5', 8), ('E5', 4), ('A5', 4)],
+        [('D6', 8), ('C6', 4), ('A#5', 4)],
+        [('A5', 8), ('G5', 4), ('E5', 4)],
+        [('F5', 4), ('A5', 4), ('C6', 8)],
+        [('D6', 12), ('r', 4)],
+        [('B5', 8), ('A5', 8)],
+        [('D6', 16)],
+    ],
+)
+
+TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO}
 
 
 if __name__ == '__main__':

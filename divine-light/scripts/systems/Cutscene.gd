@@ -81,7 +81,12 @@ func play_text(text: String) -> void:
 ## Fills in {next} (the next dungeon on this game's route, written for the
 ## middle of a sentence: "the Monastery") and {next_where} ("up in the hills
 ## to the north-east"), so one scene can serve every starting character (20b).
+## {a1}-{a3} are the other party members in party order, as actor/sprite ids
+## ("ryn"), for scenes with the whole party (20d: Act I's ending).
 func _expand(text: String) -> String:
+	for i in 3:
+		var m: Combatant = GameManager.party[i + 1] if GameManager.party.size() > i + 1 else null
+		text = text.replace("{a%d}" % (i + 1), m.char_class.to_lower() if m != null else "ally%d" % (i + 1))
 	var id := ActOne.next_dungeon()
 	if id == "":
 		return text.replace("{next}", "the last of them").replace("{next_where}", "")

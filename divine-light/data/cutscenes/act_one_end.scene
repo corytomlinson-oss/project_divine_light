@@ -1,0 +1,50 @@
+# The end of Act I (Milestone 20d). Plays right after the fourth hero is
+# rescued, in whichever dungeon that happens. {a1}-{a3} are the three who
+# joined along the way (party order); the starting hero is "player". Then the
+# Act I / Act II card, and the party is back outside on the overworld.
+
+spawn {a1} {a1} at ~-1,-1 facing down
+spawn {a2} {a2} at ~0,-1 facing down
+spawn {a3} {a3} at ~1,-1 facing down
+face player up
+wait 0.5
+emote {a2} note
+say Vael: Four of us. I'd started to believe the Cathedral's light was the last one left.
+say Ryn: Then we train together. Whatever Vorath sends next, it meets all four of us at once.
+say Lyra: Fire, frost, storm and stone - and a knight, a monk and a thief besides. Let the Unraveling try to swallow that.
+say Silas: So what now? Nobody locks up four people just to leave the rest of the world alone.
+spawn frank frank at ~0,2 facing up
+move frank to ~0,1
+emote frank note
+say Frank: Now that is a sight. All four of you, still shining clean. Couldn't sit still in Verdance - had to see it for myself.
+say Frank: And you're right to ask. The forest was only where Vorath hid you. The real harm is out beyond it.
+say Frank: Three kingdoms - the Tundra, the Desert, the Coast - each one held by souls the Unraveling already turned. Break their hold, and the land starts to breathe again.
+emote player !
+say Frank: Rest first. Stock up. Then we set out together. Somebody has to keep you in potions.
+fade out 1.5
+despawn {a1}
+despawn {a2}
+despawn {a3}
+despawn frank
+movie start
+music intro
+image stars res://assets/movie/intro_title.png at 0,0
+fade in 1
+title Act I - The Gathering
+wait 3
+title clear
+caption Four pure souls stand together at last.
+wait 3
+caption Beyond the Forest Heartlands, three kingdoms wait in Vorath's grip.
+wait 3.5
+caption clear
+title Act II - The Purge
+wait 2
+caption Coming in a later update.
+wait 3.5
+caption clear
+title clear
+music stop 1.5
+fade out 1.5
+remove stars
+movie end

@@ -19,6 +19,7 @@ const DOOR_COORDS := Vector2i(2, 0)
 const CAPTIVE_COORDS := Vector2i(3, 0)
 const BOSS_COORDS := Vector2i(4, 0)
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
+const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
@@ -169,6 +170,13 @@ func on_captive_tile(_cell: Vector2i) -> void:
 		return
 	await Cutscene.play(_data["rescue_scene"])
 	_tile_map.set_cell(_captive_cell, 0, FLOOR_COORDS)
+	# The fourth hero rescued: Act I ends here (20d). Afterwards the party is
+	# back outside, free to roam until Act II exists.
+	if ActOne.all_cleared() and not GameManager.has_flag("act_one_complete"):
+		GameManager.story_flags["act_one_complete"] = true
+		await Cutscene.play(ACT_ONE_END_SCENE)
+		GameManager.arrival = dungeon_id
+		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 
 ## Story beats when the map loads: waking up (escape, first time), and the

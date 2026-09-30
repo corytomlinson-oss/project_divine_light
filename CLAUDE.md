@@ -8,22 +8,16 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-09-29)
 
-**⏵ AUTONOMOUS RUN IN PROGRESS (started 2026-09-29, Cory away on a trip).** Cory asked me to finish Milestone 20 (20b → 20c → 20d) on my own recommendations, step by step, and **stop at the end of Milestone 20**. Rules: finish, test and **commit each step locally (don't push)** before starting the next; **log every judgment call at the bottom of `DECISIONS.md`**; if something genuinely needs Cory's input, **stop and write what's needed here**. Usage limit: the session resets at 6:20 PM CDT; scheduled wake-ups resume the work. Check off steps here as they land:
+**Milestone 20 (Act I content) is complete** (2026-09-29): 20a The Cathedral, 20b The Monastery, 20c The Observatory, 20d The Underground Guild + Edenmere + the end of Act I. 20b-20d were built on an autonomous run while Cory was away (he asked me to finish Milestone 20 on my recommendations and stop there); every judgment call is logged at the bottom of `DECISIONS.md`. **All local commits on `cjt`, not pushed; Cory hasn't playtested 20b-20d.** All four characters are playable from the class select, each route runs through all four dungeons, and rescuing the fourth hero ends Act I.
 
-- 20b The Monastery (Ryn)
-  - [x] b1 — battle mechanics: counter stance (hits back at physical attacks), berserk (swings at a random target, own allies included), extra actions per round; Monastery enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) + bosses (escape warden "Sparring Master", Corrupted Grandmaster). **Also fix 20a's tuning mistake:** the second dungeon on every route is visited by the starting hero *alone* (nobody's been rescued yet), so the Cathedral rescue + Fallen Guardian must be retuned for one hero around level 5, not two.
-  - [x] b2 — the Monastery dungeon: recolored tileset, scene, `Dungeon.gd` entry, `ActOne` scene path, encounter tables (escape: lone level-1 Ryn; rescue: lone hero ~5), story scenes (wake / Frank / escaped / rescue); `{next}` substitution in scene text so Frank names the right next dungeon.
-  - [x] b3 — Ryn playable from the class select; Verdance's arrival scene keyed to whichever start dungeon was cleared; end-to-end test; docs.
-- 20c The Observatory (Lyra)
-  - [x] c1 — mechanics: Silence status (no skills for a turn), enemies rotating elements, a boss becoming immune to one element, random status effects; kits (Void Mage, Astral Familiar, Corrupted Scholar) + bosses (escape warden "Void Sentinel", Void Archmage, weak to earth).
-  - [x] c2 — the Observatory dungeon + scenes.
-  - [x] c3 — Lyra playable; test; docs.
-- 20d The Underground Guild (Silas)
-  - [x] d1 — mechanics: stealing items, a boss summoning adds, poison + bleed in one hit; kits (Shadow Thief, Venomous Cutthroat, Hired Muscle) + bosses (escape warden "Corrupted Enforcer", Shadow Lord, weak to holy).
-  - [x] d2 — the Guild dungeon + scenes.
-  - [x] d3 — Silas playable; test.
-  - [x] d4 — Edenmere, the mid-Act I town.
-  - [ ] d5 — the Act I → Act II transition (all four gathered → closing scene; Act II kingdoms "coming later"); final docs. **Then stop.**
+**For Cory, when back:**
+- **Push & PR:** `git push` the `cjt` commits (20b step 1 onward), then open the PR as usual.
+- **Playtest suggestions:** a Lyra or Silas start (the newest escapes: Void Sentinel, Corrupted Enforcer); the Void Archmage's phase-2 immunity (with Vael in the party it turns immune to holy); the Shadow Lord's summoned thieves; Edenmere (south-east gate: shrine, armory, item shop); and a full route to the Act I ending. Balance is untested by a human: the numbers were tuned by formula for a lone hero at the expected levels.
+- **Known limits (by design, for later milestones):** all 15 new enemies and bosses use tinted stand-in sprites, and the Monastery/Observatory/Guild tiles are recolors of the Cathedral's (Act I art pass, 21). Nothing after the Act I card yet (Act II, 24). Save points aren't placed yet (22).
+- **One naming note:** the design doc uses "Void Sentinel" twice, for the Observatory's warden and for an Act III Blighted Maw enemy. I used it for the warden; the Act III one will need a different name or kit.
+
+**Next up: Milestone 21 (Act I art & music pass)**: real tilesets for the four dungeons and two towns, the 4 boss sprites, Frank and NPC sprites, Act I's enemy roster, and dungeon/boss/town music. It's a big art pass: talk scope through with Cory first (the same "code-drawn vs sourced" question as Milestone 16).
+
 
 **Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps, pushed to `cjt` on Cory's go-ahead (he hasn't playtested it yet): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
 
@@ -240,7 +234,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 20 — Act I content (in progress: 20a done)
+## Milestone 20 — Act I content (done)
 
 ### 20a — The Cathedral (done, 2026-09-29)
 
@@ -281,7 +275,7 @@ Built in four steps, each tested and committed on its own:
 - **Gold:** each enemy gives half its XP in gold ("Victory! Gained 22 XP and 11 gold."); `GameManager.gold` is saved; the pause menu shows it. **The Forest's enemies were retuned** for a lone hero around level 3 (they were built for the old four-person party).
 - Verified by a driver (11 checks): leaving the Cathedral lands outside its arch; gated / unbuilt entrances explain themselves; Verdance arrival + Frank's stall; the elder's post-Cathedral line; a night at the inn; buying a Potion; reviving Ryn; leaving Verdance; gold from a battle; plus screenshots.
 
-### 20b — The Monastery (in progress)
+### 20b — The Monastery (done, 2026-09-29)
 
 **Step b1: battle mechanics + Monastery enemies (done, 2026-09-29)**
 - **Counter stance:** `Combatant.counter_rounds` (rounds left, ticked in `_tick_buffs`; ≥900 = permanent). While it's up, a *physical* party action (`_physical`: Attack, or a skill aimed at enemies with no element) is hit back once per action in `_maybe_counter()` (from `_hit()`), for 80% of the enemy's ATK − the attacker's DEF; the message gets a second line "X counters! Y takes N!". Spells are never countered. Sources: the `counter_stance` ability (with a `tell` line; `rounds: 2` = the rest of this round and all of the next) and the kit's `counter_from_phase` (a boss counters permanently from that phase; the phase message says so). Orange shield status icon.
@@ -312,7 +306,7 @@ Built in four steps, each tested and committed on its own:
 - `ActOne.PLAYABLE_STARTS = ["Vael", "Ryn", "Lyra"]`.
 - Verified end to end (12 checks): Lyra's class select -> wake -> Frank -> Void Sentinel with Frank's help -> Frank names the Underground Guild -> overworld at the Observatory's arch (32,13) -> Verdance arrival names the Guild; then a Ryn game at level 5 with the Monastery cleared -> Observatory rescue -> Void Archmage -> Lyra joins at level 5. (On Lyra's route the Guild isn't built yet, so its entrance still says "coming in a later update" until 20d.)
 
-### 20d — The Underground Guild (in progress)
+### 20d — The Underground Guild, Edenmere, end of Act I (done, 2026-09-29)
 
 **Step d1: battle mechanics + Guild enemies (done, 2026-09-29)**
 - **Stealing** (`attack.steal`, percent): `_steal()` takes one random consumable (an `ITEM_DEFS` item the party owns) into the enemy's `stolen` list. On victory `_end_battle` puts everything back ("Recovered N stolen items."). Running away loses them.
@@ -332,6 +326,11 @@ Built in four steps, each tested and committed on its own:
 - **Town atlas** grew 4 tiles (12 cobbles, 13 shrine, 14 item-shop sign, 15 armory sign) in `build_act1_tiles.py`; the first 12 are byte-identical. Both town scenes register all 16.
 - **New gear** (`Equipment.DEFS`): Steel Sword (Vael, ATK 13), Steel Claws (Ryn, ATK 11), Oak Staff (Lyra, ATK 4 / INT 9), Steel Daggers (Silas, ATK 12), Amber Charm (any, RES 3).
 - Verified (16 checks): gate, townsfolk + Frank, shrine once per visit and reset by a dungeon, inn, both shops, late lines, class-locked gear, and Verdance's NPCs / inn / walls after the refactor.
+
+**Step d5: the end of Act I (done, 2026-09-29)**
+- `ActOne.all_cleared()`. In `Dungeon.on_captive_tile()`, right after a rescue scene: if all four dungeons are cleared and `act_one_complete` isn't set, set it, play `data/cutscenes/act_one_end.scene`, then return to the overworld outside that dungeon (`GameManager.arrival`). The party is free to roam afterwards; nothing else changes yet.
+- The scene: the three rescued heroes (new `Cutscene._expand()` tokens `{a1}`-`{a3}` = party members 2-4 as lowercase actor/sprite ids) gather around the starting hero; each of the four speaks (speaker names are fixed, so it works for every start); Frank walks in and points at Act II's three kingdoms; then a movie-mode card on the intro's starfield with the intro theme: "Act I - The Gathering" -> "Act II - The Purge / Coming in a later update".
+- Verified (6 checks + screenshots): a Silas route finishing at the Observatory -> Lyra joins -> closing scene -> both cards -> overworld at (32,13), `act_one_complete` set.
 
 ## Milestone 19 — Cutscenes (done)
 

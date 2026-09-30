@@ -248,3 +248,14 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The townsfolk and their lines are mine** (pronoun-free): a shopkeeper, innkeeper, smith, priestess, mayor, traveler, child and guard. The mayor and traveler say something new once you've cleared two of Act I's dungeons. The traveler's gossip hints at the Guild and the Observatory.
 - **Edenmere is open from the start.** The design doc calls it a waypoint, so there's no reason to lock it.
 - **Behind the scenes:** what Verdance and Edenmere share (inn, Frank's stall, talking, drawing the map) moved into one shared `Town.gd`, so Act II's towns can reuse it. Frank's stock and revive price now live there, not in `Verdance.gd` as the 20a notes say. Verdance plays exactly as before.
+
+### Step d5: the end of Act I
+
+- **Act I ends the moment the fourth hero is rescued**, right there in that dungeon. The design doc says "each dungeon cleared adds a party member until all four are assembled" but gives no final scene, so I wrote one: the four together, each with a line in their own voice, then Frank walks in ("Couldn't sit still in Verdance") and points at Act II's three kingdoms (Tundra, Desert, Coast).
+- **Then a title card**, in movie mode on the intro's starfield with the intro theme: "Act I - The Gathering", two captions, then "Act II - The Purge / Coming in a later update". It reuses existing art and music, so there's nothing new to replace later.
+- **Afterwards you're back outside that dungeon, free to roam**: shops, grinding, Edenmere's shrine. The game doesn't end or return to the title, so nothing is lost. When Act II exists, its start can key off the `act_one_complete` flag.
+- **Frank doesn't hint at his true identity** here. The design doc saves that for the final battle.
+
+## Milestone 20 — wrap-up
+
+- **The autonomous run finished all of Milestone 20** (20b-20d), each step tested in the real game and committed locally, not pushed, and none of it playtested by Cory yet. I didn't hit anything that needed Cory's input, so nothing was left blocked. The places where I read the design doc most freely, and where Cory's opinion matters most, are: the Void Mage's aura weakness, the Archmage's immunity targeting the party's elements (Lyra is never in that fight), summoned thieves vanishing when the Shadow Lord falls, Edenmere's contents and prices, and the Act I ending.

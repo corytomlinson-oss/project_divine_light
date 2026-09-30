@@ -62,6 +62,11 @@ static func is_cleared(id: String) -> bool:
 	return GameManager.has_flag("cleared_" + id)
 
 
+## Every Act I dungeon cleared: all four heroes are together (20d).
+static func all_cleared() -> bool:
+	return DUNGEONS.keys().all(func(id: String) -> bool: return is_cleared(id))
+
+
 ## The door's gate is met when the party includes the class it asks for.
 ## Your own starting dungeon has no gate - you're already inside.
 static func can_enter(id: String) -> bool:

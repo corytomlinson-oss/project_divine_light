@@ -216,13 +216,15 @@ Everything Act I (Milestone 20) added with placeholder art, as one checklist. Al
 
 **Batch 4 — townsfolk (7 walk sheets)**
 Verdance has 5 people and Edenmere 8, today all tinted copies of the heroes. 7 base sheets, palette-swapped where two roles share one, cover all 13:
-- [ ] **Elder** (Verdance elder; Edenmere mayor)
-- [ ] **Worker** (Verdance farmer; Edenmere smith)
-- [ ] **Child** (both towns)
-- [ ] **Guard** (both towns)
-- [ ] **Merchant** (both innkeepers; Edenmere shopkeeper)
-- [ ] **Priestess** (Edenmere shrine)
-- [ ] **Traveler** (Edenmere)
+- [x] **Elder** (Verdance elder; Edenmere mayor)
+- [x] **Worker** (Verdance farmer; Edenmere smith)
+- [x] **Child** (both towns)
+- [x] **Guard** (both towns)
+- [x] **Merchant** (both innkeepers; Edenmere shopkeeper)
+- [x] **Priestess** (Edenmere shrine)
+- [x] **Traveler** (Edenmere)
+
+All via `assets/sprites/source/build_townsfolk.py`: 13 sheets (`<name>_walk.png` + `<name>_frames.tres`) from the 7 designs, with color variants mayor / smith / innkeeper_b / shopkeeper / child_b / guard_b so the same role differs between the towns. Approved by Cory 2026-10-12.
 
 **Batch 5 — dungeon tilesets (3 x 5 tiles)**
 Each replaces a recolor of the Cathedral's tiles; same 5 tiles in the same order (floor / wall / door / captive rune / boss rune; the runes can stay shared).
@@ -253,7 +255,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 - [x] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — real sprites since Milestone 21 (see above).
 
 - [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
-- [~] **Edenmere townsfolk** — placeholders: the heroes' walk sheets, tinted. Milestone 21.
+- [x] **Edenmere townsfolk** — real walk sheets since Milestone 21 (see above).
 
 ## Milestone 20c — The Observatory
 
@@ -270,7 +272,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 
 - [x] **Overworld tiles** — `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png`: the Milestone 16 grass/trees/gate unchanged, plus a road, a stone arch (dungeon entrances), water and flowers. Code-drawn placeholders.
 - [x] **Verdance tiles** — same script → `town_tiles.png`: grass, trees, gate, road, timber-framed wall, roof, door, water, fence, flowers, Frank's striped awning, the inn's sign. Code-drawn placeholders for the Act I art pass (21).
-- [~] **Verdance villagers** — placeholders: Ryn's and Lyra's walk sheets, tinted. Real NPC sprites are Milestone 21's.
+- [x] **Verdance villagers** — real walk sheets since Milestone 21 (see above).
 - [x] **Frank** — real walk sheet since Milestone 21 (see above).
 - [x] **Fallen Guardian** — real sprite since Milestone 21 (see above).
 

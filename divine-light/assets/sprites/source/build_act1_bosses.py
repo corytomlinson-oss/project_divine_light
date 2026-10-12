@@ -3,7 +3,7 @@
 Same output as build_enemies.py: a 2-frame idle sheet per boss, frames side
 by side, 48x48 each like the Hollow Warden, facing right (toward the party):
 assets/sprites/enemies/<slug>.png. Frame 2 breathes (everything above a row
-sinks 1px) and pulses the glow colors.
+sinks 1px; a floating boss rises 1px instead) and pulses the glow colors.
 
 These are bigger than the Milestone 16 enemies, so each is drawn on a small
 canvas: the large plates (cape, shield, armor) are placed as hand-picked
@@ -29,7 +29,7 @@ BASE = {
     'w': (150, 70, 200),    # aura wisp
     'x': (210, 140, 250),   # aura wisp bright
 }
-WISPS = {'w', 'x'}
+WISPS = {'w', 'x', 'q', 'Q', 'i', 'I', 'y', 'Y'}  # also the Archmage's elemental motes
 
 
 class Canvas:
@@ -355,10 +355,117 @@ def corrupted_grandmaster(c):
         c.put(x, y, 'w')
 
 
+# --------------------------------------------------------------- Void Archmage
+# The Observatory's boss: a brilliant mage consumed by the void. Deep indigo
+# robes with star-silver trim, an empty hood with two cold eyes, a staff
+# crowned with a black void orb, and a hem that dissolves into dripping void
+# - it hovers. Fire, ice and lightning motes orbit it (its spells cycle
+# through them).
+@boss('void_archmage', None, {'V': 'X', 'w': 'x', 'q': 'Q', 'i': 'I', 'y': 'Y', 'E': 'e'}, {
+    'R': (70, 48, 118),     # robe
+    'r': (44, 28, 80),      # robe shade
+    'd': (26, 16, 48),      # robe deep shade
+    'L': (196, 204, 232),   # star-silver trim
+    'l': (124, 132, 172),   # trim shade
+    'H': (10, 6, 18),       # inside the hood
+    'E': (236, 228, 255),   # eyes
+    'e': (190, 160, 240),   # eyes dim (frame 2)
+    'F': (176, 158, 198),   # pale, void-touched hands
+    'f': (124, 106, 148),
+    'n': (96, 74, 62),      # staff
+    'N': (62, 46, 40),
+    'o': (14, 8, 26),       # void orb core
+    'q': (255, 128, 44), 'Q': (255, 196, 120),   # fire mote
+    'i': (110, 214, 255), 'I': (200, 240, 255),  # ice mote
+    'y': (250, 232, 80), 'Y': (255, 252, 190),   # lightning mote
+})
+def void_archmage(c):
+    # robe body, widening to the hem
+    for y in range(14, 41):
+        x0 = 19 - (y - 14) // 4
+        x1 = 31 + (y - 14) // 9
+        c.span(y, x0, x1, 'R')
+        c.put(x0, y, 'd')
+        c.put(x0 + 1, y, 'r')
+        c.put(x0 + 2, y, 'r')
+    for y in range(16, 41):     # front opening with star-silver trim
+        c.put(27, y, 'Ld')
+        c.put(29, y, 'l')
+    c.span(40, 13, 34, 'L')     # hem trim
+    for x, y in [(16, 20), (22, 27), (18, 34), (31, 23), (24, 37), (21, 18)]:
+        c.put(x, y, 'L')        # stars stitched into the robe
+    # the hem dissolving into void
+    for x, drop in [(13, 3), (15, 5), (17, 2), (19, 4), (21, 6), (23, 3), (25, 5), (27, 2),
+                    (29, 4), (31, 3), (33, 5)]:
+        for k in range(drop):
+            c.put(x, 41 + k, 'V' if k < drop - 1 else 'v')
+        c.put(x + 1, 41, 'v')
+    # back arm raised mid-cast, palm open, a rune hanging above it
+    for y, x0, x1 in [(15, 17, 20), (14, 15, 19), (13, 14, 18), (12, 13, 17), (11, 12, 16)]:
+        c.span(y, x0, x1, 'r')
+        c.put(x0, y, 'd')
+    c.span(11, 12, 16, 'L')     # cuff
+    c.span(9, 12, 15, 'F')      # hand
+    c.span(10, 12, 15, 'f')
+    c.put(12, 8, 'F F')         # fingers
+    c.put(15, 8, 'F')
+    c.put(11, 4, ' V ')         # the rune
+    c.put(11, 5, 'VXV')
+    c.put(11, 6, ' V ')
+    # hood, peak swept back
+    for y, x0, x1 in [(2, 18, 20), (3, 18, 23), (4, 19, 26), (5, 20, 28), (6, 20, 29),
+                      (7, 20, 30), (8, 20, 30), (9, 20, 30), (10, 20, 30), (11, 21, 30),
+                      (12, 21, 30), (13, 19, 32), (14, 18, 32)]:
+        c.span(y, x0, x1, 'R')
+        c.put(x0, y, 'r')
+    c.put(17, 1, 'R')           # the peak's tip
+    c.put(16, 0, 'r')
+    for y, x0, x1 in [(6, 25, 28), (7, 24, 29), (8, 24, 30), (9, 24, 30), (10, 24, 30), (11, 25, 30), (12, 26, 29)]:
+        c.span(y, x0, x1, 'H')
+    c.put(26, 9, 'EE')          # narrow, cold eyes
+    c.put(29, 9, 'EE')
+    c.put(26, 10, 'v')
+    c.put(30, 10, 'v')
+    c.span(13, 22, 31, 'L')     # mantle trim
+    c.span(14, 20, 32, 'l')
+    # front arm, holding the staff
+    for y, x0, x1 in [(16, 30, 33), (17, 30, 34), (18, 31, 34), (19, 31, 34)]:
+        c.span(y, x0, x1, 'R')
+        c.put(x1, y, 'd')
+    c.span(20, 31, 34, 'L')     # cuff
+    # staff (the hand is drawn over it)
+    for y in range(9, 45):
+        c.put(36, y, 'nN')
+    c.span(21, 34, 38, 'F')
+    c.span(22, 34, 38, 'f')
+    c.put(35, 8, 'llll')        # silver collar under the orb
+    # void orb
+    for y, x0, x1 in [(1, 35, 38), (2, 34, 39), (3, 33, 40), (4, 33, 40), (5, 33, 40), (6, 34, 39), (7, 35, 38)]:
+        c.span(y, x0, x1, 'o')
+        c.put(x0, y, 'V')
+        c.put(x1, y, 'V')
+    c.span(1, 35, 38, 'V')
+    c.span(7, 35, 38, 'v')
+    c.put(35, 3, 'X')           # glint
+    c.put(36, 4, 'v')
+    # elemental motes orbiting (fire, ice, lightning), plus loose void wisps
+    for x, y, lo, hi in [(8, 16, 'q', 'Q'), (43, 14, 'i', 'I'), (9, 31, 'y', 'Y')]:
+        c.put(x, y - 1, lo)     # a small glowing cross each
+        c.put(x - 1, y, lo + hi + lo)
+        c.put(x, y + 1, lo)
+    for x, y, ch in [(42, 28, 'q'), (5, 23, 'i'), (40, 36, 'y')]:
+        c.put(x, y, ch)
+    for x, y in [(23, 0), (33, 11), (5, 38), (43, 21), (11, 44), (38, 45)]:
+        c.put(x, y, 'w')
+
+
 def render(b, glow_frame):
     grid = b['rows']
     if glow_frame:
         grid = [''.join(b['glow'].get(ch, ch) for ch in row) for row in grid]
+    if glow_frame and b['split'] is None:
+        grid = grid[1:] + ['.' * W]  # floats: the whole sprite rises 1px
+    elif glow_frame:
         split = b['split']
         upper = grid[:split]
         merged = ''.join(u if u != '.' else l for u, l in zip(upper[-1], grid[split]))

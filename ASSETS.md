@@ -200,7 +200,7 @@ Everything Act I (Milestone 20) added with placeholder art, as one checklist. Al
 **Batch 1 — bosses + Frank (5)**
 - [x] **Fallen Guardian** (Cathedral boss) — corrupted holy knight: tarnished gold plate, violet visor, cracked-sun tabard and kite shield, greatsword planted point-down. 48x48, `assets/sprites/source/build_act1_bosses.py`. Approved by Cory 2026-10-12.
 - [x] **Corrupted Grandmaster** (Monastery boss) — old master mid-punch: bald, long white beard, open terracotta robe, prayer beads, wide stance, violet ki bursting off the fists. 48x48. Approved by Cory 2026-10-12.
-- [ ] **Void Archmage** (Observatory boss) — robed mage, void energy, orbiting elemental motes. 48x48.
+- [x] **Void Archmage** (Observatory boss) — empty indigo hood with cold eyes, star-silver trim, void-orb staff, hem dissolving into void (it floats), orbiting fire/ice/lightning motes. 48x48. Approved by Cory 2026-10-12.
 - [ ] **Shadow Lord** (Guild boss) — hooded guildmaster, cloak, twin blades. 48x48.
 - [ ] **Frank** — traveling merchant: walk sheet + `frank_frames.tres` (today he's a dark silhouette in every scene and town).
 

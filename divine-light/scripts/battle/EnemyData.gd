@@ -318,7 +318,6 @@ const STAND_INS := {
 	"Astral Familiar": {"sprite": "shade_wisp", "tint": Color(0.7, 0.9, 1.0)},
 	"Corrupted Scholar": {"sprite": "fallen_priest", "tint": Color(0.85, 0.8, 0.55)},
 	"Void Sentinel": {"sprite": "hollow_warden", "tint": Color(0.55, 0.45, 0.9)},
-	"Void Archmage": {"sprite": "fallen_priest", "scale": 2, "tint": Color(0.5, 0.35, 0.9)},
 	"Shadow Thief": {"sprite": "hollow_archer", "tint": Color(0.55, 0.55, 0.7)},
 	"Venomous Cutthroat": {"sprite": "shadow_acolyte", "tint": Color(0.6, 0.95, 0.5)},
 	"Hired Muscle": {"sprite": "corrupted_farmer", "tint": Color(0.85, 0.75, 0.65)},

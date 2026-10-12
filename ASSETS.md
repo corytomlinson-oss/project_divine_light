@@ -236,10 +236,12 @@ All three via `assets/tilesets/source/build_dungeon_tiles.py` (replaces `build_d
 
 **Batch 6 — battle backgrounds (4)**
 Only the overworld has one (`battle_bg_forest.png`); dungeon battles are a plain dark backdrop. Same layered build as the forest (`assets/ui/source/build_battle_bg.py`), added to `Battle.BATTLE_BACKGROUNDS`:
-- [ ] **Cathedral** — nave, cracked stained glass, violet glow.
-- [ ] **Monastery** — training hall, hanging banners, a cold brazier.
-- [ ] **Observatory** — the great lens under a cracked dome, stars.
-- [ ] **Guild** — tunnel, lamp light, crates.
+- [x] **Cathedral** — nave, cracked stained glass, violet glow.
+- [x] **Monastery** — training hall, hanging banners, a cold brazier.
+- [x] **Observatory** — the great lens under a cracked dome, stars.
+- [x] **Guild** — tunnel, lamp light, crates.
+
+All four via `assets/ui/source/build_dungeon_battle_bgs.py` -> `assets/ui/battle_bg_<id>.png`, used for both the escape and the rescue version of each dungeon. Approved by Cory 2026-10-12.
 
 **Batch 7 — music (synthesized, `build_music.py`)**
 Today all four dungeons share one dungeon track, and both towns play the overworld theme.

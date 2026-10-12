@@ -459,6 +459,144 @@ def void_archmage(c):
         c.put(x, y, 'w')
 
 
+# ----------------------------------------------------------------- Shadow Lord
+# The Guild's boss: the old guildmaster, hollowed out by Vorath. A tall cowl
+# with a green scarf over the lower face and violet eyes above it, a long
+# tattered cloak lined in Guild green, dark leathers with the gold guild coin
+# at the chest - crouched, one curved dagger raised high, the other thrust
+# forward, both dripping venom. Smoke curls around its feet.
+@boss('shadow_lord', 25, {'V': 'X', 'w': 'x', 'Z': 'z'}, {
+    'H': (54, 50, 70),      # hood / cloak
+    'h': (84, 78, 104),     # cloak highlight
+    'j': (30, 26, 42),      # cloak shadow / boots
+    'L': (42, 80, 60),      # cloak lining (Guild green)
+    'M': (54, 100, 72),     # scarf
+    'm': (32, 64, 46),
+    'F': (190, 164, 146),   # pale skin
+    'f': (126, 104, 98),
+    'A': (94, 74, 62),      # leathers
+    'a': (60, 48, 42),
+    'C': (228, 188, 86),    # guild coin
+    'c': (150, 112, 44),
+    'S': (206, 212, 226),   # blade
+    's': (122, 130, 152),
+    'Z': (150, 232, 92),    # venom
+    'z': (96, 168, 56),
+    'w': (70, 50, 96),      # smoke (darker than the other bosses' wisps)
+    'x': (104, 76, 140),
+})
+def shadow_lord(c):
+    # cloak flaring out behind, tattered
+    for y in range(12, 41):
+        x0 = 19 - (y - 12) * 14 // 28
+        x1 = 22 if y < 20 else 20
+        c.span(y, x0, x1, 'H')
+        c.put(x0, y, 'j')
+        c.put(x1, y, 'L')       # the green lining showing at the inner edge
+        if y % 5 == 0:
+            c.put(x0 + 2, y, 'h')
+    for x, drop in [(5, 3), (7, 1), (9, 4), (11, 2), (13, 3), (15, 1), (17, 2), (19, 3)]:
+        for k in range(drop):
+            c.put(x, 41 + k, 'H' if k < drop - 1 else 'j')
+    # back leg, knee bent out behind
+    for y, x0, x1 in [(26, 20, 24), (27, 19, 23), (28, 18, 22), (29, 17, 21), (30, 16, 20),
+                      (31, 16, 19), (32, 16, 19), (33, 16, 19), (34, 16, 19), (35, 15, 18),
+                      (36, 15, 18), (37, 14, 18), (38, 14, 18), (39, 14, 18), (40, 14, 18),
+                      (41, 14, 18), (42, 14, 18)]:
+        c.span(y, x0, x1, 'a')
+    for y in range(37, 43):     # boot
+        c.span(y, 14, 18, 'j')
+    c.span(43, 12, 19, 'j')
+    # front leg, lunging forward
+    for y, x0, x1 in [(26, 26, 30), (27, 27, 31), (28, 28, 32), (29, 29, 33), (30, 30, 34),
+                      (31, 31, 35), (32, 31, 35), (33, 31, 35), (34, 31, 35), (35, 31, 35),
+                      (36, 31, 35), (37, 31, 35), (38, 31, 35), (39, 31, 35), (40, 31, 35),
+                      (41, 31, 35), (42, 31, 35)]:
+        c.span(y, x0, x1, 'A')
+        c.put(x1, y, 'a')
+    for y in range(36, 43):
+        c.span(y, 31, 35, 'j')
+    c.span(43, 31, 38, 'j')
+    c.put(32, 37, 'h')
+    # torso, leaning in
+    for y, x0, x1 in [(13, 21, 29), (14, 20, 30), (15, 20, 30), (16, 20, 30), (17, 20, 30),
+                      (18, 21, 30), (19, 21, 29), (20, 22, 29), (21, 22, 29), (22, 22, 29),
+                      (23, 21, 30), (24, 21, 31), (25, 20, 31)]:
+        c.span(y, x0, x1, 'A')
+        c.put(x0, y, 'a')
+        c.put(x0 + 1, y, 'a')
+        c.put(x1, y, 'a')
+    for k in range(9):          # strap across the chest
+        c.put(21 + k, 14 + k, 'a')
+    c.put(24, 15, 'cCc')        # the guild coin
+    c.put(24, 16, 'CcC')
+    c.put(24, 17, 'cCc')
+    c.span(23, 21, 30, 'j')     # belt
+    c.put(27, 24, 'aa')         # pouch
+    c.put(27, 25, 'aa')
+    c.put(21, 24, 'V')          # corruption at the seams
+    c.put(29, 20, 'V')
+    # back arm raised high, dagger pointing up
+    for y, x0, x1 in [(13, 18, 21), (12, 17, 20), (11, 16, 19), (10, 15, 18), (9, 15, 18)]:
+        c.span(y, x0, x1, 'H')
+        c.put(x0, y, 'j')
+    c.put(14, 6, 'FFF')         # fist around the hilt
+    c.put(14, 7, 'FFf')
+    c.put(14, 8, 'fff')
+    c.put(15, 5, 'a')           # hilt
+    for x, y in [(15, 4), (15, 3), (14, 2), (14, 1), (13, 0)]:
+        c.put(x, y, 'Ss')       # curved blade
+    c.put(17, 5, 'Z')           # venom running down
+    c.put(17, 9, 'z')
+    # hood, peak leaning forward
+    for y, x0, x1 in [(2, 22, 25), (3, 21, 27), (4, 21, 28), (5, 20, 29), (6, 20, 30),
+                      (7, 20, 30), (8, 20, 30), (9, 20, 30), (10, 20, 30), (11, 20, 30),
+                      (12, 21, 30)]:
+        c.span(y, x0, x1, 'H')
+        c.put(x0, y, 'j')
+    c.put(26, 1, 'HH')          # the cowl's peak tipping forward
+    c.put(28, 2, 'H')
+    c.put(29, 3, 'h')
+    for y, x0, x1 in [(6, 25, 29), (7, 25, 30), (8, 25, 30), (9, 25, 30)]:
+        c.span(y, x0, x1, 'j')  # shadow under the hood
+    c.span(8, 26, 30, 'f')      # the strip of face above the scarf
+    c.put(27, 8, 'V')           # eyes
+    c.put(29, 8, 'V')
+    for y, x0, x1 in [(9, 25, 30), (10, 24, 30), (11, 23, 30), (12, 23, 29)]:
+        c.span(y, x0, x1, 'M')  # scarf over the lower face
+        c.put(x0, y, 'm')
+    c.put(23, 13, 'Mm')         # its tail
+    c.put(22, 14, 'm')
+    # mantle over the shoulders
+    for y, x0, x1 in [(13, 19, 31), (14, 19, 32), (15, 20, 32), (16, 21, 31)]:
+        c.span(y, x0, x1, 'H')
+        c.put(x0, y, 'j')
+    c.span(13, 21, 30, 'h')
+    c.put(24, 15, 'cCc')        # the guild coin pins the mantle
+    c.put(24, 16, 'CcC')
+    c.put(24, 17, 'cCc')
+    # front arm thrust forward, dagger out, edge down
+    for y, x0, x1 in [(15, 30, 33), (16, 30, 35), (17, 31, 35), (18, 32, 35)]:
+        c.span(y, x0, x1, 'H')
+        c.put(x1, y, 'j')
+    c.span(16, 35, 37, 'F')     # hand
+    c.span(17, 35, 37, 'F')
+    c.span(18, 35, 37, 'f')
+    c.put(38, 16, 'aa')         # hilt
+    for x, y in [(40, 16), (41, 16), (42, 16), (43, 17), (44, 17), (45, 18)]:
+        c.put(x, y, 'S')        # curved blade
+    for x, y in [(40, 17), (41, 17), (42, 17), (44, 18)]:
+        c.put(x, y, 's')
+    c.put(42, 18, 'Z')          # venom dripping off it
+    c.put(42, 19, 'z')
+    c.put(42, 21, 'Z')
+    # smoke curling around
+    for x, y in [(23, 44), (27, 45), (11, 45), (39, 41), (42, 37), (36, 9), (9, 22), (6, 30), (38, 28)]:
+        c.put(x, y, 'w')
+    c.put(24, 45, 'w')
+    c.put(37, 42, 'w')
+
+
 def render(b, glow_frame):
     grid = b['rows']
     if glow_frame:

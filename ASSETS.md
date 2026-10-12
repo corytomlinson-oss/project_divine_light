@@ -201,8 +201,8 @@ Everything Act I (Milestone 20) added with placeholder art, as one checklist. Al
 - [x] **Fallen Guardian** (Cathedral boss) — corrupted holy knight: tarnished gold plate, violet visor, cracked-sun tabard and kite shield, greatsword planted point-down. 48x48, `assets/sprites/source/build_act1_bosses.py`. Approved by Cory 2026-10-12.
 - [x] **Corrupted Grandmaster** (Monastery boss) — old master mid-punch: bald, long white beard, open terracotta robe, prayer beads, wide stance, violet ki bursting off the fists. 48x48. Approved by Cory 2026-10-12.
 - [x] **Void Archmage** (Observatory boss) — empty indigo hood with cold eyes, star-silver trim, void-orb staff, hem dissolving into void (it floats), orbiting fire/ice/lightning motes. 48x48. Approved by Cory 2026-10-12.
-- [ ] **Shadow Lord** (Guild boss) — hooded guildmaster, cloak, twin blades. 48x48.
-- [ ] **Frank** — traveling merchant: walk sheet + `frank_frames.tres` (today he's a dark silhouette in every scene and town).
+- [x] **Shadow Lord** (Guild boss) — hooded guildmaster: green scarf mask, violet eyes, tattered green-lined cloak, guild-coin clasp, crouched with twin venom-dripping daggers. 48x48. Approved by Cory 2026-10-12.
+- [x] **Frank** — traveling merchant: wide-brimmed hat with a red band, grey-brown beard, green coat, big pack with a red bedroll. Walk sheet `frank_walk.png` + `frank_frames.tres` via `build_frank_walk.py`; replaces the silhouette everywhere. Approved by Cory 2026-10-12.
 
 **Batch 2 — escape wardens (3)**
 - [ ] **Sparring Master** (Monastery) — monk in a guarding stance. 48x48.
@@ -271,7 +271,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 - [x] **Overworld tiles** — `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png`: the Milestone 16 grass/trees/gate unchanged, plus a road, a stone arch (dungeon entrances), water and flowers. Code-drawn placeholders.
 - [x] **Verdance tiles** — same script → `town_tiles.png`: grass, trees, gate, road, timber-framed wall, roof, door, water, fence, flowers, Frank's striped awning, the inn's sign. Code-drawn placeholders for the Act I art pass (21).
 - [~] **Verdance villagers** — placeholders: Ryn's and Lyra's walk sheets, tinted. Real NPC sprites are Milestone 21's.
-- [~] **Frank** — still the dark silhouette (no sprite yet). Milestone 21.
+- [x] **Frank** — real walk sheet since Milestone 21 (see above).
 - [x] **Fallen Guardian** — real sprite since Milestone 21 (see above).
 
 ## Milestone 19 — Cutscenes

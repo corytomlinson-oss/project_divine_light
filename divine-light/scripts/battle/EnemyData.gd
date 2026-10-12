@@ -322,7 +322,6 @@ const STAND_INS := {
 	"Venomous Cutthroat": {"sprite": "shadow_acolyte", "tint": Color(0.6, 0.95, 0.5)},
 	"Hired Muscle": {"sprite": "corrupted_farmer", "tint": Color(0.85, 0.75, 0.65)},
 	"Corrupted Enforcer": {"sprite": "cursed_paladin", "tint": Color(0.7, 0.55, 0.5)},
-	"Shadow Lord": {"sprite": "shadow_acolyte", "scale": 2, "tint": Color(0.45, 0.4, 0.6)},
 }
 
 

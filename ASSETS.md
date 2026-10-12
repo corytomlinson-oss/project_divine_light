@@ -205,9 +205,9 @@ Everything Act I (Milestone 20) added with placeholder art, as one checklist. Al
 - [x] **Frank** — traveling merchant: wide-brimmed hat with a red band, grey-brown beard, green coat, big pack with a red bedroll. Walk sheet `frank_walk.png` + `frank_frames.tres` via `build_frank_walk.py`; replaces the silhouette everywhere. Approved by Cory 2026-10-12.
 
 **Batch 2 — escape wardens (3)**
-- [ ] **Sparring Master** (Monastery) — monk in a guarding stance. 48x48.
-- [ ] **Void Sentinel** (Observatory) — stone-and-void construct. 48x48.
-- [ ] **Corrupted Enforcer** (Guild) — thug with poisoned knuckle-dusters. 48x48.
+- [x] **Sparring Master** (Monastery) — young instructor in a slate gi, black belt, topknot, both forearms up in a high guard; lightly corrupted. 48x48. Approved by Cory 2026-10-12.
+- [x] **Void Sentinel** (Observatory) — cracked, chipped stone construct with brass bands, floating joints, a void core and one violet eye. 48x48. Approved by Cory 2026-10-12.
+- [x] **Corrupted Enforcer** (Guild) — bruiser in a red bandana, scarred eye, open vest, chain belt, poison-dripping brass knuckles. 48x48. Approved by Cory 2026-10-12.
 
 **Batch 3 — dungeon enemies (9, 24x32)**
 - [ ] Monastery: **Corrupted Monk**, **Berserk Warrior**, **Iron Sentinel**

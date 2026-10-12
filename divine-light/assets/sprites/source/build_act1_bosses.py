@@ -1,4 +1,5 @@
-"""Hand-placed battle sprites for Act I's four dungeon bosses (Milestone 21).
+"""Hand-placed battle sprites for Act I's four dungeon bosses and three escape
+wardens (Milestone 21).
 
 Same output as build_enemies.py: a 2-frame idle sheet per boss, frames side
 by side, 48x48 each like the Hollow Warden, facing right (toward the party):
@@ -595,6 +596,295 @@ def shadow_lord(c):
         c.put(x, y, 'w')
     c.put(24, 45, 'w')
     c.put(37, 42, 'w')
+
+
+# ============================================================ escape wardens
+# The bosses that guard each starting dungeon's exit (Batch 2). Same size and
+# pipeline as the four above.
+
+# ------------------------------------------------------------- Sparring Master
+# The Monastery's warden (a Ryn start): a younger instructor in a slate
+# training gi, settled into a high guard - both forearms up, palms ready to
+# turn a blow aside (its counter stance). Only lightly touched by the
+# corruption: violet eyes and a few cracks along the arms.
+@boss('sparring_master', 26, {'V': 'X', 'w': 'x'}, {
+    'F': (214, 170, 130),   # skin
+    'f': (158, 112, 84),
+    'h': (42, 32, 34),      # hair
+    'O': (168, 184, 200),   # gi
+    'o': (108, 122, 140),
+    'd': (72, 82, 100),     # gi deep shade
+    'n': (40, 34, 46),      # black belt
+    'W': (232, 226, 212),   # hand wraps
+})
+def sparring_master(c):
+    # back leg, planted behind
+    for y, x0, x1 in [(28, 19, 24), (29, 18, 23), (30, 17, 22), (31, 16, 21), (32, 15, 20),
+                      (33, 14, 19), (34, 13, 18), (35, 13, 18), (36, 12, 17), (37, 12, 17),
+                      (38, 12, 16), (39, 12, 16), (40, 12, 16), (41, 12, 16)]:
+        c.span(y, x0, x1, 'o')
+        c.put(x0, y, 'd')
+    c.span(42, 11, 16, 'F')
+    c.span(43, 10, 16, 'f')
+    # front leg, knee bent forward
+    for y, x0, x1 in [(28, 25, 30), (29, 26, 31), (30, 27, 32), (31, 28, 33), (32, 28, 33),
+                      (33, 29, 34), (34, 29, 34), (35, 29, 34), (36, 29, 33), (37, 29, 33),
+                      (38, 29, 33), (39, 29, 33), (40, 29, 33), (41, 29, 33)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x1, y, 'o')
+    c.span(42, 29, 35, 'F')
+    c.span(43, 29, 36, 'f')
+    # gi jacket, belted
+    for y, x0, x1 in [(15, 21, 30), (16, 20, 31), (17, 20, 31), (18, 20, 31), (19, 20, 31),
+                      (20, 20, 31), (21, 20, 31), (22, 21, 30), (23, 21, 30), (24, 20, 31),
+                      (25, 19, 31), (26, 19, 31), (27, 19, 31)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x0, y, 'o')
+    for k in range(6):          # the jacket's crossed front, open at the neck
+        c.put(25 + k // 2, 15 + k, 'o')
+    c.put(26, 15, 'FF')
+    c.put(27, 16, 'F')
+    c.span(23, 20, 31, 'n')     # black belt
+    c.put(26, 24, 'nn')
+    c.put(27, 25, 'n')
+    # back arm: elbow down, forearm up, guarding the face
+    for y, x0, x1 in [(16, 18, 21), (17, 17, 20), (18, 16, 19), (19, 16, 19), (20, 16, 19)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x0, y, 'd')
+    for y in range(13, 20):     # forearm, wrapped
+        c.put(14, y, 'FFf')
+    c.put(14, 15, 'WWW')
+    c.put(14, 16, 'WWW')
+    c.put(14, 11, 'FFF')        # open hand
+    c.put(14, 12, 'FFf')
+    c.put(13, 11, 'f')
+    # head: shaved sides, topknot
+    for y, x0, x1 in [(5, 25, 29), (6, 24, 30), (7, 23, 31), (8, 23, 31), (9, 23, 31),
+                      (10, 23, 31), (11, 23, 31), (12, 24, 30), (13, 25, 29)]:
+        c.span(y, x0, x1, 'F')
+        c.put(x0, y, 'f')
+    c.span(5, 25, 29, 'h')
+    c.span(6, 24, 29, 'h')
+    c.put(23, 7, 'hh')
+    c.put(26, 3, 'hh')          # topknot
+    c.put(26, 4, 'hhh')
+    c.put(28, 8, 'hh')          # brow
+    c.put(29, 9, 'V')           # eye
+    c.put(31, 10, 'f')          # nose
+    c.put(28, 12, 'ff')         # set jaw
+    c.put(23, 9, 'f')           # ear
+    c.span(14, 25, 28, 'f')     # neck
+    # front arm: elbow out, forearm raised in front of the face, palm open
+    for y, x0, x1 in [(16, 30, 33), (17, 31, 34), (18, 32, 35), (19, 33, 36), (20, 34, 37)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x1, y, 'd')
+    for y in range(11, 20):
+        c.put(36, y, 'FFf')
+    c.put(36, 15, 'WWW')
+    c.put(36, 16, 'WWW')
+    c.put(37, 17, 'V')          # cracks up the forearm
+    c.put(36, 13, 'V')
+    c.put(36, 8, 'F F')         # fingers up, palm out
+    c.put(36, 9, 'FFF')
+    c.put(36, 10, 'FFF')
+    c.put(39, 9, 'f')           # thumb
+    # a few wisps
+    for x, y in [(20, 8), (40, 5), (42, 22), (9, 28), (38, 30)]:
+        c.put(x, y, 'w')
+
+
+# ---------------------------------------------------------------- Void Sentinel
+# The Observatory's warden (a Lyra start): a construct of carved stone and
+# observatory brass, its joints floating free, a void core in its chest and
+# one violet eye. Blows skip off the stone - but it hates fire.
+@boss('void_sentinel', 27, {'V': 'X', 'w': 'x'}, {
+    'G': (110, 116, 138),   # stone
+    'g': (70, 74, 94),
+    'l': (152, 160, 182),   # stone highlight
+    'B': (194, 154, 72),    # brass
+    'b': (134, 100, 46),
+    'o': (12, 8, 24),       # void core
+})
+def void_sentinel(c):
+    def block(x0, y0, x1, y1):
+        for y in range(y0, y1 + 1):
+            c.span(y, x0, x1, 'G')
+            c.put(x0, y, 'l')
+            c.put(x1, y, 'g')
+        c.span(y0, x0, x1, 'l')
+        c.span(y1, x0, x1, 'g')
+        for x, y in ((x0, y0), (x1, y1)):
+            c.put(x, y, '.')    # worn, chipped corners
+    # legs: stacked blocks with gaps (floating joints)
+    block(18, 31, 23, 36)
+    block(27, 31, 32, 36)
+    block(17, 38, 23, 43)
+    block(27, 38, 33, 43)
+    c.span(44, 16, 24, 'g')     # feet
+    c.span(44, 26, 34, 'g')
+    c.span(45, 16, 24, 'G')
+    c.span(45, 26, 35, 'G')
+    # torso: one big block banded in brass
+    block(17, 13, 33, 29)
+    c.span(14, 18, 32, 'B')
+    c.span(28, 18, 32, 'B')
+    c.put(18, 15, 'b')
+    c.put(32, 15, 'b')
+    # engraved star chart on the stone
+    for x, y in [(19, 18), (20, 24), (31, 19), (30, 25), (21, 21)]:
+        c.put(x, y, 'g')
+    c.put(19, 19, 'g')
+    c.put(20, 20, 'g')
+    # void core
+    for y, x0, x1 in [(18, 23, 27), (19, 22, 28), (20, 22, 28), (21, 22, 28), (22, 22, 28), (23, 23, 27)]:
+        c.span(y, x0, x1, 'o')
+        c.put(x0, y, 'V')
+        c.put(x1, y, 'V')
+    c.span(17, 23, 27, 'V')
+    c.span(24, 23, 27, 'v')
+    c.put(24, 20, 'X')
+    c.put(25, 21, 'v')
+    for x, y in [(21, 25), (20, 26), (29, 17), (30, 16)]:
+        c.put(x, y, 'V')        # void cracks spreading out from the core
+    # head: a block with one eye slit
+    block(21, 4, 30, 11)
+    c.span(5, 22, 29, 'B')      # brass crown band
+    c.span(8, 22, 30, 'o')
+    c.put(26, 8, 'VXXV')        # the eye, looking right
+    c.span(7, 22, 30, 'g')      # a heavy stone brow over it
+    # shoulders: floating stones
+    block(9, 13, 16, 19)        # (lopsided: the left one has slipped)
+    block(34, 11, 41, 17)
+    c.put(10, 14, 'BBBBBB')
+    c.put(35, 12, 'BBBBBB')
+    # arms: segments hanging free, heavy fists
+    block(10, 21, 15, 26)
+    block(36, 19, 40, 24)
+    block(8, 28, 16, 34)
+    block(34, 26, 42, 32)
+    c.span(31, 9, 15, 'g')      # knuckle lines
+    c.span(31, 11, 11, 'l')
+    c.span(29, 35, 41, 'g')
+    # void cracks running through the stone
+    for x, y in [(12, 15), (13, 16), (13, 17), (38, 13), (37, 14), (11, 30), (12, 29),
+                 (39, 28), (40, 29), (24, 6), (23, 7), (28, 10), (19, 30), (20, 33),
+                 (31, 35), (30, 40), (21, 40), (32, 27), (18, 16)]:
+        c.put(x, y, 'V')
+    c.put(28, 15, 'v')
+    c.put(27, 16, 'v')
+    # void wisps leaking from the gaps
+    for x, y in [(13, 19), (37, 19), (13, 26), (37, 26), (25, 37), (25, 30), (25, 12)]:
+        c.put(x, y, 'w')
+    for x, y in [(6, 8), (44, 10), (5, 30), (44, 34)]:
+        c.put(x, y, 'w')
+
+
+# ----------------------------------------------------------- Corrupted Enforcer
+# The Guild's warden (a Silas start): the muscle that kept the Guild's
+# debtors in line. Bald under a red bandana, a scar across one eye, an open
+# leather vest over a bruiser's bulk, hunched forward with brass knuckles
+# dripping poison.
+@boss('corrupted_enforcer', 27, {'V': 'X', 'Z': 'z', 'w': 'x'}, {
+    'F': (192, 142, 106),   # skin
+    'f': (138, 98, 74),
+    'R': (154, 46, 44),     # bandana
+    'r': (100, 28, 30),
+    'A': (88, 64, 50),      # vest
+    'a': (56, 42, 36),
+    'U': (72, 68, 84),      # trousers
+    'u': (48, 44, 58),
+    'j': (34, 28, 30),      # boots
+    'C': (222, 182, 86),    # brass knuckles
+    'c': (148, 110, 44),
+    'N': (120, 120, 128),   # chain belt
+    'Z': (150, 232, 92),    # poison
+    'z': (96, 168, 56),
+})
+def corrupted_enforcer(c):
+    # legs, short and thick, wide stance
+    for y, x0, x1 in [(30, 16, 22), (31, 15, 21), (32, 14, 21), (33, 14, 20), (34, 13, 20),
+                      (35, 13, 19), (36, 13, 19), (37, 13, 19), (38, 13, 19)]:
+        c.span(y, x0, x1, 'U')
+        c.put(x0, y, 'u')
+    for y, x0, x1 in [(30, 26, 32), (31, 27, 33), (32, 27, 34), (33, 28, 34), (34, 28, 35),
+                      (35, 29, 35), (36, 29, 35), (37, 29, 35), (38, 29, 35)]:
+        c.span(y, x0, x1, 'U')
+        c.put(x1, y, 'u')
+    for y in range(39, 44):     # boots
+        c.span(y, 12, 19, 'j')
+        c.span(y, 29, 36, 'j')
+    c.span(43, 11, 20, 'j')
+    c.span(43, 29, 37, 'j')
+    # torso: barrel chest and belly under an open vest
+    for y, x0, x1 in [(13, 18, 32), (14, 16, 33), (15, 15, 34), (16, 15, 34), (17, 15, 34),
+                      (18, 15, 34), (19, 15, 34), (20, 15, 34), (21, 15, 34), (22, 16, 34),
+                      (23, 16, 34), (24, 16, 34), (25, 16, 33), (26, 17, 33), (27, 17, 32),
+                      (28, 17, 32), (29, 17, 32)]:
+        c.span(y, x0, x1, 'A')
+        c.put(x0, y, 'a')
+    for y, x0, x1 in [(14, 24, 30), (15, 23, 31), (16, 23, 31), (17, 23, 31), (18, 23, 31),
+                      (19, 23, 31), (20, 23, 32), (21, 23, 32), (22, 23, 32), (23, 23, 32),
+                      (24, 23, 32), (25, 23, 31), (26, 24, 31)]:
+        c.span(y, x0, x1, 'F')  # bare chest and belly
+        c.put(x0, y, 'f')
+    c.put(26, 18, 'ff')         # chest line
+    c.put(28, 18, 'ff')
+    c.put(27, 23, 'f')          # navel
+    c.put(29, 16, 'V')          # corruption veins
+    c.put(30, 17, 'V')
+    c.put(30, 21, 'v')
+    c.span(27, 17, 32, 'N')     # chain belt
+    for x in range(18, 32, 2):
+        c.put(x, 27, 'u')
+    c.put(24, 28, 'CC')         # buckle
+    # back arm: cocked fist, knuckles up
+    for y, x0, x1 in [(14, 12, 17), (15, 11, 16), (16, 10, 15), (17, 10, 15), (18, 10, 15),
+                      (19, 10, 15), (20, 10, 15)]:
+        c.span(y, x0, x1, 'F')
+        c.put(x0, y, 'f')
+    c.span(21, 9, 15, 'F')
+    c.span(22, 9, 15, 'F')
+    c.span(23, 9, 15, 'f')
+    c.span(21, 9, 15, 'C')      # knuckle-duster
+    c.put(10, 21, 'c c c')
+    c.put(12, 24, 'Z')          # poison dripping
+    c.put(12, 25, 'z')
+    c.put(14, 26, 'z')
+    # head, hunched low between the shoulders
+    for y, x0, x1 in [(6, 25, 31), (7, 24, 32), (8, 24, 33), (9, 24, 33), (10, 24, 33),
+                      (11, 24, 33), (12, 25, 33), (13, 26, 32)]:
+        c.span(y, x0, x1, 'F')
+        c.put(x0, y, 'f')
+    c.span(6, 25, 31, 'R')      # bandana
+    c.span(7, 24, 32, 'R')
+    c.put(24, 8, 'rr')          # knot and tails
+    c.put(22, 8, 'R')
+    c.put(21, 9, 'Rr')
+    c.put(29, 9, 'ff')          # heavy brow
+    c.put(30, 10, 'V')          # eye
+    c.put(28, 9, 'r')           # the scar across the eye
+    c.put(29, 10, 'r')
+    c.put(30, 11, 'r')
+    c.put(33, 11, 'f')          # nose
+    c.put(30, 12, 'fff')        # sneer
+    c.put(32, 12, 'F')
+    # front arm: forearm forward, fist out toward the party
+    for y, x0, x1 in [(14, 31, 35), (15, 32, 37), (16, 33, 38), (17, 34, 39), (18, 35, 39),
+                      (19, 35, 39)]:
+        c.span(y, x0, x1, 'F')
+        c.put(x1, y, 'f')
+    c.put(36, 17, 'V')
+    for y in range(20, 24):     # fist
+        c.span(y, 35, 40, 'F')
+        c.put(40, y, 'f')
+    c.span(20, 35, 40, 'C')     # knuckle-duster
+    c.put(36, 20, 'c c')
+    c.put(41, 21, 'Z')          # poison
+    c.put(41, 22, 'z')
+    c.put(39, 25, 'Z')
+    c.put(39, 26, 'z')
+    for x, y in [(8, 10), (40, 6), (44, 28), (6, 32), (24, 45)]:
+        c.put(x, y, 'w')
 
 
 def render(b, glow_frame):

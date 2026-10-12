@@ -261,6 +261,11 @@ func _ready() -> void:
 	_setup_background()
 	_setup_party_window()
 	_enemies = _generate_encounter()
+	# For a suspend mid-fight (22b): the game as the fight began, and its enemies.
+	GameManager.begin_battle(_enemies.map(func(e: Combatant) -> Dictionary: return {
+		"name": e.display_name, "hp": e.max_hp, "atk": e.atk, "def": e.defense, "agi": e.agi,
+		"xp": e.xp_reward, "is_boss": e.is_boss, "phase_hp_thresholds": e.phase_hp_thresholds.duplicate(),
+	}))
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
 	Music.play("boss" if boss_fight else "battle", "battle")
 	_setup_enemy_ui()
@@ -2585,6 +2590,7 @@ func _tick_dot() -> void:
 
 func _end_battle(victory: bool) -> void:
 	state = State.BATTLE_OVER
+	GameManager.battle_snapshot = {}  # a suspend from here on saves the result
 	_victory = victory
 	action_menu.visible = false
 	command_title.text = ""

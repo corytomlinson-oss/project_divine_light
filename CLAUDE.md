@@ -8,7 +8,11 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-12)
 
-**Milestone 22a (save / load, part 1) is built** (2026-10-12), committed locally, not pushed: Cory hasn't playtested it yet. Cory scoped it (choices in `DECISIONS.md`). Saves now remember where you are and your play time; there's a real save/load screen; you can save at inns, at Edenmere's shrine, and from the pause menu on the overworld; and the game autosaves to its own slot after boss wins, rescues, escapes and the end of Act I. **Try it:** play a little, save at the Verdance inn or from the overworld pause menu (B -> Save), quit to the title, Continue. **Next: 22b, the suspend save** (closing the app / Home button; a fight in progress restarts from its beginning), then Milestone 23 (the APK, where suspend gets its real test).
+**Milestone 22 (save / load triggers) is complete** (2026-10-12), committed locally, not pushed; Cory hasn't playtested it yet:
+- **22a:** save slots + a save/load screen, saving at inns, Edenmere's shrine and the overworld pause menu, and autosaves to their own slot after boss wins, rescues, escapes and the end of Act I. Saves remember the map, spot and play time.
+- **22b:** the suspend save. Closing the game, Home, or Android's back-out writes it; the title offers Resume; it's single use. A suspend mid-battle restarts that fight as it began.
+
+Cory scoped it; his calls and mine are in `DECISIONS.md`. **Try it:** save at the Verdance inn or from the overworld pause menu, quit, Continue; and close the window mid-dungeon or mid-fight, relaunch, Resume. **Next up: Milestone 23 (Android APK export)**: build for the Retroid Pocket 6, test the controller, and give the suspend save its real test (Home / app switching).
 
 **Milestone 21 (Act I art & music pass) is complete** (2026-10-12), built with Cory reviewing each batch. Everything Act I added now has real art and music, all made in code:
 - **Sprites:** the 4 dungeon bosses, Frank, the 3 escape wardens, 9 dungeon enemies, and 13 townsfolk (7 designs plus color variants).
@@ -243,7 +247,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 22 — Save / load triggers (in progress)
+## Milestone 22 — Save / load triggers (done)
 
 Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own slot; 22a = slots, manual saves, autosaves, saves that remember place + play time; 22b = suspend save (mid-battle suspend restarts the fight); manual saves at inns, Edenmere's shrine and the overworld pause menu.
 
@@ -254,6 +258,15 @@ Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own
 - **The screen:** `scripts/menu/SaveMenu.gd` (built in code, like ShopMenu). `await SaveMenu.open(node, "save" | "load")` returns the slot or -1; it pauses the tree and restores the previous paused state. Each row: party heads (16x16 crop of the walk sheet), names + levels, location, play time, gold. Save mode lists slots 1-3 and asks before overwriting; load mode adds the Autosave row and starts on the newest save. `GameManager.slot_summary(slot)` reads a slot for display.
 - **Where you can save:** inns (`Town._inn` -> `offer_save()`), Edenmere's shrine (after praying, used or not), and the pause menu's Save, which exists only when the current scene is the Overworld (removed from the menu elsewhere). The title's Continue opens the load screen (enabled when any slot exists). F5 / F6 still debug-save / load slot 1.
 - Verified (15 checks + screenshots): pause-menu save, overwrite confirmation, no Save in a dungeon, inn save in Verdance, autosave after a boss (made on the next map) and after a rescue, play time, Continue -> load screen -> back on the saved overworld spot with the saved gold and party.
+
+### 22b — suspend save (done 2026-10-12, not yet playtested)
+- **When:** `GameManager._notification` writes `user://saves/suspend.json` on `NOTIFICATION_WM_CLOSE_REQUEST` (closing the window), `NOTIFICATION_APPLICATION_PAUSED` (Home / app switch on Android) and `NOTIFICATION_WM_GO_BACK_REQUEST` (backing out). On `NOTIFICATION_APPLICATION_RESUMED` it's deleted again - the game is still running and will rewrite it next time. Only while `in_game` (never from the title / class select).
+- **What:** the same data as a slot save (`_save_data()`, now split out of `save_game`; slot saves and the suspend share `_write()` / `_apply()`), plus `location_id` so a battle knows where it is. Mid-battle it's `GameManager.battle_snapshot` instead: `Battle._ready` calls `GameManager.begin_battle(encounter)` to snapshot the game as the fight begins, plus the enemies as `debug_encounter`-style dicts (name, stats, `is_boss`, `phase_hp_thresholds`); `_end_battle` clears it, so a suspend after the result saves the outcome instead.
+- **Resume:** the title adds a "Resume" option on top while the file exists (the menu panel grows up by a line; options are now matched by node name). `GameManager.resume()` applies it, deletes the file, and returns the scene: the map (pending spawn at the saved position), or the battle scene with the snapshot's enemies queued in `debug_encounter` (the fight restarts; Frank still helps in escape fights because `current_location` is restored).
+- **Single use:** resuming deletes it, and so do starting a new game and loading a slot.
+- A cutscene in progress isn't saved: resuming puts you on the map at that spot with whatever flags were already set.
+- Verified (15 checks + screenshots): nothing from the title, close -> Resume back in Verdance on the spot with the right gold, used up afterwards, Home/come-back drops it, mid-boss-fight suspend -> the Sparring Master fight restarts at full HP with the party as it began and Frank helping, win -> back on the dungeon map with the warden beaten, new game / load discard it.
+- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 23's on-device test.
 
 ## Milestone 21 — Act I art & music pass (done)
 
@@ -452,7 +465,7 @@ Built in four steps, each tested and committed on its own:
 | 20c | Act I — The Observatory (Lyra) | ✅ (2026-09-29) — silence, auras, immunity, random status; Lyra playable |
 | 20d | Act I — The Underground Guild (Silas) | ✅ (2026-09-29) — stealing, summons, Edenmere, end of Act I; Silas playable |
 | 21 | Act I art & music pass | ✅ (2026-10-12) — 7 bosses/wardens, 9 enemies, Frank, 13 townsfolk, 3 tilesets, 4 battle backgrounds, 4 tracks |
-| 22 | Save/load — triggers & integration (inns, auto-save, suspend save) | Not started |
+| 22 | Save / load — triggers & integration | ✅ (2026-10-12) — save screen, inn/shrine/overworld saves, autosave slot, suspend save |
 | 23 | Android APK export | Not started |
 | 24a | Act II — Cleansing transformation system | Not started |
 | 24b | Act II — Nordveil (Tundra) | Not started |

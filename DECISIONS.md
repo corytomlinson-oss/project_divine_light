@@ -296,3 +296,11 @@ Cory's calls (asked before building):
 - **The load screen starts on your most recent save**, which may be the autosave.
 - **Each slot card shows** the party's heads, names and levels, the location, play time and gold: the design doc's slot card in our screen size.
 - **Play time only counts while you're playing**: not on the title, and not while a menu has the game paused.
+
+### 22b: calls I made
+
+- **The suspend save is written on closing the window, on Home / switching apps, and on backing out with Android's back button.** If the app comes back from the background still running, the suspend is dropped: the game carries on, and it's rewritten the next time you leave. That way an old suspend never lingers to be resumed by mistake.
+- **Resume sits at the top of the title menu, and only while there's a suspend.** Using it deletes the suspend (single use, as the design doc says), and so do starting a new game or loading a save. Picking another save means abandoning the suspended game.
+- **Mid-fight suspend restarts that fight** (Cory's call): the same enemies at full strength, the party as it was when the fight began, and Frank's help again in an escape fight. A suspend after the fight is won saves the result instead, so a won fight is never re-fought.
+- **A cutscene in progress isn't saved.** Resuming puts you on the map where you were, with whatever had already happened. Short scenes simply don't replay; it isn't worth saving scene state.
+- **Nothing is saved from the title or class select**: there's no game to suspend.

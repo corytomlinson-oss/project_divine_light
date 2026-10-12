@@ -451,7 +451,159 @@ INTRO = dict(
     ],
 )
 
-TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO}
+# ---------------------------------------------------------------- Milestone 21
+# Town theme (Verdance + Edenmere): F major, 104 BPM - warm and unhurried, a
+# homey melody over gentle eighth-note arpeggios and a soft backbeat.
+TOWN = dict(
+    bpm=104, peak=0.75, loop_from_bar=2,
+    lead_vol=0.26, lead_duty=0.5, arp_vol=0.06, arp_div=2, bass_vol=0.36, drum_vol=0.12,
+    bass_pattern=['R', '-', 'F', '-', 'O', '-', 'F', '-'],
+    kick=[0, 8], snare=[12],
+    fills=[9, 17],
+    chords=(
+        ['F', 'C'] +                                             # intro
+        ['F', 'C', 'Dm', 'Bb', 'F', 'C', 'Bb', 'C'] +            # A
+        ['Dm', 'Am', 'Bb', 'F', 'Dm', 'Am', 'Bb', 'C']           # B
+    ),
+    lead=[
+        [('r', 16)],
+        [('r', 8), ('C5', 4), ('E5', 4)],
+        # A
+        [('F5', 6), ('E5', 2), ('F5', 4), ('A5', 4)],
+        [('G5', 8), ('E5', 4), ('C5', 4)],
+        [('D5', 4), ('F5', 4), ('A5', 6), ('G5', 2)],
+        [('F5', 8), ('D5', 8)],
+        [('C5', 4), ('F5', 4), ('A5', 4), ('C6', 4)],
+        [('G5', 8), ('E5', 4), ('G5', 4)],
+        [('F5', 4), ('D5', 4), ('A#4', 4), ('D5', 4)],
+        [('E5', 8), ('G5', 4), ('C5', 4)],
+        # B
+        [('A5', 6), ('G5', 2), ('F5', 4), ('D5', 4)],
+        [('E5', 8), ('C5', 8)],
+        [('D5', 4), ('F5', 4), ('A#5', 6), ('A5', 2)],
+        [('A5', 12), ('r', 4)],
+        [('F5', 4), ('A5', 4), ('D6', 6), ('C6', 2)],
+        [('C6', 8), ('A5', 4), ('E5', 4)],
+        [('D5', 4), ('F5', 4), ('A#5', 4), ('D6', 4)],
+        [('C6', 4), ('A#5', 2), ('A5', 2), ('G5', 4), ('E5', 4)],
+    ],
+)
+
+# The Monastery: D minor pentatonic, 84 BPM - a meditative flute line over a
+# temple drone, one low "gong" on each downbeat, no hi-hat. Calm on the
+# surface; the G major chord near the end of B is the unease underneath.
+MONASTERY = dict(
+    bpm=84, peak=0.72, loop_from_bar=2,
+    lead_vol=0.26, lead_duty=0.5, arp_vol=0.04, arp_div=2, arp_from=2,
+    pad=True, pad_vol=0.05, bass_vol=0.36, drum_vol=0.18, drums_from=2, hats=False,
+    bass_pattern=['R', '-', '-', '-', 'F', '-', '-', '-'],
+    kick=[0], snare=[],
+    chords=(
+        ['Dm', 'Dm'] +                                           # intro: drone
+        ['Dm', 'C', 'Dm', 'Am', 'F', 'C', 'Dm', 'Dm'] +          # A
+        ['Am', 'C', 'Dm', 'Am', 'F', 'G', 'Am', 'Am']            # B
+    ),
+    lead=[
+        [('r', 16)],
+        [('r', 8), ('A4', 4), ('C5', 4)],
+        # A
+        [('D5', 8), ('F5', 4), ('D5', 4)],
+        [('C5', 8), ('G4', 8)],
+        [('A4', 4), ('C5', 4), ('D5', 8)],
+        [('C5', 6), ('A4', 2), ('A4', 8)],
+        [('F5', 6), ('G5', 2), ('A5', 8)],
+        [('G5', 8), ('C5', 8)],
+        [('D5', 4), ('F5', 4), ('G5', 4), ('F5', 4)],
+        [('D5', 12), ('r', 4)],
+        # B
+        [('A5', 8), ('C6', 4), ('A5', 4)],
+        [('G5', 8), ('C5', 8)],
+        [('A5', 4), ('G5', 4), ('F5', 4), ('D5', 4)],
+        [('C5', 8), ('A4', 8)],
+        [('F5', 6), ('G5', 2), ('A5', 4), ('C6', 4)],
+        [('D6', 8), ('B5', 4), ('G5', 4)],
+        [('A5', 4), ('G5', 4), ('E5', 4), ('C5', 4)],
+        [('A4', 12), ('r', 4)],
+    ],
+)
+
+# The Observatory: E minor, 92 BPM - celestial and cold. A twinkling
+# sixteenth-note arpeggio carries it, the melody hangs high and slow, a soft
+# pad underneath, and only a whisper of hi-hat for pulse.
+OBSERVATORY = dict(
+    bpm=92, peak=0.7, loop_from_bar=2,
+    lead_vol=0.22, lead_duty=0.25, arp_vol=0.07, arp_div=1,
+    pad=True, pad_vol=0.05, bass_vol=0.30, drum_vol=0.07, drums_from=2, hats=True,
+    bass_pattern=['R', '-', '-', '-', 'O', '-', '-', '-'],
+    kick=[], snare=[],
+    chords=(
+        ['Em', 'C'] +                                            # intro: stars
+        ['Em', 'C', 'G', 'D', 'Em', 'C', 'Am', 'B'] +            # A
+        ['C', 'G', 'Am', 'Em', 'C', 'D', 'B', 'B']               # B
+    ),
+    lead=[
+        [('r', 16)],
+        [('r', 16)],
+        # A
+        [('B5', 8), ('G5', 4), ('E5', 4)],
+        [('E6', 12), ('r', 4)],
+        [('D6', 8), ('B5', 4), ('G5', 4)],
+        [('A5', 12), ('r', 4)],
+        [('G5', 4), ('B5', 4), ('E6', 8)],
+        [('G6', 8), ('E6', 4), ('C6', 4)],
+        [('C6', 8), ('A5', 4), ('E5', 4)],
+        [('D#6', 12), ('r', 4)],
+        # B
+        [('E6', 8), ('G6', 4), ('E6', 4)],
+        [('D6', 12), ('r', 4)],
+        [('C6', 8), ('E6', 4), ('A5', 4)],
+        [('B5', 12), ('r', 4)],
+        [('C6', 4), ('E6', 4), ('G6', 8)],
+        [('F#6', 8), ('D6', 4), ('A5', 4)],
+        [('B5', 4), ('D#6', 4), ('F#6', 8)],
+        [('B6', 12), ('r', 4)],
+    ],
+)
+
+# The Underground Guild: G minor, 108 BPM - sneaky. Staccato lead with rests
+# between the notes, a plucked bass that skips beats, light backbeat.
+GUILD = dict(
+    bpm=108, peak=0.78, loop_from_bar=2,
+    lead_vol=0.26, lead_duty=0.25, arp_vol=0.05, arp_div=2, bass_vol=0.40, drum_vol=0.15,
+    bass_pattern=['R', '.', 'F', '.', 'O', '.', 'F', 'R'],
+    kick=[0, 10], snare=[4, 12],
+    fills=[9, 17],
+    chords=(
+        ['Gm', 'Gm'] +                                           # intro
+        ['Gm', 'Gm', 'Cm', 'D', 'Gm', 'Eb', 'Cm', 'D'] +         # A
+        ['Eb', 'Bb', 'Cm', 'Gm', 'Eb', 'Bb', 'Cm', 'D']          # B
+    ),
+    lead=[
+        [('r', 16)],
+        [('D5', 2), ('r', 2), ('D5', 2), ('r', 2), ('F5', 2), ('r', 2), ('F#5', 2), ('r', 2)],
+        # A
+        [('G5', 2), ('r', 2), ('A#5', 2), ('r', 2), ('D6', 4), ('C6', 2), ('A#5', 2)],
+        [('A5', 2), ('G5', 2), ('F#5', 4), ('G5', 4), ('r', 4)],
+        [('G5', 2), ('r', 2), ('C6', 2), ('r', 2), ('D#6', 4), ('D6', 2), ('C6', 2)],
+        [('A5', 4), ('F#5', 2), ('A5', 2), ('D6', 8)],
+        [('A#5', 2), ('r', 2), ('A#5', 2), ('A5', 2), ('G5', 4), ('D5', 4)],
+        [('D#5', 4), ('G5', 4), ('A#5', 6), ('G5', 2)],
+        [('C6', 2), ('A#5', 2), ('G5', 2), ('D#5', 2), ('C5', 4), ('D#5', 4)],
+        [('D5', 4), ('F#5', 4), ('A5', 4), ('C6', 4)],
+        # B
+        [('D#6', 6), ('D6', 2), ('C6', 4), ('A#5', 4)],
+        [('D6', 6), ('C6', 2), ('A#5', 4), ('F5', 4)],
+        [('D#5', 2), ('G5', 2), ('C6', 4), ('A#5', 2), ('G5', 2), ('D#5', 4)],
+        [('D5', 8), ('r', 4), ('G5', 4)],
+        [('G5', 2), ('A#5', 2), ('D#6', 4), ('D6', 2), ('C6', 2), ('A#5', 4)],
+        [('F5', 2), ('A#5', 2), ('D6', 4), ('C6', 2), ('A#5', 2), ('A5', 4)],
+        [('G5', 2), ('C6', 2), ('D#6', 4), ('D6', 2), ('C6', 2), ('A#5', 4)],
+        [('A5', 2), ('F#5', 2), ('D5', 2), ('F#5', 2), ('A5', 4), ('r', 4)],
+    ],
+)
+
+TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO,
+          'town': TOWN, 'monastery': MONASTERY, 'observatory': OBSERVATORY, 'guild': GUILD}
 
 
 if __name__ == '__main__':

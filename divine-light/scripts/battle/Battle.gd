@@ -101,8 +101,18 @@ const LOCATION_BOSSES := {
 	"guild_escape": "corrupted_enforcer",
 }
 
+# Location -> backdrop art. Each dungeon uses the same one whether you're
+# escaping it or coming back to rescue someone (Milestone 21).
 const BATTLE_BACKGROUNDS: Dictionary = {
 	"overworld": "res://assets/ui/battle_bg_forest.png",
+	"cathedral": "res://assets/ui/battle_bg_cathedral.png",
+	"cathedral_escape": "res://assets/ui/battle_bg_cathedral.png",
+	"monastery": "res://assets/ui/battle_bg_monastery.png",
+	"monastery_escape": "res://assets/ui/battle_bg_monastery.png",
+	"observatory": "res://assets/ui/battle_bg_observatory.png",
+	"observatory_escape": "res://assets/ui/battle_bg_observatory.png",
+	"guild": "res://assets/ui/battle_bg_guild.png",
+	"guild_escape": "res://assets/ui/battle_bg_guild.png",
 }
 
 # Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on

@@ -259,3 +259,21 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 ## Milestone 20 — wrap-up
 
 - **The autonomous run finished all of Milestone 20** (20b-20d), each step tested in the real game and committed locally, not pushed, and none of it playtested by Cory yet. I didn't hit anything that needed Cory's input, so nothing was left blocked. The places where I read the design doc most freely, and where Cory's opinion matters most, are: the Void Mage's aura weakness, the Archmage's immunity targeting the party's elements (Lyra is never in that fight), summoned thieves vanishing when the Shadow Lord falls, Edenmere's contents and prices, and the Act I ending.
+
+## Milestone 21 — Act I art & music pass (2026-10-12)
+
+Cory chose hand-drawn-in-code for everything (like the Milestone 16 sprites) and bosses + Frank first, then reviewed each batch. Calls I made along the way:
+
+- **How the big sprites are drawn:** a 48x48 boss is too big to type pixel by pixel. So the large plates (armor, robes, cloaks, shields) are placed as hand-picked spans row by row, the details (faces, emblems, cracks, glow) pixel by pixel, and the dark outline is added automatically around the silhouette. The 9 regular enemies and the townsfolk use the same tools. Frank is fully hand-gridded, like the heroes.
+- **Corruption is the shared language.** Every enemy and boss has some violet: a glowing eye, cracks, veins, wisps. On their second idle frame it pulses brighter. The escape wardens are only lightly touched (they're still "becoming"); the bosses are steeped in it.
+- **Floaters float.** The Void Archmage, Void Mage and Astral Familiar rise 1px on their idle frame instead of breathing.
+- **The Void Archmage's motes match its spell cycle** (fire, ice, lightning), and its aura icon still shows above it in battle.
+- **Townsfolk are 7 designs in 13 colorings**, so the same role in two towns (innkeeper, child, guard) and roles that share a build (elder/mayor, farmer/smith, innkeeper/shopkeeper) still look like different people.
+- **The dungeon runes stay the Cathedral's** (violet captive, crimson boss), drawn onto each dungeon's own floor, so they read the same everywhere.
+- **The Observatory battle background shows tall arched windows onto the night sky**, not the inside of a dome. Two tries at the dome read as a flat grid. It's also kept lighter than the other dungeons, so the dark Archmage stands out.
+- **The Monastery battle floor was darkened** so the orange-robed monks don't blend into it.
+- **Each dungeon uses one battle background** for both its escape and its rescue fights.
+- **The Cathedral keeps the original dungeon theme**; the other three got their own. Both towns share one town theme (the overworld theme played there before).
+- **Kept the stand-in sprite mechanism** (now empty) so Act II's new enemies can borrow sprites until their own art pass.
+- **Not done (optional in the checklist):** redrawing the code-drawn town/overworld placeholder tiles from 20a, new sounds for steal / silence / summon / counter, and portraits (the dialogue box has no portrait slot; recommend skipping).
+- **Review images go in `previews/` (git-ignored)** at the repo root. Links to my scratch folder don't open in VS Code.

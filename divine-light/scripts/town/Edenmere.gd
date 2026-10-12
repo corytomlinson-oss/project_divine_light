@@ -57,16 +57,17 @@ const ARMORY_STOCK: Array = [
 	{"item": "Amber Charm", "price": 200},
 ]
 
-# Townsfolk borrow the heroes' walk sheets, tinted, until Milestone 21.
+# Townsfolk, with their own walk sheets since Milestone 21
+# (assets/sprites/source/build_townsfolk.py).
 const PEOPLE: Array = [
-	{"id": "shopkeeper", "sprite": "lyra", "tint": Color(0.95, 0.8, 0.7), "at": Vector2i(4, 4), "facing": "down"},
-	{"id": "innkeeper", "sprite": "ryn", "tint": Color(0.9, 0.78, 0.6), "at": Vector2i(13, 4), "facing": "down"},
-	{"id": "smith", "sprite": "ryn", "tint": Color(0.7, 0.62, 0.58), "at": Vector2i(24, 4), "facing": "down"},
-	{"id": "priestess", "sprite": "lyra", "tint": Color(1.0, 0.96, 0.85), "at": Vector2i(15, 8), "facing": "left"},
-	{"id": "mayor", "sprite": "silas", "tint": Color(0.85, 0.8, 0.9), "at": Vector2i(19, 7), "facing": "down"},
-	{"id": "traveler", "sprite": "silas", "tint": Color(0.75, 0.9, 0.75), "at": Vector2i(7, 9), "facing": "right"},
-	{"id": "child", "sprite": "lyra", "tint": Color(1.0, 0.85, 0.9), "at": Vector2i(25, 15), "facing": "left"},
-	{"id": "guard", "sprite": "ryn", "tint": Color(0.66, 0.72, 0.9), "at": Vector2i(13, 16), "facing": "up"},
+	{"id": "shopkeeper", "sprite": "shopkeeper", "at": Vector2i(4, 4), "facing": "down"},
+	{"id": "innkeeper", "sprite": "innkeeper_b", "at": Vector2i(13, 4), "facing": "down"},
+	{"id": "smith", "sprite": "smith", "at": Vector2i(24, 4), "facing": "down"},
+	{"id": "priestess", "sprite": "priestess", "at": Vector2i(15, 8), "facing": "left"},
+	{"id": "mayor", "sprite": "mayor", "at": Vector2i(19, 7), "facing": "down"},
+	{"id": "traveler", "sprite": "traveler", "at": Vector2i(7, 9), "facing": "right"},
+	{"id": "child", "sprite": "child_b", "at": Vector2i(25, 15), "facing": "left"},
+	{"id": "guard", "sprite": "guard_b", "at": Vector2i(13, 16), "facing": "up"},
 ]
 # What they say (scene commands). "<id>_late" is used once two or more of Act
 # I's dungeons are cleared, when there is one.
@@ -108,11 +109,11 @@ var _dungeons_cleared := 0
 func _ready() -> void:
 	GameManager.current_location = "edenmere"
 	GameManager.current_scene_path = "res://scenes/town/Edenmere.tscn"
-	Music.play("overworld")
+	Music.play("town", "overworld")
 	_tile_map.y_sort_enabled = true
 	_paint(MAP)
 	for p: Dictionary in PEOPLE:
-		_add_npc(p["id"], p["sprite"], p["at"], p["facing"], p["tint"])
+		_add_npc(p["id"], p["sprite"], p["at"], p["facing"])
 	if GameManager.has_flag("verdance_frank"):
 		_add_npc("frank", "frank", FRANK_SPOT, "down")
 	for id: String in ActOne.DUNGEONS:

@@ -34,15 +34,14 @@ const STALL: Array = [Vector2i(15, 12), Vector2i(16, 12)]
 const FRANK_SPOT := Vector2i(15, 13)
 const INN_PRICE := 10
 
-# Villagers. They borrow Ryn's and Lyra's walk sheets, tinted, until the Act I
-# art pass (Milestone 21) gives Verdance its own people. (Not Vael's: Vael is
-# the leader you see on the map when you start as Vael.)
+# Villagers, with their own walk sheets since Milestone 21
+# (assets/sprites/source/build_townsfolk.py).
 const VILLAGERS: Array = [
-	{"id": "elder", "sprite": "lyra", "tint": Color(0.72, 0.7, 0.78), "at": Vector2i(9, 10), "facing": "down"},
-	{"id": "farmer", "sprite": "ryn", "tint": Color(0.86, 0.72, 0.52), "at": Vector2i(21, 10), "facing": "down"},
-	{"id": "child", "sprite": "ryn", "tint": Color(1.0, 0.86, 0.86), "at": Vector2i(3, 7), "facing": "right"},
-	{"id": "guard", "sprite": "ryn", "tint": Color(0.66, 0.72, 0.9), "at": Vector2i(12, 16), "facing": "up"},
-	{"id": "innkeeper", "sprite": "lyra", "tint": Color(0.92, 0.78, 0.6), "at": Vector2i(12, 5), "facing": "down"},
+	{"id": "elder", "sprite": "elder", "at": Vector2i(9, 10), "facing": "down"},
+	{"id": "farmer", "sprite": "worker", "at": Vector2i(21, 10), "facing": "down"},
+	{"id": "child", "sprite": "child", "at": Vector2i(3, 7), "facing": "right"},
+	{"id": "guard", "sprite": "guard", "at": Vector2i(12, 16), "facing": "up"},
+	{"id": "innkeeper", "sprite": "merchant", "at": Vector2i(12, 5), "facing": "down"},
 ]
 # What they say (scene commands). "<id>_after" is used once the Cathedral is
 # cleared, when there is one.
@@ -72,11 +71,11 @@ const TALK := {
 func _ready() -> void:
 	GameManager.current_location = "verdance"
 	GameManager.current_scene_path = "res://scenes/town/Verdance.tscn"
-	Music.play("overworld")
+	Music.play("town", "overworld")
 	_tile_map.y_sort_enabled = true
 	_paint(MAP)
 	for v: Dictionary in VILLAGERS:
-		_add_npc(v["id"], v["sprite"], v["at"], v["facing"], v["tint"])
+		_add_npc(v["id"], v["sprite"], v["at"], v["facing"])
 	if GameManager.has_flag("verdance_frank"):
 		_add_npc("frank", "frank", FRANK_SPOT, "down")
 	_place_player(ENTRY_CELL)

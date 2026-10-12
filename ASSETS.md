@@ -193,54 +193,62 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
-## Milestone 21 — Act I art & music pass (planned 2026-10-12)
+## Milestone 21 — Act I art & music pass (done 2026-10-12)
 
 Everything Act I (Milestone 20) added with placeholder art, as one checklist. All hand-placed pixel art in code (Cory's call, 2026-10-12), same technique as the Milestone 16 sprites: `assets/sprites/source/pixelgrid.py` grids, one `build_*.py` per batch. **Order: the 4 bosses and Frank first.** Sizes follow the existing art: enemies are 2-frame idle sheets (24x32 per frame; bosses and wardens 48x48 per frame, like the Hollow Warden), people are 9-frame walk sheets (16x32 per frame, 48x96: rows down/up/right x idle/stepA/stepB) plus a `<name>_frames.tres`. When an enemy gets real art, its `EnemyData.STAND_INS` entry is deleted (the real file wins automatically).
 
 **Batch 1 — bosses + Frank (5)**
-- [ ] **Fallen Guardian** (Cathedral boss) — corrupted holy knight, dark-gold armor wreathed in violet light. 48x48.
-- [ ] **Corrupted Grandmaster** (Monastery boss) — old martial master, torn robes, wild corrupted ki. 48x48.
-- [ ] **Void Archmage** (Observatory boss) — robed mage, void energy, orbiting elemental motes. 48x48.
-- [ ] **Shadow Lord** (Guild boss) — hooded guildmaster, cloak, twin blades. 48x48.
-- [ ] **Frank** — traveling merchant: walk sheet + `frank_frames.tres` (today he's a dark silhouette in every scene and town).
+- [x] **Fallen Guardian** (Cathedral boss) — corrupted holy knight: tarnished gold plate, violet visor, cracked-sun tabard and kite shield, greatsword planted point-down. 48x48, `assets/sprites/source/build_act1_bosses.py`. Approved by Cory 2026-10-12.
+- [x] **Corrupted Grandmaster** (Monastery boss) — old master mid-punch: bald, long white beard, open terracotta robe, prayer beads, wide stance, violet ki bursting off the fists. 48x48. Approved by Cory 2026-10-12.
+- [x] **Void Archmage** (Observatory boss) — empty indigo hood with cold eyes, star-silver trim, void-orb staff, hem dissolving into void (it floats), orbiting fire/ice/lightning motes. 48x48. Approved by Cory 2026-10-12.
+- [x] **Shadow Lord** (Guild boss) — hooded guildmaster: green scarf mask, violet eyes, tattered green-lined cloak, guild-coin clasp, crouched with twin venom-dripping daggers. 48x48. Approved by Cory 2026-10-12.
+- [x] **Frank** — traveling merchant: wide-brimmed hat with a red band, grey-brown beard, green coat, big pack with a red bedroll. Walk sheet `frank_walk.png` + `frank_frames.tres` via `build_frank_walk.py`; replaces the silhouette everywhere. Approved by Cory 2026-10-12.
 
 **Batch 2 — escape wardens (3)**
-- [ ] **Sparring Master** (Monastery) — monk in a guarding stance. 48x48.
-- [ ] **Void Sentinel** (Observatory) — stone-and-void construct. 48x48.
-- [ ] **Corrupted Enforcer** (Guild) — thug with poisoned knuckle-dusters. 48x48.
+- [x] **Sparring Master** (Monastery) — young instructor in a slate gi, black belt, topknot, both forearms up in a high guard; lightly corrupted. 48x48. Approved by Cory 2026-10-12.
+- [x] **Void Sentinel** (Observatory) — cracked, chipped stone construct with brass bands, floating joints, a void core and one violet eye. 48x48. Approved by Cory 2026-10-12.
+- [x] **Corrupted Enforcer** (Guild) — bruiser in a red bandana, scarred eye, open vest, chain belt, poison-dripping brass knuckles. 48x48. Approved by Cory 2026-10-12.
 
 **Batch 3 — dungeon enemies (9, 24x32)**
-- [ ] Monastery: **Corrupted Monk**, **Berserk Warrior**, **Iron Sentinel**
-- [ ] Observatory: **Void Mage**, **Astral Familiar**, **Corrupted Scholar**
-- [ ] Guild: **Shadow Thief** (also the Shadow Lord's summons), **Venomous Cutthroat**, **Hired Muscle**
+- [x] Monastery: **Corrupted Monk** (bald young monk mid-flurry), **Berserk Warrior** (shirtless, wild red hair, axe raised), **Iron Sentinel** (heavy iron, riveted tower shield)
+- [x] Observatory: **Void Mage** (bent pointed hat, empty face, starry robe, void orb; floats), **Astral Familiar** (floating starlight owl), **Corrupted Scholar** (hunched, spectacles, open glyph tome)
+- [x] Guild: **Shadow Thief** (crouched hooded cutpurse with a loot sack; also the Shadow Lord's summons), **Venomous Cutthroat** (masked, hooked venom blades), **Hired Muscle** (huge bruiser, open vest, nail-studded club). All 9 via `assets/sprites/source/build_act1_enemies.py`. Approved by Cory 2026-10-12.
 
 **Batch 4 — townsfolk (7 walk sheets)**
 Verdance has 5 people and Edenmere 8, today all tinted copies of the heroes. 7 base sheets, palette-swapped where two roles share one, cover all 13:
-- [ ] **Elder** (Verdance elder; Edenmere mayor)
-- [ ] **Worker** (Verdance farmer; Edenmere smith)
-- [ ] **Child** (both towns)
-- [ ] **Guard** (both towns)
-- [ ] **Merchant** (both innkeepers; Edenmere shopkeeper)
-- [ ] **Priestess** (Edenmere shrine)
-- [ ] **Traveler** (Edenmere)
+- [x] **Elder** (Verdance elder; Edenmere mayor)
+- [x] **Worker** (Verdance farmer; Edenmere smith)
+- [x] **Child** (both towns)
+- [x] **Guard** (both towns)
+- [x] **Merchant** (both innkeepers; Edenmere shopkeeper)
+- [x] **Priestess** (Edenmere shrine)
+- [x] **Traveler** (Edenmere)
+
+All via `assets/sprites/source/build_townsfolk.py`: 13 sheets (`<name>_walk.png` + `<name>_frames.tres`) from the 7 designs, with color variants mayor / smith / innkeeper_b / shopkeeper / child_b / guard_b so the same role differs between the towns. Approved by Cory 2026-10-12.
 
 **Batch 5 — dungeon tilesets (3 x 5 tiles)**
 Each replaces a recolor of the Cathedral's tiles; same 5 tiles in the same order (floor / wall / door / captive rune / boss rune; the runes can stay shared).
-- [ ] **Monastery** — wooden floorboards, paper-screen walls, a temple gate.
-- [ ] **Observatory** — star-chart floor, brass-and-stone walls, a domed archway.
-- [ ] **Underground Guild** — wet cobbles, rough cellar brick, an iron-banded door.
+- [x] **Monastery** — wooden floorboards, paper-screen walls (one small violet tear each), a red-lacquered temple gate.
+- [x] **Observatory** — navy flagstones inlaid with brass star charts, blue-grey stone with a riveted brass band, a domed brass archway onto the night sky.
+- [x] **Underground Guild** — wet rounded cobbles with moss, rough dark cellar brick, an iron-banded plank door.
+
+All three via `assets/tilesets/source/build_dungeon_tiles.py` (replaces `build_dungeon_recolors.py`, deleted); the runes are the Cathedral's, drawn on each floor. Approved by Cory 2026-10-12.
 
 **Batch 6 — battle backgrounds (4)**
 Only the overworld has one (`battle_bg_forest.png`); dungeon battles are a plain dark backdrop. Same layered build as the forest (`assets/ui/source/build_battle_bg.py`), added to `Battle.BATTLE_BACKGROUNDS`:
-- [ ] **Cathedral** — nave, cracked stained glass, violet glow.
-- [ ] **Monastery** — training hall, hanging banners, a cold brazier.
-- [ ] **Observatory** — the great lens under a cracked dome, stars.
-- [ ] **Guild** — tunnel, lamp light, crates.
+- [x] **Cathedral** — nave, cracked stained glass, violet glow.
+- [x] **Monastery** — training hall, hanging banners, a cold brazier.
+- [x] **Observatory** — three tall brass-framed arched windows onto the starry sky (one cracked violet), the great lens angled across, a star-chart ring in the floor.
+- [x] **Guild** — tunnel, lamp light, crates.
+
+All four via `assets/ui/source/build_dungeon_battle_bgs.py` -> `assets/ui/battle_bg_<id>.png`, used for both the escape and the rescue version of each dungeon. Approved by Cory 2026-10-12.
 
 **Batch 7 — music (synthesized, `build_music.py`)**
 Today all four dungeons share one dungeon track, and both towns play the overworld theme.
-- [ ] **Town theme** (Verdance + Edenmere)
-- [ ] **Monastery**, **Observatory**, **Guild** dungeon themes (the current dungeon track stays the Cathedral's)
+- [x] **Town theme** (Verdance + Edenmere) — F major, 104 BPM, warm and unhurried.
+- [x] **Monastery** (D minor pentatonic, 84 BPM, flute over a temple drone), **Observatory** (E minor, 92 BPM, twinkling arpeggio), **Guild** (G minor, 108 BPM, sneaky staccato) dungeon themes; the old dungeon track stays the Cathedral's.
+
+All four in `assets/audio/source/build_music.py` -> `assets/audio/music/<name>.wav`; picked per dungeon by `"music"` in `Dungeon.DUNGEONS`, and by the towns' `Music.play("town", "overworld")`. Approved by Cory 2026-10-12.
 
 **Optional (decide later)**
 - [ ] Upgrade the code-drawn placeholder town tiles (16) and overworld road / arch / water / flowers (4) from 20a/20d. They're readable as they are.
@@ -249,30 +257,30 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 
 ## Milestone 20d — The Underground Guild
 
-- [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
-- [~] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — stand-ins: tinted/scaled Hollow Archer, Shadow Acolyte, Corrupted Farmer and Cursed Paladin sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Guild tiles** — real tiles since Milestone 21 (see above).
+- [x] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — real sprites since Milestone 21 (see above).
 
 - [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
-- [~] **Edenmere townsfolk** — placeholders: the heroes' walk sheets, tinted. Milestone 21.
+- [x] **Edenmere townsfolk** — real walk sheets since Milestone 21 (see above).
 
 ## Milestone 20c — The Observatory
 
-- [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).
-- [~] **Guild tiles** — same script -> `guild_tiles.png` (dark moss/sewer greens), made ahead for 20d.
-- [~] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — stand-ins: tinted/scaled Fallen Priest, Shade Wisp and Hollow Warden sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Observatory tiles** — real tiles since Milestone 21 (see above).
+- [x] **Guild tiles** — real tiles since Milestone 21 (see above).
+- [x] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20b — The Monastery
 
-- [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).
-- [~] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — stand-ins: tinted/scaled copies of existing enemy sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Monastery tiles** — real tiles since Milestone 21 (see above).
+- [x] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20a — The Cathedral
 
 - [x] **Overworld tiles** — `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png`: the Milestone 16 grass/trees/gate unchanged, plus a road, a stone arch (dungeon entrances), water and flowers. Code-drawn placeholders.
 - [x] **Verdance tiles** — same script → `town_tiles.png`: grass, trees, gate, road, timber-framed wall, roof, door, water, fence, flowers, Frank's striped awning, the inn's sign. Code-drawn placeholders for the Act I art pass (21).
-- [~] **Verdance villagers** — placeholders: Ryn's and Lyra's walk sheets, tinted. Real NPC sprites are Milestone 21's.
-- [~] **Frank** — still the dark silhouette (no sprite yet). Milestone 21.
-- [~] **Fallen Guardian** — stand-in: the Cursed Paladin sprite at 2×, gold-tinted (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Verdance villagers** — real walk sheets since Milestone 21 (see above).
+- [x] **Frank** — real walk sheet since Milestone 21 (see above).
+- [x] **Fallen Guardian** — real sprite since Milestone 21 (see above).
 
 ## Milestone 19 — Cutscenes
 

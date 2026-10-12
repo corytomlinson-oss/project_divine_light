@@ -85,6 +85,14 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 **Completed:** Milestone 20d — The Underground Guild, Edenmere and the end of Act I, which completes Milestone 20 (Act I content). Silas is now playable: wake in the Guild's cellars and outfight the Corrupted Enforcer's dirty tricks. On other routes the Shadow Lord holds Silas and calls in Shadow Thieves halfway through. New enemy behaviors: thieves that steal your items (win to get them back) and cutthroats that poison and bleed in one strike. Edenmere, the busy market town in the south-east, has an inn, an item shop, an armory with Act I's steel-tier gear, and a shrine that heals once per dungeon trip. When the fourth hero is rescued, the party gathers, Frank points the way to the three corrupted kingdoms, and Act I ends ("Act II - The Purge: coming in a later update"). All four characters can start the game, and each route runs through all four dungeons. Next: Milestone 21, the Act I art & music pass.
 
+**Completed:** Milestone 21 — Act I art & music pass. Everything Act I added now has real, hand-made art and music:
+- **Enemies:** the four dungeon bosses (a tarnished Fallen Guardian, the Corrupted Grandmaster mid-punch, the hovering Void Archmage, the Shadow Lord with venom daggers), the three escape bosses, and all nine dungeon enemies.
+- **People:** Frank finally has a face: a traveling merchant with a wide hat and a big pack. Thirteen townsfolk give Verdance and Edenmere their own people.
+- **Places:** the Monastery, Observatory and Guild have their own tilesets (floorboards and paper screens, brass star charts, wet cobbles and brick), and every dungeon has its own battle backdrop.
+- **Music:** a town theme plus a theme for each of the Monastery, Observatory and Guild.
+
+Next: Milestone 22, save/load triggers.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

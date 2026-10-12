@@ -210,9 +210,9 @@ Everything Act I (Milestone 20) added with placeholder art, as one checklist. Al
 - [x] **Corrupted Enforcer** (Guild) — bruiser in a red bandana, scarred eye, open vest, chain belt, poison-dripping brass knuckles. 48x48. Approved by Cory 2026-10-12.
 
 **Batch 3 — dungeon enemies (9, 24x32)**
-- [ ] Monastery: **Corrupted Monk**, **Berserk Warrior**, **Iron Sentinel**
-- [ ] Observatory: **Void Mage**, **Astral Familiar**, **Corrupted Scholar**
-- [ ] Guild: **Shadow Thief** (also the Shadow Lord's summons), **Venomous Cutthroat**, **Hired Muscle**
+- [x] Monastery: **Corrupted Monk** (bald young monk mid-flurry), **Berserk Warrior** (shirtless, wild red hair, axe raised), **Iron Sentinel** (heavy iron, riveted tower shield)
+- [x] Observatory: **Void Mage** (bent pointed hat, empty face, starry robe, void orb; floats), **Astral Familiar** (floating starlight owl), **Corrupted Scholar** (hunched, spectacles, open glyph tome)
+- [x] Guild: **Shadow Thief** (crouched hooded cutpurse with a loot sack; also the Shadow Lord's summons), **Venomous Cutthroat** (masked, hooked venom blades), **Hired Muscle** (huge bruiser, open vest, nail-studded club). All 9 via `assets/sprites/source/build_act1_enemies.py`. Approved by Cory 2026-10-12.
 
 **Batch 4 — townsfolk (7 walk sheets)**
 Verdance has 5 people and Edenmere 8, today all tinted copies of the heroes. 7 base sheets, palette-swapped where two roles share one, cover all 13:
@@ -250,7 +250,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 ## Milestone 20d — The Underground Guild
 
 - [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
-- [~] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — stand-ins: tinted/scaled Hollow Archer, Shadow Acolyte, Corrupted Farmer and Cursed Paladin sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — real sprites since Milestone 21 (see above).
 
 - [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
 - [~] **Edenmere townsfolk** — placeholders: the heroes' walk sheets, tinted. Milestone 21.
@@ -259,12 +259,12 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 
 - [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).
 - [~] **Guild tiles** — same script -> `guild_tiles.png` (dark moss/sewer greens), made ahead for 20d.
-- [~] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — stand-ins: tinted/scaled Fallen Priest, Shade Wisp and Hollow Warden sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20b — The Monastery
 
 - [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).
-- [~] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — stand-ins: tinted/scaled copies of existing enemy sprites (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20a — The Cathedral
 

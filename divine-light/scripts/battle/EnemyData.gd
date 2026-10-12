@@ -308,18 +308,11 @@ const BOSSES := {
 
 
 # Enemies with no art of their own yet borrow another enemy's sprite, scaled
-# up (whole-number, nearest) and tinted, until the Act I art pass (21).
-const STAND_INS := {
-	"Corrupted Monk": {"sprite": "shadow_acolyte", "tint": Color(0.95, 0.7, 0.45)},
-	"Berserk Warrior": {"sprite": "corrupted_farmer", "tint": Color(1.0, 0.55, 0.5)},
-	"Iron Sentinel": {"sprite": "cursed_paladin", "tint": Color(0.62, 0.66, 0.78)},
-	"Void Mage": {"sprite": "fallen_priest", "tint": Color(0.6, 0.5, 1.0)},
-	"Astral Familiar": {"sprite": "shade_wisp", "tint": Color(0.7, 0.9, 1.0)},
-	"Corrupted Scholar": {"sprite": "fallen_priest", "tint": Color(0.85, 0.8, 0.55)},
-	"Shadow Thief": {"sprite": "hollow_archer", "tint": Color(0.55, 0.55, 0.7)},
-	"Venomous Cutthroat": {"sprite": "shadow_acolyte", "tint": Color(0.6, 0.95, 0.5)},
-	"Hired Muscle": {"sprite": "corrupted_farmer", "tint": Color(0.85, 0.75, 0.65)},
-}
+# up (whole-number, nearest) and tinted - e.g. "New Enemy": {"sprite":
+# "cursed_paladin", "scale": 2, "tint": Color(...)}. Empty since every Act I
+# enemy got real art in Milestone 21; Act II's new enemies can use it until
+# their own art pass.
+const STAND_INS := {}
 
 
 static func kit(enemy_name: String) -> Dictionary:

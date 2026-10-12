@@ -34,13 +34,14 @@ WISPS = {'w', 'x', 'q', 'Q', 'i', 'I', 'y', 'Y'}  # also the Archmage's elementa
 
 
 class Canvas:
-    def __init__(self):
-        self.g = [['.'] * W for _ in range(H)]
+    def __init__(self, w=W, h=H):
+        self.w, self.h = w, h
+        self.g = [['.'] * w for _ in range(h)]
 
     def put(self, x, y, s):
         """Writes s starting at (x, y); spaces leave what's underneath."""
         for i, ch in enumerate(s):
-            if ch != ' ' and 0 <= x + i < W and 0 <= y < H:
+            if ch != ' ' and 0 <= x + i < self.w and 0 <= y < self.h:
                 self.g[y][x + i] = ch
 
     def span(self, y, x0, x1, ch):
@@ -48,13 +49,13 @@ class Canvas:
 
     def outline(self):
         src = [row[:] for row in self.g]
-        for y in range(H):
-            for x in range(W):
+        for y in range(self.h):
+            for x in range(self.w):
                 if src[y][x] != '.':
                     continue
                 for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                     nx, ny = x + dx, y + dy
-                    if 0 <= nx < W and 0 <= ny < H and src[ny][nx] not in ('.', 'K') and src[ny][nx] not in WISPS:
+                    if 0 <= nx < self.w and 0 <= ny < self.h and src[ny][nx] not in ('.', 'K') and src[ny][nx] not in WISPS:
                         self.g[y][x] = 'K'
                         break
 
@@ -65,12 +66,14 @@ class Canvas:
 BOSSES = {}
 
 
-def boss(slug, breathe_row, glow, pal):
+def boss(slug, breathe_row, glow, pal, size=(W, H), registry=BOSSES):
+    """Registers a sprite. breathe_row: rows above it sink 1px on frame 2
+    (None = the whole sprite floats up 1px instead)."""
     def register(draw):
-        c = Canvas()
+        c = Canvas(*size)
         draw(c)
         c.outline()
-        BOSSES[slug] = dict(rows=c.rows(), split=breathe_row, glow=glow, pal=dict(BASE, **pal))
+        registry[slug] = dict(rows=c.rows(), split=breathe_row, glow=glow, pal=dict(BASE, **pal), size=size)
         return draw
     return register
 
@@ -888,17 +891,18 @@ def corrupted_enforcer(c):
 
 
 def render(b, glow_frame):
+    w, h = b['size']
     grid = b['rows']
     if glow_frame:
         grid = [''.join(b['glow'].get(ch, ch) for ch in row) for row in grid]
     if glow_frame and b['split'] is None:
-        grid = grid[1:] + ['.' * W]  # floats: the whole sprite rises 1px
+        grid = grid[1:] + ['.' * w]  # floats: the whole sprite rises 1px
     elif glow_frame:
         split = b['split']
         upper = grid[:split]
         merged = ''.join(u if u != '.' else l for u, l in zip(upper[-1], grid[split]))
-        grid = ['.' * W] + upper[:-1] + [merged] + grid[split + 1:]
-    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        grid = ['.' * w] + upper[:-1] + [merged] + grid[split + 1:]
+    im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     for y, row in enumerate(grid):
         for x, ch in enumerate(row):
             col = b['pal'][ch]
@@ -908,23 +912,31 @@ def render(b, glow_frame):
 
 
 def sheet(b):
-    out = Image.new('RGBA', (W * 2, H), (0, 0, 0, 0))
+    w, h = b['size']
+    out = Image.new('RGBA', (w * 2, h), (0, 0, 0, 0))
     out.paste(render(b, False), (0, 0))
-    out.paste(render(b, True), (W, 0))
+    out.paste(render(b, True), (w, 0))
     return out
 
 
-if __name__ == '__main__':
+def build(registry):
+    """Command line: <out_dir> [preview.png] - writes every sheet, plus an
+    optional 6x preview of them side by side."""
     out_dir = sys.argv[1]
     os.makedirs(out_dir, exist_ok=True)
-    sheets = {slug: sheet(b) for slug, b in BOSSES.items()}
+    sheets = {slug: sheet(b) for slug, b in registry.items()}
     for slug, s in sheets.items():
         s.save(os.path.join(out_dir, slug + '.png'))
     if len(sys.argv) > 2:
         pw = sum(s.width for s in sheets.values()) + 4 * (len(sheets) + 1)
-        prev = Image.new('RGBA', (pw, 52), (60, 52, 70, 255))
+        ph = max(s.height for s in sheets.values()) + 4
+        prev = Image.new('RGBA', (pw, ph), (60, 52, 70, 255))
         x = 4
         for s in sheets.values():
-            prev.alpha_composite(s, (x, 2))
+            prev.alpha_composite(s, (x, ph - 2 - s.height))
             x += s.width + 4
         prev.resize((prev.width * 6, prev.height * 6), Image.NEAREST).save(sys.argv[2])
+
+
+if __name__ == '__main__':
+    build(BOSSES)

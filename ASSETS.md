@@ -193,7 +193,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
-## Milestone 21 — Act I art & music pass (planned 2026-10-12)
+## Milestone 21 — Act I art & music pass (done 2026-10-12)
 
 Everything Act I (Milestone 20) added with placeholder art, as one checklist. All hand-placed pixel art in code (Cory's call, 2026-10-12), same technique as the Milestone 16 sprites: `assets/sprites/source/pixelgrid.py` grids, one `build_*.py` per batch. **Order: the 4 bosses and Frank first.** Sizes follow the existing art: enemies are 2-frame idle sheets (24x32 per frame; bosses and wardens 48x48 per frame, like the Hollow Warden), people are 9-frame walk sheets (16x32 per frame, 48x96: rows down/up/right x idle/stepA/stepB) plus a `<name>_frames.tres`. When an enemy gets real art, its `EnemyData.STAND_INS` entry is deleted (the real file wins automatically).
 
@@ -238,15 +238,17 @@ All three via `assets/tilesets/source/build_dungeon_tiles.py` (replaces `build_d
 Only the overworld has one (`battle_bg_forest.png`); dungeon battles are a plain dark backdrop. Same layered build as the forest (`assets/ui/source/build_battle_bg.py`), added to `Battle.BATTLE_BACKGROUNDS`:
 - [x] **Cathedral** — nave, cracked stained glass, violet glow.
 - [x] **Monastery** — training hall, hanging banners, a cold brazier.
-- [x] **Observatory** — the great lens under a cracked dome, stars.
+- [x] **Observatory** — three tall brass-framed arched windows onto the starry sky (one cracked violet), the great lens angled across, a star-chart ring in the floor.
 - [x] **Guild** — tunnel, lamp light, crates.
 
 All four via `assets/ui/source/build_dungeon_battle_bgs.py` -> `assets/ui/battle_bg_<id>.png`, used for both the escape and the rescue version of each dungeon. Approved by Cory 2026-10-12.
 
 **Batch 7 — music (synthesized, `build_music.py`)**
 Today all four dungeons share one dungeon track, and both towns play the overworld theme.
-- [ ] **Town theme** (Verdance + Edenmere)
-- [ ] **Monastery**, **Observatory**, **Guild** dungeon themes (the current dungeon track stays the Cathedral's)
+- [x] **Town theme** (Verdance + Edenmere) — F major, 104 BPM, warm and unhurried.
+- [x] **Monastery** (D minor pentatonic, 84 BPM, flute over a temple drone), **Observatory** (E minor, 92 BPM, twinkling arpeggio), **Guild** (G minor, 108 BPM, sneaky staccato) dungeon themes; the old dungeon track stays the Cathedral's.
+
+All four in `assets/audio/source/build_music.py` -> `assets/audio/music/<name>.wav`; picked per dungeon by `"music"` in `Dungeon.DUNGEONS`, and by the towns' `Music.play("town", "overworld")`. Approved by Cory 2026-10-12.
 
 **Optional (decide later)**
 - [ ] Upgrade the code-drawn placeholder town tiles (16) and overworld road / arch / water / flowers (4) from 20a/20d. They're readable as they are.

@@ -26,6 +26,7 @@ const DUNGEONS := {
 	"cathedral": {
 		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
 		"scene": "res://scenes/dungeon/CathedralDungeon.tscn",
+		"music": "dungeon",
 		"wake_scene": "res://data/cutscenes/cathedral_wake.scene",
 		"frank_scene": "res://data/cutscenes/cathedral_frank.scene",
 		"escaped_scene": "res://data/cutscenes/cathedral_escaped.scene",
@@ -34,6 +35,7 @@ const DUNGEONS := {
 	"monastery": {
 		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
 		"scene": "res://scenes/dungeon/MonasteryDungeon.tscn",
+		"music": "monastery",
 		"wake_scene": "res://data/cutscenes/monastery_wake.scene",
 		"frank_scene": "res://data/cutscenes/monastery_frank.scene",
 		"escaped_scene": "res://data/cutscenes/monastery_escaped.scene",
@@ -42,6 +44,7 @@ const DUNGEONS := {
 	"observatory": {
 		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
 		"scene": "res://scenes/dungeon/ObservatoryDungeon.tscn",
+		"music": "observatory",
 		"wake_scene": "res://data/cutscenes/observatory_wake.scene",
 		"frank_scene": "res://data/cutscenes/observatory_frank.scene",
 		"escaped_scene": "res://data/cutscenes/observatory_escaped.scene",
@@ -50,6 +53,7 @@ const DUNGEONS := {
 	"guild": {
 		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
 		"scene": "res://scenes/dungeon/GuildDungeon.tscn",
+		"music": "guild",
 		"wake_scene": "res://data/cutscenes/guild_wake.scene",
 		"frank_scene": "res://data/cutscenes/guild_frank.scene",
 		"escaped_scene": "res://data/cutscenes/guild_escaped.scene",
@@ -83,7 +87,7 @@ func _ready() -> void:
 	GameManager.current_location = dungeon_id + ("_escape" if _escape else "")
 	GameManager.current_scene_path = _data["scene"]
 	GameManager.story_flags.erase("edenmere_shrine_used")  # once per dungeon visit (20d)
-	Music.play("dungeon")
+	Music.play(_data.get("music", "dungeon"), "dungeon")  # each dungeon's own theme (Milestone 21)
 	# Characters lower on screen draw in front (a captive standing just above
 	# the player, cutscene actors walking past each other).
 	_tile_map.y_sort_enabled = true

@@ -109,7 +109,7 @@ var _dungeons_cleared := 0
 func _ready() -> void:
 	GameManager.current_location = "edenmere"
 	GameManager.current_scene_path = "res://scenes/town/Edenmere.tscn"
-	Music.play("overworld")
+	Music.play("town", "overworld")
 	_tile_map.y_sort_enabled = true
 	_paint(MAP)
 	for p: Dictionary in PEOPLE:

@@ -71,7 +71,7 @@ const TALK := {
 func _ready() -> void:
 	GameManager.current_location = "verdance"
 	GameManager.current_scene_path = "res://scenes/town/Verdance.tscn"
-	Music.play("overworld")
+	Music.play("town", "overworld")
 	_tile_map.y_sort_enabled = true
 	_paint(MAP)
 	for v: Dictionary in VILLAGERS:

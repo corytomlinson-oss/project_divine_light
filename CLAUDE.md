@@ -6,17 +6,24 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **User:** Cory. First-time game dev, new to Godot. Explain concepts clearly, guide step by step, don't assume prior game-dev knowledge. Home hobby project — no deadlines.
 
-## Picking back up (last touched 2026-09-29)
+## Picking back up (last touched 2026-10-12)
+
+**Milestone 21 (Act I art & music pass) is complete** (2026-10-12), built with Cory reviewing each batch. Everything Act I added now has real art and music, all made in code:
+- **Sprites:** the 4 dungeon bosses, Frank, the 3 escape wardens, 9 dungeon enemies, and 13 townsfolk (7 designs plus color variants).
+- **Tiles and backgrounds:** the Monastery, Observatory and Guild tilesets, and battle backgrounds for all four dungeons.
+- **Music:** a town theme and three dungeon themes.
+
+The checklist and per-asset notes are in `ASSETS.md`; how it's built is in the Milestone 21 section below; the judgment calls are in `DECISIONS.md`. **Next up: Milestone 22 (save/load triggers)**: save points at inns/shrines and autosaves after bosses, rescues and region clears (see README's save system). Still open from Milestone 20: the design doc uses "Void Sentinel" twice (the Observatory's warden and an Act III enemy); the Act III one needs a new name or kit.
+
+Review images from this milestone live in `previews/` at the repo root (git-ignored). Clickable links to files outside the workspace don't open in Cory's VS Code, so anything shown for review goes there.
+
 
 **Milestone 20 (Act I content) is complete** (2026-09-29): 20a The Cathedral, 20b The Monastery, 20c The Observatory, 20d The Underground Guild + Edenmere + the end of Act I. 20b-20d were built on an autonomous run while Cory was away (he asked me to finish Milestone 20 on my recommendations and stop there); every judgment call is logged at the bottom of `DECISIONS.md`. **All local commits on `cjt`, not pushed; Cory hasn't playtested 20b-20d.** All four characters are playable from the class select, each route runs through all four dungeons, and rescuing the fourth hero ends Act I.
 
-**For Cory, when back:**
-- **Push & PR:** `git push` the `cjt` commits (20b step 1 onward), then open the PR as usual.
+**For Cory (from the autonomous run, now merged):**
 - **Playtest suggestions:** a Lyra or Silas start (the newest escapes: Void Sentinel, Corrupted Enforcer); the Void Archmage's phase-2 immunity (with Vael in the party it turns immune to holy); the Shadow Lord's summoned thieves; Edenmere (south-east gate: shrine, armory, item shop); and a full route to the Act I ending. Balance is untested by a human: the numbers were tuned by formula for a lone hero at the expected levels.
-- **Known limits (by design, for later milestones):** all 15 new enemies and bosses use tinted stand-in sprites, and the Monastery/Observatory/Guild tiles are recolors of the Cathedral's (Act I art pass, 21). Nothing after the Act I card yet (Act II, 24). Save points aren't placed yet (22).
+- **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 24), and save points aren't placed yet (22).
 - **One naming note:** the design doc uses "Void Sentinel" twice, for the Observatory's warden and for an Act III Blighted Maw enemy. I used it for the warden; the Act III one will need a different name or kit.
-
-**Next up: Milestone 21 (Act I art & music pass)**: real tilesets for the four dungeons and two towns, the 4 boss sprites, Frank and NPC sprites, Act I's enemy roster, and dungeon/boss/town music. It's a big art pass: talk scope through with Cory first (the same "code-drawn vs sourced" question as Milestone 16).
 
 
 **Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps, pushed to `cjt` on Cory's go-ahead (he hasn't playtested it yet): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
@@ -234,6 +241,17 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
+## Milestone 21 — Act I art & music pass (done)
+
+Built 2026-10-12 in seven batches, each reviewed by Cory before committing (checklist: `ASSETS.md`).
+
+- **Big sprites on a canvas:** `assets/sprites/source/build_act1_bosses.py` has a small `Canvas` (spans + pixels, then `outline()` adds the dark outline around the silhouette; chars in `WISPS` float free with no outline) and a `boss(slug, breathe_row, glow, pal, size=, registry=)` decorator. Frame 2 sinks everything above `breathe_row` by 1px (or floats the whole sprite up when it's `None`) and applies the `glow` color swaps. `build(registry)` is the command line. The 4 bosses + 3 wardens are 48x48; `build_act1_enemies.py` reuses it for the 9 dungeon enemies at 24x32. Output goes to `assets/sprites/enemies/<slug>.png`, and a real file always wins over a stand-in, so `EnemyData.STAND_INS` is now empty (the mechanism stays for Act II).
+- **People:** `build_frank_walk.py` (hand grids via `pixelgrid.py`, like the heroes) and `build_townsfolk.py` (Canvas-based shared parts: `head` / `body` / `legs` / `robe` / `robe_feet`, then per-design details; 13 palettes from 7 designs). Each writes `<name>_walk.png` + `<name>_frames.tres` (a copy of Silas's with the path swapped). `Cutscene.make_character()` picks up a new frames file automatically, so Frank's silhouette is gone everywhere. The towns' `PEOPLE` / `VILLAGERS` now name their own sprites; `Town._add_npc()` still takes an optional tint.
+- **Dungeon tiles:** `assets/tilesets/source/build_dungeon_tiles.py` (replaces the deleted `build_dungeon_recolors.py`) draws floor / wall / door per dungeon and puts the Cathedral's two runes on each floor; 16px-periodic patterns so they tile.
+- **Battle backgrounds:** `assets/ui/source/build_dungeon_battle_bgs.py` -> `assets/ui/battle_bg_<id>.png`; `Battle.BATTLE_BACKGROUNDS` maps both `<id>` and `<id>_escape` to it.
+- **Music:** four more tracks in `build_music.py` (`town`, `monastery`, `observatory`, `guild`). `Dungeon.DUNGEONS[id]["music"]` picks the dungeon's track (Cathedral: `dungeon`); towns call `Music.play("town", "overworld")`.
+- **Workflow that worked:** draw -> render a large preview -> fix what reads wrong before showing Cory (e.g. the first Void Sentinel looked like a toy robot, the first Hired Muscle's vest like a door) -> install and screenshot in the real scene with a throwaway `_tmp_shot` harness -> Cory reviews from `previews/`.
+
 ## Milestone 20 — Act I content (done)
 
 ### 20a — The Cathedral (done, 2026-09-29)
@@ -416,10 +434,10 @@ Built in four steps, each tested and committed on its own:
 | 19a | Cutscenes — system + movie mode (in-game scripted scenes with a name-tag dialogue box; full-screen pixel "movie" scenes) | ✅ (2026-09-29) |
 | 19b | Cutscenes — intro movie (pixel-art opening before the player wakes up captive) | ✅ (2026-09-29) |
 | 20a | Act I — The Cathedral (Vael) | ✅ (2026-09-29) — class select, start-alone party, gates/routes, enemy abilities, both Cathedral variants, Verdance, the Forest Heartlands overworld, gold/inn/shop |
-| 20b | Act I — The Monastery (Ryn) | Not started |
-| 20c | Act I — The Observatory (Lyra) | Not started |
-| 20d | Act I — The Underground Guild (Silas) | Not started |
-| 21 | Act I art & music pass | Not started |
+| 20b | Act I — The Monastery (Ryn) | ✅ (2026-09-29) — counter stance, berserk, extra actions; Ryn playable |
+| 20c | Act I — The Observatory (Lyra) | ✅ (2026-09-29) — silence, auras, immunity, random status; Lyra playable |
+| 20d | Act I — The Underground Guild (Silas) | ✅ (2026-09-29) — stealing, summons, Edenmere, end of Act I; Silas playable |
+| 21 | Act I art & music pass | ✅ (2026-10-12) — 7 bosses/wardens, 9 enemies, Frank, 13 townsfolk, 3 tilesets, 4 battle backgrounds, 4 tracks |
 | 22 | Save/load — triggers & integration (inns, auto-save, suspend save) | Not started |
 | 23 | Android APK export | Not started |
 | 24a | Act II — Cleansing transformation system | Not started |

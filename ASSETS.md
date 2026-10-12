@@ -198,7 +198,7 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 Everything Act I (Milestone 20) added with placeholder art, as one checklist. All hand-placed pixel art in code (Cory's call, 2026-10-12), same technique as the Milestone 16 sprites: `assets/sprites/source/pixelgrid.py` grids, one `build_*.py` per batch. **Order: the 4 bosses and Frank first.** Sizes follow the existing art: enemies are 2-frame idle sheets (24x32 per frame; bosses and wardens 48x48 per frame, like the Hollow Warden), people are 9-frame walk sheets (16x32 per frame, 48x96: rows down/up/right x idle/stepA/stepB) plus a `<name>_frames.tres`. When an enemy gets real art, its `EnemyData.STAND_INS` entry is deleted (the real file wins automatically).
 
 **Batch 1 — bosses + Frank (5)**
-- [ ] **Fallen Guardian** (Cathedral boss) — corrupted holy knight, dark-gold armor wreathed in violet light. 48x48.
+- [x] **Fallen Guardian** (Cathedral boss) — corrupted holy knight: tarnished gold plate, violet visor, cracked-sun tabard and kite shield, greatsword planted point-down. 48x48, `assets/sprites/source/build_act1_bosses.py`. Approved by Cory 2026-10-12.
 - [ ] **Corrupted Grandmaster** (Monastery boss) — old martial master, torn robes, wild corrupted ki. 48x48.
 - [ ] **Void Archmage** (Observatory boss) — robed mage, void energy, orbiting elemental motes. 48x48.
 - [ ] **Shadow Lord** (Guild boss) — hooded guildmaster, cloak, twin blades. 48x48.
@@ -272,7 +272,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 - [x] **Verdance tiles** — same script → `town_tiles.png`: grass, trees, gate, road, timber-framed wall, roof, door, water, fence, flowers, Frank's striped awning, the inn's sign. Code-drawn placeholders for the Act I art pass (21).
 - [~] **Verdance villagers** — placeholders: Ryn's and Lyra's walk sheets, tinted. Real NPC sprites are Milestone 21's.
 - [~] **Frank** — still the dark silhouette (no sprite yet). Milestone 21.
-- [~] **Fallen Guardian** — stand-in: the Cursed Paladin sprite at 2×, gold-tinted (`EnemyData.STAND_INS`). Milestone 21.
+- [x] **Fallen Guardian** — real sprite since Milestone 21 (see above).
 
 ## Milestone 19 — Cutscenes
 

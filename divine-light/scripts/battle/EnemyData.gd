@@ -310,7 +310,6 @@ const BOSSES := {
 # Enemies with no art of their own yet borrow another enemy's sprite, scaled
 # up (whole-number, nearest) and tinted, until the Act I art pass (21).
 const STAND_INS := {
-	"Fallen Guardian": {"sprite": "cursed_paladin", "scale": 2, "tint": Color(0.78, 0.64, 0.36)},
 	"Corrupted Monk": {"sprite": "shadow_acolyte", "tint": Color(0.95, 0.7, 0.45)},
 	"Berserk Warrior": {"sprite": "corrupted_farmer", "tint": Color(1.0, 0.55, 0.5)},
 	"Iron Sentinel": {"sprite": "cursed_paladin", "tint": Color(0.62, 0.66, 0.78)},

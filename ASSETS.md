@@ -228,9 +228,11 @@ All via `assets/sprites/source/build_townsfolk.py`: 13 sheets (`<name>_walk.png`
 
 **Batch 5 — dungeon tilesets (3 x 5 tiles)**
 Each replaces a recolor of the Cathedral's tiles; same 5 tiles in the same order (floor / wall / door / captive rune / boss rune; the runes can stay shared).
-- [ ] **Monastery** — wooden floorboards, paper-screen walls, a temple gate.
-- [ ] **Observatory** — star-chart floor, brass-and-stone walls, a domed archway.
-- [ ] **Underground Guild** — wet cobbles, rough cellar brick, an iron-banded door.
+- [x] **Monastery** — wooden floorboards, paper-screen walls (one small violet tear each), a red-lacquered temple gate.
+- [x] **Observatory** — navy flagstones inlaid with brass star charts, blue-grey stone with a riveted brass band, a domed brass archway onto the night sky.
+- [x] **Underground Guild** — wet rounded cobbles with moss, rough dark cellar brick, an iron-banded plank door.
+
+All three via `assets/tilesets/source/build_dungeon_tiles.py` (replaces `build_dungeon_recolors.py`, deleted); the runes are the Cathedral's, drawn on each floor. Approved by Cory 2026-10-12.
 
 **Batch 6 — battle backgrounds (4)**
 Only the overworld has one (`battle_bg_forest.png`); dungeon battles are a plain dark backdrop. Same layered build as the forest (`assets/ui/source/build_battle_bg.py`), added to `Battle.BATTLE_BACKGROUNDS`:
@@ -251,7 +253,7 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 
 ## Milestone 20d — The Underground Guild
 
-- [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
+- [x] **Guild tiles** — real tiles since Milestone 21 (see above).
 - [x] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — real sprites since Milestone 21 (see above).
 
 - [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
@@ -259,13 +261,13 @@ Today all four dungeons share one dungeon track, and both towns play the overwor
 
 ## Milestone 20c — The Observatory
 
-- [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).
-- [~] **Guild tiles** — same script -> `guild_tiles.png` (dark moss/sewer greens), made ahead for 20d.
+- [x] **Observatory tiles** — real tiles since Milestone 21 (see above).
+- [x] **Guild tiles** — real tiles since Milestone 21 (see above).
 - [x] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20b — The Monastery
 
-- [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).
+- [x] **Monastery tiles** — real tiles since Milestone 21 (see above).
 - [x] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — real sprites since Milestone 21 (see above).
 
 ## Milestone 20a — The Cathedral

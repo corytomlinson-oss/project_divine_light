@@ -4,6 +4,13 @@ signal party_loaded
 
 const SAVE_DIR: String = "user://saves/"
 const SAVE_SLOTS: int = 3
+# Slot 0 is the autosave (Milestone 22a): its own file, so it never overwrites
+# one of the three manual slots.
+const AUTOSAVE_SLOT: int = 0
+# The suspend save (Milestone 22b): written when the app closes or goes to the
+# background, offered as Resume on the title, deleted once used (or when a new
+# game starts or another save is loaded) - single use, as the design doc says.
+const SUSPEND_PATH: String = SAVE_DIR + "suspend.json"
 
 # Everyone who exists in the story (Milestone 20a), by class name, and the
 # party: who's actually with you, in the order they joined. A new game starts
@@ -34,6 +41,17 @@ var story_flags: Dictionary = {}
 # next battle fights exactly this group - bosses too, via "is_boss" and
 # "phase_hp_thresholds" - then it's cleared (Milestone 20a).
 var debug_encounter: Array = []
+# Milestone 22a: play time (seconds, counted only while a game is running and
+# not paused), and an autosave requested from somewhere that can't save yet -
+# e.g. a boss win in the battle scene - which the next map performs once the
+# player is standing in it (autosave_if_pending(), called by Player).
+var play_time: float = 0.0
+var in_game: bool = false
+var autosave_pending: bool = false
+# The game as it was when the current battle began, plus the enemies it began
+# with (22b): suspending mid-fight saves this, so resuming restarts that fight.
+# Cleared when the battle ends.
+var battle_snapshot: Dictionary = {}
 
 
 func _ready() -> void:
@@ -84,6 +102,10 @@ func _build_roster() -> void:
 
 ## A fresh game as `cls`: alone, level 1, a few potions, no gear, nothing done.
 func start_new_game(cls: String) -> void:
+	discard_suspend()
+	play_time = 0.0
+	in_game = true
+	autosave_pending = false
 	_build_roster()
 	party = [roster[cls]]
 	starting_class = cls
@@ -132,15 +154,36 @@ func _input(event: InputEvent) -> void:
 			print("No save found in slot 1.")
 
 
+func _process(delta: float) -> void:
+	# This autoload pauses with the tree, so menus that pause the game (and
+	# the title screen, where in_game is false) don't count.
+	if in_game:
+		play_time += delta
+
+
+## Saves to `slot` (1-3, or AUTOSAVE_SLOT). Records where the party is - the
+## current map, and the player's position on it - so loading puts you back
+## there (Milestone 22a). Never called from a battle; autosaves after a boss
+## wait for the map (autosave_pending).
 func save_game(slot: int) -> bool:
-	if slot < 1 or slot > SAVE_SLOTS:
+	if slot < 0 or slot > SAVE_SLOTS:
 		return false
+	return _write(_slot_path(slot), _save_data())
+
+
+func _write(path: String, data: Dictionary) -> bool:
 	var dir := DirAccess.open("user://")
 	if dir and not dir.dir_exists("saves"):
 		dir.make_dir("saves")
-	var file := FileAccess.open(_slot_path(slot), FileAccess.WRITE)
+	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
 		return false
+	file.store_string(JSON.stringify(data))
+	return true
+
+
+## Everything a save holds, as of now.
+func _save_data() -> Dictionary:
 	var data := {
 		"party": party.map(func(c: Combatant) -> Dictionary: return c.to_save_dict()),
 		"roster": _roster_save(),
@@ -151,19 +194,91 @@ func save_game(slot: int) -> bool:
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
 		"story_flags": story_flags.duplicate(),
+		"scene": current_scene_path,
+		"location": location_name(current_location),
+		"location_id": current_location,
+		"play_time": play_time,
+		"saved_at": int(Time.get_unix_time_from_system()),
 	}
-	file.store_string(JSON.stringify(data))
-	return true
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player != null:
+		data["position"] = [player.position.x, player.position.y]
+	elif has_pending_spawn:
+		# In a battle: where the party stood on the map when it began.
+		data["position"] = [pending_spawn_position.x, pending_spawn_position.y]
+	return data
+
+
+func autosave() -> void:
+	save_game(AUTOSAVE_SLOT)
+
+
+## Performs an autosave someone asked for earlier (autosave_pending), now
+## that a map is loaded and the player is placed in it.
+func autosave_if_pending() -> void:
+	if autosave_pending and in_game:
+		autosave_pending = false
+		autosave()
+
+
+## A place's name for the save screen.
+static func location_name(location: String) -> String:
+	var id := location.trim_suffix("_escape")
+	if ActOne.DUNGEONS.has(id):
+		return ActOne.DUNGEONS[id]["name"]
+	match id:
+		"overworld": return "Forest Heartlands"
+		"verdance": return "Verdance"
+		"edenmere": return "Edenmere"
+	return id.capitalize()
+
+
+## What the save screen shows for a slot: the party (class + level, in
+## order), location, play time and gold. {} when the slot is empty.
+func slot_summary(slot: int) -> Dictionary:
+	var path := _slot_path(slot)
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return {}
+	var levels := {}
+	var roster_data: Dictionary = parsed.get("roster", {})
+	for data: Dictionary in parsed.get("party", []):
+		levels[String(data.get("char_class", ""))] = int(data.get("level", 1))
+	var order: Array = parsed.get("party_order", levels.keys())
+	var members: Array = []
+	for cls in order:
+		var lv: int = levels.get(cls, int(roster_data.get(cls, {}).get("level", 1)))
+		members.append({"class": String(cls), "level": lv})
+	return {
+		"party": members,
+		"location": String(parsed.get("location", "Forest Heartlands")),
+		"play_time": float(parsed.get("play_time", 0.0)),
+		"gold": int(parsed.get("gold", 0)),
+	}
+
+
+func any_save_exists() -> bool:
+	for slot in range(0, SAVE_SLOTS + 1):
+		if save_exists(slot):
+			return true
+	return false
 
 
 func load_game(slot: int) -> bool:
 	var path := _slot_path(slot)
 	if not FileAccess.file_exists(path):
 		return false
-	var file := FileAccess.open(path, FileAccess.READ)
-	var parsed = JSON.parse_string(file.get_as_text())
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return false
+	discard_suspend()  # loading another save abandons a suspended game
+	_apply(parsed)
+	return true
+
+
+func _apply(parsed: Dictionary) -> void:
 	_build_roster()
 	# Saves from before 20a have only "party" (always all four); newer ones
 	# also have the full roster and who's in the party, in order.
@@ -198,8 +313,74 @@ func load_game(slot: int) -> bool:
 	story_flags.clear()
 	for flag in save_story_flags:
 		story_flags[flag] = bool(save_story_flags[flag])
+	# Where the save was made (Milestone 22a); older saves land on the overworld.
+	current_scene_path = String(parsed.get("scene", "res://scenes/overworld/Overworld.tscn"))
+	var pos: Array = parsed.get("position", [])
+	has_pending_spawn = pos.size() == 2
+	if has_pending_spawn:
+		pending_spawn_position = Vector2(float(pos[0]), float(pos[1]))
+	current_location = String(parsed.get("location_id", current_location))
+	play_time = float(parsed.get("play_time", 0.0))
+	in_game = true
+	autosave_pending = false
+	battle_snapshot = {}
+	arrival = ""
 	party_loaded.emit()
-	return true
+
+
+# ---------------------------------------------------------------- suspend (22b)
+
+## Closing the window / the app, the Home button (the app going to the
+## background) and Android's back-out all write the suspend save first. When
+## a backgrounded app comes back, the game is still running, so the suspend
+## is dropped again (it'll be rewritten next time).
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_WM_GO_BACK_REQUEST:
+			suspend()
+		NOTIFICATION_APPLICATION_RESUMED:
+			discard_suspend()
+
+
+## Saves the game exactly where it is - mid-dungeon, mid-town, or (as the
+## state when the fight began, plus its enemies) mid-battle. Nothing to do on
+## the title or class select.
+func suspend() -> void:
+	if not in_game:
+		return
+	var in_battle := get_tree().current_scene != null and get_tree().current_scene.name == "Battle"
+	var data: Dictionary = battle_snapshot if in_battle and not battle_snapshot.is_empty() else _save_data()
+	_write(SUSPEND_PATH, data)
+
+
+## Called by Battle as a fight begins: remembers the game as it is now and the
+## enemies it's facing, for a suspend during the fight.
+func begin_battle(encounter: Array) -> void:
+	battle_snapshot = _save_data()
+	battle_snapshot["battle"] = encounter
+
+
+func has_suspend() -> bool:
+	return FileAccess.file_exists(SUSPEND_PATH)
+
+
+func discard_suspend() -> void:
+	if FileAccess.file_exists(SUSPEND_PATH):
+		DirAccess.remove_absolute(SUSPEND_PATH)
+
+
+## Loads the suspend save and deletes it. Returns the scene to go to: the map,
+## or the battle scene when it was made mid-fight (that fight restarts).
+func resume() -> String:
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(SUSPEND_PATH))
+	discard_suspend()
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return ""
+	_apply(parsed)
+	if parsed.has("battle"):
+		debug_encounter = parsed["battle"]
+		return "res://scenes/battle/Battle.tscn"
+	return current_scene_path
 
 
 ## Lazily rolls a seed the first time a dungeon is entered, then reuses it
@@ -229,4 +410,6 @@ func save_exists(slot: int) -> bool:
 
 
 func _slot_path(slot: int) -> String:
+	if slot == AUTOSAVE_SLOT:
+		return SAVE_DIR + "autosave.json"
 	return SAVE_DIR + "slot_%d.json" % slot

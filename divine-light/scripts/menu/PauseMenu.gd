@@ -5,7 +5,8 @@ extends CanvasLayer
 # a dungeon (Player.gd). Pauses the tree while open; this layer runs anyway
 # (process_mode Always in the scene). Left: a party summary, FF-style. Right:
 # commands - Equip (the Milestone 15 screen, which reopens this menu when it
-# closes) and Close. The natural home for Formation, Items and Save later.
+# closes), Save (22a: only on the overworld - never in a dungeon) and Close.
+# The natural home for Formation and Items later.
 
 const CLASS_TITLES := {
 	"Vael": "Templar",
@@ -40,13 +41,23 @@ static func open(player: Node2D, start_index: int = 0) -> void:
 
 func _ready() -> void:
 	_opened_frame = Engine.get_process_frames()
+	# Saving from the menu is an overworld thing (Cory's call, 22a); towns
+	# have their inns, dungeons and battles have only autosaves.
+	var can_save := get_tree().current_scene.name == "Overworld"
+	if not can_save:
+		var save_option := $CommandWindow/Options/Save
+		$CommandWindow/Options.remove_child(save_option)
+		save_option.queue_free()
+		_options = $CommandWindow/Options.get_children()
+	else:
+		$CommandWindow.size.y += 10
 	add_child(_cursor)
 	for i in GameManager.party.size():
 		_add_party_row(GameManager.party[i], 5.0 + i * ROW_H)
 	_cursor.target = _options[_index]
 	# Gold under the commands (Milestone 20a).
 	var gold_box := Panel.new()
-	gold_box.position = Vector2(244, 34)
+	gold_box.position = Vector2(244, 34 if not can_save else 44)
 	gold_box.size = Vector2(72, 18)
 	add_child(gold_box)
 	var gold := Label.new()
@@ -71,10 +82,18 @@ func _process(_delta: float) -> void:
 		Sfx.play("menu_confirm")
 		match _options[_index].name:
 			"Equip": _open_equip()
+			"Save": _save()
 			"Close": _close()
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
 		Sfx.play("menu_cancel")
 		_close()
+
+
+func _save() -> void:
+	set_process(false)
+	await SaveMenu.open(self, "save")
+	set_process(true)
+	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
 
 
 func _close() -> void:

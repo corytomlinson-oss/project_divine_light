@@ -34,5 +34,8 @@ theme_override_constants/separation = 0
 [node name="Equip" type="Label" parent="CommandWindow/Options"]
 text = "  Equip"
 
+[node name="Save" type="Label" parent="CommandWindow/Options"]
+text = "  Save"
+
 [node name="Close" type="Label" parent="CommandWindow/Options"]
 text = "  Close"

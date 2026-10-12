@@ -93,6 +93,8 @@ This document is the canonical design reference for *Divine Light*, a retro high
 
 Next: Milestone 22, save/load triggers.
 
+**Completed:** Milestone 22 — Save / load. Saving is real now: a save screen with three slots shows each save's party, location, play time and gold. You can save at inns, at Edenmere's shrine, and from the pause menu anywhere on the overworld, and the game quietly autosaves to its own slot after every boss, rescue and escape. Saves put you back exactly where you were. Closing the game (or pressing Home on the Retroid) makes a one-time suspend save, and the title offers Resume to pick up right there; a fight in progress restarts from its beginning. Next: Milestone 23, the Android build for the Retroid Pocket 6.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

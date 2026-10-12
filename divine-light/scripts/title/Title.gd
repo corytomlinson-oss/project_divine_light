@@ -1,9 +1,10 @@
 extends Node2D
 
 # The title screen (Milestone 19b) - the game's main scene now. New Game plays
-# the intro movie, then the class select (20a). Continue loads save slot 1
-# (the F5 debug save until Milestone 22 builds real save slots); it's greyed
-# out when there's no save.
+# the intro movie, then the class select (20a). Continue opens the load
+# screen (22a: the 3 slots and the autosave); it's greyed out when there's no
+# save at all. Resume (22b) appears on top when the game was suspended - it
+# picks up exactly where you left off, then the suspend is gone.
 
 const CLASS_SELECT := "res://scenes/title/ClassSelect.tscn"
 const INTRO := "res://data/cutscenes/intro.scene"
@@ -19,9 +20,18 @@ var _cursor := MenuCursor.new()
 func _ready() -> void:
 	add_child(_cursor)
 	Music.play("intro")
-	_can_continue = GameManager.save_exists(1)
+	GameManager.in_game = false  # the play-time clock stops on the title
+	if GameManager.has_suspend():
+		var resume := Label.new()
+		resume.name = "Resume"
+		resume.text = "  Resume"
+		$Menu/Options.add_child(resume)
+		$Menu/Options.move_child(resume, 0)
+		$Menu.offset_top -= 10
+		_options = $Menu/Options.get_children()
+	_can_continue = GameManager.any_save_exists()
 	if not _can_continue:
-		_options[1].modulate = Color(0.5, 0.5, 0.58)
+		$Menu/Options/Continue.modulate = Color(0.5, 0.5, 0.58)
 	_cursor.target = _options[_index]
 
 
@@ -30,15 +40,17 @@ func _process(_delta: float) -> void:
 		return
 	if UiInput.nav(&"down") or UiInput.nav(&"up"):
 		Sfx.play("menu_move")
-		_index = 1 - _index
+		_index = posmod(_index + (1 if UiInput.nav(&"down") else -1), _options.size())
 		_cursor.target = _options[_index]
 	elif Input.is_action_just_pressed("confirm"):
-		if _index == 0:
-			_new_game()
-		elif _can_continue:
-			_continue()
-		else:
-			Sfx.play("menu_cancel")
+		match _options[_index].name:
+			"Resume": _resume()
+			"NewGame": _new_game()
+			"Continue":
+				if _can_continue:
+					_continue()
+				else:
+					Sfx.play("menu_cancel")
 
 
 func _new_game() -> void:
@@ -51,11 +63,24 @@ func _new_game() -> void:
 	Transition.change_scene(CLASS_SELECT)
 
 
-func _continue() -> void:
+func _resume() -> void:
 	_busy = true
 	Sfx.play("menu_confirm")
 	Music.stop(0.6)
-	GameManager.load_game(1)
-	# The save doesn't record where the party was yet (Milestone 22), so this
-	# lands on the map GameManager points at - the overworld for now.
+	var where := GameManager.resume()
+	if where == "":
+		get_tree().reload_current_scene()
+		return
+	Transition.change_scene(where)
+
+
+func _continue() -> void:
+	_busy = true
+	Sfx.play("menu_confirm")
+	var slot := await SaveMenu.open(self, "load")
+	if slot < 0 or not GameManager.load_game(slot):
+		_busy = false
+		return
+	Music.stop(0.6)
+	# The save remembers the map and the spot on it (22a).
 	Transition.change_scene(GameManager.current_scene_path)

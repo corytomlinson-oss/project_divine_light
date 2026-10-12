@@ -314,7 +314,6 @@ const STAND_INS := {
 	"Berserk Warrior": {"sprite": "corrupted_farmer", "tint": Color(1.0, 0.55, 0.5)},
 	"Iron Sentinel": {"sprite": "cursed_paladin", "tint": Color(0.62, 0.66, 0.78)},
 	"Sparring Master": {"sprite": "shadow_acolyte", "tint": Color(0.75, 0.9, 1.0)},
-	"Corrupted Grandmaster": {"sprite": "shadow_acolyte", "scale": 2, "tint": Color(0.95, 0.6, 0.35)},
 	"Void Mage": {"sprite": "fallen_priest", "tint": Color(0.6, 0.5, 1.0)},
 	"Astral Familiar": {"sprite": "shade_wisp", "tint": Color(0.7, 0.9, 1.0)},
 	"Corrupted Scholar": {"sprite": "fallen_priest", "tint": Color(0.85, 0.8, 0.55)},

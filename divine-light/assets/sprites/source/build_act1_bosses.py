@@ -224,6 +224,137 @@ def fallen_guardian(c):
         c.put(x, y, 'w')
 
 
+# ------------------------------------------------------- Corrupted Grandmaster
+# The Monastery's boss: an old master whose discipline the Unraveling twisted.
+# Bald, long white beard, torn terracotta robes and prayer beads, caught
+# mid-strike in a wide stance; corrupted ki burns violet around both fists
+# and seeps through cracks in the skin.
+@boss('corrupted_grandmaster', 25, {'V': 'X', 'w': 'x'}, {
+    'F': (212, 168, 128),   # skin
+    'f': (156, 110, 82),    # skin shade
+    'b': (234, 230, 218),   # beard
+    'B': (168, 164, 158),   # beard shade
+    'O': (198, 112, 52),    # robe
+    'o': (134, 68, 36),     # robe shade
+    'r': (82, 40, 28),      # trousers / wraps
+    'n': (72, 46, 84),      # sash
+    'p': (120, 76, 42),     # prayer beads
+})
+def corrupted_grandmaster(c):
+    # back leg, stretched out behind (left)
+    for y, x0, x1 in [(32, 15, 21), (33, 14, 20), (34, 13, 19), (35, 12, 18), (36, 11, 17),
+                      (37, 10, 16), (38, 10, 15), (39, 9, 14), (40, 9, 13), (41, 8, 13), (42, 8, 12)]:
+        c.span(y, x0, x1, 'r')
+        c.put(x0, y, 'o')
+    c.span(43, 6, 12, 'F')      # bare back foot
+    c.span(44, 5, 12, 'f')
+    # front leg, bent forward (right)
+    for y, x0, x1 in [(32, 24, 30), (33, 25, 31), (34, 26, 32), (35, 27, 33), (36, 28, 33),
+                      (37, 28, 33), (38, 29, 33), (39, 29, 33), (40, 29, 33), (41, 29, 33), (42, 29, 33)]:
+        c.span(y, x0, x1, 'r')
+        c.put(x1, y, 'o')
+    c.span(38, 29, 33, 'n')     # shin wraps
+    c.span(40, 29, 33, 'n')
+    c.span(43, 29, 36, 'F')     # bare front foot
+    c.span(44, 29, 37, 'f')
+    # robe skirt, torn, flaring over the hips
+    for y, x0, x1 in [(25, 17, 30), (26, 16, 31), (27, 15, 31), (28, 15, 32), (29, 14, 32),
+                      (30, 14, 32), (31, 14, 31)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x0, y, 'o')
+        c.put(x0 + 1, y, 'o')
+    for x, drop in [(14, 2), (16, 1), (19, 3), (22, 1), (27, 2), (30, 1)]:
+        for k in range(drop):
+            c.put(x, 32 + k, 'o')
+    c.put(23, 27, 'oo')         # the split between the legs
+    c.put(23, 28, 'o.o')
+    c.put(23, 29, '...')
+    c.put(23, 30, '...')
+    c.put(23, 31, '...')
+    # torso: robe leaning into the punch
+    for y, x0, x1 in [(13, 20, 28), (14, 19, 29), (15, 19, 29), (16, 18, 29), (17, 18, 29),
+                      (18, 18, 29), (19, 17, 29), (20, 17, 29), (21, 17, 29), (22, 17, 30),
+                      (23, 17, 30), (24, 17, 30)]:
+        c.span(y, x0, x1, 'O')
+        c.put(x0, y, 'o')
+    for y in range(13, 22):     # robe hangs open: chest and the skin crack
+        c.span(y, 25, 28, 'F')
+        c.put(25, y, 'f')
+    c.put(27, 16, 'V')
+    c.put(26, 17, 'V')
+    c.put(27, 18, 'v')
+    c.span(23, 17, 30, 'n')     # sash
+    c.span(24, 17, 30, 'n')
+    c.put(18, 24, 'nn')
+    c.put(17, 25, 'n')          # sash tail
+    c.put(16, 26, 'n')
+    # prayer beads across the chest
+    for x, y in [(21, 13), (22, 14), (23, 15), (24, 16), (25, 17), (26, 18), (27, 19), (28, 20)]:
+        c.put(x, y, 'p')
+    c.put(28, 21, 'V')          # the bead that's gone violet
+    # back arm, fist pulled to the hip
+    for y, x0, x1 in [(14, 17, 20), (15, 16, 19), (16, 16, 19), (17, 15, 18), (18, 15, 18), (19, 15, 18)]:
+        c.span(y, x0, x1, 'o')
+        c.put(x1, y, 'O')
+    c.span(20, 14, 18, 'F')     # fist chambered at the hip
+    c.span(21, 14, 18, 'F')
+    c.span(22, 14, 18, 'f')
+    c.put(15, 20, 'f f')        # knuckles
+    c.put(12, 19, 'v')          # ki licking around it
+    c.put(12, 20, 'VX')
+    c.put(11, 21, 'VXV')
+    c.put(12, 22, 'VV')
+    c.put(13, 23, 'v')
+    # front arm: bare, wiry, thrown forward
+    for y, x0, x1 in [(13, 29, 32), (14, 29, 35), (15, 30, 36), (16, 31, 36)]:
+        c.span(y, x0, x1, 'F')
+    c.span(16, 31, 36, 'f')
+    c.put(32, 14, 'V')          # cracks up the forearm
+    c.put(34, 15, 'V')
+    c.put(30, 13, 'f')
+    c.span(12, 37, 41, 'F')     # the fist, big and square
+    c.span(13, 37, 41, 'F')
+    c.span(14, 37, 41, 'F')
+    c.span(15, 37, 41, 'f')
+    c.span(16, 37, 41, 'f')
+    c.put(41, 12, 'f')
+    c.put(41, 14, 'f')
+    c.put(37, 12, 'fff')        # curled fingers
+    # corrupted ki bursting off the fist
+    for x, y, t in [(42, 11, 'v'), (42, 12, 'VV'), (42, 13, 'VXXV'), (42, 14, 'XXXVv'),
+                    (42, 15, 'VXXV'), (42, 16, 'VV'), (42, 17, 'v'), (39, 10, 'v'),
+                    (40, 11, 'V'), (39, 18, 'v'), (40, 17, 'V'), (46, 14, 'v')]:
+        c.put(x, y, t)
+    # and rising off the shoulders like heat
+    for x, y, t in [(19, 10, 'v'), (18, 11, 'VV'), (19, 12, 'V'), (17, 9, 'v'), (30, 10, 'v'),
+                    (31, 11, 'V'), (16, 12, 'v')]:
+        c.put(x, y, t)
+    # head: bald, heavy brow, long beard
+    for y, x0, x1 in [(3, 23, 27), (4, 22, 28), (5, 21, 29), (6, 21, 29), (7, 21, 29),
+                      (8, 21, 29), (9, 22, 29), (10, 22, 28), (11, 23, 28)]:
+        c.span(y, x0, x1, 'F')
+        c.put(x0, y, 'f')
+    c.put(24, 4, 'bb')          # scalp shine
+    c.put(23, 5, 'b')
+    c.put(25, 7, 'BBBB')        # white brows
+    c.put(26, 8, 'VFX')         # glowing eye
+    c.put(29, 8, 'f')           # nose
+    c.put(29, 9, 'F')
+    c.put(23, 6, 'V')           # violet crack across the scalp
+    c.put(22, 7, 'V')
+    c.put(21, 9, 'f')           # ear
+    # beard, long and ragged
+    for y, x0, x1 in [(10, 25, 29), (11, 24, 30), (12, 24, 30), (13, 24, 29), (14, 24, 29),
+                      (15, 25, 28), (16, 25, 28), (17, 26, 28), (18, 26, 27), (19, 26, 26)]:
+        c.span(y, x0, x1, 'b')
+        c.put(x0, y, 'B')
+    c.put(27, 13, 'B')
+    c.put(28, 16, 'B')
+    # aura wisps
+    for x, y in [(17, 6), (33, 4), (36, 9), (10, 15), (8, 27), (38, 24), (14, 2), (40, 30)]:
+        c.put(x, y, 'w')
+
+
 def render(b, glow_frame):
     grid = b['rows']
     if glow_frame:

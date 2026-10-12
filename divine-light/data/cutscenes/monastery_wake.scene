@@ -1,0 +1,14 @@
+# Ryn wakes up captive in the Monastery (Milestone 20b, escape start).
+# Plays once, the first time the Monastery loads on Ryn's game.
+
+wait 0.6
+emote player ...
+narrate Incense, long gone cold. Somewhere above, a gong trembles with no one striking it.
+face player left
+wait 0.4
+face player right
+wait 0.4
+face player down
+say Ryn: The training halls... I'd know these floors blindfolded. But the masters' voices are all wrong now.
+say Ryn: They left my hands free. Careless. Breathe in, breathe out - then find a way out.
+narrate From deeper in the halls comes a muffled voice, calling for help.

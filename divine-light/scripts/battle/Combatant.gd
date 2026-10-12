@@ -60,6 +60,29 @@ var attack_mods: Dictionary = {}
 var weak: Array = []
 var turns_taken: int = 0
 var charging: Dictionary = {}  # the telegraphed ability it will unleash next turn
+# Milestone 20b: a counter stance (rounds left; hits back at physical attacks),
+# the boss phase from which it's always countering (-1 = never), and extra
+# actions per round (up to boss phase extra_actions_max_phase).
+var counter_rounds: int = 0
+var counter_from_phase: int = -1
+var extra_actions: int = 0
+var extra_actions_max_phase: int = 99
+# Milestone 20c: Silence (the member's next turn can't use skills), an
+# elemental aura that cycles each time it casts (aura_cycle / aura_index; with
+# aura_weakness it's weak to whatever beats its current aura), and elements
+# it's immune to (a boss can gain one from boss phase immune_from_phase).
+var silence_rounds: int = 0
+var aura_cycle: Array = []
+var aura_index: int = 0
+var aura_weakness: bool = false
+var immune: Array = []
+var immune_from_phase: int = -1
+# Milestone 20d: items this enemy has stolen (recovered on victory), whether it
+# was summoned mid-fight (adds flee when their summoner falls and give no XP),
+# and the turn it last summoned.
+var stolen: Array = []
+var summoned: bool = false
+var last_summon_turn: int = -99
 var equipment: Dictionary = {"weapon": "", "armor": "", "helmet": "", "gloves": "", "accessory": ""}
 
 
@@ -80,6 +103,11 @@ func _init(p_name: String, p_hp: int, p_atk: int, p_def: int, p_agi: int,
 	if p_class == "Ryn":
 		max_qi = 6
 		qi = 0
+
+
+## The element of its current aura, or "" if it has none.
+func aura() -> String:
+	return "" if aura_cycle.is_empty() else String(aura_cycle[aura_index % aura_cycle.size()])
 
 
 func is_alive() -> bool:

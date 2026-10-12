@@ -193,6 +193,79 @@ Two separate 5-tile sets (Overworld and Cathedral got distinct looks — see the
 
 ---
 
+## Milestone 21 — Act I art & music pass (planned 2026-10-12)
+
+Everything Act I (Milestone 20) added with placeholder art, as one checklist. All hand-placed pixel art in code (Cory's call, 2026-10-12), same technique as the Milestone 16 sprites: `assets/sprites/source/pixelgrid.py` grids, one `build_*.py` per batch. **Order: the 4 bosses and Frank first.** Sizes follow the existing art: enemies are 2-frame idle sheets (24x32 per frame; bosses and wardens 48x48 per frame, like the Hollow Warden), people are 9-frame walk sheets (16x32 per frame, 48x96: rows down/up/right x idle/stepA/stepB) plus a `<name>_frames.tres`. When an enemy gets real art, its `EnemyData.STAND_INS` entry is deleted (the real file wins automatically).
+
+**Batch 1 — bosses + Frank (5)**
+- [ ] **Fallen Guardian** (Cathedral boss) — corrupted holy knight, dark-gold armor wreathed in violet light. 48x48.
+- [ ] **Corrupted Grandmaster** (Monastery boss) — old martial master, torn robes, wild corrupted ki. 48x48.
+- [ ] **Void Archmage** (Observatory boss) — robed mage, void energy, orbiting elemental motes. 48x48.
+- [ ] **Shadow Lord** (Guild boss) — hooded guildmaster, cloak, twin blades. 48x48.
+- [ ] **Frank** — traveling merchant: walk sheet + `frank_frames.tres` (today he's a dark silhouette in every scene and town).
+
+**Batch 2 — escape wardens (3)**
+- [ ] **Sparring Master** (Monastery) — monk in a guarding stance. 48x48.
+- [ ] **Void Sentinel** (Observatory) — stone-and-void construct. 48x48.
+- [ ] **Corrupted Enforcer** (Guild) — thug with poisoned knuckle-dusters. 48x48.
+
+**Batch 3 — dungeon enemies (9, 24x32)**
+- [ ] Monastery: **Corrupted Monk**, **Berserk Warrior**, **Iron Sentinel**
+- [ ] Observatory: **Void Mage**, **Astral Familiar**, **Corrupted Scholar**
+- [ ] Guild: **Shadow Thief** (also the Shadow Lord's summons), **Venomous Cutthroat**, **Hired Muscle**
+
+**Batch 4 — townsfolk (7 walk sheets)**
+Verdance has 5 people and Edenmere 8, today all tinted copies of the heroes. 7 base sheets, palette-swapped where two roles share one, cover all 13:
+- [ ] **Elder** (Verdance elder; Edenmere mayor)
+- [ ] **Worker** (Verdance farmer; Edenmere smith)
+- [ ] **Child** (both towns)
+- [ ] **Guard** (both towns)
+- [ ] **Merchant** (both innkeepers; Edenmere shopkeeper)
+- [ ] **Priestess** (Edenmere shrine)
+- [ ] **Traveler** (Edenmere)
+
+**Batch 5 — dungeon tilesets (3 x 5 tiles)**
+Each replaces a recolor of the Cathedral's tiles; same 5 tiles in the same order (floor / wall / door / captive rune / boss rune; the runes can stay shared).
+- [ ] **Monastery** — wooden floorboards, paper-screen walls, a temple gate.
+- [ ] **Observatory** — star-chart floor, brass-and-stone walls, a domed archway.
+- [ ] **Underground Guild** — wet cobbles, rough cellar brick, an iron-banded door.
+
+**Batch 6 — battle backgrounds (4)**
+Only the overworld has one (`battle_bg_forest.png`); dungeon battles are a plain dark backdrop. Same layered build as the forest (`assets/ui/source/build_battle_bg.py`), added to `Battle.BATTLE_BACKGROUNDS`:
+- [ ] **Cathedral** — nave, cracked stained glass, violet glow.
+- [ ] **Monastery** — training hall, hanging banners, a cold brazier.
+- [ ] **Observatory** — the great lens under a cracked dome, stars.
+- [ ] **Guild** — tunnel, lamp light, crates.
+
+**Batch 7 — music (synthesized, `build_music.py`)**
+Today all four dungeons share one dungeon track, and both towns play the overworld theme.
+- [ ] **Town theme** (Verdance + Edenmere)
+- [ ] **Monastery**, **Observatory**, **Guild** dungeon themes (the current dungeon track stays the Cathedral's)
+
+**Optional (decide later)**
+- [ ] Upgrade the code-drawn placeholder town tiles (16) and overworld road / arch / water / flowers (4) from 20a/20d. They're readable as they are.
+- [ ] New sounds for the 20b-20d mechanics (steal, silence, summon, counter); they reuse existing sounds today.
+- [ ] **Portraits.** The roadmap mentions them, but the dialogue box has no portrait slot (name tags only), so this would be a UI feature first. Recommend skipping.
+
+## Milestone 20d — The Underground Guild
+
+- [~] **Guild tiles** — see 20c (`guild_tiles.png`, a recolor). Placeholder for the Act I art pass (21).
+- [~] **Shadow Thief, Venomous Cutthroat, Hired Muscle, Corrupted Enforcer, Shadow Lord** — stand-ins: tinted/scaled Hollow Archer, Shadow Acolyte, Corrupted Farmer and Cursed Paladin sprites (`EnemyData.STAND_INS`). Milestone 21.
+
+- [x] **Edenmere tiles** (20d) — 4 more code-drawn tiles on `town_tiles.png` via `build_act1_tiles.py`: cobbles, shrine, item-shop sign, armory sign. Placeholders for Milestone 21.
+- [~] **Edenmere townsfolk** — placeholders: the heroes' walk sheets, tinted. Milestone 21.
+
+## Milestone 20c — The Observatory
+
+- [~] **Observatory tiles** — `build_dungeon_recolors.py` -> `observatory_tiles.png`: the Cathedral's tiles on a deep-navy/star-silver ramp. Placeholder for the Act I art pass (21).
+- [~] **Guild tiles** — same script -> `guild_tiles.png` (dark moss/sewer greens), made ahead for 20d.
+- [~] **Void Mage, Astral Familiar, Corrupted Scholar, Void Sentinel, Void Archmage** — stand-ins: tinted/scaled Fallen Priest, Shade Wisp and Hollow Warden sprites (`EnemyData.STAND_INS`). Milestone 21.
+
+## Milestone 20b — The Monastery
+
+- [~] **Monastery tiles** — `assets/tilesets/source/build_dungeon_recolors.py` -> `monastery_tiles.png`: the Cathedral's floor/wall/door recolored onto a terracotta/sandstone ramp, runes unchanged. Placeholder for the Act I art pass (21).
+- [~] **Corrupted Monk, Berserk Warrior, Iron Sentinel, Sparring Master, Corrupted Grandmaster** — stand-ins: tinted/scaled copies of existing enemy sprites (`EnemyData.STAND_INS`). Milestone 21.
+
 ## Milestone 20a — The Cathedral
 
 - [x] **Overworld tiles** — `assets/tilesets/source/build_act1_tiles.py` rebuilds `overworld_tiles.png`: the Milestone 16 grass/trees/gate unchanged, plus a road, a stone arch (dungeon entrances), water and flowers. Code-drawn placeholders.

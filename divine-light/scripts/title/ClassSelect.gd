@@ -12,7 +12,7 @@ const BLURBS := {
 	"Silas": "Assassin. The fastest of the four: poisons, bleeds and shadow strikes that wear down any foe.",
 }
 const TITLES := {"Vael": "Templar", "Ryn": "Martial Artist", "Lyra": "Invoker", "Silas": "Assassin"}
-const LOCKED_TEXT := "Their story opens in a later update. For now, Vael awakens first."
+const LOCKED_TEXT := "Their story opens in a later update."
 
 var _index := 0
 var _busy := false

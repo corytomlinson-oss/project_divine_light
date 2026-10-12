@@ -173,3 +173,89 @@ Cory chose the placement (before Act I), in-engine scenes and name tags, and ask
 - **The tiles are code-drawn placeholders** (road, stone arch, water, flowers, and the village set), to be replaced in Milestone 21.
 - **After escaping, you come out on the overworld next to the Cathedral**, not straight into Verdance. Frank's line points you to the village, and his arrival scene plays the first time you walk in.
 - **Talking uses A while facing someone**, and people turn to face you. **Buildings aren't enterable.** House doors are barred ("Nobody answers"), and the inn works from its front door.
+
+## Milestone 20b — The Monastery (2026-09-29)
+
+### Step b1: battle mechanics and the Monastery's enemies
+
+- **Correction to 20a:** I'd tuned the Cathedral's rescue for "two heroes around level 5 (Silas's route)". Wrong: the second dungeon on any route is visited by the starting hero **alone**, since nobody's been rescued yet. Rescue dungeons are now tuned for **one hero around level 5**. The Cathedral's rescue enemies were toned down, and the Fallen Guardian went from 420 HP / 34 ATK to 300 / 30.
+- **How counter stance works:**
+  - Only physical actions get countered: Attack, or any skill aimed at enemies with no element. Spells never are, which follows the design doc ("cannot counter spells").
+  - A counter hits back **once per action**, even against a multi-hit skill, for 80% of a normal enemy hit.
+  - *Change:* `_maybe_counter()` in `Battle.gd`.
+- **The Sparring Master's "parry timing" lesson is a guarding stance, not a timed button press.** Every 3rd turn it announces "settles into a guarding stance!". Strike into it and you're countered, so the right play is Defend, heal or build Qi until it drops. In phase 2 it does this every 2nd turn.
+- **The Corrupted Grandmaster** acts twice a round in phase 1 ("acts multiple times per round"), and from phase 2 counters every physical blow for the rest of the fight. Lyra's spells, or Vael's holy magic, are the answer.
+- **The Berserk Warrior hits one of its own allies 30% of the time.** The Corrupted Monk hits 2-3 times. The Iron Sentinel is an armored wall with almost no magic defense.
+- **All five new enemies use stand-in art:** tinted copies of existing enemy sprites until the Act I art pass (21).
+- **Long boss names get a short form in the enemy list**, e.g. "Grandmaster". Messages still use the full name.
+
+### Steps b2-b3: the Monastery dungeon, Ryn playable
+
+- **The Monastery's tiles are a recolor of the Cathedral's**, not new art: same shapes, warm terracotta and sandstone instead of grey stone. The captive and boss runes stay identical so they read the same everywhere. The Observatory and Guild will get their own colors the same way. Real tiles come with the Act I art pass (21). *Change:* `RAMPS` in `build_dungeon_recolors.py`.
+- **Same layout rules as the Cathedral** (5-8 rooms). The design doc gives the Monastery no special layout mechanic, so I didn't invent one.
+- **All the Monastery dialogue is mine**, pronoun-free as always: `monastery_wake`, `monastery_frank`, `monastery_escaped`, `monastery_rescue` in `data/cutscenes/`. Ryn trained there, so the wake scene leans on that; Frank warns about the Sparring Master's guard stance (the fight's hint).
+- **Frank's "where next" lines fill themselves in.** Scene text can say `{next}` and `{next_where}`, which become the next dungeon on *this* game's route ("the Observatory, out on the eastern plain"). One set of scenes then works for every starting character, instead of four copies. The directions ("on the hill north of Verdance", "up in the hills to the north-east", "out on the eastern plain", "down in the ravine to the south") match the overworld layout I drew in 20a. *Change:* `where` in `ActOne.DUNGEONS`.
+- **Ryn is selectable at the class select.** Lyra and Silas still say "Their story opens in a later update." (I dropped the "For now, Vael awakens first" half, since it's no longer true.)
+- **Verdance's welcome now follows whichever dungeon you escaped**, not just the Cathedral. The elder's line changed from "You came down from the Cathedral?" to "You got away from them?", which fits every start.
+- **Behind the scenes:** the dungeon is marked cleared just *before* the escape scene plays (it used to be just after), so Frank's `{next}` already points to the next dungeon. Nothing visible changes.
+
+## Milestone 20c — The Observatory (2026-09-29)
+
+### Step c1: battle mechanics and the Observatory's enemies
+
+- **Silence lasts for the silenced person's next turn**, as the design doc says ("blocks skill use for 1 turn"). Skill is greyed out in the menu; if you'd already picked a skill when it landed, that skill fails. Items, Attack and Defend still work. Lyra's stance switches count as skills, so they're blocked too.
+- **The Corrupted Scholar silences 45% of its turns, never someone already silenced.** "One party member per round" every single round would lock a lone hero out of skills for the whole fight (Lyra's route starts alone), so I made it a chance.
+- **How the Void Mage "rotates through elements":** it has a visible aura (a small coloured marker above it) that goes fire → ice → lightning, one step each time it casts. Its spell is in its current element, and **it's weak to whatever beats its aura** (fire ↔ ice, lightning ↔ earth). The message says where the aura shifts next, so watching the pattern pays off. That's how I read "teaches players to watch for patterns". Party members have no elemental resistances, so the enemy's spell element alone would teach nothing.
+- **The Astral Familiar's random status** is poison, silence or DEF down, with stun rarer (half as likely as each of the others), on 40% of its hits.
+- **The escape warden is the "Void Sentinel"**, the name from the design doc's warden table ("spell-casting warden, exploitable by Lyra's INT"). It's armored against blows (a staff tap does 1) but has no magic defense and is weak to fire, so Ember, the only spell a level-1 Lyra knows, is the answer. It telegraphs a heavy Void Nova a turn early (Defend), like the other wardens. The design doc also lists a "Void Sentinel" among the Act III Blighted Maw enemies; that one can get a different name or a different kit when Act III is built.
+- **The Void Archmage's phase-2 immunity picks an element the party can actually use.** The design doc says it "forces Lyra to switch stances", but Lyra is never in this fight: she's the one it holds prisoner. So on entering phase 2 it becomes immune to an element the current party deals (in practice Vael's holy magic), or, if nobody deals any, to a random one of fire / ice / lightning. It's immune rather than absorbing, so a mistaken spell wastes a turn but doesn't heal it. Earth (its weakness) is never picked.
+- **The Archmage's phase 1** casts single-target aura spells (fire → ice → lightning) and a party-wide Void Storm every 3rd turn; phase 2 hits harder. 270 HP, tuned for a lone hero around level 5 like the other rescue bosses.
+- **All five new enemies use stand-in art** (tinted Fallen Priest, Shade Wisp and Hollow Warden sprites) until the Act I art pass (21).
+
+### Steps c2-c3: the Observatory dungeon, Lyra playable
+
+- **The Observatory's tiles are another recolor** of the Cathedral's, in deep navy and star-silver. I also made the Guild's (dark mossy greens) at the same time, to use in 20d.
+- **Same layout rules as the other dungeons** (5-8 rooms); the design doc gives the Observatory no special layout mechanic.
+- **All the Observatory dialogue is mine** (pronoun-free): `observatory_wake`, `observatory_frank`, `observatory_escaped`, `observatory_rescue`. Lyra comes across as sharp and curious: the scratched-out star charts, "they took my focus stone but left me my spells". Frank's hint for the Void Sentinel: blades skip off it, it's uneasy near fire, and brace when it draws the dark in.
+- **Lyra is selectable at the class select.** Only Silas is still "a later update".
+- **Known gap until 20d:** on Lyra's route the next dungeon is the Underground Guild, which isn't built yet, so after Verdance her story stops at the Guild's "coming in a later update" entrance. 20d fills it in.
+
+## Milestone 20d — The Underground Guild (2026-09-29)
+
+### Step d1: battle mechanics and the Guild's enemies
+
+- **Stolen items come back if you win.** A Shadow Thief pockets one random consumable per successful steal (35% of its hits). Beat it, or anyone in that fight, and everything stolen is returned ("Recovered 1 stolen item."). Run away and it's gone. Equipment is never stolen in Act I (the design doc saves that for the Desert's Dune Marauder).
+- **The Venomous Cutthroat's "poison and bleed in a single turn"** is its Twin Fangs move: 35% of its turns, one hit that always does both. Its normal hits can poison too.
+- **The Hired Muscle is plain stats**: big HP and attack, very slow. The design doc's "soaks damage while others attack" is about its bulk, so there's no special move.
+- **The Corrupted Enforcer (Silas's escape warden)** fights dirty, as the design doc says: poisoned knuckles, a Gut Punch it telegraphs a turn early ("cracks its knuckles and grins..."), and a Dirty Trick that poisons and bleeds. Silas starts with one Antidote; Frank's potion helps too.
+- **The Shadow Lord's summons:** in phase 2 it whistles in two Shadow Thieves (they can steal too). It calls more only once both are down, and not within 3 of its turns of the last call. Summoned thieves give no XP, so the fight can't be farmed. **When the Shadow Lord falls, the fight ends** and any thieves still standing slip away. Killing the boss is a valid way to win, which fits the design doc's "kill adds or burn the boss".
+- **Phase 1 status effects** use the same random-status roll as the Astral Familiar (30% of its double strikes).
+- **All five new enemies use stand-in art** until the Act I art pass (21).
+
+### Steps d2-d3: the Guild dungeon, Silas playable
+
+- **The Guild's tiles are the dark-moss recolor** made in 20c. Same 5-8 room layout as the others.
+- **All the Guild dialogue is mine** (pronoun-free): `guild_wake`, `guild_frank`, `guild_escaped`, `guild_rescue`. Silas is dry and practical: used to run jobs out of these tunnels, spots the knife they missed, and "breaking people out of places is sort of my specialty". The Shadow Lord was once the guildmaster. Frank warns about the Enforcer's poison and its telegraphed punch.
+- **Silas is selectable**, so all four characters can now start the game.
+
+### Step d4: Edenmere
+
+- **Edenmere follows the design doc's standard town layout**: an inn, an item shop, an armory, a shrine and a town square, plus Frank wandering the square. It's bigger and busier than Verdance: a market crossroads where "the four roads still meet".
+- **The shrine restores HP and MP for free once per dungeon visit**, as the design doc says. It resets whenever you enter any dungeon. Like the inn, it doesn't revive the fallen; that stays with Frank and items.
+- **The inn costs 15 gold** (Verdance's is 10): "Edenmere prices".
+- **The armory sells Act I's second tier of gear**, a step up from Frank's iron: Steel Sword, Steel Claws, Oak Staff and Steel Daggers at 320 gold, plus Monk Wraps and Scholar's Robe (they already existed but weren't sold anywhere) and a new Amber Charm (RES +3, any class). The numbers are mine. The Holy Guardian set stays out of shops; it's meant as loot. *Change:* `ARMORY_STOCK` in `Edenmere.gd`, stats in `Equipment.gd`.
+- **The item shop sells the same four consumables as Frank**, at the same prices. There are no other consumables in the game yet.
+- **The townsfolk and their lines are mine** (pronoun-free): a shopkeeper, innkeeper, smith, priestess, mayor, traveler, child and guard. The mayor and traveler say something new once you've cleared two of Act I's dungeons. The traveler's gossip hints at the Guild and the Observatory.
+- **Edenmere is open from the start.** The design doc calls it a waypoint, so there's no reason to lock it.
+- **Behind the scenes:** what Verdance and Edenmere share (inn, Frank's stall, talking, drawing the map) moved into one shared `Town.gd`, so Act II's towns can reuse it. Frank's stock and revive price now live there, not in `Verdance.gd` as the 20a notes say. Verdance plays exactly as before.
+
+### Step d5: the end of Act I
+
+- **Act I ends the moment the fourth hero is rescued**, right there in that dungeon. The design doc says "each dungeon cleared adds a party member until all four are assembled" but gives no final scene, so I wrote one: the four together, each with a line in their own voice, then Frank walks in ("Couldn't sit still in Verdance") and points at Act II's three kingdoms (Tundra, Desert, Coast).
+- **Then a title card**, in movie mode on the intro's starfield with the intro theme: "Act I - The Gathering", two captions, then "Act II - The Purge / Coming in a later update". It reuses existing art and music, so there's nothing new to replace later.
+- **Afterwards you're back outside that dungeon, free to roam**: shops, grinding, Edenmere's shrine. The game doesn't end or return to the title, so nothing is lost. When Act II exists, its start can key off the `act_one_complete` flag.
+- **Frank doesn't hint at his true identity** here. The design doc saves that for the final battle.
+
+## Milestone 20 — wrap-up
+
+- **The autonomous run finished all of Milestone 20** (20b-20d), each step tested in the real game and committed locally, not pushed, and none of it playtested by Cory yet. I didn't hit anything that needed Cory's input, so nothing was left blocked. The places where I read the design doc most freely, and where Cory's opinion matters most, are: the Void Mage's aura weakness, the Archmage's immunity targeting the party's elements (Lyra is never in that fight), summoned thieves vanishing when the Shadow Lord falls, Edenmere's contents and prices, and the Act I ending.

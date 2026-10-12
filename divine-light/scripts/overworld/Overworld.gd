@@ -48,7 +48,7 @@ const ENTRANCES := {
 }
 const TOWNS := {
 	"verdance": {"name": "Verdance", "scene": "res://scenes/town/Verdance.tscn"},
-	"edenmere": {"name": "Edenmere", "scene": ""},
+	"edenmere": {"name": "Edenmere", "scene": "res://scenes/town/Edenmere.tscn"},
 }
 
 @onready var _tile_map: TileMapLayer = $TileMapLayer

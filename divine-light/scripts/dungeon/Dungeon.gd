@@ -19,6 +19,7 @@ const DOOR_COORDS := Vector2i(2, 0)
 const CAPTIVE_COORDS := Vector2i(3, 0)
 const BOSS_COORDS := Vector2i(4, 0)
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
+const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
@@ -29,6 +30,30 @@ const DUNGEONS := {
 		"frank_scene": "res://data/cutscenes/cathedral_frank.scene",
 		"escaped_scene": "res://data/cutscenes/cathedral_escaped.scene",
 		"rescue_scene": "res://data/cutscenes/cathedral_rescue.scene",
+	},
+	"monastery": {
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"scene": "res://scenes/dungeon/MonasteryDungeon.tscn",
+		"wake_scene": "res://data/cutscenes/monastery_wake.scene",
+		"frank_scene": "res://data/cutscenes/monastery_frank.scene",
+		"escaped_scene": "res://data/cutscenes/monastery_escaped.scene",
+		"rescue_scene": "res://data/cutscenes/monastery_rescue.scene",
+	},
+	"observatory": {
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"scene": "res://scenes/dungeon/ObservatoryDungeon.tscn",
+		"wake_scene": "res://data/cutscenes/observatory_wake.scene",
+		"frank_scene": "res://data/cutscenes/observatory_frank.scene",
+		"escaped_scene": "res://data/cutscenes/observatory_escaped.scene",
+		"rescue_scene": "res://data/cutscenes/observatory_rescue.scene",
+	},
+	"guild": {
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"scene": "res://scenes/dungeon/GuildDungeon.tscn",
+		"wake_scene": "res://data/cutscenes/guild_wake.scene",
+		"frank_scene": "res://data/cutscenes/guild_frank.scene",
+		"escaped_scene": "res://data/cutscenes/guild_escaped.scene",
+		"rescue_scene": "res://data/cutscenes/guild_rescue.scene",
 	},
 }
 
@@ -57,6 +82,7 @@ func _ready() -> void:
 	_escape = ActOne.is_start_dungeon(dungeon_id)
 	GameManager.current_location = dungeon_id + ("_escape" if _escape else "")
 	GameManager.current_scene_path = _data["scene"]
+	GameManager.story_flags.erase("edenmere_shrine_used")  # once per dungeon visit (20d)
 	Music.play("dungeon")
 	# Characters lower on screen draw in front (a captive standing just above
 	# the player, cutscene actors walking past each other).
@@ -144,6 +170,13 @@ func on_captive_tile(_cell: Vector2i) -> void:
 		return
 	await Cutscene.play(_data["rescue_scene"])
 	_tile_map.set_cell(_captive_cell, 0, FLOOR_COORDS)
+	# The fourth hero rescued: Act I ends here (20d). Afterwards the party is
+	# back outside, free to roam until Act II exists.
+	if ActOne.all_cleared() and not GameManager.has_flag("act_one_complete"):
+		GameManager.story_flags["act_one_complete"] = true
+		await Cutscene.play(ACT_ONE_END_SCENE)
+		GameManager.arrival = dungeon_id
+		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 
 ## Story beats when the map loads: waking up (escape, first time), and the
@@ -157,8 +190,9 @@ func _play_arrival_story() -> void:
 		await Cutscene.play(_data["wake_scene"])
 	elif _boss_defeated() and not ActOne.is_cleared(dungeon_id):
 		await _after_transition()
-		await Cutscene.play(_data["escaped_scene"])
+		# Cleared before the scene, so {next} in it names the *next* dungeon.
 		GameManager.story_flags["cleared_" + dungeon_id] = true
+		await Cutscene.play(_data["escaped_scene"])
 		GameManager.arrival = dungeon_id
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 

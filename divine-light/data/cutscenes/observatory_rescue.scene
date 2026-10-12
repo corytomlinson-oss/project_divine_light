@@ -1,0 +1,15 @@
+# Rescuing Lyra from the Observatory (Milestone 20c, any other start). Plays on
+# reaching Lyra's rune after the Void Archmage is beaten.
+
+face player up
+emote lyra !
+say Lyra: The Archmage is gone? Then the void it was drinking in has nowhere left to go. Good.
+say Lyra: It was studying me. Every spell I cast, it tried to swallow. I think it wanted to learn how the light works.
+say Lyra: Frank sent you? Then the others are still out there somewhere.
+emote lyra note
+say Lyra: Count me in. Fire, frost, lightning, stone - point me at whatever's next.
+join lyra
+despawn lyra
+sound level_up
+narrate Lyra joins the party!
+set cleared_observatory

@@ -1,0 +1,14 @@
+# Rescuing Ryn from the Monastery (Milestone 20b, any other start). Plays on
+# reaching Ryn's rune after the Corrupted Grandmaster is beaten.
+
+face player up
+emote ryn !
+say Ryn: You beat the Grandmaster? Then it's over. I trained under that old master for years... that wasn't them anymore.
+say Ryn: Frank sent you? Then the rest of us are still out there somewhere.
+emote ryn note
+say Ryn: Count me in. My fists are yours - and I can patch you up, too.
+join ryn
+despawn ryn
+sound level_up
+narrate Ryn joins the party!
+set cleared_monastery

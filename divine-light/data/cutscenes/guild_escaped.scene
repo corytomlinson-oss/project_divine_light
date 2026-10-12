@@ -1,0 +1,13 @@
+# After the Corrupted Enforcer falls (Milestone 20d, escape start). Plays when
+# the Guild reloads after the fight; then the map fades out to the overworld.
+
+spawn frank frank at ~-1,0 facing right
+face player left
+emote frank note
+say Frank: Ha! Down it goes! Didn't even see you move. I'm glad you're on my side.
+say Frank: Listen - I heard the guards talking. They took three others like you. Souls that still shine clean, the ones the Unraveling can't turn.
+say Frank: So Vorath's people lock them away instead. One is held in {next}, {next_where}.
+emote player !
+say Silas: Then we get them out. All three. Breaking people out of places is sort of my specialty.
+say Frank: Verdance first - the village up the road from here. You need rest, and I need to see what's left of my stock. Come on - fresh air!
+fade out 1

@@ -17,6 +17,7 @@ const SLOTS: Array = ["weapon", "armor", "helmet", "gloves", "accessory"]
 const DEFS: Dictionary = {
 	# Vael (Templar)
 	"Iron Sword":         {"slot": "weapon",    "class": "Vael", "atk": 8},
+	"Steel Sword":        {"slot": "weapon",    "class": "Vael", "atk": 13},  # Edenmere's armory (20d)
 	"Guardian Plate":     {"slot": "armor",     "class": "Vael", "def": 6, "set_id": "holy_guardian"},
 	"Guardian Helm":      {"slot": "helmet",    "class": "Vael", "def": 3, "set_id": "holy_guardian"},
 	"Guardian Gauntlets": {"slot": "gloves",    "class": "Vael", "def": 3, "set_id": "holy_guardian"},
@@ -24,18 +25,22 @@ const DEFS: Dictionary = {
 
 	# Ryn (Martial Artist)
 	"Iron Claws": {"slot": "weapon", "class": "Ryn", "atk": 6},
+	"Steel Claws": {"slot": "weapon", "class": "Ryn", "atk": 11},
 	"Monk Wraps": {"slot": "armor",  "class": "Ryn", "def": 3},
 
 	# Lyra (Invoker)
 	"Apprentice Staff": {"slot": "weapon", "class": "Lyra", "atk": 3, "int": 5},
+	"Oak Staff":        {"slot": "weapon", "class": "Lyra", "atk": 4, "int": 9},
 	"Scholar's Robe":   {"slot": "armor",  "class": "Lyra", "res": 3},
 
 	# Silas (Assassin)
 	"Twin Daggers": {"slot": "weapon", "class": "Silas", "atk": 7},
+	"Steel Daggers": {"slot": "weapon", "class": "Silas", "atk": 12},
 	"Leather Hood": {"slot": "helmet", "class": "Silas", "agi": 3},
 
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
+	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},
 }
 
 # set_id -> data describing the bonus. Only "holy_guardian" (Vael's Act I

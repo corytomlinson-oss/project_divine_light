@@ -50,6 +50,13 @@ const CLASS_SKILLS: Dictionary = {
 
 const LYRA_STANCES: Array = ["Fire", "Ice", "Lightning", "Earth"]
 
+# Milestone 20c: what an elemental aura is weak to (the Void Mage), the spell
+# names and sounds for aura magic, and element names for messages.
+const AURA_WEAKNESS := {"fire": "ice", "ice": "fire", "lightning": "earth", "earth": "lightning"}
+const AURA_SPELLS := {"fire": "Void Flame", "ice": "Void Frost", "lightning": "Void Spark", "earth": "Void Stone"}
+const AURA_SOUNDS := {"fire": "fire", "ice": "ice", "lightning": "thunder", "earth": "earth"}
+const ELEMENT_NOUNS := {"holy": "holy light", "fire": "flames", "ice": "frost", "lightning": "lightning", "earth": "earth"}
+
 const LYRA_SKILLS: Dictionary = {
 	"Fire": [
 		{"name": "Ember",   "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 14, "min_level": 1},
@@ -86,6 +93,12 @@ const ITEM_DEFS: Dictionary = {
 const LOCATION_BOSSES := {
 	"cathedral": "fallen_guardian",
 	"cathedral_escape": "hollow_warden",
+	"monastery": "corrupted_grandmaster",
+	"monastery_escape": "sparring_master",
+	"observatory": "void_archmage",
+	"observatory_escape": "void_sentinel",
+	"guild": "shadow_lord",
+	"guild_escape": "corrupted_enforcer",
 }
 
 const BATTLE_BACKGROUNDS: Dictionary = {
@@ -115,6 +128,7 @@ const MP_TEXT := Color(0.67, 0.75, 1.0)
 const MP_BLUE := Color(0.43, 0.55, 1.0)
 const ROW_GREY := Color(0.63, 0.61, 0.72)
 const TARGET_YELLOW := Color(1.0, 1.0, 0.3)
+const DISABLED_GREY := Color(0.5, 0.5, 0.56)
 
 # Party formation: a diagonal line, FF6-style, stepping down and right per
 # slot across the battlefield's right side. Slots are grouped by
@@ -217,8 +231,12 @@ var _acting := false
 # it just hit a weakness (Milestone 20a).
 var _skill_element := ""
 var _weak_hit := false
+var _immune_hit := false
 # Frank's help in an escape warden fight (Milestone 20a): a blinding vial at
 # the start, one potion when a hero is about to fall.
+var _actor: Combatant = null     # the party member whose action is resolving
+var _physical := false           # whether that action is a physical attack
+var _counter_note := ""          # "X counters! Y takes N!" when a counter landed
 var _frank_helps := false
 var _frank_healed := false
 var _victory := false
@@ -321,6 +339,12 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	e.weak = kit.get("weak", [])
 	e.int_stat = int(kit.get("int", 0))
 	e.res_stat = int(kit.get("res", 0))
+	e.counter_from_phase = int(kit.get("counter_from_phase", -1))
+	e.extra_actions = int(kit.get("actions", 1)) - 1
+	e.extra_actions_max_phase = int(kit.get("actions_max_phase", 99))
+	e.aura_cycle = kit.get("aura", [])
+	e.aura_weakness = bool(kit.get("aura_weakness", false))
+	e.immune_from_phase = int(kit.get("immune_from_phase", -1))
 	return e
 
 
@@ -427,7 +451,7 @@ func _setup_enemy_ui() -> void:
 		# Enemy window row: name with the HP bar under it.
 		var y := 4.0 + i * 16.0
 		var label := _window_label(enemy_window, Vector2(8, y), ENEMY_LIST_BAR_W)
-		label.text = _enemies[i].display_name
+		label.text = EnemyData.kit(_enemies[i].display_name).get("short", _enemies[i].display_name)
 		_enemy_labels.append(label)
 		_enemy_hp_bars.append(_window_bar(enemy_window, Vector2(8, y + 10), ENEMY_LIST_BAR_W, ENEMY_RED))
 
@@ -970,7 +994,12 @@ func _confirm_main() -> void:
 	var member: Combatant = _party[_selecting_index]
 	match _menu_cursor:
 		0: _enter_targeting("attack", {})
-		1: _open_skill_menu(member)
+		1:
+			if member.silence_rounds > 0:
+				Sfx.play("menu_cancel")
+				message_label.text = "%s is silenced - no skills this turn!" % member.display_name
+				return
+			_open_skill_menu(member)
 		2: _open_item_menu()
 		3:
 			member.queued_action = "defend"
@@ -1264,6 +1293,10 @@ func _begin_resolving() -> void:
 	for enemy in _enemies:
 		if enemy.is_alive():
 			_turn_queue.append(enemy)
+			# Some enemies act more than once a round (20b: the Grandmaster).
+			if enemy.boss_phase <= enemy.extra_actions_max_phase:
+				for k in enemy.extra_actions:
+					_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
 	_advance_turn()
@@ -1288,7 +1321,7 @@ func _execute_next_turn() -> void:
 			enemy.defending = false
 		_tick_buffs()
 		_tick_dot()
-		if _enemies.filter(func(e): return e.is_alive()).is_empty():
+		if _foes_defeated():
 			_end_battle(true)
 			return
 		if _party.filter(func(c): return c.is_alive()).is_empty():
@@ -1300,6 +1333,7 @@ func _execute_next_turn() -> void:
 	# The acting party member steps forward for their turn (enemies: nobody).
 	_party_acting = _party.find(combatant)
 	if combatant.is_stunned:
+		combatant.silence_rounds = maxi(0, combatant.silence_rounds - 1)
 		combatant.stun_rounds -= 1
 		if combatant.stun_rounds <= 0:
 			combatant.is_stunned = false
@@ -1337,6 +1371,14 @@ func _get_ally_target(member: Combatant, skill: Dictionary) -> Combatant:
 ## at that same moment, so hurt flashes and damage numbers land with it.
 ## Targets are worked out before the logic runs, from the same helpers it uses.
 func _execute_party_turn(member: Combatant) -> void:
+	# Silence (20c) lasts for the member's next turn: a skill chosen before it
+	# landed fizzles.
+	if member.silence_rounds > 0:
+		member.silence_rounds -= 1
+		if member.queued_action == "skill":
+			Sfx.play("menu_cancel")
+			message_label.text = "%s is silenced!\n%s fails." % [member.display_name, member.queued_skill.get("name", "The skill")]
+			return
 	var offensive: bool = member.queued_action == "attack" \
 			or (member.queued_action == "skill" and str(member.queued_skill.get("target", "")).begins_with("enemy"))
 	var recipe: Dictionary = FxRecipes.for_member(member)
@@ -1357,6 +1399,10 @@ func _execute_party_turn(member: Combatant) -> void:
 			Sfx.play(recipe["sound"])
 	_skill_element = _element_of(member)
 	_weak_hit = false
+	_immune_hit = false
+	_actor = member
+	_counter_note = ""
+	_physical = member.queued_action == "attack" or (member.queued_action == "skill" and _skill_element == "" 			and str(member.queued_skill.get("target", "")).begins_with("enemy"))
 	match member.queued_action:
 		"attack":      _do_attack(member)
 		"skill":       _do_skill(member, member.queued_skill)
@@ -1370,7 +1416,13 @@ func _execute_party_turn(member: Combatant) -> void:
 			message_label.text = "%s moves to the %s row!" % [member.display_name, member.row]
 	if _weak_hit:
 		message_label.text += " Weak!"
+	if _immune_hit:
+		message_label.text += " Immune!"
+	if _counter_note != "":
+		message_label.text += "
+" + _counter_note
 	_skill_element = ""
+	_actor = null
 
 
 ## The element a party action deals ("" for plain physical), from the skill's
@@ -1390,11 +1442,81 @@ func _element_of(member: Combatant) -> String:
 ## Deals damage from a party action, 1.5x if the enemy is weak to the
 ## action's element. Returns what was actually dealt (for the message).
 func _hit(target: Combatant, dmg: int) -> int:
-	if target.is_enemy and _skill_element != "" and _skill_element in target.weak:
+	if target.is_enemy and _skill_element != "" and _skill_element in target.immune:
+		_immune_hit = true
+		return 0
+	if target.is_enemy and _skill_element != "" and _is_weak(target, _skill_element):
 		dmg = roundi(dmg * 1.5)
 		_weak_hit = true
 	target.receive_damage(dmg)
+	_maybe_counter(target)
 	return dmg
+
+
+## True once every enemy that matters is down. Summoned adds (20d) don't
+## fight on without their summoner: when only adds are left, they slip away
+## (the victory message follows at once).
+func _foes_defeated() -> bool:
+	if _enemies.any(func(e: Combatant) -> bool: return e.is_alive() and not e.summoned):
+		return false
+	for e: Combatant in _enemies:
+		if e.is_alive():
+			e.is_ko = true
+			var i := _enemies.find(e)
+			if i < _enemy_sprites.size() and _enemy_sprites[i] != null:
+				_enemy_sprites[i].visible = false
+	return true
+
+
+## Weak to an element: from its kit, or (20c, Void Mage) to whatever beats
+## its current aura.
+func _is_weak(target: Combatant, element: String) -> bool:
+	if element in target.weak:
+		return true
+	return target.aura_weakness and AURA_WEAKNESS.get(target.aura(), "") == element
+
+
+## Elements the living party can deal right now (skills they know), for a boss
+## choosing what to become immune to (20c).
+func _party_elements() -> Array:
+	var out: Array = []
+	for m: Combatant in _party:
+		if not m.is_alive():
+			continue
+		var skills: Array = CLASS_SKILLS.get(m.char_class, [])
+		if m.char_class == "Lyra":
+			skills = []
+			for stance: String in LYRA_STANCES:
+				skills += LYRA_SKILLS[stance]
+		for s: Dictionary in skills:
+			if m.level < int(s.get("min_level", 1)):
+				continue
+			var effect: String = s.get("effect", "")
+			var element := ""
+			if effect.begins_with("holy") or effect == "consecrate":
+				element = "holy"
+			for e: String in ["fire", "ice", "lightning", "earth"]:
+				if effect.contains(e):
+					element = e
+			if element != "" and not element in out:
+				out.append(element)
+	return out
+
+
+## A counter stance (20b) hits back at a physical attack - once per action,
+## however many times the action struck. Spells are never countered.
+func _maybe_counter(target: Combatant) -> void:
+	if not (target.is_enemy and target.is_alive() and target.counter_rounds > 0):
+		return
+	if not _physical or _actor == null or _counter_note != "" or not _actor.is_alive():
+		return
+	var effective_def := _actor.defense + _actor.def_buff
+	var dmg := maxi(1, roundi((target.atk + target.atk_buff - effective_def) * 0.8))
+	_actor.receive_damage(dmg)
+	var sprite := _sprite_of(_actor)
+	if sprite != null:
+		_fx.impact(FxRecipes.ENEMY_ATTACK, [sprite])
+	_counter_note = "%s counters! %s takes %d!" % [target.display_name, _actor.display_name, dmg]
 
 
 ## The sprites a party member's action will land on, resolved the same way
@@ -1471,7 +1593,7 @@ func _do_attack(member: Combatant) -> void:
 	_update_ui()
 	var crit_tag := " CRIT!" if crit else ""
 	message_label.text = "%s attacks %s for %d!%s" % [member.display_name, target.display_name, dmg, crit_tag]
-	if _enemies.filter(func(e): return e.is_alive()).is_empty():
+	if _foes_defeated():
 		_end_battle(true)
 
 
@@ -1504,7 +1626,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"holy_stun":
@@ -1524,7 +1646,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix := (" CRIT!" if crit else "") + (" Stunned!" if stunned else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"holy_wrath":
@@ -1542,7 +1664,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix := (" CRIT!" if crit else "") + (" Stunned!" if not target.is_ko else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"guard":
@@ -1594,7 +1716,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take holy damage!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"sanctuary":
@@ -1627,7 +1749,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"sweep":
@@ -1640,7 +1762,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take damage!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"stun_phys":
@@ -1666,7 +1788,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"multi_hit":
@@ -1688,7 +1810,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if any_crit else ""
 			message_label.text = "%s uses %s!\n%d hits on %s - %d total!%s" % [member.display_name, skill["name"], hits, target.display_name, total, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"cripple":
@@ -1707,7 +1829,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag2 := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s\nAGI halved for 2 rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag2]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"heal_all":
@@ -1734,7 +1856,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix := (" CRIT!" if crit else "") + (" Stunned!" if not target.is_ko else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"switch_stance":
@@ -1759,7 +1881,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix2 := (" CRIT!" if crit else "") + (" Burning!" if burned else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix2]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"ice_slow":
@@ -1777,7 +1899,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s\nAGI lowered for 1 round!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"ice_freeze":
@@ -1797,7 +1919,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix3 := (" CRIT!" if crit else "") + (" Frozen!" if frozen else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix3]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"ice_freeze_aoe":
@@ -1812,7 +1934,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					enemy.stun_rounds = 1
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take ice damage, chance to freeze!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"lightning_aoe":
@@ -1824,7 +1946,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take lightning damage!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"lightning_paralyze":
@@ -1842,7 +1964,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var suffix4 := (" CRIT!" if crit else "") + (" Paralyzed!" if not target.is_ko else "")
 			message_label.text = "%s uses %s on %s for %d!%s" % [member.display_name, skill["name"], target.display_name, dmg, suffix4]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"earth_sunder":
@@ -1857,7 +1979,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					enemy.def_buff_rounds = 2
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take earth damage, DEF lowered!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"earth_aoe":
@@ -1869,7 +1991,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg = _hit(enemy, dmg)
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies take reduced earth damage!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"poison":
@@ -1888,7 +2010,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s\nPoisoned for 3 rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"bleed":
@@ -1907,7 +2029,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses %s on %s for %d!%s\nBleeding for 4 rounds! (Purify only)" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"vanish":
@@ -1956,7 +2078,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					enemy.poison_power = 8 + member.atk / 6
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies poisoned!" % [member.display_name, skill["name"]]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 		"death_mark":
@@ -1989,7 +2111,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
 			message_label.text = "%s uses Shadowstep on %s for %d!%s\nPoisoned, Bleeding, and Stunned!" % [member.display_name, target.display_name, dmg, crit_tag]
-			if _enemies.filter(func(e): return e.is_alive()).is_empty():
+			if _foes_defeated():
 				_end_battle(true)
 
 
@@ -2043,7 +2165,9 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not ability.is_empty():
 		await _enemy_ability(enemy, ability, targets, phase_note)
 		return
-	await _enemy_attack(enemy, targets, phase_note, {}, int(enemy.attack_mods.get("hits", 1)))
+	var hits := int(enemy.attack_mods.get("hits", 1))
+	hits = randi_range(hits, maxi(hits, int(enemy.attack_mods.get("hits_max", hits))))
+	await _enemy_attack(enemy, targets, phase_note, {}, hits)
 
 
 ## The first ability whose boss phase and timing allow it this turn, or {}.
@@ -2051,6 +2175,11 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 func _choose_ability(enemy: Combatant) -> Dictionary:
 	for a: Dictionary in enemy.abilities:
 		if enemy.boss_phase < int(a.get("phase", 0)) or enemy.boss_phase > int(a.get("max_phase", 99)):
+			continue
+		if a.get("kind", "") == "summon" and (enemy.turns_taken - enemy.last_summon_turn < 3 \
+				or _enemies.any(func(e: Combatant) -> bool: return e.summoned and e.is_alive())):
+			continue
+		if a.get("kind", "") == "silence" and _party.all(func(m: Combatant) -> bool: return not m.is_alive() or m.silence_rounds > 0):
 			continue
 		if a.has("every"):
 			if enemy.turns_taken % int(a["every"]) == 0:
@@ -2075,9 +2204,13 @@ func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 
 ## A basic attack - `hits` swings (Blighted Wolf: 2) - or, with `charged`,
 ## the heavy blow it telegraphed last turn (damage x its "mult").
-func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged: Dictionary, hits := 1) -> void:
+func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged: Dictionary, hits := 1, extra_mods := {}) -> void:
 	_anim_enemy_attack(_enemies.find(enemy))
 	var target := _pick_target(enemy, targets)
+	# Berserk (20b): sometimes it lashes out at one of its own side instead.
+	var others := _enemies.filter(func(e: Combatant) -> bool: return e != enemy and e.is_alive())
+	if charged.is_empty() and not others.is_empty() and randi() % 100 < int(enemy.attack_mods.get("berserk", 0)):
+		target = others[randi() % others.size()]
 	var recipe: Dictionary = FxRecipes.ENEMY_ATTACK if charged.is_empty() else FxRecipes.ENEMY_HEAVY
 	var enemy_sprite: CanvasItem = _sprite_of(enemy)
 	var target_sprite: CanvasItem = _sprite_of(target)
@@ -2124,7 +2257,7 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 
 	var reduced := " (reduced)" if target.defending else ""
 	var status := ""
-	var mods := enemy.attack_mods
+	var mods := enemy.attack_mods.merged(extra_mods, true)
 	if target.is_alive() and randi() % 100 < int(mods.get("poison_chance", 0)):
 		target.poison_rounds = int(mods.get("poison_rounds", 3))
 		target.poison_power = int(mods.get("poison_power", 4))
@@ -2133,6 +2266,14 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 		target.is_stunned = true
 		target.stun_rounds = 1
 		status += " Stunned!"
+	if target.is_alive() and randi() % 100 < int(mods.get("random_status", 0)):
+		status += _random_status(target)
+	if target.is_alive() and randi() % 100 < int(mods.get("bleed_chance", 0)):
+		target.bleed_rounds = int(mods.get("bleed_rounds", 3))
+		target.bleed_power = int(mods.get("bleed_power", 5))
+		status += " Bleeding!"
+	if target.is_ko == false and randi() % 100 < int(mods.get("steal", 0)):
+		status += _steal(enemy)
 	_update_ui()
 	if not charged.is_empty():
 		message_label.text = phase_note + "%s unleashes %s!\n%s takes %d%s!%s" % [enemy.display_name, charged.get("name", "a heavy blow"), target.display_name, total, reduced, status]
@@ -2142,6 +2283,40 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 		message_label.text = phase_note + "%s hits %s for %d%s!%s" % [enemy.display_name, target.display_name, total, reduced, status]
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+## A thief (20d) pockets one consumable from the party's bag; everything
+## stolen comes back if the party wins. Returns a message suffix.
+func _steal(enemy: Combatant) -> String:
+	var owned: Array = ITEM_DEFS.keys().filter(func(n: String) -> bool: return int(GameManager.inventory.get(n, 0)) > 0)
+	if owned.is_empty():
+		return ""
+	var item: String = owned.pick_random()
+	GameManager.inventory[item] = int(GameManager.inventory[item]) - 1
+	enemy.stolen.append(item)
+	Sfx.play("item")
+	return " Stole %s %s!" % ["an" if item[0] in "AEIOU" else "a", item]
+
+
+## One status effect at random (20c, Astral Familiar), returned as a message
+## suffix. Stun is the rarest.
+func _random_status(target: Combatant) -> String:
+	match ["poison", "poison", "silence", "silence", "def_down", "def_down", "stun"].pick_random():
+		"poison":
+			target.poison_rounds = 3
+			target.poison_power = 4
+			return " Poisoned!"
+		"silence":
+			target.silence_rounds = 1
+			return " Silenced!"
+		"def_down":
+			target.def_buff = -4
+			target.def_buff_rounds = 2
+			return " DEF down!"
+		_:
+			target.is_stunned = true
+			target.stun_rounds = 1
+			return " Stunned!"
 
 
 ## A special move from the enemy's kit. The banner names it while the enemy
@@ -2177,6 +2352,12 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			_fx_on(enemy, "ring", "shield")
 			Sfx.play("holy")
 			message_label.text = phase_note + "%s uses %s!\nIts armor hardens!" % [enemy.display_name, ability_name]
+		"counter_stance":
+			# Rounds count down at each round's end, so 2 = the rest of this
+			# round and all of the next: the player sees it coming.
+			enemy.counter_rounds = int(a.get("rounds", 2))
+			_fx_on(enemy, "ring", "taunt")
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "takes a guarding stance!")]
 		"charge":
 			enemy.charging = a
 			_fx_on(enemy, "stars", "enemy")
@@ -2189,6 +2370,43 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			target.receive_damage(dmg)
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s!\n%s takes %d!" % [enemy.display_name, ability_name, target.display_name, dmg]
+		"dot_strike":
+			# A basic hit that always poisons and bleeds (20d).
+			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, 1,
+					{"poison_chance": 100, "bleed_chance": 100, "poison_power": int(a.get("poison_power", 4)), "bleed_power": int(a.get("bleed_power", 5))})
+			return
+		"summon":
+			await _summon(enemy, a.get("enemies", []))
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "calls for help!")]
+		"silence":
+			var open := targets.filter(func(m: Combatant) -> bool: return m.silence_rounds == 0)
+			var target: Combatant = open.pick_random() if not open.is_empty() else _pick_target(enemy, targets)
+			target.silence_rounds = 1
+			_fx_on(target, "sinking", "arcane")
+			Sfx.play("spell")
+			message_label.text = phase_note + "%s casts %s!\n%s is silenced!" % [enemy.display_name, ability_name, target.display_name]
+		"aura_bolt", "aura_storm":
+			# Elemental magic in the caster's current aura, which then moves on
+			# to the next element in its cycle (20c).
+			var element := enemy.aura()
+			var spell: String = AURA_SPELLS.get(element, ability_name) if a.get("kind") == "aura_bolt" else ability_name
+			Sfx.play(AURA_SOUNDS.get(element, "spell"))
+			var result := ""
+			if a.get("kind") == "aura_bolt":
+				var target := _pick_target(enemy, targets)
+				var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+				_fx_on(target, "pillar", element if element != "" else "debuff")
+				target.receive_damage(dmg)
+				result = "%s takes %d!" % [target.display_name, dmg]
+			else:
+				_fx.flash(BattleFx.PALETTES.get(element, pal)[0], 0.4)
+				for m: Combatant in targets:
+					_fx_on(m, "burst", element if element != "" else "debuff")
+					m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+				result = "The whole party is struck!"
+			enemy.aura_index += 1
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s! %s\nIts aura shifts to %s." % [enemy.display_name, spell, result, enemy.aura()]
 		"magic_all":
 			_fx.flash(pal[0], 0.4)
 			Sfx.play("thunder")
@@ -2200,6 +2418,37 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 	_update_ui()
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+## Adds enemies mid-fight (20d, the Shadow Lord's thieves). The fallen are
+## cleared out and the whole enemy row is rebuilt, so the newcomers get slots,
+## sprites and list rows. Summoned enemies give no XP.
+func _summon(summoner: Combatant, group: Array) -> void:
+	summoner.last_summon_turn = summoner.turns_taken
+	_enemies = _enemies.filter(func(e: Combatant) -> bool: return e.is_alive())
+	for data: Dictionary in group:
+		if _enemies.size() >= 3:
+			break
+		var add := _build_enemy(data)
+		add.summoned = true
+		add.xp_reward = 0
+		_enemies.append(add)
+	for sprite: CanvasItem in _enemy_sprites:
+		if sprite != null:
+			sprite.queue_free()
+	for node: Control in _enemy_labels + _enemy_hp_bars:
+		node.queue_free()
+	_setup_enemy_ui()
+	for i in _enemies.size():
+		var sprite := _sprite_of(_enemies[i])
+		if sprite == null:
+			continue
+		if _enemies[i].is_boss and _enemies[i].boss_phase > 0:
+			sprite.self_modulate = Color(1.25, 0.72, 0.8)  # keep the enraged tint
+		if _enemies[i].summoned:
+			_fx.impact({"impact": "cloud", "palette": "shadow", "size": 12.0}, [sprite])
+	Sfx.play("encounter")
+	_update_enemy_ui()
 
 
 ## One BattleFx impact of `kind` in `palette` on a fighter.
@@ -2224,6 +2473,17 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if hp_frac > enemy.phase_hp_thresholds[enemy.boss_phase]:
 		return ""
 	enemy.boss_phase += 1
+	if enemy.immune_from_phase >= 0 and enemy.boss_phase >= enemy.immune_from_phase and enemy.immune.is_empty():
+		# The element the party can deal, if any, so the switch matters (20c).
+		var pool := _party_elements().filter(func(e: String) -> bool: return not e in enemy.weak)
+		if pool.is_empty():
+			pool = ["fire", "ice", "lightning"]
+		var element: String = pool.pick_random()
+		enemy.immune.append(element)
+		return "%s drinks in the %s! It's now immune to %s!\n" % [enemy.display_name, ELEMENT_NOUNS[element], element]
+	if enemy.counter_from_phase >= 0 and enemy.boss_phase >= enemy.counter_from_phase:
+		enemy.counter_rounds = 999  # from here on it's always countering (20b)
+		return "%s enters a new phase! It will counter every blow!\n" % enemy.display_name
 	return "%s enters a new phase!\n" % enemy.display_name
 
 
@@ -2274,6 +2534,8 @@ func _tick_buffs() -> void:
 			c.evasion_rounds -= 1
 		if c.accuracy_debuff_rounds > 0:
 			c.accuracy_debuff_rounds -= 1
+		if c.counter_rounds > 0 and c.counter_rounds < 900:
+			c.counter_rounds -= 1
 
 
 ## Poison / burn / bleed damage at the end of a round. Each tick also puffs a
@@ -2333,6 +2595,14 @@ func _end_battle(victory: bool) -> void:
 		Sfx.play("victory")
 		GameManager.gold += total_gold
 		message_label.text = "Victory! Gained %d XP and %d gold." % [total_xp, total_gold]
+		var recovered: Array = []
+		for e: Combatant in _enemies:
+			for item: String in e.stolen:
+				GameManager.inventory[item] = int(GameManager.inventory.get(item, 0)) + 1
+				recovered.append(item)
+			e.stolen = []
+		if not recovered.is_empty():
+			message_label.text += "\nRecovered %d stolen item%s." % [recovered.size(), "" if recovered.size() == 1 else "s"]
 	else:
 		Music.stop(1.0)
 		message_label.text = "The party has fallen..."
@@ -2367,6 +2637,7 @@ func _update_menu() -> void:
 		if idx < _menu_options.size():
 			_option_labels[i].text = "  " + _menu_options[idx]
 			_option_labels[i].visible = true
+			_option_labels[i].modulate = DISABLED_GREY if _option_disabled(idx) else Color.WHITE
 		else:
 			_option_labels[i].text = ""
 			_option_labels[i].visible = false
@@ -2376,6 +2647,13 @@ func _update_menu() -> void:
 	_scroll_hint.height = 42.0
 	_scroll_hint.more_above = scrollable and _list_scroll > 0
 	_scroll_hint.more_below = scrollable and _list_scroll + page < _menu_options.size()
+
+
+## Silence (20c) greys out Skill in the main menu.
+func _option_disabled(idx: int) -> bool:
+	if _menu_state != MenuState.MAIN or idx != 1 or _selecting_index >= _party.size():
+		return false
+	return _party[_selecting_index].silence_rounds > 0
 
 
 ## At least LEFT_WINDOW_W; wider when a skill/item name needs it (the widest,

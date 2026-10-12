@@ -162,8 +162,9 @@ func _talk(id: String, facing: String) -> void:
 func _shrine() -> void:
 	if GameManager.has_flag(SHRINE_FLAG):
 		await Cutscene.play_text("narrate The shrine's light is steady and warm, but it has given what it can for now. Return after your next journey.")
-		return
-	GameManager.story_flags[SHRINE_FLAG] = true
-	Sfx.play("heal")
-	_restore_party()
-	await Cutscene.play_text("narrate A gentle light washes over the party. Wounds close; weariness fades.")
+	else:
+		GameManager.story_flags[SHRINE_FLAG] = true
+		Sfx.play("heal")
+		_restore_party()
+		await Cutscene.play_text("narrate A gentle light washes over the party. Wounds close; weariness fades.")
+	await offer_save()  # a save point either way (22a)

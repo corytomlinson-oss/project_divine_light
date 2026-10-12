@@ -1,9 +1,9 @@
 extends Node2D
 
 # The title screen (Milestone 19b) - the game's main scene now. New Game plays
-# the intro movie, then the class select (20a). Continue loads save slot 1
-# (the F5 debug save until Milestone 22 builds real save slots); it's greyed
-# out when there's no save.
+# the intro movie, then the class select (20a). Continue opens the load
+# screen (22a: the 3 slots and the autosave); it's greyed out when there's no
+# save at all.
 
 const CLASS_SELECT := "res://scenes/title/ClassSelect.tscn"
 const INTRO := "res://data/cutscenes/intro.scene"
@@ -19,7 +19,8 @@ var _cursor := MenuCursor.new()
 func _ready() -> void:
 	add_child(_cursor)
 	Music.play("intro")
-	_can_continue = GameManager.save_exists(1)
+	GameManager.in_game = false  # the play-time clock stops on the title
+	_can_continue = GameManager.any_save_exists()
 	if not _can_continue:
 		_options[1].modulate = Color(0.5, 0.5, 0.58)
 	_cursor.target = _options[_index]
@@ -54,8 +55,10 @@ func _new_game() -> void:
 func _continue() -> void:
 	_busy = true
 	Sfx.play("menu_confirm")
+	var slot := await SaveMenu.open(self, "load")
+	if slot < 0 or not GameManager.load_game(slot):
+		_busy = false
+		return
 	Music.stop(0.6)
-	GameManager.load_game(1)
-	# The save doesn't record where the party was yet (Milestone 22), so this
-	# lands on the map GameManager points at - the overworld for now.
+	# The save remembers the map and the spot on it (22a).
 	Transition.change_scene(GameManager.current_scene_path)

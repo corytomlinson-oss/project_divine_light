@@ -2597,6 +2597,7 @@ func _end_battle(victory: bool) -> void:
 			total_gold += e.xp_reward / 2  # gold: half an enemy's XP (20a)
 			if e.is_boss:
 				GameManager.defeated_bosses[GameManager.current_location] = true
+				GameManager.autosave_pending = true  # saved back on the map (22a)
 		for member in _party:
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))

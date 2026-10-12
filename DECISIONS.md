@@ -277,3 +277,22 @@ Cory chose hand-drawn-in-code for everything (like the Milestone 16 sprites) and
 - **Kept the stand-in sprite mechanism** (now empty) so Act II's new enemies can borrow sprites until their own art pass.
 - **Not done (optional in the checklist):** redrawing the code-drawn town/overworld placeholder tiles from 20a, new sounds for steal / silence / summon / counter, and portraits (the dialogue box has no portrait slot; recommend skipping).
 - **Review images go in `previews/` (git-ignored)** at the repo root. Links to my scratch folder don't open in VS Code.
+
+## Milestone 22 — Save / load triggers (scoped 2026-10-12)
+
+Cory's calls (asked before building):
+- **Autosaves get their own slot**, shown as a 4th "Autosave" entry on the load screen, so they never overwrite one of the 3 manual saves.
+- **Suspend save mid-battle restarts that fight** (same enemies, party as it was when the fight began) rather than restoring every HP, buff and turn exactly.
+- **Split into 22a and 22b.** 22a: the save/load screen, manual saves, autosaves, and saves that remember where you are and your play time. 22b: suspend save (closing the app / Home), properly tested on the Retroid in Milestone 23.
+- **Manual saves at inns and Edenmere's shrine, and also from the pause menu anywhere on the overworld** (more forgiving than the design doc's inns-and-shrines-only). Never in dungeons or battles.
+
+### 22a: calls I made
+
+- **A save puts you back on the exact spot** where you saved: the same map and tile. Saves from before this load onto the overworld.
+- **Autosaves happen after:** every boss win (escape wardens included), every rescue, escaping your starting dungeon, and the end of Act I. They're silent, as the design doc says. One made right after a battle waits until you're back on the map, so it never saves mid-battle.
+- **Inns ask "Save your progress?" after you rest**, and Edenmere's shrine asks after you pray, even when it's already used up this visit.
+- **The pause menu's Save shows only on the overworld**, as Cory chose. Towns have their inns, so it's not in the town menus either.
+- **Saving over a used slot asks first** ("Overwrite Slot 1? A: Yes B: No"). An empty slot saves straight away.
+- **The load screen starts on your most recent save**, which may be the autosave.
+- **Each slot card shows** the party's heads, names and levels, the location, play time and gold: the design doc's slot card in our screen size.
+- **Play time only counts while you're playing**: not on the title, and not while a menu has the game paused.

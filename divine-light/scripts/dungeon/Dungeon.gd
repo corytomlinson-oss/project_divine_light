@@ -174,12 +174,14 @@ func on_captive_tile(_cell: Vector2i) -> void:
 		return
 	await Cutscene.play(_data["rescue_scene"])
 	_tile_map.set_cell(_captive_cell, 0, FLOOR_COORDS)
+	GameManager.autosave()  # a rescue (22a)
 	# The fourth hero rescued: Act I ends here (20d). Afterwards the party is
 	# back outside, free to roam until Act II exists.
 	if ActOne.all_cleared() and not GameManager.has_flag("act_one_complete"):
 		GameManager.story_flags["act_one_complete"] = true
 		await Cutscene.play(ACT_ONE_END_SCENE)
 		GameManager.arrival = dungeon_id
+		GameManager.autosave_pending = true  # saved on arrival outside (22a)
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 
@@ -198,6 +200,7 @@ func _play_arrival_story() -> void:
 		GameManager.story_flags["cleared_" + dungeon_id] = true
 		await Cutscene.play(_data["escaped_scene"])
 		GameManager.arrival = dungeon_id
+		GameManager.autosave_pending = true  # saved on arrival outside (22a)
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 

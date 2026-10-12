@@ -8,6 +8,8 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-12)
 
+**Milestone 22a (save / load, part 1) is built** (2026-10-12), committed locally, not pushed: Cory hasn't playtested it yet. Cory scoped it (choices in `DECISIONS.md`). Saves now remember where you are and your play time; there's a real save/load screen; you can save at inns, at Edenmere's shrine, and from the pause menu on the overworld; and the game autosaves to its own slot after boss wins, rescues, escapes and the end of Act I. **Try it:** play a little, save at the Verdance inn or from the overworld pause menu (B -> Save), quit to the title, Continue. **Next: 22b, the suspend save** (closing the app / Home button; a fight in progress restarts from its beginning), then Milestone 23 (the APK, where suspend gets its real test).
+
 **Milestone 21 (Act I art & music pass) is complete** (2026-10-12), built with Cory reviewing each batch. Everything Act I added now has real art and music, all made in code:
 - **Sprites:** the 4 dungeon bosses, Frank, the 3 escape wardens, 9 dungeon enemies, and 13 townsfolk (7 designs plus color variants).
 - **Tiles and backgrounds:** the Monastery, Observatory and Guild tilesets, and battle backgrounds for all four dungeons.
@@ -240,6 +242,18 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Items are tossed** to the target as a small orb (skipped when used on yourself: `BattleFx.cast` ignores projectiles to the caster's own position).
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
+
+## Milestone 22 — Save / load triggers (in progress)
+
+Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own slot; 22a = slots, manual saves, autosaves, saves that remember place + play time; 22b = suspend save (mid-battle suspend restarts the fight); manual saves at inns, Edenmere's shrine and the overworld pause menu.
+
+### 22a — save slots, manual saves, autosaves (done 2026-10-12, not yet playtested)
+- **What a save holds now** (`GameManager.save_game(slot)`): everything from Milestone 12, plus `scene` (the map), `position` (the player's, read from the `player` group), `location` (display name via `GameManager.location_name()`), `play_time` and `saved_at`. `load_game()` sets `current_scene_path` and a pending spawn at that position, so the map puts you back on the spot (older saves land on the overworld). Slot 0 (`AUTOSAVE_SLOT`) is `autosave.json`; 1-3 are `slot_N.json`.
+- **Play time:** `GameManager.play_time`, counted in its `_process` while `in_game` (set by `start_new_game` / `load_game`, cleared on the title). The autoload pauses with the tree, so open menus don't count.
+- **Autosaves:** `GameManager.autosave()` saves to slot 0. Places that can't save yet set `autosave_pending` instead, and the next map does it (`Player._ready` calls `autosave_if_pending` deferred, once the map has placed the player): a boss win (`Battle._end_battle`), an escape and the end of Act I (`Dungeon`, before going to the overworld). A rescue saves on the spot (`Dungeon.on_captive_tile`).
+- **The screen:** `scripts/menu/SaveMenu.gd` (built in code, like ShopMenu). `await SaveMenu.open(node, "save" | "load")` returns the slot or -1; it pauses the tree and restores the previous paused state. Each row: party heads (16x16 crop of the walk sheet), names + levels, location, play time, gold. Save mode lists slots 1-3 and asks before overwriting; load mode adds the Autosave row and starts on the newest save. `GameManager.slot_summary(slot)` reads a slot for display.
+- **Where you can save:** inns (`Town._inn` -> `offer_save()`), Edenmere's shrine (after praying, used or not), and the pause menu's Save, which exists only when the current scene is the Overworld (removed from the menu elsewhere). The title's Continue opens the load screen (enabled when any slot exists). F5 / F6 still debug-save / load slot 1.
+- Verified (15 checks + screenshots): pause-menu save, overwrite confirmation, no Save in a dungeon, inn save in Verdance, autosave after a boss (made on the next map) and after a rescue, play time, Continue -> load screen -> back on the saved overworld spot with the saved gold and party.
 
 ## Milestone 21 — Act I art & music pass (done)
 

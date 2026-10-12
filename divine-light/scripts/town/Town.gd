@@ -99,6 +99,14 @@ func _inn(price: int) -> void:
 	await get_tree().create_timer(0.8).timeout
 	await Transition.fade_in(0.6)
 	await Cutscene.play_text("say Innkeeper: Morning already. Sleep well? You look like you needed it.")
+	await offer_save()
+
+
+## Inns and shrines are save points (Milestone 22a).
+func offer_save() -> void:
+	var pick := await Cutscene.ask("Save your progress?", ["Save", "Not now"])
+	if pick == 0:
+		await SaveMenu.open(self, "save")
 
 
 ## Full HP and MP for everyone still standing (the fallen stay fallen).

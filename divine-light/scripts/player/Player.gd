@@ -27,6 +27,8 @@ func _ready() -> void:
 		if ResourceLoader.exists(path):
 			_sprite.sprite_frames = load(path)
 	_reset_encounter_counter()
+	# Deferred: by then the map has put the player in place (Milestone 22a).
+	GameManager.autosave_if_pending.call_deferred()
 	if GameManager.reopen_pause_menu:
 		GameManager.reopen_pause_menu = false
 		_reopen_pause_menu()

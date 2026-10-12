@@ -4,6 +4,9 @@ signal party_loaded
 
 const SAVE_DIR: String = "user://saves/"
 const SAVE_SLOTS: int = 3
+# Slot 0 is the autosave (Milestone 22a): its own file, so it never overwrites
+# one of the three manual slots.
+const AUTOSAVE_SLOT: int = 0
 
 # Everyone who exists in the story (Milestone 20a), by class name, and the
 # party: who's actually with you, in the order they joined. A new game starts
@@ -34,6 +37,13 @@ var story_flags: Dictionary = {}
 # next battle fights exactly this group - bosses too, via "is_boss" and
 # "phase_hp_thresholds" - then it's cleared (Milestone 20a).
 var debug_encounter: Array = []
+# Milestone 22a: play time (seconds, counted only while a game is running and
+# not paused), and an autosave requested from somewhere that can't save yet -
+# e.g. a boss win in the battle scene - which the next map performs once the
+# player is standing in it (autosave_if_pending(), called by Player).
+var play_time: float = 0.0
+var in_game: bool = false
+var autosave_pending: bool = false
 
 
 func _ready() -> void:
@@ -84,6 +94,9 @@ func _build_roster() -> void:
 
 ## A fresh game as `cls`: alone, level 1, a few potions, no gear, nothing done.
 func start_new_game(cls: String) -> void:
+	play_time = 0.0
+	in_game = true
+	autosave_pending = false
 	_build_roster()
 	party = [roster[cls]]
 	starting_class = cls
@@ -132,8 +145,19 @@ func _input(event: InputEvent) -> void:
 			print("No save found in slot 1.")
 
 
+func _process(delta: float) -> void:
+	# This autoload pauses with the tree, so menus that pause the game (and
+	# the title screen, where in_game is false) don't count.
+	if in_game:
+		play_time += delta
+
+
+## Saves to `slot` (1-3, or AUTOSAVE_SLOT). Records where the party is - the
+## current map, and the player's position on it - so loading puts you back
+## there (Milestone 22a). Never called from a battle; autosaves after a boss
+## wait for the map (autosave_pending).
 func save_game(slot: int) -> bool:
-	if slot < 1 or slot > SAVE_SLOTS:
+	if slot < 0 or slot > SAVE_SLOTS:
 		return false
 	var dir := DirAccess.open("user://")
 	if dir and not dir.dir_exists("saves"):
@@ -151,9 +175,73 @@ func save_game(slot: int) -> bool:
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
 		"story_flags": story_flags.duplicate(),
+		"scene": current_scene_path,
+		"location": location_name(current_location),
+		"play_time": play_time,
+		"saved_at": int(Time.get_unix_time_from_system()),
 	}
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player != null:
+		data["position"] = [player.position.x, player.position.y]
 	file.store_string(JSON.stringify(data))
 	return true
+
+
+func autosave() -> void:
+	save_game(AUTOSAVE_SLOT)
+
+
+## Performs an autosave someone asked for earlier (autosave_pending), now
+## that a map is loaded and the player is placed in it.
+func autosave_if_pending() -> void:
+	if autosave_pending and in_game:
+		autosave_pending = false
+		autosave()
+
+
+## A place's name for the save screen.
+static func location_name(location: String) -> String:
+	var id := location.trim_suffix("_escape")
+	if ActOne.DUNGEONS.has(id):
+		return ActOne.DUNGEONS[id]["name"]
+	match id:
+		"overworld": return "Forest Heartlands"
+		"verdance": return "Verdance"
+		"edenmere": return "Edenmere"
+	return id.capitalize()
+
+
+## What the save screen shows for a slot: the party (class + level, in
+## order), location, play time and gold. {} when the slot is empty.
+func slot_summary(slot: int) -> Dictionary:
+	var path := _slot_path(slot)
+	if not FileAccess.file_exists(path):
+		return {}
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return {}
+	var levels := {}
+	var roster_data: Dictionary = parsed.get("roster", {})
+	for data: Dictionary in parsed.get("party", []):
+		levels[String(data.get("char_class", ""))] = int(data.get("level", 1))
+	var order: Array = parsed.get("party_order", levels.keys())
+	var members: Array = []
+	for cls in order:
+		var lv: int = levels.get(cls, int(roster_data.get(cls, {}).get("level", 1)))
+		members.append({"class": String(cls), "level": lv})
+	return {
+		"party": members,
+		"location": String(parsed.get("location", "Forest Heartlands")),
+		"play_time": float(parsed.get("play_time", 0.0)),
+		"gold": int(parsed.get("gold", 0)),
+	}
+
+
+func any_save_exists() -> bool:
+	for slot in range(0, SAVE_SLOTS + 1):
+		if save_exists(slot):
+			return true
+	return false
 
 
 func load_game(slot: int) -> bool:
@@ -198,6 +286,16 @@ func load_game(slot: int) -> bool:
 	story_flags.clear()
 	for flag in save_story_flags:
 		story_flags[flag] = bool(save_story_flags[flag])
+	# Where the save was made (Milestone 22a); older saves land on the overworld.
+	current_scene_path = String(parsed.get("scene", "res://scenes/overworld/Overworld.tscn"))
+	var pos: Array = parsed.get("position", [])
+	has_pending_spawn = pos.size() == 2
+	if has_pending_spawn:
+		pending_spawn_position = Vector2(float(pos[0]), float(pos[1]))
+	play_time = float(parsed.get("play_time", 0.0))
+	in_game = true
+	autosave_pending = false
+	arrival = ""
 	party_loaded.emit()
 	return true
 
@@ -229,4 +327,6 @@ func save_exists(slot: int) -> bool:
 
 
 func _slot_path(slot: int) -> String:
+	if slot == AUTOSAVE_SLOT:
+		return SAVE_DIR + "autosave.json"
 	return SAVE_DIR + "slot_%d.json" % slot

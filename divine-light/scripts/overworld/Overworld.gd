@@ -70,6 +70,7 @@ func _ready() -> void:
 		var id := GameManager.arrival if GameManager.arrival != "" else "verdance"
 		_player.snap_to(_tile_map.map_to_local(_outside(id)))
 	GameManager.arrival = ""
+	on_player_moved(_tile_map.local_to_map(_player.position))
 
 
 func _paint() -> void:
@@ -122,3 +123,34 @@ func get_door_destination(cell: Vector2i) -> Dictionary:
 	if dungeon["scene"] == "":
 		return {"blocked": "%s lies ahead, but the way isn't open yet. (Coming in a later update.)" % dungeon["name"]}
 	return {"scene": dungeon["scene"]}
+
+
+# ---------------------------------------------------------------- map
+
+## Fog of war (Player.gd calls this every tile): you've seen what's been on
+## screen around you - 10 tiles either side, 6 up and down.
+func on_player_moved(cell: Vector2i) -> void:
+	var seen: Array = []
+	for dx in range(-10, 11):
+		for dy in range(-6, 7):
+			seen.append(cell + Vector2i(dx, dy))
+	GameManager.mark_explored(GameManager.current_location, seen)
+
+
+func map_fog() -> bool:
+	return true
+
+
+## Every town (gold) and dungeon (red, grey once cleared) you've seen, with
+## its name.
+func map_markers() -> Array:
+	var markers: Array = []
+	for cell in _entrances:
+		if not GameManager.is_explored(GameManager.current_location, cell):
+			continue
+		var id: String = _entrances[cell]
+		var color := Color(0.95, 0.78, 0.3)
+		if ActOne.DUNGEONS.has(id):
+			color = Color(0.6, 0.6, 0.66) if ActOne.is_cleared(id) else Color(0.95, 0.25, 0.25)
+		markers.append({"cell": cell, "color": color, "label": GameManager.location_name(id)})
+	return markers

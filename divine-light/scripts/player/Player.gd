@@ -36,17 +36,31 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _moving:
-		position = position.move_toward(_target, MOVE_SPEED * delta)
-		if position.is_equal_approx(_target):
-			position = _target
-			_moving = false
-			_on_tile_entered()
+		var step: float = MOVE_SPEED * delta
+		var left_to_go: float = position.distance_to(_target)
+		if step < left_to_go:
+			position = position.move_toward(_target, step)
+			return
+		position = _target
+		_moving = false
+		_on_tile_entered()
+		# Still holding a direction: start the next tile this same frame and
+		# spend the leftover distance on it. Waiting a frame stalled the walk
+		# for one frame on every tile, which read as stutter.
+		if not (Transition.is_busy() or Cutscene.is_playing() or get_tree().paused):
+			_handle_input()
+			if _moving:
+				position = position.move_toward(_target, step - left_to_go)
 	elif Cutscene.is_playing():
 		pass  # a cutscene is moving the player; no input until it ends
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
 		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
 		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
 		_open_pause_menu()
+	elif Input.is_action_just_pressed("map"):
+		_play_anim("idle")
+		Sfx.play("menu_confirm")
+		MapScreen.open(self)
 	elif Input.is_action_just_pressed("confirm"):
 		_interact()
 	else:
@@ -143,6 +157,8 @@ func _on_tile_entered() -> void:
 	var cell: Vector2i = _tile_map.local_to_map(position)
 	var coords: Vector2i = _tile_map.get_cell_atlas_coords(cell)
 	var map_root: Node = _tile_map.get_parent()
+	if map_root.has_method("on_player_moved"):
+		map_root.on_player_moved(cell)  # the dungeon auto-map
 	# The gate tile is always a door; maps can declare others (the overworld's
 	# stone arches into dungeons).
 	if coords == DOOR_ATLAS_COORDS or (map_root.has_method("is_door") and map_root.is_door(cell)):
@@ -175,6 +191,9 @@ func _use_door(cell: Vector2i) -> void:
 
 
 func _check_encounter() -> void:
+	# Towns are safe zones: no random fights.
+	if _tile_map.get_parent() is Town:
+		return
 	_steps_to_encounter -= 1
 	if _steps_to_encounter <= 0:
 		_reset_encounter_counter()

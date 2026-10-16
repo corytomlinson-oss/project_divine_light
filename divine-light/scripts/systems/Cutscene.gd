@@ -470,6 +470,9 @@ func _spawn(id: String, sprite_name: String, tile: Vector2i, facing: String) -> 
 func make_character(sprite_name: String) -> AnimatedSprite2D:
 	var path := "res://assets/sprites/%s_frames.tres" % sprite_name
 	var sprite := AnimatedSprite2D.new()
+	# Above the tiles, like the player: maps y-sort their tiles too, and a
+	# 16x32 sprite's feet would sit under the next row of tiles otherwise.
+	sprite.z_index = 1
 	if ResourceLoader.exists(path):
 		sprite.sprite_frames = load(path)
 	else:

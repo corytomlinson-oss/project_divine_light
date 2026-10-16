@@ -24,7 +24,7 @@ const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
 	"cathedral": {
-		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10)},
 		"scene": "res://scenes/dungeon/CathedralDungeon.tscn",
 		"music": "dungeon",
 		"wake_scene": "res://data/cutscenes/cathedral_wake.scene",
@@ -33,7 +33,7 @@ const DUNGEONS := {
 		"rescue_scene": "res://data/cutscenes/cathedral_rescue.scene",
 	},
 	"monastery": {
-		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10)},
 		"scene": "res://scenes/dungeon/MonasteryDungeon.tscn",
 		"music": "monastery",
 		"wake_scene": "res://data/cutscenes/monastery_wake.scene",
@@ -42,7 +42,7 @@ const DUNGEONS := {
 		"rescue_scene": "res://data/cutscenes/monastery_rescue.scene",
 	},
 	"observatory": {
-		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10)},
 		"scene": "res://scenes/dungeon/ObservatoryDungeon.tscn",
 		"music": "observatory",
 		"wake_scene": "res://data/cutscenes/observatory_wake.scene",
@@ -51,7 +51,7 @@ const DUNGEONS := {
 		"rescue_scene": "res://data/cutscenes/observatory_rescue.scene",
 	},
 	"guild": {
-		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(4, 4), "room_max_size": Vector2i(7, 6)},
+		"template": {"min_rooms": 5, "max_rooms": 8, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10)},
 		"scene": "res://scenes/dungeon/GuildDungeon.tscn",
 		"music": "guild",
 		"wake_scene": "res://data/cutscenes/guild_wake.scene",
@@ -79,6 +79,7 @@ var _escape := false
 var _data: Dictionary
 var _exit_cell: Vector2i
 var _captive_cell: Vector2i
+var _room_rects: Array = []  # Rect2i per room, for the auto-map
 
 
 func _ready() -> void:
@@ -91,6 +92,7 @@ func _ready() -> void:
 	# Characters lower on screen draw in front (a captive standing just above
 	# the player, cutscene actors walking past each other).
 	_tile_map.y_sort_enabled = true
+	_add_backdrop()
 	_generate_and_build()
 	_play_arrival_story()
 
@@ -106,6 +108,7 @@ func _generate_and_build() -> void:
 	var deep_door: Vector2i = layout["exit_cell"]
 	var spawn: Vector2i = layout["player_spawn"]
 	var boss_cell: Vector2i = layout["boss_trigger_cell"]
+	_room_rects = layout["room_rects"]
 
 	# Both variants: the deep room's door is gone (that room is a cell), so the
 	# entrance is the only way in or out.
@@ -135,11 +138,27 @@ func _generate_and_build() -> void:
 		_tile_map.set_cell(cell, 0, TAG_TO_COORDS[tiles[cell]])
 	_place_captive()
 
-	if GameManager.has_pending_spawn:
+	# A saved spot that isn't floor anymore (a save from before the rooms got
+	# bigger lands somewhere else in the new layout) falls back to the entrance.
+	var saved_cell: Vector2i = _tile_map.local_to_map(GameManager.pending_spawn_position)
+	if GameManager.has_pending_spawn and tiles.get(saved_cell, "") == DungeonGenerator.FLOOR:
 		_player.snap_to(GameManager.pending_spawn_position)
-		GameManager.has_pending_spawn = false
 	else:
 		_player.snap_to(_tile_map.map_to_local(spawn))
+	GameManager.has_pending_spawn = false
+	on_player_moved(_tile_map.local_to_map(_player.position))
+
+
+## Darkness behind the map, so the space outside the walls reads as solid
+## black rather than the engine's grey clear color.
+func _add_backdrop() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = -1
+	var dark := ColorRect.new()
+	dark.color = Color(0.03, 0.02, 0.05)
+	dark.set_anchors_preset(Control.PRESET_FULL_RECT)
+	layer.add_child(dark)
+	add_child(layer)
 
 
 ## The captive stands just behind their rune: Frank in the escape variant (until
@@ -207,6 +226,52 @@ func _play_arrival_story() -> void:
 func _after_transition() -> void:
 	if Transition.is_busy():
 		await Transition.finished
+
+
+# ---------------------------------------------------------------- auto-map
+
+## Called by Player.gd on every tile: stepping into a room reveals all of it
+## (walls included); in a corridor you see two tiles around you.
+func on_player_moved(cell: Vector2i) -> void:
+	var seen: Array = []
+	for rect: Rect2i in _room_rects:
+		if rect.has_point(cell):
+			var walls := rect.grow(1)
+			for x in range(walls.position.x, walls.end.x):
+				for y in range(walls.position.y, walls.end.y):
+					seen.append(Vector2i(x, y))
+	for dx in range(-2, 3):
+		for dy in range(-2, 3):
+			seen.append(cell + Vector2i(dx, dy))
+	GameManager.mark_explored(GameManager.current_location, seen)
+
+
+## For MapScreen: only explored cells are drawn, plus the exit, captive and
+## boss once you've seen them.
+func map_fog() -> bool:
+	return true
+
+
+## A dungeon's size is a secret until explored: the map zooms to fit what
+## you've seen rather than the whole layout.
+func map_fit_explored() -> bool:
+	return true
+
+
+func map_markers() -> Array:
+	var kinds := {
+		DOOR_COORDS: {"color": Color(0.95, 0.78, 0.3), "legend": "Exit"},
+		CAPTIVE_COORDS: {"color": Color(0.7, 0.45, 1.0), "legend": "Captive"},
+		BOSS_COORDS: {"color": Color(0.95, 0.25, 0.25), "legend": "Boss"},
+	}
+	var markers: Array = []
+	for cell in GameManager.explored.get(GameManager.current_location, {}):
+		var coords := _tile_map.get_cell_atlas_coords(cell)
+		if kinds.has(coords):
+			var marker: Dictionary = kinds[coords].duplicate()
+			marker["cell"] = cell
+			markers.append(marker)
+	return markers
 
 
 func get_door_destination(cell: Vector2i) -> Dictionary:

@@ -9,7 +9,7 @@ extends RefCounted
 # automatically). Pure logic, no scene/node dependencies, so it can be
 # tested headlessly without instantiating anything.
 
-const SLOT_SIZE := 10
+const SLOT_SIZE := 19
 
 const FLOOR := "floor"
 const WALL := "wall"
@@ -29,8 +29,8 @@ static func generate(template: Dictionary, seed_value: int) -> Dictionary:
 
 	var min_rooms: int = template.get("min_rooms", 5)
 	var max_rooms: int = template.get("max_rooms", 8)
-	var room_min: Vector2i = template.get("room_min_size", Vector2i(4, 4))
-	var room_max: Vector2i = template.get("room_max_size", Vector2i(7, 6))
+	var room_min: Vector2i = template.get("room_min_size", Vector2i(10, 7))
+	var room_max: Vector2i = template.get("room_max_size", Vector2i(15, 10))
 	var room_count: int = rng.randi_range(min_rooms, max_rooms)
 
 	var graph: Dictionary = _build_room_graph(room_count, rng)
@@ -172,6 +172,7 @@ static func _build_tile_layout(graph: Dictionary, anchors: Dictionary, room_min:
 		"boss_trigger_cell": boss_trigger_cell,
 		"player_spawn": player_spawn,
 		"room_count": slot_of.size(),
+		"room_rects": room_rects.values(),
 	}
 
 

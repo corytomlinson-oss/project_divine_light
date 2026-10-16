@@ -1219,6 +1219,14 @@ func _confirm_skill() -> void:
 	if skill["cost_type"] == "qi" and member.qi < int(skill["cost"]):
 		message_label.text = "Not enough Qi!"
 		return
+	if skill["effect"] == "switch_stance" and Equipment.has_set_bonus(member, "arcane_scholar"):
+		# Arcane Scholar Set (23a): the switch happens now and costs nothing -
+		# Lyra still picks her action, from the new stance's spells.
+		member.stance = skill["to_stance"]
+		Sfx.play("spell")
+		_open_skill_menu(member)
+		message_label.text = "%s shifts to the %s stance." % [member.display_name, member.stance]
+		return
 	var target_type: String = skill["target"]
 	match target_type:
 		"ally", "ally_all", "self", "enemy_all":
@@ -1604,7 +1612,9 @@ func _do_attack(member: Combatant) -> void:
 		dmg *= 2
 	dmg = _hit(target, dmg)
 	if member.max_qi > 0:
-		member.qi = mini(member.max_qi, member.qi + 1)
+		# Iron Monk Set (23a): +1 extra Qi per basic attack.
+		var gain := 2 if Equipment.has_set_bonus(member, "iron_monk") else 1
+		member.qi = mini(member.max_qi, member.qi + gain)
 	_update_ui()
 	var crit_tag := " CRIT!" if crit else ""
 	message_label.text = "%s attacks %s for %d!%s" % [member.display_name, target.display_name, dmg, crit_tag]
@@ -2051,7 +2061,12 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			member.evasion_rounds = 1
 			member.row = "back"
 			_update_ui()
-			message_label.text = "%s vanishes into the shadows!\nMoves to the back row, evasion increased!" % member.display_name
+			if Equipment.has_set_bonus(member, "shadow_walker"):
+				# Shadow Walker Set (23a): gone from sight for the rest of the round.
+				member.hidden_rounds = 1
+				message_label.text = "%s vanishes into the shadows!\nMoves to the back row, untargetable!" % member.display_name
+			else:
+				message_label.text = "%s vanishes into the shadows!\nMoves to the back row, evasion increased!" % member.display_name
 
 		"smoke_bomb":
 			var alive_enemies_sb: Array = _enemies.filter(func(e): return e.is_alive())
@@ -2165,6 +2180,10 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	var targets: Array = _party.filter(func(c): return c.is_alive())
 	if targets.is_empty():
 		return
+	# Shadow Walker's Vanish (23a): out of reach, unless no one else is left.
+	var in_sight := targets.filter(func(c: Combatant) -> bool: return c.hidden_rounds <= 0)
+	if not in_sight.is_empty():
+		targets = in_sight
 	enemy.turns_taken += 1
 	var phase_note := ""
 	if enemy.is_boss:
@@ -2547,6 +2566,8 @@ func _tick_buffs() -> void:
 			c.taunt_rounds -= 1
 		if c.evasion_rounds > 0:
 			c.evasion_rounds -= 1
+		if c.hidden_rounds > 0:
+			c.hidden_rounds -= 1
 		if c.accuracy_debuff_rounds > 0:
 			c.accuracy_debuff_rounds -= 1
 		if c.counter_rounds > 0 and c.counter_rounds < 900:

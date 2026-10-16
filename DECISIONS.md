@@ -304,3 +304,23 @@ Cory's calls (asked before building):
 - **Mid-fight suspend restarts that fight** (Cory's call): the same enemies at full strength, the party as it was when the fight began, and Frank's help again in an escape fight. A suspend after the fight is won saves the result instead, so a won fight is never re-fought.
 - **A cutscene in progress isn't saved.** Resuming puts you on the map where you were, with whatever had already happened. Short scenes simply don't replay; it isn't worth saving scene state.
 - **Nothing is saved from the title or class select**: there's no game to suspend.
+
+## Milestone 23 — Exploration & loot (scoped 2026-10-16)
+
+Cory, after playtesting 22: dungeons are "kinda boring to walk through"; the overworld needs to be bigger. His calls:
+- **Chests hold random loot plus set pieces:** each dungeon's captive's Act I armor set in gilded chests, random consumables/gold in plain ones (over random-only or sets-only).
+- **All four twists:** mimics, dead-end side rooms, Silas-locked chests, healing springs (23b).
+- **Overworld about 3x** (~64x44), with dungeons spread out and things to find off the road (23c).
+- Inserted as Milestone 23; APK moves to 24 and everything after shifts +1.
+
+### 23a: calls I made
+
+- **Each dungeon holds its captive's set** (Cathedral: Holy Guardian, Monastery: Iron Monk, Observatory: Arcane Scholar, Guild: Shadow Walker), so you find a hero's gear where you free them.
+- **Sets are sealed in your starting dungeon until the warden falls.** Your own class set is there, but the full set would make the level-1 solo warden trivial (Hollow Warden: ~14 damage a hit on Vael, ~2 with the set). Trying a sealed chest says it will break once the warden falls; it's there when you come back. Plain chests there open as normal (the solo hero can use the potions).
+- **Chests sit one tile in from room corners**, never on a corridor line, so they can't block a path; one set piece per room where possible, never in the entrance room; 2-4 plain chests per dungeon.
+- **Chests don't refill.** Opened is opened, saved per dungeon.
+- **Plain-chest loot table:** Potion 30%, gold 30-90 28%, Antidote 14%, Ether 14%, Elixir 6%, Traveler's Ring 4%, Amber Charm 4%.
+- **Set-piece stats** sit around the Holy Guardian Set's level: Iron Monk (DEF 4 ATK 2 / DEF 2 AGI 1 / ATK 3 / HP 20), Arcane Scholar (DEF 2 RES 4 / INT 3 / INT 2 DEF 1 / MP 15), Shadow Walker (DEF 3 AGI 2 / AGI 3 / ATK 3 / AGI 2). The 4th piece is a universal accessory, like the Guardian Emblem.
+- **Arcane Scholar's free switch** happens the moment you pick it, then the new stance's spells come up and Lyra still takes her action. Switching back and forth is free too.
+- **Shadow Walker's "untargetable for 1 round"** lasts the rest of the round Vanish is used in (same timing as Vanish's evasion; Silas is usually fastest, so that's most of it). It covers attacks and abilities alike; if everyone else is down, enemies can still hit him.
+- **Two chest looks:** wooden with iron bands (random), navy with gold bands (set piece), so you can tell from across the room. One chest-opening sound: a lid creak, then a rising four-note fanfare.

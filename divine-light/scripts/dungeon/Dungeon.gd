@@ -20,6 +20,9 @@ const CAPTIVE_COORDS := Vector2i(3, 0)
 const BOSS_COORDS := Vector2i(4, 0)
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
 const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
+# Treasure chests (Milestone 23a): wooden closed/open, gilded closed/open.
+const CHEST_SHEET := preload("res://assets/sprites/chests.png")
+const SEALED_TEXT := "narrate A seal of corruption binds this chest shut. It should break once the warden falls."
 
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
@@ -80,6 +83,7 @@ var _data: Dictionary
 var _exit_cell: Vector2i
 var _captive_cell: Vector2i
 var _room_rects: Array = []  # Rect2i per room, for the auto-map
+var _chests: Dictionary = {}  # cell -> {cell, gilded, reward, sprite}
 
 
 func _ready() -> void:
@@ -137,11 +141,13 @@ func _generate_and_build() -> void:
 	for cell in tiles.keys():
 		_tile_map.set_cell(cell, 0, TAG_TO_COORDS[tiles[cell]])
 	_place_captive()
+	_place_chests(layout, seed_value)
 
 	# A saved spot that isn't floor anymore (a save from before the rooms got
 	# bigger lands somewhere else in the new layout) falls back to the entrance.
 	var saved_cell: Vector2i = _tile_map.local_to_map(GameManager.pending_spawn_position)
-	if GameManager.has_pending_spawn and tiles.get(saved_cell, "") == DungeonGenerator.FLOOR:
+	if GameManager.has_pending_spawn and tiles.get(saved_cell, "") == DungeonGenerator.FLOOR \
+			and not _chests.has(saved_cell):
 		_player.snap_to(GameManager.pending_spawn_position)
 	else:
 		_player.snap_to(_tile_map.map_to_local(spawn))
@@ -176,6 +182,53 @@ func _place_captive() -> void:
 	npc.set_meta("actor_id", who)
 	npc.add_to_group("npc")
 	_tile_map.add_child(npc)
+
+
+# ---------------------------------------------------------------- chests
+
+## The dungeon's chests (23a): its captive's armor set in gilded chests, plus
+## a few plain ones. Where they are and what they hold come from the seed.
+func _place_chests(layout: Dictionary, seed_value: int) -> void:
+	var set_items: Array = Loot.DUNGEON_SETS.get(dungeon_id, [])
+	for chest: Dictionary in DungeonGenerator.place_chests(layout, set_items, seed_value):
+		var sprite := Sprite2D.new()
+		sprite.texture = CHEST_SHEET
+		sprite.hframes = 4
+		sprite.position = _tile_map.map_to_local(chest["cell"])
+		_tile_map.add_child(sprite)
+		chest["sprite"] = sprite
+		_chests[chest["cell"]] = chest
+		_show_chest(chest)
+
+
+func _show_chest(chest: Dictionary) -> void:
+	var opened := GameManager.is_chest_opened(GameManager.current_location, chest["cell"])
+	chest["sprite"].frame = (2 if chest["gilded"] else 0) + (1 if opened else 0)
+
+
+## In your own starting dungeon the set pieces are sealed until the warden
+## falls - the full set would make that solo fight a walkover. Come back for
+## them after the escape.
+func _sealed(chest: Dictionary) -> bool:
+	return chest["gilded"] and _escape and not _boss_defeated()
+
+
+func is_blocked(cell: Vector2i) -> bool:
+	return _chests.has(cell)
+
+
+## A on the tile you're facing: open a chest.
+func interact(cell: Vector2i, _facing: String) -> void:
+	if not _chests.has(cell) or GameManager.is_chest_opened(GameManager.current_location, cell):
+		return
+	var chest: Dictionary = _chests[cell]
+	if _sealed(chest):
+		await Cutscene.play_text(SEALED_TEXT)
+		return
+	GameManager.mark_chest_opened(GameManager.current_location, cell)
+	_show_chest(chest)
+	Sfx.play("chest")
+	await Cutscene.play_text("narrate " + Loot.give(chest["reward"]))
 
 
 ## Called by Player.gd on stepping onto the captive rune.
@@ -267,7 +320,12 @@ func map_markers() -> Array:
 	var markers: Array = []
 	for cell in GameManager.explored.get(GameManager.current_location, {}):
 		var coords := _tile_map.get_cell_atlas_coords(cell)
-		if kinds.has(coords):
+		if _chests.has(cell):
+			if not GameManager.is_chest_opened(GameManager.current_location, cell):
+				var gilded: bool = _chests[cell]["gilded"]
+				markers.append({"cell": cell, "color": Color(0.35, 0.9, 0.95) if gilded else Color(0.8, 0.55, 0.3),
+						"legend": "Set piece" if gilded else "Chest"})
+		elif kinds.has(coords):
 			var marker: Dictionary = kinds[coords].duplicate()
 			marker["cell"] = cell
 			markers.append(marker)

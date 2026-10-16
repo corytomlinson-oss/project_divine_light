@@ -8,7 +8,7 @@ const SOUNDS := [
 	"attack", "spell", "hit",
 	"menu_move", "menu_confirm", "menu_cancel",
 	"victory", "level_up", "item", "equip",
-	"encounter",
+	"encounter", "chest",
 	"fire", "ice", "thunder", "earth", "holy", "heal", "poison",
 ]
 # Enough voices that a hit landing during a spell doesn't cut the spell off.

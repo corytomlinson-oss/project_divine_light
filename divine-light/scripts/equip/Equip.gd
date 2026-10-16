@@ -113,7 +113,7 @@ func _exit_to_map() -> void:
 ## missing a piece, especially the universal accessory slot, which can end
 ## up equipped on a different character by accident since nothing restricts
 ## it to this one.
-func _set_progress_text(member: Combatant, set_id: String, set_name: String) -> String:
+func _set_progress_text(member: Combatant, set_id: String) -> String:
 	var count := 0
 	for slot in ["armor", "helmet", "gloves", "accessory"]:
 		var item_name: String = member.equipment.get(slot, "")
@@ -145,7 +145,8 @@ func _update_ui() -> void:
 			var member: Combatant = GameManager.party[_member_index]
 			title_label.text = "%s - Equipment" % member.display_name
 			var stats_text := "ATK %d  DEF %d  INT %d  RES %d  AGI %d" % [member.atk, member.defense, member.int_stat, member.res_stat, member.agi]
-			stats_text += _set_progress_text(member, "holy_guardian", "Holy Guardian Set")
+			for set_id: String in Equipment.SET_BONUSES:
+				stats_text += _set_progress_text(member, set_id)
 			stats_label.text = stats_text
 			help_label.text = "Up/Down: Select   A: Confirm   B: Back"
 			for i in Equipment.SLOTS.size():

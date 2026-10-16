@@ -27,31 +27,45 @@ const DEFS: Dictionary = {
 	"Iron Claws": {"slot": "weapon", "class": "Ryn", "atk": 6},
 	"Steel Claws": {"slot": "weapon", "class": "Ryn", "atk": 11},
 	"Monk Wraps": {"slot": "armor",  "class": "Ryn", "def": 3},
+	"Iron Monk Gi":       {"slot": "armor",     "class": "Ryn", "def": 4, "atk": 2, "set_id": "iron_monk"},
+	"Iron Monk Headband": {"slot": "helmet",    "class": "Ryn", "def": 2, "agi": 1, "set_id": "iron_monk"},
+	"Iron Knuckles":      {"slot": "gloves",    "class": "Ryn", "atk": 3, "set_id": "iron_monk"},
+	"Iron Monk Beads":    {"slot": "accessory", "class": "",    "hp": 20, "set_id": "iron_monk"},
 
 	# Lyra (Invoker)
 	"Apprentice Staff": {"slot": "weapon", "class": "Lyra", "atk": 3, "int": 5},
 	"Oak Staff":        {"slot": "weapon", "class": "Lyra", "atk": 4, "int": 9},
 	"Scholar's Robe":   {"slot": "armor",  "class": "Lyra", "res": 3},
+	"Arcane Robe":      {"slot": "armor",     "class": "Lyra", "def": 2, "res": 4, "set_id": "arcane_scholar"},
+	"Scholar's Circlet": {"slot": "helmet",   "class": "Lyra", "int": 3, "set_id": "arcane_scholar"},
+	"Scholar's Gloves": {"slot": "gloves",    "class": "Lyra", "int": 2, "def": 1, "set_id": "arcane_scholar"},
+	"Arcane Focus":     {"slot": "accessory", "class": "",     "mp": 15, "set_id": "arcane_scholar"},
 
 	# Silas (Assassin)
 	"Twin Daggers": {"slot": "weapon", "class": "Silas", "atk": 7},
 	"Steel Daggers": {"slot": "weapon", "class": "Silas", "atk": 12},
 	"Leather Hood": {"slot": "helmet", "class": "Silas", "agi": 3},
+	"Shadow Walker Garb": {"slot": "armor",     "class": "Silas", "def": 3, "agi": 2, "set_id": "shadow_walker"},
+	"Shadow Cowl":        {"slot": "helmet",    "class": "Silas", "agi": 3, "set_id": "shadow_walker"},
+	"Shadow Grips":       {"slot": "gloves",    "class": "Silas", "atk": 3, "set_id": "shadow_walker"},
+	"Shadow Sigil":       {"slot": "accessory", "class": "",      "agi": 2, "set_id": "shadow_walker"},
 
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
 	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},
 }
 
-# set_id -> data describing the bonus. Only "holy_guardian" (Vael's Act I
-# set, "all buff skills last 1 extra round") is actually wired up as a real
-# mechanic - see Battle.gd's _buff_duration(). The README lists 11 more
-# (3 sets x 4 classes), each its own unique skill-behavior change; those
-# aren't implemented yet since there's no real loot to award them through
-# until Act I/II content exists. Add here + wire the actual mechanic when
-# each one is needed, same pattern as this one.
+# set_id -> data describing the bonus. Act I's four sets are all wired up
+# (Milestone 23a; their pieces sit in the gilded chests of each class's
+# dungeon - Loot.gd). Each bonus is checked where its mechanic lives in
+# Battle.gd: _buff_duration() (Holy Guardian), the basic attack's Qi gain
+# (Iron Monk), _confirm_skill() (Arcane Scholar), the "vanish" effect
+# (Shadow Walker). Acts II/III add theirs the same way.
 const SET_BONUSES: Dictionary = {
 	"holy_guardian": {"name": "Holy Guardian Set", "buff_duration_bonus": 1},
+	"iron_monk": {"name": "Iron Monk Set", "desc": "Basic attacks build +1 extra Qi"},
+	"arcane_scholar": {"name": "Arcane Scholar Set", "desc": "Switching stance is a free action"},
+	"shadow_walker": {"name": "Shadow Walker Set", "desc": "Vanish makes Silas untargetable for the round"},
 }
 
 

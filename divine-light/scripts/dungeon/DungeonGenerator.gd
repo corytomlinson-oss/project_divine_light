@@ -129,6 +129,7 @@ static func _build_tile_layout(graph: Dictionary, anchors: Dictionary, room_min:
 	var tiles: Dictionary = {}
 	var room_rects: Dictionary = {}
 	var room_centers: Dictionary = {}
+	var room_depths: Array = []
 
 	for node_id in slot_of.keys():
 		var w: int = rng.randi_range(room_min.x, room_max.x)
@@ -138,6 +139,7 @@ static func _build_tile_layout(graph: Dictionary, anchors: Dictionary, room_min:
 		var rect := Rect2i(room_origin, Vector2i(w, h))
 		room_rects[node_id] = rect
 		room_centers[node_id] = rect.position + rect.size / 2
+		room_depths.append(graph["depth_of"][node_id])
 		for x in range(rect.position.x, rect.position.x + rect.size.x):
 			for y in range(rect.position.y, rect.position.y + rect.size.y):
 				tiles[Vector2i(x, y)] = FLOOR
@@ -173,7 +175,70 @@ static func _build_tile_layout(graph: Dictionary, anchors: Dictionary, room_min:
 		"player_spawn": player_spawn,
 		"room_count": slot_of.size(),
 		"room_rects": room_rects.values(),
+		"room_depths": room_depths,  # parallel to room_rects; 0 = entrance room
 	}
+
+
+## Treasure chests (Milestone 23a), from their own RNG stream so adding them
+## didn't change any existing layout. Chests sit one tile in from a room's
+## corners: corridors run along room centers and rooms are at least 10x7, so a
+## chest there never blocks a path. `set_items` go in gilded chests, one per
+## room where possible, never in the entrance room; then 2-4 plain chests
+## anywhere. Returns [{cell, gilded, reward}] (reward: see Loot.give()).
+static func place_chests(layout: Dictionary, set_items: Array, seed_value: int) -> Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value + 7919
+	var rects: Array = layout["room_rects"]
+	var depths: Array = layout["room_depths"]
+	var reserved := [layout["entrance_cell"], layout["exit_cell"], layout["captive_cell"],
+			layout["boss_trigger_cell"], layout["player_spawn"]]
+	var free_corners: Array = []  # per room, shuffled
+	for rect: Rect2i in rects:
+		var corners: Array = []
+		for x in [rect.position.x + 1, rect.end.x - 2]:
+			for y in [rect.position.y + 1, rect.end.y - 2]:
+				var cell := Vector2i(x, y)
+				if layout["tiles"].get(cell, "") == FLOOR and not reserved.has(cell):
+					corners.append(cell)
+		_shuffle(corners, rng)
+		free_corners.append(corners)
+
+	var chests: Array = []
+	var inner: Array = []
+	for i in rects.size():
+		if depths[i] > 0:
+			inner.append(i)
+	_shuffle(inner, rng)
+	for n in set_items.size():
+		var room: int = _room_with_space(inner, n, free_corners)
+		if room != -1:
+			chests.append({"cell": free_corners[room].pop_back(), "gilded": true, "reward": {"item": set_items[n], "count": 1}})
+
+	var all_rooms: Array = range(rects.size())
+	for n in rng.randi_range(2, 4):
+		_shuffle(all_rooms, rng)
+		var room: int = _room_with_space(all_rooms, 0, free_corners)
+		if room != -1:
+			chests.append({"cell": free_corners[room].pop_back(), "gilded": false, "reward": Loot.roll(rng)})
+	return chests
+
+
+## The first room from `order` (starting at `start`, wrapping) with a corner left.
+static func _room_with_space(order: Array, start: int, free_corners: Array) -> int:
+	for k in order.size():
+		var room: int = order[(start + k) % order.size()]
+		if not free_corners[room].is_empty():
+			return room
+	return -1
+
+
+## Fisher-Yates with the dungeon's own RNG (Array.shuffle() uses the global one).
+static func _shuffle(arr: Array, rng: RandomNumberGenerator) -> void:
+	for i in range(arr.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var tmp = arr[i]
+		arr[i] = arr[j]
+		arr[j] = tmp
 
 
 # Finds a tile just off a room's center (its door), always inside the room

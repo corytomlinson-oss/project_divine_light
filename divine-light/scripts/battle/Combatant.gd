@@ -46,6 +46,7 @@ var poison_power: int = 0
 var bleed_rounds: int = 0
 var bleed_power: int = 0
 var evasion_rounds: int = 0
+var hidden_rounds: int = 0  # untargetable (Shadow Walker's Vanish, 23a)
 var accuracy_debuff_rounds: int = 0
 var row: String = "front"
 var queued_action: String = ""

@@ -286,11 +286,23 @@ def poison():
 
 # Peak level per sound. Menu blips play constantly, so they sit well below
 # the one-off fanfares; the thin, high equip clink needs a push to be heard.
+# ------------------------------------------------- exploration (Milestone 23)
+def chest():
+    # lid creak (a wobbling low pulse with grit), then a bright rising
+    # four-note fanfare over a held chord - the classic "treasure!" moment
+    creak = tone('pulse', lambda tt: 140 + 40 * math.sin(2 * math.pi * 11 * tt), 0.16, 0.35, 0.3, adsr(0.01, 0.05, 0.7, 0.04))
+    grit = noise(0.16, 0.18, rate_hz=3000, env=adsr(0.01, 0.05, 0.6, 0.04))
+    run, t = seq([('C5', 0.07), ('E5', 0.07), ('G5', 0.07), ('C6', 0.28)], 'pulse', 0.45, 0.25, adsr(0.002, 0.03, 0.7, 0.05))
+    harmony, _ = seq([('E5', 0.07), ('G5', 0.07), ('C6', 0.07), ('E6', 0.28)], 'pulse', 0.22, 0.125, adsr(0.002, 0.03, 0.7, 0.05))
+    bass = tone('tri', note('C4'), 0.42, 0.5, env=decay(4))
+    return echo(mix(0.18 + t + 0.15, (0, creak), (0, grit), (0.18, run), (0.18, harmony), (0.39, bass)), 0.09, 0.25, 2)
+
+
 GAIN = {
     'attack': 0.8, 'spell': 0.7, 'hit': 0.8,
     'menu_move': 0.35, 'menu_confirm': 0.4, 'menu_cancel': 0.4,
     'victory': 0.75, 'level_up': 0.7, 'item': 0.65, 'equip': 0.9,
-    'encounter': 0.75,
+    'encounter': 0.75, 'chest': 0.7,
     'fire': 0.7, 'ice': 0.6, 'thunder': 0.8, 'earth': 0.8, 'holy': 0.65, 'heal': 0.6, 'poison': 0.6,
 }
 
@@ -298,7 +310,7 @@ SOUNDS = {
     'attack': attack, 'spell': spell, 'hit': hit,
     'menu_move': menu_move, 'menu_confirm': menu_confirm, 'menu_cancel': menu_cancel,
     'victory': victory, 'level_up': level_up, 'item': item, 'equip': equip,
-    'encounter': encounter,
+    'encounter': encounter, 'chest': chest,
     'fire': fire, 'ice': ice, 'thunder': thunder, 'earth': earth, 'holy': holy, 'heal': heal, 'poison': poison,
 }
 

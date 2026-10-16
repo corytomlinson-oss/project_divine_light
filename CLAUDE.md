@@ -13,7 +13,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 - **23b:** two dead-end side rooms per dungeon holding a healing spring or a vault of rich chests (some locked: Silas picks them); sometimes one plain chest is a mimic (rescue dungeons only).
 - **23c:** the Forest Heartlands is 64x44 (was 36x24): a river with two bridges, a lake, dungeons spread out, 7 chests along the way, and three hidden clearings reached by secret paths through the trees (an accessory found nowhere else in each, plus a spring).
 
-**Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). **Next up: Milestone 24 (Android APK export).** Details in the Milestone 23 section below; calls in `DECISIONS.md`.
+**Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
+
+**Next up: Milestone 24 (Act I side quests) — planned, not started; scope it with Cory first** (draft + open questions in the Milestone 24 section below). Then Milestone 25 (Android APK export).
 
 **Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
 - **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
@@ -41,7 +43,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 **For Cory (from the autonomous run, now merged):**
 - **Playtest suggestions:** a Lyra or Silas start (the newest escapes: Void Sentinel, Corrupted Enforcer); the Void Archmage's phase-2 immunity (with Vael in the party it turns immune to holy); the Shadow Lord's summoned thieves; Edenmere (south-east gate: shrine, armory, item shop); and a full route to the Act I ending. Balance is untested by a human: the numbers were tuned by formula for a lone hero at the expected levels.
-- **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 25), and save points aren't placed yet (22).
+- **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 26), and save points aren't placed yet (22).
 - **One naming note:** the design doc uses "Void Sentinel" twice, for the Observatory's warden and for an Act III Blighted Maw enemy. I used it for the warden; the Act III one will need a different name or kit.
 
 
@@ -55,7 +57,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
-- The gamepad bindings are untested on the RP6 itself until the APK milestone (24).
+- The gamepad bindings are untested on the RP6 itself until the APK milestone (25).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
 - The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.
 
@@ -72,7 +74,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 **1. Enemy level scaling** — **decided 2026-09-29 (Claude, while Cory was away; see DECISIONS.md): no level scaling.** Difficulty stays set by region, as the README's Enemy Design section already describes. Over-leveling is the classic FF reward for grinding, and scaling would undercut it. Revisit if Act I playtesting shows fights going trivial too fast.
 
-Original note: *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-25d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
+Original note: *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-26d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
 
 ## Dungeon generation — decided (2026-08-06)
 
@@ -117,7 +119,7 @@ Implements the design decided earlier this session (see "Dungeon generation — 
 
 ## Milestone 14 — Boss encounters (done)
 
-Builds the generic system the roadmap calls for — "used by both Act I's dungeon bosses (20a-20d) and Act II's kingdom bosses (25b-d)" — validated against one placeholder test boss in the Cathedral, same pattern as 13a/13b's test-tech-first approach.
+Builds the generic system the roadmap calls for — "used by both Act I's dungeon bosses (20a-20d) and Act II's kingdom bosses (26b-d)" — validated against one placeholder test boss in the Cathedral, same pattern as 13a/13b's test-tech-first approach.
 
 - **Bosses are visible, fixed encounters, not random ones.** New 5th placeholder tile (crimson, `BOSS_COORDS := Vector2i(4, 0)`, tileset now 80×16) placed by `DungeonGenerator` just inside the boss room's door — reuses the exact same `_offset_within_room()` helper the player's dungeon-entry spawn already used, now shared by both. Walking onto it (`Player._on_tile_entered()` checks `BOSS_ATLAS_COORDS` alongside the existing door check) always starts a fight via `_trigger_boss_battle()` — no step-counter roll, matching the design doc's "Visible on-screen enemies for mini-bosses and main bosses."
 - **`Combatant` gained `is_boss`/`boss_phase`/`phase_hp_thresholds`.** `Battle.gd`'s `_generate_encounter()` checks `GameManager.pending_boss_battle` (set by `Player._trigger_boss_battle()`, consumed here) before falling through to the normal random-table path, and builds a single boss `Combatant` from a new `BOSS_ENCOUNTERS` dict (keyed by location, same shape as `ENCOUNTER_TABLES`) instead. Boss fights are always solo — matches "Single enemy with multiple phases for bosses" from the design doc, no group-sizing logic needed.
@@ -210,7 +212,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 
 ### 17c — controller & pause menu (done, 2026-09-29)
 
-- **Input map** (`project.godot` `[input]`, generated with `ProjectSettings.set_setting()` + `save()`, not hand-written): `up`/`down`/`left`/`right` (arrows, **WASD**, D-pad, left stick), `confirm` (Enter, Space, Z, A), `cancel` (Esc, Backspace, X, B), `item_shortcut` (C, X button), `defend_shortcut` (V, Y button), `prev_member`/`next_member` (Q/E, L1/R1), `pause` (Tab, Start). Keyboard follows emulator habits (Z = A, X = B). **No code uses the built-in `ui_*` actions anymore.** Gamepad bindings are untested on the RP6 itself until the APK milestone (24).
+- **Input map** (`project.godot` `[input]`, generated with `ProjectSettings.set_setting()` + `save()`, not hand-written): `up`/`down`/`left`/`right` (arrows, **WASD**, D-pad, left stick), `confirm` (Enter, Space, Z, A), `cancel` (Esc, Backspace, X, B), `item_shortcut` (C, X button), `defend_shortcut` (V, Y button), `prev_member`/`next_member` (Q/E, L1/R1), `pause` (Tab, Start). Keyboard follows emulator habits (Z = A, X = B). **No code uses the built-in `ui_*` actions anymore.** Gamepad bindings are untested on the RP6 itself until the APK milestone (25).
 - **`UiInput` autoload** (`scripts/systems/UiInput.gd`): `UiInput.nav(&"down")` is true on the press and then every 0.08s after a 0.3s hold. All menus use it for directions; movement on the map uses `Input.is_action_pressed` directly. It runs while paused.
 - **Battle:** X = Items, Y = Defend at once, L1/R1 = switch to another member who hasn't chosen yet, and **B on the command menu steps back** to whoever chose last, to change their pick (safe: MP/Qi/items are paid when the action runs). Selection is tracked by `_chosen` / `_chosen_order`; `_next_unchosen()` replaced `_skip_ko_members()`. The round starts as soon as everyone alive has chosen, and the **first action plays immediately**. Every later message waits for A, with a blinking arrow in the banner's corner (`_advance_hint`, a `ScrollHint`) instead of "Press Enter".
 - **Pause menu** (`scenes/menu/PauseMenu.tscn` + `scripts/menu/PauseMenu.gd`, `class_name PauseMenu`): B or Start on the map (`Player.gd`) calls `PauseMenu.open(player)`, which adds a CanvasLayer over the map and pauses the tree (the menu runs with process mode Always). Left: party summary (standing sprite, class, level, HP, MP or Qi). Right: Equip, Close. **Equip returns to the menu:** the menu sets `GameManager.reopen_pause_menu` before switching scenes, and `Player._ready()` reopens it (deferred, after the map places the player). The old keyboard-only `E` shortcut is gone; E is now R1. The menu ignores input on the frame it opens, since the B that opened it still reads as just pressed.
@@ -260,6 +262,26 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
+## Milestone 24 — Act I side quests (planned, not started)
+
+Cory's request (2026-10-16), after Milestone 23: instead of heading straight from one dungeon to the next, do **1-2 side quests from the towns first**, ideally to **retrieve items that help beat the next dungeon** in some way. Scope below is a draft to talk through with him before building; it's design-heavy (quest structure + per-dungeon effects), so discuss before starting.
+
+**Draft shape:**
+- **24a — quest system:** quest state + flags (`GameManager`, saved), quest givers in Verdance/Edenmere whose lines change as a quest moves along, a quest log (pause menu), objective markers on the map, key items (unlimited, per the design doc's inventory rules), and quest-specific overworld spots (a marked monster to fight, an item to pick up in a clearing or off-road spot - the 23c map has room).
+- **24b / 24c — the quests, two dungeons each:** 1-2 quests unlocked before each dungeon, each rewarding a dungeon-helping item. Since the route depends on the starting class, every dungeon needs its quests (only your own starting dungeon has none: you wake up inside it). First ideas to react to:
+  - Cathedral: *Holy Water* (Verdance's elder) - holy damage bonus vs. the Fallen Guardian, or stops its phase-2 DEF-down.
+  - Monastery: *Calming Incense* - Berserk Warriors stop hitting their own side... or rather, the Grandmaster's counter stance lasts fewer rounds.
+  - Observatory: *Star Chart* - the whole dungeon map revealed; *Void Lens* - the Void Archmage loses its phase-2 elemental immunity.
+  - Guild: *Thieves' Ledger* - the Shadow Lord's summons come later/fewer; a lantern that shows which chest is a mimic.
+- Art/music for whatever this adds (quest-giver tweaks, item icons if any, a marked overworld monster) done with each sub-milestone, like 23.
+
+**Open questions for Cory:**
+1. Hard gate or optional? Does the next dungeon's door stay sealed until its quest is done, or are quests optional help (the dungeon just gets easier)?
+2. How strong should the items be: a real edge in the boss fight, or a lighter convenience (map, fewer fights)?
+3. Quest types: only fetch ("go get X"), or also hunts (a visible overworld monster) and small errands between the two towns?
+4. Who gives them: existing villagers (elder, guard, farmer...), new NPCs, Frank?
+5. Rewards beyond the item: XP/gold, so quests also smooth the level curve?
+
 ## Milestone 23 — Exploration & loot (done)
 
 Scoped with Cory 2026-10-16 (see Roadmap restructuring): 23a chests + loot + set bonuses, 23b dungeon twists, 23c bigger overworld.
@@ -307,7 +329,7 @@ Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own
 - **Single use:** resuming deletes it, and so do starting a new game and loading a slot.
 - A cutscene in progress isn't saved: resuming puts you on the map at that spot with whatever flags were already set.
 - Verified (15 checks + screenshots): nothing from the title, close -> Resume back in Verdance on the spot with the right gold, used up afterwards, Home/come-back drops it, mid-boss-fight suspend -> the Sparring Master fight restarts at full HP with the party as it began and Frank helping, win -> back on the dungeon map with the warden beaten, new game / load discard it.
-- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 24's on-device test.
+- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 25's on-device test.
 
 ## Milestone 21 — Act I art & music pass (done)
 
@@ -430,7 +452,7 @@ Built in four steps, each tested and committed on its own:
 - **Movie mode** (`movie start` ... `movie end`): a CanvasLayer (60) over everything but the fade: black background, pictures (`image id path at x,y` in screen pixels, `pan ... over t`), a bottom `caption` that fades in/out, and a centered `title` drawn at 2× (pixel-crisp). **Start skips a movie**: everything up to `movie end` is skipped except `set` and `music` steps.
 - **Story flags:** `set flag` → `GameManager.story_flags` (saved/loaded with the game), `GameManager.has_flag()`.
 - **Demos:** `data/cutscenes/demo.scene` (F7: Ryn appears beside you, talks, a hooded silhouette watches) and `demo_movie.scene` (F8: title card and captions over the forest). They double as format examples.
-- **⚠ For the APK milestone (24):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
+- **⚠ For the APK milestone (25):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
 - Verified by a driver playing both demos on the real overworld (parser incl. error reporting, dialogue advance, flags, cleanup, player control returning, movie skip) plus screenshots.
 
 ### 19b — intro movie + title screen (done, 2026-09-29)
@@ -510,20 +532,25 @@ Built in four steps, each tested and committed on its own:
 | 23a | Exploration & loot — treasure chests, Act I armor sets, set bonuses | ✅ (2026-10-16) — not yet playtested |
 | 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
 | 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
-| 24 | Android APK export | Not started |
-| 25a | Act II — Cleansing transformation system | Not started |
-| 25b | Act II — Nordveil (Tundra) | Not started |
-| 25c | Act II — Duskara (Desert) | Not started |
-| 25d | Act II — Selavon (Coastal) | Not started |
-| 26 | Act II art & music pass | Not started |
-| 27 | Act III + Vorath (includes the ending movie) | Not started |
-| 28 | Act III art & music pass | Not started |
+| 24 | Act I side quests — 1-2 town quests before each dungeon, rewarding items that help in it | Planned — scope with Cory first |
+| 25 | Android APK export | Not started |
+| 26a | Act II — Cleansing transformation system | Not started |
+| 26b | Act II — Nordveil (Tundra) | Not started |
+| 26c | Act II — Duskara (Desert) | Not started |
+| 26d | Act II — Selavon (Coastal) | Not started |
+| 27 | Act II art & music pass | Not started |
+| 28 | Act III + Vorath (includes the ending movie) | Not started |
+| 29 | Act III art & music pass | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 
 ## Roadmap restructuring
 
 Several restructuring passes so far, most recent first. **Milestone numbers cited in older entries below are historical** — the roadmap has been renumbered more than once since; the Implementation status table above is always the authoritative current numbering, not any number quoted in the prose here.
+
+### Act I side quests inserted as 24 (2026-10-16)
+
+- End of the same session, Cory asked for town side quests in Act I (1-2 before each dungeon, retrieving items that help beat it) so the game isn't just dungeon after dungeon. Placed right after 23, before the APK, so the APK (now 25) stays the "Act I complete" on-hardware checkpoint. Not scoped yet - draft and open questions in the Milestone 24 section. Everything after 23 shifted +1 again: APK 25, Act II 26a-26d, Act II art 27, Act III + Vorath 28, Act III art 29.
 
 ### Exploration & loot inserted as 23 (2026-10-16)
 

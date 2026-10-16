@@ -25,16 +25,26 @@ const TABLE: Array = [
 	{"weight": 4, "item": "Amber Charm", "count": [1, 1]},
 ]
 
+# Side-room vaults, locked chests and mimics (23b): the best finds.
+const RICH_TABLE: Array = [
+	{"weight": 25, "item": "Elixir", "count": [1, 2]},
+	{"weight": 20, "item": "Ether", "count": [2, 3]},
+	{"weight": 30, "gold": [120, 240]},
+	{"weight": 5, "item": "Potion", "count": [4, 5]},
+	{"weight": 10, "item": "Traveler's Ring", "count": [1, 1]},
+	{"weight": 10, "item": "Amber Charm", "count": [1, 1]},
+]
+
 const MAX_STACK := 99
 
 
-## A plain chest's contents: {"item", "count"} or {"gold"}.
-static func roll(rng: RandomNumberGenerator) -> Dictionary:
+## A chest's contents from `table`: {"item", "count"} or {"gold"}.
+static func roll(rng: RandomNumberGenerator, table: Array = TABLE) -> Dictionary:
 	var total := 0
-	for entry: Dictionary in TABLE:
+	for entry: Dictionary in table:
 		total += int(entry["weight"])
 	var pick := rng.randi_range(1, total)
-	for entry: Dictionary in TABLE:
+	for entry: Dictionary in table:
 		pick -= int(entry["weight"])
 		if pick > 0:
 			continue

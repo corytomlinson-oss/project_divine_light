@@ -199,9 +199,10 @@ Hand-placed in code, same technique as Milestone 21.
 
 - [x] **Treasure chests** (23a) — `assets/sprites/source/build_chests.py` -> `assets/sprites/chests.png` (64x16: wooden closed/open, gilded closed/open). Wooden = random loot, navy + gold = set piece. Shared by all four dungeons.
 - [x] **Chest SFX** (23a) — `chest` in `assets/audio/source/build_sfx.py` -> `assets/audio/sfx/chest.wav`: lid creak, then a rising C-major fanfare.
-- [ ] **Mimic** (23b) — closed-chest disguise + battle sprite.
-- [ ] **Locked chest, healing spring** (23b).
-- [ ] **Bigger overworld** (23c) — reuses the overworld tileset; any new tiles (bridge, clearing details) go here.
+- [x] **Mimic** (23b) — disguise frame in `chests.png` (two teeth at the seam); battle sprite `assets/sprites/source/build_mimic.py` -> `assets/sprites/enemies/mimic.png` (24x32, lid flung up, teeth, tongue, violet eye).
+- [x] **Locked chest** (23b) — padlock frame in `chests.png` (now 96x16, 6 frames).
+- [x] **Healing spring** (23b) — `assets/sprites/source/build_spring.py` -> `assets/sprites/spring.png` (48x16: shimmer A/B, spent).
+- [x] **Bridge tile** (23c) — `bridge()` in `assets/tilesets/source/build_act1_tiles.py`, overworld atlas tile 7.
 
 ## Milestone 21 — Act I art & music pass (done 2026-10-12)
 

@@ -324,3 +324,21 @@ Cory, after playtesting 22: dungeons are "kinda boring to walk through"; the ove
 - **Arcane Scholar's free switch** happens the moment you pick it, then the new stance's spells come up and Lyra still takes her action. Switching back and forth is free too.
 - **Shadow Walker's "untargetable for 1 round"** lasts the rest of the round Vanish is used in (same timing as Vanish's evasion; Silas is usually fastest, so that's most of it). It covers attacks and abilities alike; if everyone else is down, enemies can still hit him.
 - **Two chest looks:** wooden with iron bands (random), navy with gold bands (set piece), so you can tell from across the room. One chest-opening sound: a lid creak, then a rising four-note fanfare.
+
+### 23b: calls I made
+
+- **Two side rooms per dungeon**, dead ends off any main room except the boss's, smaller than the main rooms. They're added without changing the rest of the layout.
+- **What a side room holds:** the first is a healing spring 60% of the time; otherwise a side room is a vault of two rich chests (better loot table: elixirs, ethers, 120-240 gold, accessories), each 50% locked. So about half of dungeons have a spring.
+- **Locked chests need Silas in the party** ("Silas picks the lock"). Only vault chests are locked, never set pieces, so a missing Silas never blocks anything essential; you can come back.
+- **Mimics:** 60% of rescue dungeons have one, disguised as a plain chest. None in your starting dungeon: a lone level-1 hero shouldn't meet one. The tell is two teeth poking out of the lid's seam. Beating it gives a rich-table reward plus its XP; running away is allowed and leaves it waiting.
+- **Mimic stats:** 170 HP, 32 ATK, 12 DEF, 9 AGI, 120 XP; weak to fire (it's dry wood); every third turn it telegraphs a big bite ("opens its jaws wide!") for 2.2x, so Defend is the answer, like the Hollow Warden's hammer. Same stats in every dungeon (no level scaling, as decided in 20a).
+- **The spring heals HP and MP of everyone standing, once,** and doesn't revive: the design doc keeps revival to Frank and items, same as inns.
+
+### 23c: calls I made
+
+- **64x44 tiles** (old: 36x24), about 3.3x the area. Every place sits where its `where` text says (Cathedral on the hill north of Verdance, Monastery in the north-east hills, Observatory on the eastern plain, Guild in the southern ravine, Edenmere south-east).
+- **A river runs north to south through the middle**, crossed by two bridges (a new bridge tile). There's a lake in the south-west, reached by a footpath.
+- **Three hidden clearings**, sealed by forest and reached by secret paths you can walk through (they look like trees). You can see the clearings on screen through the trees; each path starts by a patch of flowers, and a Verdance child hints at it. Each clearing has an accessory found nowhere else: Heartwood Charm (HP+30, DEF+1), Moonstone Pendant (MP+20, INT+2), Fox-Eye Ring (AGI+3, ATK+1). The Cathedral-side clearing also has a spring.
+- **Seven chests along the way** with hand-picked contents (potions, ethers, antidotes, gold, an elixir, a Traveler's Ring) rather than random rolls, since the overworld isn't generated.
+- **Overworld fights come every 14-26 steps** (dungeons stay 10-20), so the longer walks don't turn into a grind.
+- **The camera stops at the map's edges** instead of showing the grey void past them.

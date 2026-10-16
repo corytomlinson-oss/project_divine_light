@@ -7,7 +7,8 @@ Retro Diffusion art from Milestone 16, copied in unchanged, so existing
 atlas coordinates keep working.
 
   overworld_tiles.png  0 grass  1 trees  2 gate  3 road  4 stone arch
-                       5 water  6 flowers
+                       5 water  6 flowers  7 bridge (Milestone 23c: planks
+                       across a north-south river, rails on the water sides)
   town_tiles.png       0 grass  1 trees  2 gate  3 road  4 wall (timber)
                        5 roof   6 door   7 water 8 fence 9 flowers
                        10 awning (Frank's stall)  11 inn sign wall
@@ -91,6 +92,21 @@ def flowers():
                     (13, 12, (240, 220, 120)), (2, 13, (230, 120, 150))):
         im.putpixel((x, y), c + (255,))
         im.putpixel((x, y + 1), (60, 120, 60, 255))
+    return im
+
+
+def bridge():
+    im = water()
+    for y in range(2, 14):                          # deck: boards across the river
+        for x in range(16):
+            c = (96, 64, 40) if x % 4 == 3 else (156, 110, 64) if (x // 4) % 2 else (140, 98, 56)
+            im.putpixel((x, y), c + (255,))
+    for y0 in (1, 12):                              # rails, light top edge
+        rect(im, 0, y0, 15, y0 + 1, (96, 64, 40))
+        rect(im, 0, y0, 15, y0, (176, 128, 76))
+    for x in (1, 8, 15):                            # posts
+        rect(im, x, 0, x, 2, (78, 50, 30))
+        rect(im, x, 12, x, 15, (78, 50, 30))
     return im
 
 
@@ -220,6 +236,6 @@ def strip(tiles, name):
 
 
 if __name__ == '__main__':
-    strip([GRASS, TREES, GATE, road(), arch(), water(), flowers()], 'overworld_tiles.png')
+    strip([GRASS, TREES, GATE, road(), arch(), water(), flowers(), bridge()], 'overworld_tiles.png')
     strip([GRASS, TREES, GATE, road(), wall(), roof(), door(), water(), fence(), flowers(), awning(), inn_sign(),
            cobbles(), shrine(), shop_sign(), armory_sign()], 'town_tiles.png')

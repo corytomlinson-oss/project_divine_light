@@ -3,6 +3,9 @@
 One 16x16 frame per state, left to right:
   0 wooden closed   1 wooden open    (plain chests: random loot)
   2 gilded closed   3 gilded open    (set pieces: navy lacquer, gold bands)
+  4 mimic closed     (a wooden chest, but two teeth poke out of the seam -
+                      a tell for sharp eyes; opened, it's frame 1)
+  5 locked closed    (a heavy padlock only Silas can pick; opened, frame 1)
 
 Usage: python build_chests.py <out.png> [preview.png]
 """
@@ -16,6 +19,7 @@ PAL = {
     'k': (34, 22, 18, 255),     # dark interior
     'Y': (255, 232, 140, 255),  # lock highlight
     'g': (170, 120, 40, 255),   # lock shadow
+    'T': (240, 236, 220, 255),  # mimic tooth
 }
 WOOD = {
     'l': (190, 132, 76, 255),   # lid top / front highlight
@@ -23,6 +27,7 @@ WOOD = {
     'w': (96, 58, 34, 255),     # shade
     'S': (150, 158, 178, 255),  # iron band
     'D': (78, 84, 104, 255),    # iron band in shade
+    'L': (176, 184, 200, 255),  # padlock
 }
 GILDED = {
     'l': (98, 122, 204, 255),
@@ -71,6 +76,18 @@ OPEN = [
 ] + body(1)
 
 
+MIMIC = CLOSED[:8] + ['.KKTKKKYYKKKTKK.'] + CLOSED[9:]
+
+LOCKED = CLOSED[:6] + [
+    '.K' + 'ooSooLLooSoo' + 'K.',
+    '.K' + 'wwDwLwwLwDww' + 'K.',
+    '.KKKKKLLLLKKKKK.',
+    '.K' + 'llSlLLLLlSll' + 'K.',
+    '.K' + 'ooSoLKKLoSoo' + 'K.',
+    '.K' + 'ooSoDLLDoSoo' + 'K.',
+] + CLOSED[12:]
+
+
 def frame(rows, colors):
     pal = dict(PAL, **colors)
     assert len(rows) == 16, len(rows)
@@ -84,7 +101,7 @@ def frame(rows, colors):
 
 
 def main():
-    frames = [(CLOSED, WOOD), (OPEN, WOOD), (CLOSED, GILDED), (OPEN, GILDED)]
+    frames = [(CLOSED, WOOD), (OPEN, WOOD), (CLOSED, GILDED), (OPEN, GILDED), (MIMIC, WOOD), (LOCKED, WOOD)]
     out = Image.new('RGBA', (16 * len(frames), 16), (0, 0, 0, 0))
     for i, (rows, colors) in enumerate(frames):
         out.paste(frame(rows, colors), (i * 16, 0))

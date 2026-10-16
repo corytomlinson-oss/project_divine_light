@@ -38,6 +38,11 @@ var explored: Dictionary = {}
 # Treasure chests already opened (Milestone 23a), same shape and save format
 # as `explored`: location -> {Vector2i: true}.
 var opened_chests: Dictionary = {}
+# A mimic fight in progress (23b): {location, cell} of the chest that bit, so
+# the dungeon can settle it on the way back (won: it's opened; fled: it waits).
+var pending_mimic: Dictionary = {}
+# Whether the last battle ended in victory (set by Battle.gd).
+var last_battle_won: bool = false
 # Set by the pause menu before it opens another screen (Equip), so the map
 # reopens the menu when that screen returns to it.
 var reopen_pause_menu: bool = false
@@ -122,6 +127,7 @@ func start_new_game(cls: String) -> void:
 	defeated_bosses = {}
 	explored = {}
 	opened_chests = {}
+	pending_mimic = {}
 	gold = 0
 	arrival = ""
 	has_pending_spawn = false

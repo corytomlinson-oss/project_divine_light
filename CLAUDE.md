@@ -8,7 +8,12 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-16)
 
-**Milestone 23 (Exploration & loot) is in progress: 23a done, not yet playtested.** After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 24). 23a: treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones), and all four Act I set bonuses work. **Try it:** start a new game, open chests with A (they show on the map once seen); in your starting dungeon the gilded chests are sealed until the warden falls, so come back after the escape. **Next: 23b** (dead-end side rooms, mimics, Silas-locked chests, healing springs), then **23c** (~3x overworld). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
+**Milestone 23 (Exploration & loot) is complete (2026-10-16), committed locally, not pushed; Cory hasn't playtested it yet** (he asked for 23b + 23c to be finished first, then he'll playtest all three). After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 24).
+- **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
+- **23b:** two dead-end side rooms per dungeon holding a healing spring or a vault of rich chests (some locked: Silas picks them); sometimes one plain chest is a mimic (rescue dungeons only).
+- **23c:** the Forest Heartlands is 64x44 (was 36x24): a river with two bridges, a lake, dungeons spread out, 7 chests along the way, and three hidden clearings reached by secret paths through the trees (an accessory found nowhere else in each, plus a spring).
+
+**Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). **Next up: Milestone 24 (Android APK export).** Details in the Milestone 23 section below; calls in `DECISIONS.md`.
 
 **Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
 - **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
@@ -255,7 +260,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 23 — Exploration & loot (in progress)
+## Milestone 23 — Exploration & loot (done)
 
 Scoped with Cory 2026-10-16 (see Roadmap restructuring): 23a chests + loot + set bonuses, 23b dungeon twists, 23c bigger overworld.
 
@@ -267,6 +272,21 @@ Scoped with Cory 2026-10-16 (see Roadmap restructuring): 23a chests + loot + set
 - **Set pieces** (`Equipment.DEFS`): Iron Monk (Gi, Headband, Iron Knuckles, Beads), Arcane Scholar (Arcane Robe, Scholar's Circlet, Scholar's Gloves, Arcane Focus), Shadow Walker (Garb, Cowl, Grips, Sigil). The 4th piece is a universal accessory, like the Guardian Emblem. The equip screen shows progress for every set (`Equip._set_progress_text()` loops `SET_BONUSES`).
 - **Set bonuses** (`Battle.gd`): Iron Monk = +1 extra Qi per basic attack (`_do_attack`); Arcane Scholar = switching stance happens at once in `_confirm_skill()` and reopens the spell list, so Lyra still acts; Shadow Walker = Vanish also sets `Combatant.hidden_rounds = 1`, and `_execute_enemy_turn()` leaves hidden members out of its targets (unless no one else is standing), ticking down with the other round statuses.
 - **Not done here:** chest art is shared by all four dungeons (no per-tileset recolor); Act II sets wait for Act II.
+
+### 23b — dungeon twists (done 2026-10-16, not yet playtested)
+- **Side rooms** (`DungeonGenerator._add_side_rooms()`, template key `side_rooms`, 2 per Act I dungeon): dead-end leaves hung off any main room but the boss's, in free grid slots, sized `SIDE_MIN..SIDE_MAX` (8x6..10x8). Added after the anchors from their own RNG stream (`seed + 104729`), and sized after every main room, so main rooms and anchors are identical with or without them (checked over 2000 layouts). `generate()` returns `room_kinds` ("main"/"side") parallel to `room_rects`.
+- **Treasure** (`DungeonGenerator.place_treasure()`, replaces 23a's `place_chests()`): returns `{chests: [{cell, kind, reward}], springs: [cell]}`, kind = plain / gilded / locked / mimic. Set pieces and plain chests go in main rooms; with `allow_mimic` (rescue variants only - Dungeon.gd passes `not _escape`) a plain chest becomes a mimic 60% of the time; the first side room is a spring 60% of the time (its center tile), otherwise each side room is a vault of two `Loot.RICH_TABLE` chests, each 50% locked.
+- **In the dungeon** (`Dungeon.gd`): `chests.png` is 6 frames now (+ mimic disguise: two teeth at the seam; + locked: padlock); `spring.png` (`build_spring.py`: shimmer A/B, spent; a Timer flips the shimmer). Locked: opens only with `GameManager.has_member("Silas")`. Mimic: a line, then `Player.start_battle_against([EnemyData.MIMIC])` (sets `debug_encounter`, the forced-encounter hook the suspend restore also uses) with `GameManager.pending_mimic = {location, cell}`; back on the map `_settle_mimic()` opens it and gives its rich loot if `GameManager.last_battle_won` (set by Battle.gd), otherwise it's still a mimic. Fleeing is allowed. Spring: restores HP/MP of everyone standing (no revive, like inns), once; "used" is stored in `opened_chests` like a chest. Map legend: Spring (green).
+- **Mimic** (`EnemyData.MIMIC` + kit): 170 HP / 32 ATK / 12 DEF / 9 AGI / 120 XP, RES 8, weak to fire, "Gnash" = a telegraphed x2.2 charge every third turn. Sprite: `build_mimic.py` (uses the Act I boss canvas) -> `enemies/mimic.png`, 24x32.
+- **Tested:** 2000 layouts x with/without mimics: set pieces always placed, no mimics in escape variants, mimics/gilded never in side rooms, locked only in vaults, everything reachable with chests and springs as walls. End to end (rendered): Silas picks a lock, the spring heals and goes dark, a mimic fight starts, a won fight opens the chest with its hoard.
+
+### 23c — the bigger overworld (done 2026-10-16, not yet playtested)
+- **The map** (`Overworld.gd` `MAP`, 64x44, still hand-editable text): drafted with a throwaway script (meadow blobs, a north-south river, roads, clearings sealed by a ring of trees), checked for reachability, and pasted in. Verdance west-center, the Cathedral on the hill north, the Monastery in the north-east hills, the Observatory on the eastern plain, the Guild in the southern ravine, Edenmere south-east - matching each dungeon's `where` text. Two bridges cross the river; a footpath leads down to the lake.
+- **New tiles/chars:** `b` bridge (overworld atlas tile 7, `bridge()` in `build_act1_tiles.py`; the builder was verified to reproduce the old atlas byte-for-byte first; `7:0/0 = 0` added to Overworld.tscn's atlas source), `t` secret path (painted as trees; `Overworld.is_secret_path()`, which `Player._is_walkable()` now asks before treating trees as walls), `c` chest and `s` spring (on grass).
+- **Treasure:** `CHEST_LOOT` hand-picks every chest's contents (asserted to match the map's `c` cells when it was pasted in). Three hidden clearings, each with an accessory found nowhere else (`Heartwood Charm` HP+30 DEF+1, `Moonstone Pendant` MP+20 INT+2, `Fox-Eye Ring` AGI+3 ATK+1, in `Equipment.DEFS`); the Cathedral-side clearing also has a spring. Secret paths start by a patch of flowers; the Verdance child now hints at that.
+- **Fights:** maps may define `encounter_steps()`; the overworld spaces fights 14-26 steps apart (dungeons keep 10-20), since walks are longer now.
+- **Camera:** clamped to the map (`Camera2D` limits, offset by the TileMapLayer's position in the scene - it isn't at the origin). Before, the grey void past the west edge showed.
+- **Old saves:** a saved overworld spot that isn't walkable on the new map falls back to outside Verdance.
 
 ## Milestone 22 — Save / load triggers (done)
 
@@ -488,8 +508,8 @@ Built in four steps, each tested and committed on its own:
 | 21 | Act I art & music pass | ✅ (2026-10-12) — 7 bosses/wardens, 9 enemies, Frank, 13 townsfolk, 3 tilesets, 4 battle backgrounds, 4 tracks |
 | 22 | Save / load — triggers & integration | ✅ (2026-10-12) — save screen, inn/shrine/overworld saves, autosave slot, suspend save |
 | 23a | Exploration & loot — treasure chests, Act I armor sets, set bonuses | ✅ (2026-10-16) — not yet playtested |
-| 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | Not started |
-| 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | Not started |
+| 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
+| 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
 | 24 | Android APK export | Not started |
 | 25a | Act II — Cleansing transformation system | Not started |
 | 25b | Act II — Nordveil (Tundra) | Not started |

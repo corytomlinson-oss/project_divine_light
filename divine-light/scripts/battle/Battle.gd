@@ -261,6 +261,7 @@ func _ready() -> void:
 	_setup_background()
 	_setup_party_window()
 	_enemies = _generate_encounter()
+	GameManager.last_battle_won = false
 	# For a suspend mid-fight (22b): the game as the fight began, and its enemies.
 	GameManager.begin_battle(_enemies.map(func(e: Combatant) -> Dictionary: return {
 		"name": e.display_name, "hp": e.max_hp, "atk": e.atk, "def": e.defense, "agi": e.agi,
@@ -2615,6 +2616,7 @@ func _end_battle(victory: bool) -> void:
 	_victory = victory
 	action_menu.visible = false
 	command_title.text = ""
+	GameManager.last_battle_won = victory
 	if victory:
 		_level_up_queue = []
 		var total_xp: int = 0

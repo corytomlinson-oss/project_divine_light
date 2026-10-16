@@ -58,6 +58,7 @@ const TALK := {
 	],
 	"child": [
 		"say Child: Mama says not to go past the fence after dark. Something walks out there.",
+		"say Child: But I know a secret! Where flowers grow thick against the trees, you can squeeze right through to hidden places.",
 	],
 	"guard": [
 		"say Guard: The north road climbs to the Cathedral. East, past the crossing, is the Monastery.",

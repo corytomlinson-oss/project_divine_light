@@ -146,10 +146,13 @@ func _play_anim(kind: String) -> void:
 
 func _is_walkable(world_pos: Vector2) -> bool:
 	var cell: Vector2i = _tile_map.local_to_map(world_pos)
+	var map_root: Node = _tile_map.get_parent()
+	# Secret paths through the overworld's trees (23c).
+	if map_root.has_method("is_secret_path") and map_root.is_secret_path(cell):
+		return true
 	if _tile_map.get_cell_atlas_coords(cell) == WALL_ATLAS_COORDS:
 		return false
 	# Maps can block more: water, buildings, people standing there (20a).
-	var map_root: Node = _tile_map.get_parent()
 	return not (map_root.has_method("is_blocked") and map_root.is_blocked(cell))
 
 
@@ -216,8 +219,23 @@ func start_boss_battle() -> void:
 	_trigger_boss_battle()
 
 
+## A fight against these exact enemies (stat dicts, like EnemyData's), started
+## by the map - a mimic (23b). Fleeing is allowed; it isn't a boss.
+func start_battle_against(enemies: Array) -> void:
+	_play_anim("idle")
+	GameManager.pending_spawn_position = position
+	GameManager.has_pending_spawn = true
+	GameManager.debug_encounter = enemies
+	Transition.to_battle()
+
+
 func _reset_encounter_counter() -> void:
-	_steps_to_encounter = randi_range(10, 20)
+	# Maps can space fights out more (the big overworld, 23c).
+	var map_root: Node = _tile_map.get_parent() if _tile_map != null else null
+	var steps := Vector2i(10, 20)
+	if map_root != null and map_root.has_method("encounter_steps"):
+		steps = map_root.encounter_steps()
+	_steps_to_encounter = randi_range(steps.x, steps.y)
 
 
 ## Directly repositions the player, bypassing the tile-to-tile tween. For a

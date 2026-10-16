@@ -53,6 +53,10 @@ const DEFS: Dictionary = {
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
 	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},
+	# One in each of the overworld's hidden clearings (23c), nowhere else.
+	"Heartwood Charm":   {"slot": "accessory", "class": "", "hp": 30, "def": 1},
+	"Moonstone Pendant": {"slot": "accessory", "class": "", "mp": 20, "int": 2},
+	"Fox-Eye Ring":      {"slot": "accessory", "class": "", "agi": 3, "atk": 1},
 }
 
 # set_id -> data describing the bonus. Act I's four sets are all wired up

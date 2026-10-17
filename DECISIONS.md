@@ -343,6 +343,11 @@ Cory, after playtesting 22: dungeons are "kinda boring to walk through"; the ove
 - **Overworld fights come every 14-26 steps** (dungeons stay 10-20), so the longer walks don't turn into a grind.
 - **The camera stops at the map's edges** instead of showing the grey void past them.
 
+### Dungeon safety after clearing (Cory, 2026-10-16)
+
+- **Cory's call:** once the boss is beaten, random fights come a fifth as often; once the dungeon is fully cleared (all chests too), it's completely safe.
+- **My calls:** "all chests" includes locked chests and the mimic, but not the healing spring, so you can save it. The boss alone is enough for the 1/5 rate (in a rescue dungeon you don't need to have freed the captive yet). A one-time line marks the moment it goes safe.
+
 ## Milestone 24 — Act I side quests (scoped 2026-10-16)
 
 Cory's calls, before anything was built:

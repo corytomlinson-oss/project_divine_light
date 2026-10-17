@@ -32,6 +32,7 @@ const PICKED_TEXT := "narrate Silas kneels at the lock. A few twists of a pin...
 const MIMIC_TEXT := "narrate The lid creaks open... and the chest bares its teeth!"
 const SPRING_TEXT := "narrate Clear water wells up, glowing faintly. The party drinks and feels whole again."
 const SPENT_TEXT := "narrate The spring lies still and dark. Its power is spent."
+const QUIET_TEXT := "narrate The halls have fallen quiet. Nothing stirs here anymore."
 
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
@@ -110,6 +111,9 @@ func _ready() -> void:
 	_generate_and_build()
 	_settle_mimic()
 	_play_arrival_story()
+	# Not while an escape is about to whisk you outside (its scene plays first).
+	if not (_escape and _boss_defeated() and not ActOne.is_cleared(dungeon_id)):
+		_announce_if_quiet()
 
 
 func _boss_defeated() -> bool:
@@ -281,6 +285,7 @@ func interact(cell: Vector2i, _facing: String) -> void:
 			return
 	_open(chest)
 	await Cutscene.play_text("narrate " + Loot.give(chest["reward"]))
+	await _announce_if_quiet()
 
 
 func _open(chest: Dictionary) -> void:
@@ -302,6 +307,33 @@ func _settle_mimic() -> void:
 	_open(chest)
 	await _after_transition()
 	await Cutscene.play_text("narrate The mimic's jaws fall slack. Inside, its hoard: " + Loot.give(chest["reward"]).trim_prefix("Found "))
+	await _announce_if_quiet()
+
+
+# ------------------------------------------------------------ safety (Cory, 2026-10-16)
+
+## Boss beaten and every chest open (locked ones and the mimic included; the
+## spring can be saved for later): no more random fights here.
+func is_safe() -> bool:
+	return _boss_defeated() and _chests.keys().all(func(cell: Vector2i) -> bool: return _opened(cell))
+
+
+## With the boss beaten, fights come a fifth as often (every 50-100 steps
+## instead of 10-20).
+func encounter_steps() -> Vector2i:
+	return Vector2i(50, 100) if _boss_defeated() else Vector2i(10, 20)
+
+
+## Once per dungeon, the moment it becomes safe.
+func _announce_if_quiet() -> void:
+	var flag := "quiet_" + GameManager.current_location
+	if not is_safe() or GameManager.has_flag(flag):
+		return
+	GameManager.story_flags[flag] = true
+	await _after_transition()
+	while Cutscene.is_playing():
+		await get_tree().process_frame
+	await Cutscene.play_text(QUIET_TEXT)
 
 
 ## A healing spring (23b): restores everyone still standing, once - like an

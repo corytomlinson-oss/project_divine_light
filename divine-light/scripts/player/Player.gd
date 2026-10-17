@@ -194,8 +194,10 @@ func _use_door(cell: Vector2i) -> void:
 
 
 func _check_encounter() -> void:
-	# Towns are safe zones: no random fights.
-	if _tile_map.get_parent() is Town:
+	# Towns are safe zones: no random fights. Maps can be safe too (a dungeon
+	# with its boss beaten and every chest open).
+	var map_root: Node = _tile_map.get_parent()
+	if map_root is Town or (map_root.has_method("is_safe") and map_root.is_safe()):
 		return
 	_steps_to_encounter -= 1
 	if _steps_to_encounter <= 0:

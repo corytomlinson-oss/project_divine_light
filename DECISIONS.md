@@ -342,3 +342,12 @@ Cory, after playtesting 22: dungeons are "kinda boring to walk through"; the ove
 - **Seven chests along the way** with hand-picked contents (potions, ethers, antidotes, gold, an elixir, a Traveler's Ring) rather than random rolls, since the overworld isn't generated.
 - **Overworld fights come every 14-26 steps** (dungeons stay 10-20), so the longer walks don't turn into a grind.
 - **The camera stops at the map's edges** instead of showing the grey void past them.
+
+## Milestone 24 — Act I side quests (scoped 2026-10-16)
+
+Cory's calls, before anything was built:
+- **Each dungeon is sealed until its 1-2 town quests are done.**
+- **The quest reward is the key** that opens the dungeon: a light convenience, not a boss-fight advantage.
+- **A mix of quest types:** fetch, hunts and errands, with errands that send you to the next town so you explore.
+- **Existing villagers give the quests.**
+- **Quests also give XP and gold.**

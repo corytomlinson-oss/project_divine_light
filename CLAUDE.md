@@ -15,7 +15,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
 
-**Next up: Milestone 24 (Act I side quests) — planned, not started; scope it with Cory first** (draft + open questions in the Milestone 24 section below). Then Milestone 25 (Android APK export).
+**Next up: Milestone 24 (Act I side quests) — planned, not started.** Cory answered the main design questions (sealed dungeons, the quest item is the key, mixed quest types with errands to the next town, existing villagers, XP + gold rewards); see the Milestone 24 section below. Then Milestone 25 (Android APK export).
 
 **Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
 - **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
@@ -275,12 +275,14 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
   - Guild: *Thieves' Ledger* - the Shadow Lord's summons come later/fewer; a lantern that shows which chest is a mimic.
 - Art/music for whatever this adds (quest-giver tweaks, item icons if any, a marked overworld monster) done with each sub-milestone, like 23.
 
-**Open questions for Cory:**
-1. Hard gate or optional? Does the next dungeon's door stay sealed until its quest is done, or are quests optional help (the dungeon just gets easier)?
-2. How strong should the items be: a real edge in the boss fight, or a lighter convenience (map, fewer fights)?
-3. Quest types: only fetch ("go get X"), or also hunts (a visible overworld monster) and small errands between the two towns?
-4. Who gives them: existing villagers (elder, guard, farmer...), new NPCs, Frank?
-5. Rewards beyond the item: XP/gold, so quests also smooth the level curve?
+**Cory's answers (2026-10-16):**
+1. **Hard gate:** the next dungeon stays sealed until its quests are done.
+2. **The items are light:** mainly the key that opens the dungeon (a light convenience at most), not a boss-fight edge. So the Holy Water / Void Lens style ideas above become keys or seal-breakers, not combat effects.
+3. **A mix of quest types:** fetch, hunts (a visible overworld monster) and errands. He especially likes **errands that send you to the next town**, so players go out and explore (e.g. Verdance -> Edenmere and back).
+4. **Existing villagers give them** (elder, guard, farmer, child, innkeeper, Edenmere's people), not new NPCs.
+5. **Rewards: XP and gold too,** on top of the key item.
+
+Still to decide when building: how the quest seal sits alongside the existing party-member gates (`ActOne.can_enter()`: both must be met, or the quest replaces the member gate), and which 1-2 quests go before each dungeon.
 
 ## Milestone 23 — Exploration & loot (done)
 

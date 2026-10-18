@@ -15,7 +15,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
 
-**Next up: Milestone 24 (Act I side quests) — planned, not started.** Cory answered the main design questions (sealed dungeons, the quest item is the key, mixed quest types with errands to the next town, existing villagers, XP + gold rewards); see the Milestone 24 section below. Then Milestone 25 (Android APK export).
+**Next up: Milestone 24 (Act I side quests) — planned, not started.** Cory answered the main design questions (sealed dungeons, the quest item is the key, mixed quest types with errands to the next town, existing villagers, XP + gold rewards); see the Milestone 24 section below. Then Milestone 25 (Android APK export). Side quests for Act II (27) and Act III (30) are on the roadmap too, drafted only (2026-10-18).
 
 **Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
 - **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
@@ -284,6 +284,24 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
 
 Still to decide when building: how the quest seal sits alongside the existing party-member gates (`ActOne.can_enter()`: both must be met, or the quest replaces the member gate), and which 1-2 quests go before each dungeon.
 
+## Milestones 27 and 30 — Act II and Act III side quests (planned, not started)
+
+Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act II and Act III too, not just Act I. Both reuse Milestone 24's quest system (quest state, givers, quest log, map markers, key items), so they are content milestones: the quests, their dialogue, any hunt monsters and quest spots, and a little art. Each sits right after the content it needs (the kingdoms and towns must exist first) and before that act's art pass, which then covers the quest art too. Draft only; scope with Cory before building.
+
+**27 — Act II side quests (draft):**
+- **Before each cleansing:** like Act I, 1-2 quests in a kingdom's capital lead into its dungeon (Frozen Citadel, Sunken Sanctum, Drowned Fortress). Whether these also *seal* the dungeon, as Act I's do, is a question for Cory. The towns are corrupted at this point, so the quest givers are the few people still around: refugees, a lone guard, a holdout merchant.
+- **After each cleansing:** this is where Act II side quests fit best. The design doc already says towns reopen and new paths unlock once a kingdom is cleansed, so quests can reward going back: Nordveil's thawed passes, Duskara's hidden oasis, Selavon's harbor and sea trade (the design doc calls Selavon "the most reward-rich post-cleanse town"). Optional, never blocking the story.
+- **Errands between kingdoms:** what Cory liked in Act I (errands that send you to the next town), now across the whole continent, e.g. carry word from Nordveil to Selavon. They also bring you back through the Forest Heartlands and Verdance/Edenmere as they change.
+- **Rewards:** XP, gold, and (an idea to raise) the Act II armor set pieces, which the design doc says come from "dungeon chests and town shops"; a quest could award the 4th set piece.
+- Likely split once scoped: 27a Nordveil, 27b Duskara, 27c Selavon (+ the between-kingdom errands), mirroring 26b-26d.
+
+**30 — Act III side quests (draft):**
+- Act III has one town, **The Threshold** (free inn, unlimited shrine), right before The Blighted Maw. So the Act III quests are a short, optional "last preparations" set, not a gate: the final descent should never be blocked by a side quest.
+- **Ideas to react to:** each hero's personal last errand (one per class: Vael, Ryn, Lyra, Silas), gathering help or relics from the liberated kingdoms (the design doc says representatives of the liberated kingdoms gather in Verdance after Act II), the Act III armor set pieces or each class's best weapon, and Frank: hints about who he really is that pay off at his reveal in the Vorath fight (careful not to give it away).
+- **Rewards:** XP and gold, plus the best gear in the game. Since the quests are optional, the Vorath fight must still be winnable without them.
+
+**Questions for Cory when scoping:** do Act II quests seal the kingdom dungeons like Act I, or are they all optional? Pre-cleanse, post-cleanse, or both? Should Act II/III quests award set pieces or the best weapons, or stay XP + gold + light key items like Act I? Is Act III's set fine as a handful of Threshold quests, or should the hub (Verdance, after Act II) get quests too?
+
 ## Milestone 23 — Exploration & loot (done)
 
 Scoped with Cory 2026-10-16 (see Roadmap restructuring): 23a chests + loot + set bonuses, 23b dungeon twists, 23c bigger overworld.
@@ -543,15 +561,21 @@ Built in four steps, each tested and committed on its own:
 | 26b | Act II — Nordveil (Tundra) | Not started |
 | 26c | Act II — Duskara (Desert) | Not started |
 | 26d | Act II — Selavon (Coastal) | Not started |
-| 27 | Act II art & music pass | Not started |
-| 28 | Act III + Vorath (includes the ending movie) | Not started |
-| 29 | Act III art & music pass | Not started |
+| 27 | Act II side quests — town quests in the three kingdoms, before and after each cleansing | Planned — scope with Cory first |
+| 28 | Act II art & music pass | Not started |
+| 29 | Act III + Vorath (includes the ending movie) | Not started |
+| 30 | Act III side quests — optional quests from The Threshold (and the liberated towns) before the final descent | Planned — scope with Cory first |
+| 31 | Act III art & music pass | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 
 ## Roadmap restructuring
 
 Several restructuring passes so far, most recent first. **Milestone numbers cited in older entries below are historical** — the roadmap has been renumbered more than once since; the Implementation status table above is always the authoritative current numbering, not any number quoted in the prose here.
+
+### Act II and Act III side quests inserted as 27 and 30 (2026-10-18)
+
+- Cory asked for side quests in Act II and Act III too (on top of Act I's 24). Each sits right after the content it needs and before that act's art pass, so the art pass covers the quest art too (same reason the art passes sit after the content). New numbers: APK 25 and Act II 26a-26d unchanged, **Act II side quests 27**, Act II art 28, Act III + Vorath 29, **Act III side quests 30**, Act III art 31. Draft and open questions in the Milestones 27 and 30 section.
 
 ### Act I side quests inserted as 24 (2026-10-16)
 

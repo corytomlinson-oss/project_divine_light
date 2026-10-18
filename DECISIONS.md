@@ -364,3 +364,4 @@ Cory's calls, before anything was built:
 - **Act II, per kingdom: 1-2 required quests that help free it, plus a couple of optional ones.**
 - **Optional rewards: XP + gold + potions, and maybe permanent buffs.** Required quests keep Act I's shape (the key the story needs, plus XP and gold).
 - Still open: whether Act III follows the same split (the draft keeps it all optional), and the permanent-buff design (ideas in CLAUDE.md's Milestones 27 and 30 section).
+- **Act III (Cory): 3 required quests, done in order, assemble a complex key that opens the portal into Vorath's dungeon.** The optional Act III quests stay. My sketch (frame -> core -> binding, Frank does the binding as a hint at who he is) is in CLAUDE.md, not decided.

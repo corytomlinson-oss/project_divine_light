@@ -311,7 +311,12 @@ Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act
 - **Keep them small and countable:** a fixed number in the whole game, so the optional quests feel worth doing without making the required path a walkover. Balance the required content assuming the player has none of them.
 - **Tech note:** a permanent buff has to survive level-ups, equip/unequip and save/load. `Equipment` changes stats by mutating them directly, which is fine for that, but a permanent bonus needs its own saved record on `Combatant` (e.g. `permanent_bonuses`) so it's never lost or counted twice.
 
-**Still open:** does Act III follow the same split? The draft above keeps all of Act III optional so nothing stands between the player and Vorath; a required Act III quest would be the exception. Which quests exactly, and whether the hub (Verdance, after Act II) gets quests too.
+**Act III: the portal key (Cory, 2026-10-18).** Act III gets **3 required quests, done in order**, that assemble the parts of a complex key opening the portal into Vorath's dungeon (The Blighted Maw). The optional "last preparations" quests above stay optional alongside them. The key replaces the draft's "Act III is all optional". A first sketch to react to (names and details not decided):
+1. **The Frame:** the Threshold's last keeper remembers the old portal and that it was sealed with a key. Fetch its broken frame from a ruined shrine at the Maw's edge (a fight there). The frame then points toward the next part.
+2. **The Core:** a shard of pure light the four pure entities left behind (the design doc says Vorath was one of four). The frame leads you across Valdris to it, maybe held by one of the freed kingdoms, so the errand revisits Act II places.
+3. **The Binding:** the parts won't join on their own. Frank knows how to bind them, more than a merchant should. A quiet hint at who he is, paid off when his identity is revealed in the Vorath fight. The finished key opens the portal.
+
+**Still open:** which exact quests go in each kingdom (Act II, 2 required + a couple optional each), the optional Act III quests, the permanent-buff design, and whether the hub (Verdance, after Act II) gets quests too.
 
 ## Milestone 23 — Exploration & loot (done)
 
@@ -575,7 +580,7 @@ Built in four steps, each tested and committed on its own:
 | 27 | Act II side quests — town quests in the three kingdoms, before and after each cleansing | Planned — scope with Cory first |
 | 28 | Act II art & music pass | Not started |
 | 29 | Act III + Vorath (includes the ending movie) | Not started |
-| 30 | Act III side quests — optional quests from The Threshold (and the liberated towns) before the final descent | Planned — scope with Cory first |
+| 30 | Act III side quests — 3 required quests in order that assemble the key to Vorath's portal, plus optional quests from The Threshold | Planned — scope with Cory first |
 | 31 | Act III art & music pass | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.

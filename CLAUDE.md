@@ -300,7 +300,18 @@ Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act
 - **Ideas to react to:** each hero's personal last errand (one per class: Vael, Ryn, Lyra, Silas), gathering help or relics from the liberated kingdoms (the design doc says representatives of the liberated kingdoms gather in Verdance after Act II), the Act III armor set pieces or each class's best weapon, and Frank: hints about who he really is that pay off at his reveal in the Vorath fight (careful not to give it away).
 - **Rewards:** XP and gold, plus the best gear in the game. Since the quests are optional, the Vorath fight must still be winnable without them.
 
-**Questions for Cory when scoping:** do Act II quests seal the kingdom dungeons like Act I, or are they all optional? Pre-cleanse, post-cleanse, or both? Should Act II/III quests award set pieces or the best weapons, or stay XP + gold + light key items like Act I? Is Act III's set fine as a handful of Threshold quests, or should the hub (Verdance, after Act II) get quests too?
+**Cory's answers (2026-10-18):**
+1. **Two kinds of quest: required and optional.** Required quests are part of the story; optional ones are just fun extra things to do for more XP and items.
+2. **Act II has both, per kingdom:** 1-2 required quests that help free the kingdom (before its cleansing, leading into its dungeon), plus a couple of optional quests as extra content.
+3. **Rewards are a mix.** Optional quests give **XP + gold + potions**, and some could give **permanent buffs**. Required quests keep Act I's shape (the key or seal-breaker the story needs, plus XP and gold).
+
+**Permanent buffs: ideas to bring to Cory (not decided):**
+- **Stat tonics:** +1 or +2 to one stat (STR, DEF, INT, RES, AGI) or +5 max HP / +3 max MP, for one hero (the player picks who) or the whole party.
+- **Kingdom blessings:** finishing all of a freed kingdom's optional quests grants a party-wide boon in its theme: Nordveil's frost ward (+RES), Duskara's sun-hardened (+DEF), Selavon's sea legs (+AGI).
+- **Keep them small and countable:** a fixed number in the whole game, so the optional quests feel worth doing without making the required path a walkover. Balance the required content assuming the player has none of them.
+- **Tech note:** a permanent buff has to survive level-ups, equip/unequip and save/load. `Equipment` changes stats by mutating them directly, which is fine for that, but a permanent bonus needs its own saved record on `Combatant` (e.g. `permanent_bonuses`) so it's never lost or counted twice.
+
+**Still open:** does Act III follow the same split? The draft above keeps all of Act III optional so nothing stands between the player and Vorath; a required Act III quest would be the exception. Which quests exactly, and whether the hub (Verdance, after Act II) gets quests too.
 
 ## Milestone 23 — Exploration & loot (done)
 

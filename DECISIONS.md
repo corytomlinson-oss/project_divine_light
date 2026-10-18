@@ -356,3 +356,11 @@ Cory's calls, before anything was built:
 - **A mix of quest types:** fetch, hunts and errands, with errands that send you to the next town so you explore.
 - **Existing villagers give the quests.**
 - **Quests also give XP and gold.**
+
+## Milestones 27 and 30 — Act II and Act III side quests (scoped 2026-10-18)
+
+Cory's calls, before anything was built:
+- **Two kinds of quest: required and optional.** Optional ones are fun extra content for XP and items.
+- **Act II, per kingdom: 1-2 required quests that help free it, plus a couple of optional ones.**
+- **Optional rewards: XP + gold + potions, and maybe permanent buffs.** Required quests keep Act I's shape (the key the story needs, plus XP and gold).
+- Still open: whether Act III follows the same split (the draft keeps it all optional), and the permanent-buff design (ideas in CLAUDE.md's Milestones 27 and 30 section).

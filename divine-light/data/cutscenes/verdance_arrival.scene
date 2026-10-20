@@ -7,6 +7,7 @@ face player right
 say Frank: Verdance. Quiet as a held breath - but the roofs are still standing, and that's something.
 say Frank: I'll set up my stall down by the pond. Come see me for supplies. And if anyone falls, bring them to me - I know a trick or two.
 say Frank: The inn will put you up for the night. After that, {next}, {next_where}. One of the others is held there.
+say Frank: Mind, a place like that will be locked up tight by now. Ask around - folk here and in Edenmere may know a way in.
 move guide to 15,13
 despawn guide
 set verdance_frank

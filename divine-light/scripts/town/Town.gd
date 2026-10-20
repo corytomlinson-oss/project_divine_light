@@ -83,6 +83,25 @@ func _talk_lines(id: String, facing: String, lines: Array) -> void:
 	await Cutscene.play_text("face %s %s\n%s" % [id, OPPOSITE[facing], "\n".join(lines)])
 
 
+## Side quests (Milestone 24) come first: if this person has quest business,
+## they say that instead of their usual lines. Returns whether they did.
+func _quest_talk(id: String, facing: String) -> bool:
+	var lines := Quests.talk(GameManager.current_location + "/" + id)
+	if lines.is_empty():
+		return false
+	await _talk_lines(id, facing, lines)
+	return true
+
+
+## For MapScreen: the people with something for you on a quest.
+func map_markers() -> Array:
+	var markers: Array = []
+	for cell: Vector2i in _npcs:
+		if Quests.has_business(GameManager.current_location + "/" + String(_npcs[cell])):
+			markers.append({"cell": cell, "color": Quests.QUEST_COLOR, "legend": "Quest"})
+	return markers
+
+
 func _inn(price: int) -> void:
 	var pick := await Cutscene.ask("Rest for the night? A bed is %d gold. (You have %d.)" % [price, GameManager.gold], ["Stay", "Not now"], "Innkeeper")
 	if pick != 0:

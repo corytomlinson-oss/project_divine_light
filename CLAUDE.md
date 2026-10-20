@@ -6,7 +6,11 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **User:** Cory. First-time game dev, new to Godot. Explain concepts clearly, guide step by step, don't assume prior game-dev knowledge. Home hobby project — no deadlines.
 
-## Picking back up (last touched 2026-10-16)
+## Picking back up (last touched 2026-10-20)
+
+**Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); not playtested by hand yet.** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
+
+**Try it:** a new game; after the escape, talk to people in Verdance (the map marks who has something, pink). Which quests you get depends on the next dungeon on your route: Vael's start goes to the Monastery (Verdance guard), Ryn's to the Observatory (Edenmere smith), Lyra's to the Guild (Edenmere shopkeeper), Silas's to the Cathedral (Verdance farmer). **Next up: Milestone 25 (Android APK export).**
 
 **Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 25).
 - **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
@@ -15,7 +19,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
 
-**Next up: Milestone 24 (Act I side quests) — planned, not started.** Cory answered the main design questions (sealed dungeons, the quest item is the key, mixed quest types with errands to the next town, existing villagers, XP + gold rewards); see the Milestone 24 section below. Then Milestone 25 (Android APK export). Side quests for Act II (27) and Act III (30) are on the roadmap too, drafted only (2026-10-18).
+**Next up was Milestone 24 (Act I side quests)** — done 2026-10-20, see above.
 
 **Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
 - **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
@@ -262,7 +266,7 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
-## Milestone 24 — Act I side quests (planned, not started)
+## Milestone 24 — Act I side quests (done 2026-10-20)
 
 Cory's request (2026-10-16), after Milestone 23: instead of heading straight from one dungeon to the next, do **1-2 side quests from the towns first**, ideally to **retrieve items that help beat the next dungeon** in some way. Scope below is a draft to talk through with him before building; it's design-heavy (quest structure + per-dungeon effects), so discuss before starting.
 
@@ -282,7 +286,29 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
 4. **Existing villagers give them** (elder, guard, farmer, child, innkeeper, Edenmere's people), not new NPCs.
 5. **Rewards: XP and gold too,** on top of the key item.
 
-Still to decide when building: how the quest seal sits alongside the existing party-member gates (`ActOne.can_enter()`: both must be met, or the quest replaces the member gate), and which 1-2 quests go before each dungeon.
+**Cory's later calls (2026-10-20):** keep **both** locks (party-member gate and quest seal), and the quest list below as drafted ("sounds perfect").
+
+### What was built
+- **`scripts/systems/Quests.gd`** (`class_name Quests`, static data + logic). `QUESTS`: 8 quests, 2 per dungeon (`part` 1 then 2), each with a `giver` (`"<town>/<npc id>"`), `offer` / `remind` lines and `steps` (`talk` someone, `hunt` a `HUNTS` target, `fetch` a `FETCHES` pickup), part 2 with a `key`. State: `GameManager.quests` (id -> stage; absent = not started, `steps.size()` = done) and `GameManager.key_items` (name -> true), both saved and reset on New Game.
+- **Availability:** a quest is offered when its dungeon is `ActOne.next_dungeon()`, isn't your starting dungeon, and (for part 2) part 1 is done. So the next dungeon's quests open as soon as the previous one is cleared.
+- **The seal:** `Quests.is_unsealed(id)` = starting dungeon, already cleared, or key held. `Overworld.get_door_destination()` checks the member gate (`ActOne.can_enter`, unchanged) first, then the seal (`Quests.SEAL_TEXT`, each ends with a hint to ask in town). The first time the key opens a door, `Quests.OPEN_TEXT` plays on the way in (Player.gd's door handling now accepts `{"scene", "say"}`), flag `unsealed_<id>`.
+- **Talking:** `Town._quest_talk()` runs before a villager's usual lines (`Verdance._talk` / `Edenmere._talk`). `Quests.talk(who)` first finishes any step waiting on that person, then offers whatever they have next, so one conversation can close a quest and open the next (priestess, smith, shopkeeper). A giver whose quest is waiting elsewhere says their `remind` line.
+- **Rewards** (`Quests._reward`): XP to everyone in the party + gold, x the number of cleared Act I dungeons (1-3): part 1 90 XP / 50 g, part 2 130 XP / 80 g per step of depth. Level-ups are announced in the text.
+- **Overworld** (`Overworld.gd`, "quests (24)" section): `Quests.active_spots()` places hunt targets (their battle sprite, 2-frame idle, feet on the tile) and pickups (`quest_props.png`) while a step needs them; both block walking. Walking up beside a hunt target (or A while facing it) plays its line and calls `Player.start_battle_against([Quests.hunt_enemy(id)])` with `GameManager.pending_hunt` set; back on the map `_settle_hunt()` completes the step if `last_battle_won` (fleeing leaves it there). Not on arrival (`_settled`), so fleeing doesn't throw you straight back in. The smith's wrecked cart shows once The Lost Cart has started.
+- **Hunt targets** (`Quests.HUNTS` + `EnemyData.KITS`): Grey Fang (140 HP, double bite, Savage Lunge every 3rd turn), Wreck Ghoul (170 HP, poisons, weak to fire, Grave Swing), Cutpurse (120 HP, steals items). Tuned for a lone hero around level 4; `hunt_enemy()` adds 70% HP, +3 ATK and +1 DEF per extra hero, so they stay a fight whether their dungeon is 2nd or 4th on the route.
+- **Map markers** (pink, legend "Quest"): hunt/pickup spots on the overworld (even unexplored), any town with someone to talk to (over the town's own dot), and in towns the people themselves (`Town.map_markers()`).
+- **Quest log** (`scripts/menu/QuestLog.gd`, code-built CanvasLayer on layer 20 like MapScreen): **Quests** in the pause menu (now Equip / Map / Quests / Save / Close). Active quests with what to do next, then done ones on a line, then key items.
+- **Frank's arrival line** (`verdance_arrival.scene`) now warns the next dungeon will be locked and to ask around.
+- **Art** (`assets/sprites/source/build_quest_art.py`): the three hunt targets are recolors of Blighted Wolf / Corrupted Farmer / Shadow Thief (`enemies/grey_fang.png`, `wreck_ghoul.png`, `cutpurse.png`); `quest_props.png` = silverleaf (2 shimmer frames) + the cart wreck, hand-placed 16x16.
+- **Tested** end to end in a temp scene (real Overworld/Verdance/Battle scenes, 37 checks): Vael route Monastery quests through to the door opening; Silas route Cathedral quests including a real Grey Fang fight started by walking up to it and won; save/load round trip; New Game reset. **Test-harness gotcha:** `Input.action_press()` doesn't reach the cutscene text box; send `InputEventAction` through `Input.parse_input_event()` instead. Loading a save in a test consumes the single-use suspend save: back up `%APPDATA%/Godot/app_userdata/divine_light/saves` first and restore it after.
+
+**The quests** (route-dependent: only the next dungeon's two are offered):
+| Dungeon | Part 1 | Part 2 -> key |
+|---|---|---|
+| Cathedral (gate chained by Verdance) | *Grey Field*: Verdance farmer, hunt the Grey Fang NE of Verdance, back to him | *The Sexton's Key*: Verdance elder -> Edenmere mayor -> **Cathedral Key** |
+| Monastery (pilgrim gate) | *The Closed Gate*: Verdance guard -> Edenmere priestess | *Silverleaf*: priestess, gather silverleaf east of the Monastery, back to her -> **Pilgrim's Token** |
+| Observatory (star-lock) | *The Lost Cart*: Edenmere smith, beat the Wreck Ghoul at the cart W of the Observatory, back to him | *The Star Lock*: smith -> Verdance innkeeper (Mira, the astronomer's sister) -> **Star Chart** |
+| Guild (hatch password) | *Pickpocket*: Edenmere shopkeeper, catch the Cutpurse by the ravine road, back to her | *The Password*: shopkeeper -> Verdance farmer (a retired thief) -> **Guild Password** |
 
 ## Milestones 27 and 30 — Act II and Act III side quests (planned, not started)
 
@@ -571,7 +597,7 @@ Built in four steps, each tested and committed on its own:
 | 23a | Exploration & loot — treasure chests, Act I armor sets, set bonuses | ✅ (2026-10-16) — not yet playtested |
 | 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
 | 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
-| 24 | Act I side quests — 1-2 town quests before each dungeon, rewarding items that help in it | Planned — scope with Cory first |
+| 24 | Act I side quests — 2 town quests before each dungeon, the second gives its key | ✅ (2026-10-20) — not yet playtested |
 | 25 | Android APK export | Not started |
 | 26a | Act II — Cleansing transformation system | Not started |
 | 26b | Act II — Nordveil (Tundra) | Not started |

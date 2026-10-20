@@ -122,6 +122,8 @@ func interact(cell: Vector2i, facing: String) -> void:
 
 
 func _talk(id: String, facing: String) -> void:
+	if await _quest_talk(id, facing):
+		return
 	var lines: Array = TALK.get(id, [])
 	if GameManager.has_flag("verdance_frank") and TALK.has(id + "_after"):
 		lines = TALK[id + "_after"]

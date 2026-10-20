@@ -312,6 +312,14 @@ All four in `assets/audio/source/build_music.py` -> `assets/audio/music/<name>.w
 - [x] **Combat effects** (18a) — no art files: drawn in code by `scripts/battle/BattleFx.gd`.
 - [x] **Mosaic shader** (17d) — `assets/shaders/mosaic.gdshader`, the battle-start screen breakup.
 
+## Milestone 24 — Act I side quests
+
+Made with the milestone, like 23's chests (`assets/sprites/source/build_quest_art.py`):
+- [x] **Grey Fang** (hunt target) — Blighted Wolf recolor: ash-pale fur, red glow. `enemies/grey_fang.png`
+- [x] **Wreck Ghoul** (hunt target) — Corrupted Farmer recolor: moss-rotted clothes, red eyes. `enemies/wreck_ghoul.png`
+- [x] **Cutpurse** (hunt target) — Shadow Thief recolor: leather and a red scarf. `enemies/cutpurse.png`
+- [x] **Silverleaf patch** (2 shimmer frames) and **wrecked cart** — hand-placed 16x16, `quest_props.png`
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

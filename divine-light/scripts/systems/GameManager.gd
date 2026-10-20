@@ -49,6 +49,13 @@ var reopen_pause_menu: bool = false
 # Story flags set by cutscenes ("set met_frank"), saved with the game, so a
 # scene can check whether something already happened (Milestone 19a).
 var story_flags: Dictionary = {}
+# Act I side quests (Milestone 24, see Quests.gd): quest id -> stage, and the
+# key items they hand out (name -> true). Both saved.
+var quests: Dictionary = {}
+var key_items: Dictionary = {}
+# A quest hunt in progress: the HUNTS id, so the overworld can settle it on
+# the way back (won: the step's done; fled: it's still out there).
+var pending_hunt: String = ""
 # Development/testing: when set (a list of enemy dicts, EnemyData format), the
 # next battle fights exactly this group - bosses too, via "is_boss" and
 # "phase_hp_thresholds" - then it's cleared (Milestone 20a).
@@ -123,6 +130,9 @@ func start_new_game(cls: String) -> void:
 	starting_class = cls
 	inventory = {"Potion": 3, "Antidote": 1}
 	story_flags = {}
+	quests = {}
+	key_items = {}
+	pending_hunt = ""
 	dungeon_seeds = {}
 	defeated_bosses = {}
 	explored = {}
@@ -211,6 +221,8 @@ func _save_data() -> Dictionary:
 		"explored": _cells_save(explored),
 		"opened_chests": _cells_save(opened_chests),
 		"story_flags": story_flags.duplicate(),
+		"quests": quests.duplicate(),
+		"key_items": key_items.keys(),
 		"scene": current_scene_path,
 		"location": location_name(current_location),
 		"location_id": current_location,
@@ -332,6 +344,14 @@ func _apply(parsed: Dictionary) -> void:
 	story_flags.clear()
 	for flag in save_story_flags:
 		story_flags[flag] = bool(save_story_flags[flag])
+	var save_quests: Dictionary = parsed.get("quests", {})
+	quests.clear()
+	for id in save_quests:
+		quests[id] = int(save_quests[id])
+	key_items.clear()
+	for item_name in parsed.get("key_items", []):
+		key_items[String(item_name)] = true
+	pending_hunt = ""
 	# Where the save was made (Milestone 22a); older saves land on the overworld.
 	current_scene_path = String(parsed.get("scene", "res://scenes/overworld/Overworld.tscn"))
 	var pos: Array = parsed.get("position", [])

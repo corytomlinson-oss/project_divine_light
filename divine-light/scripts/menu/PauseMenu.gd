@@ -5,7 +5,7 @@ extends CanvasLayer
 # a dungeon (Player.gd). Pauses the tree while open; this layer runs anyway
 # (process_mode Always in the scene). Left: a party summary, FF-style. Right:
 # commands - Equip (the Milestone 15 screen, which reopens this menu when it
-# closes), Map (MapScreen, over this menu), Save (22a: only on the overworld -
+# closes), Map (MapScreen, over this menu), Quests (QuestLog, 24), Save (22a: only on the overworld -
 # never in a dungeon) and Close.
 # The natural home for Formation and Items later.
 
@@ -58,7 +58,7 @@ func _ready() -> void:
 	_cursor.target = _options[_index]
 	# Gold under the commands (Milestone 20a).
 	var gold_box := Panel.new()
-	gold_box.position = Vector2(244, 44 if not can_save else 54)
+	gold_box.position = Vector2(244, 54 if not can_save else 64)
 	gold_box.size = Vector2(72, 18)
 	add_child(gold_box)
 	var gold := Label.new()
@@ -84,6 +84,7 @@ func _process(_delta: float) -> void:
 		match _options[_index].name:
 			"Equip": _open_equip()
 			"Map": _open_map()
+			"Quests": _open_quests()
 			"Save": _save()
 			"Close": _close()
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
@@ -101,6 +102,13 @@ func _save() -> void:
 func _open_map() -> void:
 	set_process(false)
 	await MapScreen.open(_player).closed
+	set_process(true)
+	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
+
+
+func _open_quests() -> void:
+	set_process(false)
+	await QuestLog.open(self).closed
 	set_process(true)
 	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
 

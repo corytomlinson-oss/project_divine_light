@@ -190,6 +190,9 @@ func _use_door(cell: Vector2i) -> void:
 		# A gated or unfinished door (Milestone 20a): say why, stay put.
 		Cutscene.play_text("narrate " + String(dest["blocked"]))
 	elif not dest.is_empty():
+		# A line on the way through (a quest key opening a dungeon, 24).
+		if dest.has("say"):
+			await Cutscene.play_text(String(dest["say"]))
 		Transition.change_scene(dest["scene"])
 
 

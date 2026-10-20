@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-16)
 
-**Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 24).
+**Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 25).
 - **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
 - **23b:** two dead-end side rooms per dungeon holding a healing spring or a vault of rich chests (some locked: Silas picks them); sometimes one plain chest is a mimic (rescue dungeons only).
 - **23c:** the Forest Heartlands is 64x44 (was 36x24): a river with two bridges, a lake, dungeons spread out, 7 chests along the way, and three hidden clearings reached by secret paths through the trees (an accessory found nowhere else in each, plus a spring).

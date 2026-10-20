@@ -10,7 +10,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); not playtested by hand yet.** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
 
-**Try it:** a new game; after the escape, talk to people in Verdance (the map marks who has something, pink). Which quests you get depends on the next dungeon on your route: Vael's start goes to the Monastery (Verdance guard), Ryn's to the Observatory (Edenmere smith), Lyra's to the Guild (Edenmere shopkeeper), Silas's to the Cathedral (Verdance farmer). **Next up: Milestone 25 (Android APK export).**
+**Act I finale movie (2026-10-20, Cory's request before Milestone 25; not seen by him yet):** after the Act I ending scene, a ~64s animated movie replaces the old title card: the bosses of your route fall one by one (escape warden first, then the three rescue bosses; the newest party member lands each blow with their class's effect, each captive steps out of the light), the four together, animated teasers of Nordveil / Duskara / Selavon, Vorath, then "Act II - The Purge". New "finale" track. **F9 previews it on any map.** Details in the "Act I finale movie" section.
+
+**Try it (side quests):** a new game; after the escape, talk to people in Verdance (the map marks who has something, pink). Which quests you get depends on the next dungeon on your route: Vael's start goes to the Monastery (Verdance guard), Ryn's to the Observatory (Edenmere smith), Lyra's to the Guild (Edenmere shopkeeper), Silas's to the Cathedral (Verdance farmer). **Next up: Milestone 25 (Android APK export).**
 
 **Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 25).
 - **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
@@ -265,6 +267,16 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Items are tossed** to the target as a small orb (skipped when used on yourself: `BattleFx.cast` ignores projectiles to the caster's own position).
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
+
+## Act I finale movie (done 2026-10-20)
+
+Cory, before Milestone 25: a movie-style Act I cutscene like the intro, "each of the dungeon bosses slain with some cool effects to get pumped up for Act II" - then, while it was being planned, "more animation, not just pictures". So it's code-driven, not a `.scene` script (the movie format only does still pictures, pans and captions).
+- **`scripts/cutscene/ActOneFinale.gd`** (`class_name ActOneFinale`, CanvasLayer 61: over Cutscene's movie layer, under Transition). `await ActOneFinale.play(node)`; Dungeon.gd calls it right after `act_one_end.scene` (whose old movie card was removed; the scene now ends faded out, and the finale fades itself in and back out). It holds the map still via the new `Cutscene.hold()` / `release()` (counted into `Cutscene.is_playing()`, which Player.gd checks). Start skips. **F9** previews it on any map (`Cutscene._preview_finale()`), for this game's route (Vael's if none).
+- **Timing:** every beat is placed on the clock since the music started (`_at(t)`), from the same bar math as the track (`BAR = 60/140*4`): pickup 2 bars, 4 boss shots x 5 bars, together 3, kingdoms 3 x 2, Vorath 2, title 4 = 37 bars / 63.4s. Change a section's length in both places.
+- **Boss shots** (route order, `ActOne.ROUTES`): the starting dungeon's escape warden, then the rescue bosses (`BOSSES` table, same ids as `Battle.LOCATION_BOSSES`), on that dungeon's battle background drifting slowly. Party = the heroes you had for that fight (alone for the first two, then each rescued hero), walking in from the right at 2x; the newest one dashes in and strikes with BattleFx at 2x (`_fx.scale = 2`, so effect coords are halved): Vael a holy pillar + gold flash, Ryn three ki bursts with shakes + a ring, Lyra a charge then lightning + white flash, Silas triple shadow slash + burst. Boss: red wind-up pulse and sparks, white hit flashes, then `_dissolve()` (violet -> white -> fade while squashing, rising pillar + holy sparkles, victory sting). Rescue shots end with the captive fading in where the boss stood and walking to the end of the line; a gold dungeon/boss card slides in at the start.
+- **Together:** the four (classic order) walk in on the forest at dusk, face the camera, each class's flourish above them in turn, white flash. **Kingdoms:** drawn in code (gradient sky `GradientTexture2D`, `Polygon2D` skylines pushed slowly across, `Weather` inner class: snow / blowing sand / slanting rain as pixel rects; Duskara's sun; lightning over Selavon). **Vorath:** `intro_vorath.png` sinking slowly, red flashes + shakes on the music's stabs. **Title:** the intro starfield, "Act II - The Purge", "Coming in a later update."
+- **Music:** `finale` in `build_music.py` (E minor, 140 BPM, one heroic riff per boss shot, G-C-D lift for the four, shifting minor keys for the kingdoms, F-B for Vorath, C-D-G cadence under the title). Loops from bar 0 only so the importer is happy; the movie stops it at the end.
+- **Tested:** played through on a Lyra route and a Vael route (all four strike looks), screenshots at set times, no errors, the map held for the whole 64.7s and released after.
 
 ## Milestone 24 — Act I side quests (done 2026-10-20)
 
@@ -598,6 +610,7 @@ Built in four steps, each tested and committed on its own:
 | 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
 | 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
 | 24 | Act I side quests — 2 town quests before each dungeon, the second gives its key | ✅ (2026-10-20) — not yet playtested |
+| — | Act I finale movie — animated boss montage into the Act II title (Cory's request, before 25) | ✅ (2026-10-20) — not yet seen by Cory |
 | 25 | Android APK export | Not started |
 | 26a | Act II — Cleansing transformation system | Not started |
 | 26b | Act II — Nordveil (Tundra) | Not started |
@@ -746,6 +759,7 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - Use this to jump to a target level and test newly-unlocked skills without grinding
 - **F3** — instantly KO all enemies and win the current battle (`_debug_auto_win()`), granting XP/level-ups the same as a real victory. No-op if the battle is already over. Added during Milestone 13a playtesting to make repeated dungeon-walk/encounter-transition testing fast — without it, every encounter test requires manually fighting to completion.
 - **F7 / F8** — play the demo cutscene / demo movie (`Cutscene.gd` `_input()`, only on a map with the player, not while paused)
+- **F9** — play the Act I finale movie for this game's route (same conditions)
 - **F5** — save party + inventory to slot 1 (GameManager.gd `_input()`, works from any scene)
 - **F6** — load slot 1 back into the live party + inventory
 

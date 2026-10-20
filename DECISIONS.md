@@ -377,3 +377,13 @@ Cory approved the quest list and the "two quests in order, the second gives the 
 - **Rewards scale with how far into Act I you are** (cleared dungeons, 1-3): 90 XP / 50 g for a part 1, 130 XP / 80 g for a part 2, times that. *Change:* `Quests._reward()`.
 - **Quest markers are pink** (the other colors were taken) and show even in unexplored fog, since they're directions.
 - **Art:** the hunt targets are recolors of existing enemies (Cory's "hand-draw everything" still holds: the source sprites are hand-placed; the recolor makes each read as a marked, nastier one of its kind). The silverleaf and the wrecked cart are new hand-placed 16x16 props.
+
+## Act I finale movie (built 2026-10-20)
+
+Cory asked for a movie-style Act I cutscene with the bosses slain and cool effects, then for "more animation, not just pictures". My calls:
+- **The bosses you actually fought**, in your route's order: your starting dungeon's escape warden, not its rescue boss (you never met that one), then the three rescue bosses. *Change:* `ActOneFinale._boss_shot()`.
+- **The newest party member lands each blow** (the starting hero for the first two, then each rescued hero in turn), so three of the four get a strike; the fourth gets the spotlight in the "together" shot. Each captive steps out of the boss's light and joins the line.
+- **It replaces the old Act I / Act II title card** rather than playing after it, so the ending isn't two title cards in a row.
+- **Code-driven, not a .scene script:** walking, dashing, wind-ups and effects need real animation the movie format doesn't have. The kingdom teasers are drawn in code (no Act II art exists yet), with weather to make them move.
+- **A new track** ("finale") rather than reusing the boss or intro theme, laid out bar for bar against the shots so every cut lands on a downbeat.
+- **F9 previews it** on any map, like F7/F8 for the demos.

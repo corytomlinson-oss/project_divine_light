@@ -320,6 +320,11 @@ Made with the milestone, like 23's chests (`assets/sprites/source/build_quest_ar
 - [x] **Cutpurse** (hunt target) — Shadow Thief recolor: leather and a red scarf. `enemies/cutpurse.png`
 - [x] **Silverleaf patch** (2 shimmer frames) and **wrecked cart** — hand-placed 16x16, `quest_props.png`
 
+## Act I finale movie
+
+- [x] **Finale theme** — `music/finale.wav` (`build_music.py` FINALE), 63s, timed bar for bar to the movie.
+- No new image files: the movie reuses the battle backgrounds, boss and party sprites, `intro_vorath.png` and `intro_title.png`; the kingdom teasers are drawn in code (`ActOneFinale.gd`).
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

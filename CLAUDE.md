@@ -6,9 +6,24 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **User:** Cory. First-time game dev, new to Godot. Explain concepts clearly, guide step by step, don't assume prior game-dev knowledge. Home hobby project — no deadlines.
 
-## Picking back up (last touched 2026-10-12)
+## Picking back up (last touched 2026-10-16)
 
-**Milestone 22 (save / load triggers) is complete** (2026-10-12), committed locally, not pushed; Cory hasn't playtested it yet:
+**Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 25).
+- **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
+- **23b:** two dead-end side rooms per dungeon holding a healing spring or a vault of rich chests (some locked: Silas picks them); sometimes one plain chest is a mimic (rescue dungeons only).
+- **23c:** the Forest Heartlands is 64x44 (was 36x24): a river with two bridges, a lake, dungeons spread out, 7 chests along the way, and three hidden clearings reached by secret paths through the trees (an accessory found nowhere else in each, plus a spring).
+
+**Try it:** a new game, then explore: chests open with A and show on the map; in your starting dungeon the gilded chests are sealed until the warden falls. Look for side rooms, a mimic (two teeth poke out of its seam), a spring. On the overworld, the Verdance child hints at the secret paths (flowers against the treeline). Details in the Milestone 23 section below; calls in `DECISIONS.md`.
+
+**Next up: Milestone 24 (Act I side quests) — planned, not started.** Cory answered the main design questions (sealed dungeons, the quest item is the key, mixed quest types with errands to the next town, existing villagers, XP + gold rewards); see the Milestone 24 section below. Then Milestone 25 (Android APK export). Side quests for Act II (27) and Act III (30) are on the roadmap too, drafted only (2026-10-18).
+
+**Milestone 22 playtest fixes (2026-10-12) are done:** Cory confirmed all four work (2026-10-16); committed as b5bd705. Safe towns, sprite z-order, bigger rooms, and the map screen:
+- **Towns are safe zones:** `Player._check_encounter()` returns early when the map root is a `Town`.
+- **Walk sprite "bottom half flickering":** the maps y-sort their TileMapLayer, which sorts the *tiles* too, so the tile row below a 16x32 character drew over its legs (found by screenshotting frames). Characters now have `z_index = 1` (`Player.tscn`, `Cutscene.make_character()`), still y-sorted among themselves. Also fixed a one-frame stall on every tile (arrival then waited a frame before the next step); `Player._process()` now chains into the next tile in the same frame with the leftover distance.
+- **Bigger dungeon rooms:** templates are 10x7 to 15x10 (were 4x4 to 7x6), `SLOT_SIZE` 19 (was 10); 500-seed check: all rooms reachable, walls sealed, ~740 walkable tiles. Dungeons draw a near-black backdrop instead of the grey clear color. A saved/suspended spot that isn't floor in the new layout falls back to the entrance (old saves made in a dungeon).
+- **Map** (`scripts/menu/MapScreen.gd`, `class_name MapScreen`, code-built CanvasLayer on layer 20): Y / M (`map` action; Y is also battle's Defend, no clash) on any map, or **Map** in the pause menu. One square per tile in that tile's average color. Maps opt in to more: `map_fog()` (only `GameManager.explored` cells; fitted to the explored area, up to 4px/tile) and `map_markers()` (`{cell, color, label?, legend?}`). Dungeons: `on_player_moved()` (Player calls it every tile) reveals the whole room you're in plus 2 tiles around you, and the first 4 tiles of every corridor leaving that room (`_corridor_stubs()`, added 2026-10-20 after Cory missed a whole room in two dungeons: its doorway showed as a 1px notch); Exit/Captive/Boss markers once seen. `map_note()` (optional) puts a short line in the top-right corner; dungeons use it for "Chests 7/9" (springs don't count, matching the quiet rule). Overworld (fog of war added at Cory's request): `on_player_moved()` reveals what's been on screen (±10 x, ±6 y tiles); the view stays fitted to the whole map (only dungeons define `map_fit_explored()`); towns gold, dungeons red (grey when cleared), shown once seen, names placed so they don't overlap. Towns: plain layout. `GameManager.explored` is saved (flat x,y lists) and reset on New Game. Closing the map restores pause with `set_deferred` so the same B press doesn't open the pause menu.
+
+**Milestone 22 (save / load triggers) is complete** (2026-10-12), pushed; Cory playtested it ("saves work"):
 - **22a:** save slots + a save/load screen, saving at inns, Edenmere's shrine and the overworld pause menu, and autosaves to their own slot after boss wins, rescues, escapes and the end of Act I. Saves remember the map, spot and play time.
 - **22b:** the suspend save. Closing the game, Home, or Android's back-out writes it; the title offers Resume; it's single use. A suspend mid-battle restarts that fight as it began.
 
@@ -28,7 +43,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 **For Cory (from the autonomous run, now merged):**
 - **Playtest suggestions:** a Lyra or Silas start (the newest escapes: Void Sentinel, Corrupted Enforcer); the Void Archmage's phase-2 immunity (with Vael in the party it turns immune to holy); the Shadow Lord's summoned thieves; Edenmere (south-east gate: shrine, armory, item shop); and a full route to the Act I ending. Balance is untested by a human: the numbers were tuned by formula for a lone hero at the expected levels.
-- **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 24), and save points aren't placed yet (22).
+- **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 26), and save points aren't placed yet (22).
 - **One naming note:** the design doc uses "Void Sentinel" twice, for the Observatory's warden and for an Act III Blighted Maw enemy. I used it for the warden; the Act III one will need a different name or kit.
 
 
@@ -42,7 +57,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
-- The gamepad bindings are untested on the RP6 itself until the APK milestone (23).
+- The gamepad bindings are untested on the RP6 itself until the APK milestone (25).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
 - The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.
 
@@ -59,7 +74,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 **1. Enemy level scaling** — **decided 2026-09-29 (Claude, while Cory was away; see DECISIONS.md): no level scaling.** Difficulty stays set by region, as the README's Enemy Design section already describes. Over-leveling is the classic FF reward for grinding, and scaling would undercut it. Revisit if Act I playtesting shows fights going trivial too fast.
 
-Original note: *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-24d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
+Original note: *timing not yet decided*. Cory wants to discuss whether enemies should scale with the player's level, so the game stays a challenge regardless of where the player is in the story rather than becoming trivial once over-leveled. He's explicitly unsure whether this is even a good idea for the game, and unsure when the right time to design it would be — flagged here just so it isn't lost, not tied to a specific milestone yet. Milestone 14 (Boss encounters) came and went without touching this — its test boss just uses fixed stats like every other enemy, no scaling involved. Worth raising again during Act I/II content (20a-26d), when real enemy tables for each dungeon/region get built for the first time. Relevant context already in the codebase: `ENCOUNTERS` in `Battle.gd` currently has fixed enemy stats with no relationship to party level at all; the README's Enemy Design section already describes a difficulty curve by *region* ("early enemies teach basics... late-game enemies punish passive play") rather than by player level, so this would be a genuinely new axis, not an extension of something already planned.
 
 ## Dungeon generation — decided (2026-08-06)
 
@@ -104,7 +119,7 @@ Implements the design decided earlier this session (see "Dungeon generation — 
 
 ## Milestone 14 — Boss encounters (done)
 
-Builds the generic system the roadmap calls for — "used by both Act I's dungeon bosses (20a-20d) and Act II's kingdom bosses (24b-d)" — validated against one placeholder test boss in the Cathedral, same pattern as 13a/13b's test-tech-first approach.
+Builds the generic system the roadmap calls for — "used by both Act I's dungeon bosses (20a-20d) and Act II's kingdom bosses (26b-d)" — validated against one placeholder test boss in the Cathedral, same pattern as 13a/13b's test-tech-first approach.
 
 - **Bosses are visible, fixed encounters, not random ones.** New 5th placeholder tile (crimson, `BOSS_COORDS := Vector2i(4, 0)`, tileset now 80×16) placed by `DungeonGenerator` just inside the boss room's door — reuses the exact same `_offset_within_room()` helper the player's dungeon-entry spawn already used, now shared by both. Walking onto it (`Player._on_tile_entered()` checks `BOSS_ATLAS_COORDS` alongside the existing door check) always starts a fight via `_trigger_boss_battle()` — no step-counter roll, matching the design doc's "Visible on-screen enemies for mini-bosses and main bosses."
 - **`Combatant` gained `is_boss`/`boss_phase`/`phase_hp_thresholds`.** `Battle.gd`'s `_generate_encounter()` checks `GameManager.pending_boss_battle` (set by `Player._trigger_boss_battle()`, consumed here) before falling through to the normal random-table path, and builds a single boss `Combatant` from a new `BOSS_ENCOUNTERS` dict (keyed by location, same shape as `ENCOUNTER_TABLES`) instead. Boss fights are always solo — matches "Single enemy with multiple phases for bosses" from the design doc, no group-sizing logic needed.
@@ -197,7 +212,7 @@ Cory picked option B from a two-option mock page (https://claude.ai/artifact/Na2
 
 ### 17c — controller & pause menu (done, 2026-09-29)
 
-- **Input map** (`project.godot` `[input]`, generated with `ProjectSettings.set_setting()` + `save()`, not hand-written): `up`/`down`/`left`/`right` (arrows, **WASD**, D-pad, left stick), `confirm` (Enter, Space, Z, A), `cancel` (Esc, Backspace, X, B), `item_shortcut` (C, X button), `defend_shortcut` (V, Y button), `prev_member`/`next_member` (Q/E, L1/R1), `pause` (Tab, Start). Keyboard follows emulator habits (Z = A, X = B). **No code uses the built-in `ui_*` actions anymore.** Gamepad bindings are untested on the RP6 itself until the APK milestone (23).
+- **Input map** (`project.godot` `[input]`, generated with `ProjectSettings.set_setting()` + `save()`, not hand-written): `up`/`down`/`left`/`right` (arrows, **WASD**, D-pad, left stick), `confirm` (Enter, Space, Z, A), `cancel` (Esc, Backspace, X, B), `item_shortcut` (C, X button), `defend_shortcut` (V, Y button), `prev_member`/`next_member` (Q/E, L1/R1), `pause` (Tab, Start). Keyboard follows emulator habits (Z = A, X = B). **No code uses the built-in `ui_*` actions anymore.** Gamepad bindings are untested on the RP6 itself until the APK milestone (25).
 - **`UiInput` autoload** (`scripts/systems/UiInput.gd`): `UiInput.nav(&"down")` is true on the press and then every 0.08s after a 0.3s hold. All menus use it for directions; movement on the map uses `Input.is_action_pressed` directly. It runs while paused.
 - **Battle:** X = Items, Y = Defend at once, L1/R1 = switch to another member who hasn't chosen yet, and **B on the command menu steps back** to whoever chose last, to change their pick (safe: MP/Qi/items are paid when the action runs). Selection is tracked by `_chosen` / `_chosen_order`; `_next_unchosen()` replaced `_skip_ko_members()`. The round starts as soon as everyone alive has chosen, and the **first action plays immediately**. Every later message waits for A, with a blinking arrow in the banner's corner (`_advance_hint`, a `ScrollHint`) instead of "Press Enter".
 - **Pause menu** (`scenes/menu/PauseMenu.tscn` + `scripts/menu/PauseMenu.gd`, `class_name PauseMenu`): B or Start on the map (`Player.gd`) calls `PauseMenu.open(player)`, which adds a CanvasLayer over the map and pauses the tree (the menu runs with process mode Always). Left: party summary (standing sprite, class, level, HP, MP or Qi). Right: Equip, Close. **Equip returns to the menu:** the menu sets `GameManager.reopen_pause_menu` before switching scenes, and `Player._ready()` reopens it (deferred, after the map places the player). The old keyboard-only `E` shortcut is gone; E is now R1. The menu ignores input on the frame it opens, since the B that opened it still reads as just pressed.
@@ -247,6 +262,93 @@ All 24 of their skills have hand-tuned recipes in `FxRecipes.BY_EFFECT` / `BY_NA
 - **Boss phase change** (`_play_boss_phase_change()`): "X is enraged!", thunder, violet flash, big shake, burst, and a lasting reddish `self_modulate` tint (the hurt/death tweens animate `modulate`, so they don't clear it; `self_modulate` also doesn't tint the status icons). Resolves ASSETS.md's "boss phase-2 visual variant" without new art.
 - **Damage numbers are drawn under the message banner** (moved just below it in the tree) so a long message covers a number instead of being printed over.
 
+## Milestone 24 — Act I side quests (planned, not started)
+
+Cory's request (2026-10-16), after Milestone 23: instead of heading straight from one dungeon to the next, do **1-2 side quests from the towns first**, ideally to **retrieve items that help beat the next dungeon** in some way. Scope below is a draft to talk through with him before building; it's design-heavy (quest structure + per-dungeon effects), so discuss before starting.
+
+**Draft shape:**
+- **24a — quest system:** quest state + flags (`GameManager`, saved), quest givers in Verdance/Edenmere whose lines change as a quest moves along, a quest log (pause menu), objective markers on the map, key items (unlimited, per the design doc's inventory rules), and quest-specific overworld spots (a marked monster to fight, an item to pick up in a clearing or off-road spot - the 23c map has room).
+- **24b / 24c — the quests, two dungeons each:** 1-2 quests unlocked before each dungeon, each rewarding a dungeon-helping item. Since the route depends on the starting class, every dungeon needs its quests (only your own starting dungeon has none: you wake up inside it). First ideas to react to:
+  - Cathedral: *Holy Water* (Verdance's elder) - holy damage bonus vs. the Fallen Guardian, or stops its phase-2 DEF-down.
+  - Monastery: *Calming Incense* - Berserk Warriors stop hitting their own side... or rather, the Grandmaster's counter stance lasts fewer rounds.
+  - Observatory: *Star Chart* - the whole dungeon map revealed; *Void Lens* - the Void Archmage loses its phase-2 elemental immunity.
+  - Guild: *Thieves' Ledger* - the Shadow Lord's summons come later/fewer; a lantern that shows which chest is a mimic.
+- Art/music for whatever this adds (quest-giver tweaks, item icons if any, a marked overworld monster) done with each sub-milestone, like 23.
+
+**Cory's answers (2026-10-16):**
+1. **Hard gate:** the next dungeon stays sealed until its quests are done.
+2. **The items are light:** mainly the key that opens the dungeon (a light convenience at most), not a boss-fight edge. So the Holy Water / Void Lens style ideas above become keys or seal-breakers, not combat effects.
+3. **A mix of quest types:** fetch, hunts (a visible overworld monster) and errands. He especially likes **errands that send you to the next town**, so players go out and explore (e.g. Verdance -> Edenmere and back).
+4. **Existing villagers give them** (elder, guard, farmer, child, innkeeper, Edenmere's people), not new NPCs.
+5. **Rewards: XP and gold too,** on top of the key item.
+
+Still to decide when building: how the quest seal sits alongside the existing party-member gates (`ActOne.can_enter()`: both must be met, or the quest replaces the member gate), and which 1-2 quests go before each dungeon.
+
+## Milestones 27 and 30 — Act II and Act III side quests (planned, not started)
+
+Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act II and Act III too, not just Act I. Both reuse Milestone 24's quest system (quest state, givers, quest log, map markers, key items), so they are content milestones: the quests, their dialogue, any hunt monsters and quest spots, and a little art. Each sits right after the content it needs (the kingdoms and towns must exist first) and before that act's art pass, which then covers the quest art too. Draft only; scope with Cory before building.
+
+**27 — Act II side quests (draft):**
+- **Before each cleansing:** like Act I, 1-2 quests in a kingdom's capital lead into its dungeon (Frozen Citadel, Sunken Sanctum, Drowned Fortress). Whether these also *seal* the dungeon, as Act I's do, is a question for Cory. The towns are corrupted at this point, so the quest givers are the few people still around: refugees, a lone guard, a holdout merchant.
+- **After each cleansing:** this is where Act II side quests fit best. The design doc already says towns reopen and new paths unlock once a kingdom is cleansed, so quests can reward going back: Nordveil's thawed passes, Duskara's hidden oasis, Selavon's harbor and sea trade (the design doc calls Selavon "the most reward-rich post-cleanse town"). Optional, never blocking the story.
+- **Errands between kingdoms:** what Cory liked in Act I (errands that send you to the next town), now across the whole continent, e.g. carry word from Nordveil to Selavon. They also bring you back through the Forest Heartlands and Verdance/Edenmere as they change.
+- **Rewards:** XP, gold, and (an idea to raise) the Act II armor set pieces, which the design doc says come from "dungeon chests and town shops"; a quest could award the 4th set piece.
+- Likely split once scoped: 27a Nordveil, 27b Duskara, 27c Selavon (+ the between-kingdom errands), mirroring 26b-26d.
+
+**30 — Act III side quests (draft):**
+- Act III has one town, **The Threshold** (free inn, unlimited shrine), right before The Blighted Maw. So the Act III quests are a short, optional "last preparations" set, not a gate: the final descent should never be blocked by a side quest.
+- **Ideas to react to:** each hero's personal last errand (one per class: Vael, Ryn, Lyra, Silas), gathering help or relics from the liberated kingdoms (the design doc says representatives of the liberated kingdoms gather in Verdance after Act II), the Act III armor set pieces or each class's best weapon, and Frank: hints about who he really is that pay off at his reveal in the Vorath fight (careful not to give it away).
+- **Rewards:** XP and gold, plus the best gear in the game. Since the quests are optional, the Vorath fight must still be winnable without them.
+
+**Cory's answers (2026-10-18):**
+1. **Two kinds of quest: required and optional.** Required quests are part of the story; optional ones are just fun extra things to do for more XP and items.
+2. **Act II has both, per kingdom:** 1-2 required quests that help free the kingdom (before its cleansing, leading into its dungeon), plus a couple of optional quests as extra content.
+3. **Rewards are a mix.** Optional quests give **XP + gold + potions**, and some could give **permanent buffs**. Required quests keep Act I's shape (the key or seal-breaker the story needs, plus XP and gold).
+
+**Permanent buffs: ideas to bring to Cory (not decided):**
+- **Stat tonics:** +1 or +2 to one stat (STR, DEF, INT, RES, AGI) or +5 max HP / +3 max MP, for one hero (the player picks who) or the whole party.
+- **Kingdom blessings:** finishing all of a freed kingdom's optional quests grants a party-wide boon in its theme: Nordveil's frost ward (+RES), Duskara's sun-hardened (+DEF), Selavon's sea legs (+AGI).
+- **Keep them small and countable:** a fixed number in the whole game, so the optional quests feel worth doing without making the required path a walkover. Balance the required content assuming the player has none of them.
+- **Tech note:** a permanent buff has to survive level-ups, equip/unequip and save/load. `Equipment` changes stats by mutating them directly, which is fine for that, but a permanent bonus needs its own saved record on `Combatant` (e.g. `permanent_bonuses`) so it's never lost or counted twice.
+
+**Act III: the portal key (Cory, 2026-10-18).** Act III gets **3 required quests, done in order**, that assemble the parts of a complex key opening the portal into Vorath's dungeon (The Blighted Maw). The optional "last preparations" quests above stay optional alongside them. The key replaces the draft's "Act III is all optional". A first sketch to react to (names and details not decided):
+1. **The Frame:** the Threshold's last keeper remembers the old portal and that it was sealed with a key. Fetch its broken frame from a ruined shrine at the Maw's edge (a fight there). The frame then points toward the next part.
+2. **The Core:** a shard of pure light the four pure entities left behind (the design doc says Vorath was one of four). The frame leads you across Valdris to it, maybe held by one of the freed kingdoms, so the errand revisits Act II places.
+3. **The Binding:** the parts won't join on their own. Frank knows how to bind them, more than a merchant should. A quiet hint at who he is, paid off when his identity is revealed in the Vorath fight. The finished key opens the portal.
+
+**Still open:** which exact quests go in each kingdom (Act II, 2 required + a couple optional each), the optional Act III quests, the permanent-buff design, and whether the hub (Verdance, after Act II) gets quests too.
+
+## Milestone 23 — Exploration & loot (done)
+
+Scoped with Cory 2026-10-16 (see Roadmap restructuring): 23a chests + loot + set bonuses, 23b dungeon twists, 23c bigger overworld.
+
+### 23a — treasure chests, Act I armor sets, set bonuses (done 2026-10-16, not yet playtested)
+- **Placement** (`DungeonGenerator.place_chests(layout, set_items, seed)`): pure logic, its own RNG stream (`seed + 7919`), so existing layouts didn't change. Chests sit one tile in from a room's corners: corridors run along room centers and rooms are at least 10x7, so a chest never blocks a path. The 4 set pieces go one per room where possible (never the entrance room), then 2-4 plain chests anywhere. `generate()` now also returns `room_depths` (parallel to `room_rects`). Checked over 500 seeds x 4 dungeons: deterministic, always all 4 set pieces, never on an anchor, and every walkable tile still reachable with chests as walls.
+- **Contents** (`scripts/systems/Loot.gd`): `DUNGEON_SETS` (dungeon -> its captive's set), `TABLE` (weighted plain-chest loot: potions, antidotes, ethers, the odd elixir, 30-90 gold, a rare accessory), `roll(rng)`, `give(reward)` (99 stack cap). Rolled at generation time, so a chest holds the same thing every time.
+- **In the dungeon** (`Dungeon.gd`): chests are `Sprite2D`s on the y-sorted TileMapLayer (`assets/sprites/chests.png`, 4 frames: wooden closed/open, gilded closed/open), `is_blocked()` stops the player walking into them, `interact()` opens one (A while facing it): `chest` SFX + a narrate line. **Sealed in your starting dungeon** until the warden is beaten (`_sealed()`): the full set would turn the solo warden fight into a walkover (Hollow Warden hits Vael for ~14; with the set, ~2). Map markers for unopened chests once seen (Chest = brown, Set piece = cyan). A saved spot on a chest cell falls back to the entrance.
+- **Saved:** `GameManager.opened_chests` (location -> {cell: true}), same flat-list format as `explored`; both now go through `_cells_save()` / `_cells_load()`. Reset on New Game.
+- **Set pieces** (`Equipment.DEFS`): Iron Monk (Gi, Headband, Iron Knuckles, Beads), Arcane Scholar (Arcane Robe, Scholar's Circlet, Scholar's Gloves, Arcane Focus), Shadow Walker (Garb, Cowl, Grips, Sigil). The 4th piece is a universal accessory, like the Guardian Emblem. The equip screen shows progress for every set (`Equip._set_progress_text()` loops `SET_BONUSES`).
+- **Set bonuses** (`Battle.gd`): Iron Monk = +1 extra Qi per basic attack (`_do_attack`); Arcane Scholar = switching stance happens at once in `_confirm_skill()` and reopens the spell list, so Lyra still acts; Shadow Walker = Vanish also sets `Combatant.hidden_rounds = 1`, and `_execute_enemy_turn()` leaves hidden members out of its targets (unless no one else is standing), ticking down with the other round statuses.
+- **Not done here:** chest art is shared by all four dungeons (no per-tileset recolor); Act II sets wait for Act II.
+
+### 23b — dungeon twists (done 2026-10-16, not yet playtested)
+- **Side rooms** (`DungeonGenerator._add_side_rooms()`, template key `side_rooms`, 2 per Act I dungeon): dead-end leaves hung off any main room but the boss's, in free grid slots, sized `SIDE_MIN..SIDE_MAX` (8x6..10x8). Added after the anchors from their own RNG stream (`seed + 104729`), and sized after every main room, so main rooms and anchors are identical with or without them (checked over 2000 layouts). `generate()` returns `room_kinds` ("main"/"side") parallel to `room_rects`.
+- **Treasure** (`DungeonGenerator.place_treasure()`, replaces 23a's `place_chests()`): returns `{chests: [{cell, kind, reward}], springs: [cell]}`, kind = plain / gilded / locked / mimic. Set pieces and plain chests go in main rooms; with `allow_mimic` (rescue variants only - Dungeon.gd passes `not _escape`) a plain chest becomes a mimic 60% of the time; the first side room is a spring 60% of the time (its center tile), otherwise each side room is a vault of two `Loot.RICH_TABLE` chests, each 50% locked.
+- **In the dungeon** (`Dungeon.gd`): `chests.png` is 6 frames now (+ mimic disguise: two teeth at the seam; + locked: padlock); `spring.png` (`build_spring.py`: shimmer A/B, spent; a Timer flips the shimmer). Locked: opens only with `GameManager.has_member("Silas")`. Mimic: a line, then `Player.start_battle_against([EnemyData.MIMIC])` (sets `debug_encounter`, the forced-encounter hook the suspend restore also uses) with `GameManager.pending_mimic = {location, cell}`; back on the map `_settle_mimic()` opens it and gives its rich loot if `GameManager.last_battle_won` (set by Battle.gd), otherwise it's still a mimic. Fleeing is allowed. Spring: restores HP/MP of everyone standing (no revive, like inns), once; "used" is stored in `opened_chests` like a chest. Map legend: Spring (green).
+- **Mimic** (`EnemyData.MIMIC` + kit): 170 HP / 32 ATK / 12 DEF / 9 AGI / 120 XP, RES 8, weak to fire, "Gnash" = a telegraphed x2.2 charge every third turn. Sprite: `build_mimic.py` (uses the Act I boss canvas) -> `enemies/mimic.png`, 24x32.
+- **Tested:** 2000 layouts x with/without mimics: set pieces always placed, no mimics in escape variants, mimics/gilded never in side rooms, locked only in vaults, everything reachable with chests and springs as walls. End to end (rendered): Silas picks a lock, the spring heals and goes dark, a mimic fight starts, a won fight opens the chest with its hoard.
+
+### Dungeon safety after clearing (Cory's request, 2026-10-16, not yet playtested)
+- Boss beaten: `Dungeon.encounter_steps()` spaces fights 50-100 steps (a fifth of the usual 10-20). Boss beaten **and** every chest open (locked ones and the mimic included; the spring doesn't count): `Dungeon.is_safe()` is true and `Player._check_encounter()` skips fights entirely (checked every step, like towns). A one-time "The halls have fallen quiet" line (story flag `quiet_<location>`) when it happens: after the last chest, after beating the mimic, or on arriving back from the boss fight (not during an escape's exit scene). Parse-checked only; no runtime test yet (Cory's editor was open).
+
+### 23c — the bigger overworld (done 2026-10-16, not yet playtested)
+- **The map** (`Overworld.gd` `MAP`, 64x44, still hand-editable text): drafted with a throwaway script (meadow blobs, a north-south river, roads, clearings sealed by a ring of trees), checked for reachability, and pasted in. Verdance west-center, the Cathedral on the hill north, the Monastery in the north-east hills, the Observatory on the eastern plain, the Guild in the southern ravine, Edenmere south-east - matching each dungeon's `where` text. Two bridges cross the river; a footpath leads down to the lake.
+- **New tiles/chars:** `b` bridge (overworld atlas tile 7, `bridge()` in `build_act1_tiles.py`; the builder was verified to reproduce the old atlas byte-for-byte first; `7:0/0 = 0` added to Overworld.tscn's atlas source), `t` secret path (painted as trees; `Overworld.is_secret_path()`, which `Player._is_walkable()` now asks before treating trees as walls), `c` chest and `s` spring (on grass).
+- **Treasure:** `CHEST_LOOT` hand-picks every chest's contents (asserted to match the map's `c` cells when it was pasted in). Three hidden clearings, each with an accessory found nowhere else (`Heartwood Charm` HP+30 DEF+1, `Moonstone Pendant` MP+20 INT+2, `Fox-Eye Ring` AGI+3 ATK+1, in `Equipment.DEFS`); the Cathedral-side clearing also has a spring. Secret paths start by a patch of flowers; the Verdance child now hints at that.
+- **Fights:** maps may define `encounter_steps()`; the overworld spaces fights 14-26 steps apart (dungeons keep 10-20), since walks are longer now.
+- **Camera:** clamped to the map (`Camera2D` limits, offset by the TileMapLayer's position in the scene - it isn't at the origin). Before, the grey void past the west edge showed.
+- **Old saves:** a saved overworld spot that isn't walkable on the new map falls back to outside Verdance.
+
 ## Milestone 22 — Save / load triggers (done)
 
 Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own slot; 22a = slots, manual saves, autosaves, saves that remember place + play time; 22b = suspend save (mid-battle suspend restarts the fight); manual saves at inns, Edenmere's shrine and the overworld pause menu.
@@ -266,7 +368,7 @@ Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own
 - **Single use:** resuming deletes it, and so do starting a new game and loading a slot.
 - A cutscene in progress isn't saved: resuming puts you on the map at that spot with whatever flags were already set.
 - Verified (15 checks + screenshots): nothing from the title, close -> Resume back in Verdance on the spot with the right gold, used up afterwards, Home/come-back drops it, mid-boss-fight suspend -> the Sparring Master fight restarts at full HP with the party as it began and Frank helping, win -> back on the dungeon map with the warden beaten, new game / load discard it.
-- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 23's on-device test.
+- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 25's on-device test.
 
 ## Milestone 21 — Act I art & music pass (done)
 
@@ -389,7 +491,7 @@ Built in four steps, each tested and committed on its own:
 - **Movie mode** (`movie start` ... `movie end`): a CanvasLayer (60) over everything but the fade: black background, pictures (`image id path at x,y` in screen pixels, `pan ... over t`), a bottom `caption` that fades in/out, and a centered `title` drawn at 2× (pixel-crisp). **Start skips a movie**: everything up to `movie end` is skipped except `set` and `music` steps.
 - **Story flags:** `set flag` → `GameManager.story_flags` (saved/loaded with the game), `GameManager.has_flag()`.
 - **Demos:** `data/cutscenes/demo.scene` (F7: Ryn appears beside you, talks, a hooded silhouette watches) and `demo_movie.scene` (F8: title card and captions over the forest). They double as format examples.
-- **⚠ For the APK milestone (23):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
+- **⚠ For the APK milestone (25):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
 - Verified by a driver playing both demos on the real overworld (parser incl. error reporting, dialogue advance, flags, cleanup, player control returning, movie skip) plus screenshots.
 
 ### 19b — intro movie + title screen (done, 2026-09-29)
@@ -466,20 +568,38 @@ Built in four steps, each tested and committed on its own:
 | 20d | Act I — The Underground Guild (Silas) | ✅ (2026-09-29) — stealing, summons, Edenmere, end of Act I; Silas playable |
 | 21 | Act I art & music pass | ✅ (2026-10-12) — 7 bosses/wardens, 9 enemies, Frank, 13 townsfolk, 3 tilesets, 4 battle backgrounds, 4 tracks |
 | 22 | Save / load — triggers & integration | ✅ (2026-10-12) — save screen, inn/shrine/overworld saves, autosave slot, suspend save |
-| 23 | Android APK export | Not started |
-| 24a | Act II — Cleansing transformation system | Not started |
-| 24b | Act II — Nordveil (Tundra) | Not started |
-| 24c | Act II — Duskara (Desert) | Not started |
-| 24d | Act II — Selavon (Coastal) | Not started |
-| 25 | Act II art & music pass | Not started |
-| 26 | Act III + Vorath (includes the ending movie) | Not started |
-| 27 | Act III art & music pass | Not started |
+| 23a | Exploration & loot — treasure chests, Act I armor sets, set bonuses | ✅ (2026-10-16) — not yet playtested |
+| 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
+| 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
+| 24 | Act I side quests — 1-2 town quests before each dungeon, rewarding items that help in it | Planned — scope with Cory first |
+| 25 | Android APK export | Not started |
+| 26a | Act II — Cleansing transformation system | Not started |
+| 26b | Act II — Nordveil (Tundra) | Not started |
+| 26c | Act II — Duskara (Desert) | Not started |
+| 26d | Act II — Selavon (Coastal) | Not started |
+| 27 | Act II side quests — town quests in the three kingdoms, before and after each cleansing | Planned — scope with Cory first |
+| 28 | Act II art & music pass | Not started |
+| 29 | Act III + Vorath (includes the ending movie) | Not started |
+| 30 | Act III side quests — 3 required quests in order that assemble the key to Vorath's portal, plus optional quests from The Threshold | Planned — scope with Cory first |
+| 31 | Act III art & music pass | Not started |
 
 Detailed per-milestone changelog is in README.md's "Current Status" section — keep both files in sync when a milestone completes.
 
 ## Roadmap restructuring
 
-Two restructuring passes so far, most recent first. **Milestone numbers cited in older entries below are historical** — the roadmap has been renumbered more than once since; the Implementation status table above is always the authoritative current numbering, not any number quoted in the prose here.
+Several restructuring passes so far, most recent first. **Milestone numbers cited in older entries below are historical** — the roadmap has been renumbered more than once since; the Implementation status table above is always the authoritative current numbering, not any number quoted in the prose here.
+
+### Act II and Act III side quests inserted as 27 and 30 (2026-10-18)
+
+- Cory asked for side quests in Act II and Act III too (on top of Act I's 24). Each sits right after the content it needs and before that act's art pass, so the art pass covers the quest art too (same reason the art passes sit after the content). New numbers: APK 25 and Act II 26a-26d unchanged, **Act II side quests 27**, Act II art 28, Act III + Vorath 29, **Act III side quests 30**, Act III art 31. Draft and open questions in the Milestones 27 and 30 section.
+
+### Act I side quests inserted as 24 (2026-10-16)
+
+- End of the same session, Cory asked for town side quests in Act I (1-2 before each dungeon, retrieving items that help beat it) so the game isn't just dungeon after dungeon. Placed right after 23, before the APK, so the APK (now 25) stays the "Act I complete" on-hardware checkpoint. Not scoped yet - draft and open questions in the Milestone 24 section. Everything after 23 shifted +1 again: APK 25, Act II 26a-26d, Act II art 27, Act III + Vorath 28, Act III art 29.
+
+### Exploration & loot inserted as 23 (2026-10-16)
+
+- After playtesting Milestone 22, Cory found dungeons "kinda boring to walk through" and the overworld too small (dungeons close together). Scoped together: chests with random loot + each dungeon's captive's armor set (his pick over random-only or sets-only), all four twists offered (dead-end side rooms, mimics, Silas-locked chests, healing springs), and a ~3x overworld. Split **23a** chests + loot + set bonuses, **23b** dungeon twists, **23c** bigger overworld. Everything after 22 shifted +1: APK 24, Act II 25a-25d, Act II art 26, Act III + Vorath 27, Act III art 28.
 
 ### Cutscenes inserted as 19 (2026-09-29)
 

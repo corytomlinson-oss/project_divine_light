@@ -5,7 +5,8 @@ extends CanvasLayer
 # a dungeon (Player.gd). Pauses the tree while open; this layer runs anyway
 # (process_mode Always in the scene). Left: a party summary, FF-style. Right:
 # commands - Equip (the Milestone 15 screen, which reopens this menu when it
-# closes), Save (22a: only on the overworld - never in a dungeon) and Close.
+# closes), Map (MapScreen, over this menu), Save (22a: only on the overworld -
+# never in a dungeon) and Close.
 # The natural home for Formation and Items later.
 
 const CLASS_TITLES := {
@@ -57,7 +58,7 @@ func _ready() -> void:
 	_cursor.target = _options[_index]
 	# Gold under the commands (Milestone 20a).
 	var gold_box := Panel.new()
-	gold_box.position = Vector2(244, 34 if not can_save else 44)
+	gold_box.position = Vector2(244, 44 if not can_save else 54)
 	gold_box.size = Vector2(72, 18)
 	add_child(gold_box)
 	var gold := Label.new()
@@ -82,6 +83,7 @@ func _process(_delta: float) -> void:
 		Sfx.play("menu_confirm")
 		match _options[_index].name:
 			"Equip": _open_equip()
+			"Map": _open_map()
 			"Save": _save()
 			"Close": _close()
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
@@ -92,6 +94,13 @@ func _process(_delta: float) -> void:
 func _save() -> void:
 	set_process(false)
 	await SaveMenu.open(self, "save")
+	set_process(true)
+	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
+
+
+func _open_map() -> void:
+	set_process(false)
+	await MapScreen.open(_player).closed
 	set_process(true)
 	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
 

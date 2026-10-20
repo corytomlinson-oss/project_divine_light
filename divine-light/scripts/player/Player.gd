@@ -36,17 +36,31 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _moving:
-		position = position.move_toward(_target, MOVE_SPEED * delta)
-		if position.is_equal_approx(_target):
-			position = _target
-			_moving = false
-			_on_tile_entered()
+		var step: float = MOVE_SPEED * delta
+		var left_to_go: float = position.distance_to(_target)
+		if step < left_to_go:
+			position = position.move_toward(_target, step)
+			return
+		position = _target
+		_moving = false
+		_on_tile_entered()
+		# Still holding a direction: start the next tile this same frame and
+		# spend the leftover distance on it. Waiting a frame stalled the walk
+		# for one frame on every tile, which read as stutter.
+		if not (Transition.is_busy() or Cutscene.is_playing() or get_tree().paused):
+			_handle_input()
+			if _moving:
+				position = position.move_toward(_target, step - left_to_go)
 	elif Cutscene.is_playing():
 		pass  # a cutscene is moving the player; no input until it ends
 	elif Input.is_action_just_pressed("cancel") or Input.is_action_just_pressed("pause"):
 		# B or Start opens the pause menu (Milestone 17c). Lives here, not in
 		# Overworld.gd/Dungeon.gd, since Player.gd is shared by every map.
 		_open_pause_menu()
+	elif Input.is_action_just_pressed("map"):
+		_play_anim("idle")
+		Sfx.play("menu_confirm")
+		MapScreen.open(self)
 	elif Input.is_action_just_pressed("confirm"):
 		_interact()
 	else:
@@ -132,10 +146,13 @@ func _play_anim(kind: String) -> void:
 
 func _is_walkable(world_pos: Vector2) -> bool:
 	var cell: Vector2i = _tile_map.local_to_map(world_pos)
+	var map_root: Node = _tile_map.get_parent()
+	# Secret paths through the overworld's trees (23c).
+	if map_root.has_method("is_secret_path") and map_root.is_secret_path(cell):
+		return true
 	if _tile_map.get_cell_atlas_coords(cell) == WALL_ATLAS_COORDS:
 		return false
 	# Maps can block more: water, buildings, people standing there (20a).
-	var map_root: Node = _tile_map.get_parent()
 	return not (map_root.has_method("is_blocked") and map_root.is_blocked(cell))
 
 
@@ -143,6 +160,8 @@ func _on_tile_entered() -> void:
 	var cell: Vector2i = _tile_map.local_to_map(position)
 	var coords: Vector2i = _tile_map.get_cell_atlas_coords(cell)
 	var map_root: Node = _tile_map.get_parent()
+	if map_root.has_method("on_player_moved"):
+		map_root.on_player_moved(cell)  # the dungeon auto-map
 	# The gate tile is always a door; maps can declare others (the overworld's
 	# stone arches into dungeons).
 	if coords == DOOR_ATLAS_COORDS or (map_root.has_method("is_door") and map_root.is_door(cell)):
@@ -175,6 +194,11 @@ func _use_door(cell: Vector2i) -> void:
 
 
 func _check_encounter() -> void:
+	# Towns are safe zones: no random fights. Maps can be safe too (a dungeon
+	# with its boss beaten and every chest open).
+	var map_root: Node = _tile_map.get_parent()
+	if map_root is Town or (map_root.has_method("is_safe") and map_root.is_safe()):
+		return
 	_steps_to_encounter -= 1
 	if _steps_to_encounter <= 0:
 		_reset_encounter_counter()
@@ -197,8 +221,23 @@ func start_boss_battle() -> void:
 	_trigger_boss_battle()
 
 
+## A fight against these exact enemies (stat dicts, like EnemyData's), started
+## by the map - a mimic (23b). Fleeing is allowed; it isn't a boss.
+func start_battle_against(enemies: Array) -> void:
+	_play_anim("idle")
+	GameManager.pending_spawn_position = position
+	GameManager.has_pending_spawn = true
+	GameManager.debug_encounter = enemies
+	Transition.to_battle()
+
+
 func _reset_encounter_counter() -> void:
-	_steps_to_encounter = randi_range(10, 20)
+	# Maps can space fights out more (the big overworld, 23c).
+	var map_root: Node = _tile_map.get_parent() if _tile_map != null else null
+	var steps := Vector2i(10, 20)
+	if map_root != null and map_root.has_method("encounter_steps"):
+		steps = map_root.encounter_steps()
+	_steps_to_encounter = randi_range(steps.x, steps.y)
 
 
 ## Directly repositions the player, bypassing the tile-to-tile tween. For a

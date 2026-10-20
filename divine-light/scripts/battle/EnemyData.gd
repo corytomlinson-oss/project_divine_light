@@ -46,6 +46,11 @@ const KITS := {
 	"Hollow Archer": {"attack": {"target": "back_row"}},
 	"Shade Wisp": {"attack": {"poison_chance": 40, "poison_power": 4, "poison_rounds": 3}, "res": 12},
 	"Corrupted Farmer": {},
+	# A chest that bites (23b): telegraphs a big chomp every third turn;
+	# old dry wood, so fire finds it.
+	"Mimic": {"res": 8, "weak": ["fire"], "abilities": [
+		{"name": "Gnash", "kind": "charge", "every": 3, "mult": 2.2, "tell": "opens its jaws wide!"},
+	]},
 	# The Cathedral
 	"Fallen Priest": {"int": 12, "res": 10, "abilities": [
 		{"name": "Dark Litany", "kind": "party_def_down", "chance": 45, "power": 4, "rounds": 2},
@@ -253,6 +258,9 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Venomous Cutthroat", "hp": 58,  "atk": 30, "def": 8,  "agi": 14, "xp": 50},
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
+
+# A mimic (23b) - only in rescue dungeons, so there's always a party.
+const MIMIC := {"name": "Mimic", "hp": 170, "atk": 32, "def": 12, "agi": 9, "xp": 120}
 
 # Location -> table. "cathedral_escape" is the Cathedral as a starting dungeon.
 const ENCOUNTER_TABLES: Dictionary = {

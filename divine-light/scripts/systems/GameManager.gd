@@ -31,6 +31,18 @@ var has_pending_spawn: bool = false
 var dungeon_seeds: Dictionary = {}
 var pending_boss_battle: bool = false
 var defeated_bosses: Dictionary = {}
+# The auto-map: the cells of each dungeon the player has seen, keyed by
+# location like dungeon_seeds (location -> {Vector2i: true}). Saved as flat
+# [x0, y0, x1, y1, ...] lists.
+var explored: Dictionary = {}
+# Treasure chests already opened (Milestone 23a), same shape and save format
+# as `explored`: location -> {Vector2i: true}.
+var opened_chests: Dictionary = {}
+# A mimic fight in progress (23b): {location, cell} of the chest that bit, so
+# the dungeon can settle it on the way back (won: it's opened; fled: it waits).
+var pending_mimic: Dictionary = {}
+# Whether the last battle ended in victory (set by Battle.gd).
+var last_battle_won: bool = false
 # Set by the pause menu before it opens another screen (Equip), so the map
 # reopens the menu when that screen returns to it.
 var reopen_pause_menu: bool = false
@@ -113,6 +125,9 @@ func start_new_game(cls: String) -> void:
 	story_flags = {}
 	dungeon_seeds = {}
 	defeated_bosses = {}
+	explored = {}
+	opened_chests = {}
+	pending_mimic = {}
 	gold = 0
 	arrival = ""
 	has_pending_spawn = false
@@ -193,6 +208,8 @@ func _save_data() -> Dictionary:
 		"inventory": inventory.duplicate(),
 		"dungeon_seeds": dungeon_seeds.duplicate(),
 		"defeated_bosses": defeated_bosses.duplicate(),
+		"explored": _cells_save(explored),
+		"opened_chests": _cells_save(opened_chests),
 		"story_flags": story_flags.duplicate(),
 		"scene": current_scene_path,
 		"location": location_name(current_location),
@@ -309,6 +326,8 @@ func _apply(parsed: Dictionary) -> void:
 	defeated_bosses.clear()
 	for location in save_defeated_bosses:
 		defeated_bosses[location] = bool(save_defeated_bosses[location])
+	explored = _cells_load(parsed.get("explored", {}))
+	opened_chests = _cells_load(parsed.get("opened_chests", {}))
 	var save_story_flags: Dictionary = parsed.get("story_flags", {})
 	story_flags.clear()
 	for flag in save_story_flags:
@@ -388,6 +407,52 @@ func resume() -> String:
 ## generated layout. Uses the global RNG for this one-time pick only - the
 ## generator itself must never touch it, or regeneration would desync from
 ## whatever else has consumed global randomness in between.
+## Auto-map: records cells of `location` as seen.
+func mark_explored(location: String, cells: Array) -> void:
+	if not explored.has(location):
+		explored[location] = {}
+	var seen: Dictionary = explored[location]
+	for cell in cells:
+		seen[cell] = true
+
+
+func is_explored(location: String, cell: Vector2i) -> bool:
+	return explored.has(location) and explored[location].has(cell)
+
+
+func is_chest_opened(location: String, cell: Vector2i) -> bool:
+	return opened_chests.has(location) and opened_chests[location].has(cell)
+
+
+func mark_chest_opened(location: String, cell: Vector2i) -> void:
+	if not opened_chests.has(location):
+		opened_chests[location] = {}
+	opened_chests[location][cell] = true
+
+
+## location -> {Vector2i: true} as location -> flat [x0, y0, x1, y1, ...].
+func _cells_save(by_location: Dictionary) -> Dictionary:
+	var data := {}
+	for location in by_location:
+		var flat: Array = []
+		for cell in by_location[location]:
+			flat.append(cell.x)
+			flat.append(cell.y)
+		data[location] = flat
+	return data
+
+
+func _cells_load(data: Dictionary) -> Dictionary:
+	var by_location := {}
+	for location in data:
+		var flat: Array = data[location]
+		var cells := {}
+		for i in range(0, flat.size() - 1, 2):
+			cells[Vector2i(int(flat[i]), int(flat[i + 1]))] = true
+		by_location[location] = cells
+	return by_location
+
+
 func get_dungeon_seed(location: String) -> int:
 	if not dungeon_seeds.has(location):
 		dungeon_seeds[location] = randi()

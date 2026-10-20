@@ -1,44 +1,73 @@
 extends Node2D
 
-# The Forest Heartlands - Act I's overworld (Milestone 20a), painted from the
-# text map below every time the scene loads (the scene file's own tile data is
-# cleared first). Edit MAP to change the land.
+# The Forest Heartlands - Act I's overworld (Milestone 20a; made about three
+# times bigger in 23c), painted from the text map below every time the scene
+# loads (the scene file's own tile data is cleared first). Edit MAP to change
+# the land.
 #
 #   .  grass      T  trees (wall)    =  road       ~  water (blocked)
-#   *  flowers    V  Verdance        E  Edenmere   (town gates)
+#   *  flowers    b  bridge          t  secret path: looks like trees, but
+#                                       you can walk through (23c)
+#   c  chest      s  healing spring  (on grass; contents in CHEST_LOOT)
+#   V  Verdance        E  Edenmere   (town gates)
 #   C  The Cathedral   M  The Monastery   O  The Observatory
 #   G  The Underground Guild                        (dungeon arches)
+#
+# Three hidden clearings sit in the forest, each holding a chest with an
+# accessory you can't get anywhere else (one has a spring too). They show on
+# screen through the trees; the way in starts by a patch of flowers.
 #
 # Leaving a town or dungeon sets GameManager.arrival, and the player appears
 # just outside that entrance. Returning from a battle uses the saved spot.
 
 const MAP := [
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTT..TTTTTTT",
-	"TTTTTT...C....TTTTTTTTT....M....TTTT",
-	"TTTTT....=.....TTTTTTT...*.=.....TTT",
-	"TTTT.....=.....TTTTTTT.....=.....TTT",
-	"TTTTT*...=.....TTTTTTT.....=.....TTT",
-	"TTTTTT...=...TTTTTTTTTT....=....TTTT",
-	"TTTTTTT.T=.TTTTTTTTTTTTTTTT=TTTTTTTT",
-	"TTTTT....=.*.TTTT.TTTTTTTTT=T.TTTTTT",
-	"TTTT.....=..............TT.=.....TTT",
-	"TTT......=..............T..=...*..TT",
-	"TTT......=........==============..TT",
-	"TTT......V=========............=O..T",
-	"TTT...............=...TTT.........TT",
-	"TTT~~~~~........TT=TTTTTT.........TT",
-	"TTT~~~~~......TTTT===========...TTTT",
-	"TTT~~~~~.....TTTTT=TTTTTTTTT=TTTTTTT",
-	"TTTTTTTTTTTTT.....=...TTTTTT=TTTTTTT",
-	"TTTTTTTTTTTT......=.*...T...=...TTTT",
-	"TTTTTTTTTTT.......=.........===..TTT",
-	"TTTTTTTTTTT.......=...........=E.TTT",
-	"TTTTTTTTTTTTT.....G..TTT.........TTT",
-	"TTTTTTTTTTTTTTTTT.TTTTTTT.......TTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.~~.TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTT....TTTTTTTTTTTTTTTTTT.~~.TTTTTTTTTTTT....*.TTTTTTTTTT",
+	"TTTTTTTTTT.........TTTTTTTTTTTTT.~~.TTTTTTTTTTT........TTTTTTTTT",
+	"TTTTTTTTTT...........TTTTTTTTTTT.~~.TTTTTTTTT..........TTTTTTTTT",
+	"TTTTTTTTT............*.TTTTTTTTT.~~.TTT...TTT............TTTTTTT",
+	"TTTTTTTT......C.........TTTTTTTT.~~TTT...c.TTT....M........TTTTT",
+	"TTTTTTT.......=.*.......TTTTTTTT.~~TTT......TT....=.........TTTT",
+	"TTTTTTTT......=.........TTTTTTTT.~~TTT.....TTT....=.........TTTT",
+	"TTTTTTTTT.....=.T.....TTTTTTTTTT*~~.TTT...TTT.....=........TTTTT",
+	"TTTTTTTTTTT...=TTTTTTTTTTTTTTTTT.~~.TTTTtTTTTTTTTT=TTT...TTTTTTT",
+	"TTTT..TTTTTTTT=TTT..TTTTTTTTTTTTT.~~.TTTtTTTTTTTTT=TTTTTTTTTTTTT",
+	"TT..c..TTTTTTT===........TTTTTTTT.~~.TTTtTTTTTTTTT=TTTTTTTTTTTTT",
+	"TT.....TTTTTTTTT=......c...TTTTTT.~~.TTTtTTT=======TTTTTTTTTTTTT",
+	"TT...s.TTTTTTTTT=T..*.......TTTTT.~~.TTTtttt=TTTTTTTTTTTTTTTTTTT",
+	"TTTT..TTTTTTTTTT=T.........TTTTTT.~~.TTTTTTT=.TTTTTTTTTTTTTTTTTT",
+	"TTTTTtTTTTTTTTTT=T.....TTTTTTTTTT.~~.TTTTTT.=.*TTTTTTT....TTTTTT",
+	"TTTTTtttTTTTTTTT=TT.......TTTTTTT.~~.TTTTT..=..TTTTTT.........TT",
+	"TTTTTTTtTTTTTT..=.......*.TTTTTTT.~~.TTT....=..TTTTT...........T",
+	"TTTTTTTtTTTT....=..........TTTTTT.~~.TTT....=....TT............T",
+	"TTTTTTTt*.......=..........TTTTTT.~~.TT.....=....*.............T",
+	"TTTTTT***.......=...*.....TTTTTTT.~~.TT.....=...c.............TT",
+	"TTTT..***.......=.........TTTTTTTT.~~.T.....=...........==O...TT",
+	"TTTT............=.........TTTTTTT.~~.T*.....=...........=..*.TTT",
+	"TTTT.*..........V=================bb=====================....TTT",
+	"TTTT.........*..=.*...*...TTTTTTT.~~.TT....TT.................TT",
+	"TTTT...c........=...*.....TTTTTTT.~~.TTTTTTTTTTT...........*..TT",
+	"TTTTTT..........=.........TTTTTTT.~~.TTTTTTTTTTTTT.....*.....c.T",
+	"TTTTTTTTT.......=.........TTTTTTT.~~.TTTTTTTTTTTTTT............T",
+	"TTTTTTTTTTTTT...=..*......TTTTTTT.~~*TTTTTTTTTTTTTTTT.........TT",
+	"TTTTT....TTTT...==================bb======TTTTTTT..TTTTTTT..*TTT",
+	"TTTT......T..*.T.*.....TTTT=TTTTT.~~....T=TTTTTT....TTTTTTTTTTTT",
+	"TTT.............TTTTTTTTTTT=TTTTTT.~~....=TTTTTT.....TTTTTTTTTTT",
+	"TT....~~~~.......TTTTTTTTTT=TTTTTT.~~....=.TTTT...........TTTTTT",
+	"TT...~~~~~~~~....TTTTTT..*.=TTTTTT.~~....=.TTT.............TTTTT",
+	"TT...~~~~~~~~..*TTTTTT....*=....TT.~~....==========E.......TTTTT",
+	"TTT..~~~~~~~....TTTTTT.....=.......~~.TTTTTT.............*..TTTT",
+	"TTTT..~~~~~....TTTTTTT....*=........~~.TTTTT................TTTT",
+	"TTTTc.........TTTT.TTTT....G........~~.TTTTT..c.............TTTT",
+	"TTTT*.......TTTT.c...TTT**.....c....~~.TTTTTT....*..........TTTT",
+	"TTTT....TTTTTTTT...*.ttt**..........~~.TTTTTTT......TT.....TTTTT",
+	"TTTTT.TTTTTTTTTT.....TTT**...TTTTTT.~~.TTTTTTTT..*.TTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT...TTTTTTT.~~.TTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTT",
 ]
-const TILES := {".": Vector2i(0, 0), "T": Vector2i(1, 0), "=": Vector2i(3, 0), "~": Vector2i(5, 0), "*": Vector2i(6, 0)}
+const TILES := {".": Vector2i(0, 0), "T": Vector2i(1, 0), "=": Vector2i(3, 0), "~": Vector2i(5, 0),
+		"*": Vector2i(6, 0), "b": Vector2i(7, 0), "t": Vector2i(1, 0), "c": Vector2i(0, 0), "s": Vector2i(0, 0)}
 const GATE := Vector2i(2, 0)
 const ARCH := Vector2i(4, 0)
 const WATER := Vector2i(5, 0)
@@ -50,11 +79,32 @@ const TOWNS := {
 	"verdance": {"name": "Verdance", "scene": "res://scenes/town/Verdance.tscn"},
 	"edenmere": {"name": "Edenmere", "scene": "res://scenes/town/Edenmere.tscn"},
 }
+# What each chest holds (23c), hand-picked: supplies along the way, and an
+# accessory found nowhere else in each hidden clearing.
+const CHEST_LOOT := {
+	Vector2i(7, 26): {"item": "Potion", "count": 3},
+	Vector2i(23, 13): {"gold": 80},
+	Vector2i(48, 21): {"item": "Ether", "count": 2},
+	Vector2i(61, 27): {"item": "Antidote", "count": 3},
+	Vector2i(46, 38): {"gold": 120},
+	Vector2i(31, 39): {"item": "Elixir", "count": 1},
+	Vector2i(4, 38): {"item": "Traveler's Ring", "count": 1},
+	Vector2i(4, 12): {"item": "Heartwood Charm", "count": 1},    # clearing by the Cathedral
+	Vector2i(41, 6): {"item": "Moonstone Pendant", "count": 1},  # clearing by the Monastery
+	Vector2i(17, 39): {"item": "Fox-Eye Ring", "count": 1},      # clearing by the Guild
+}
+const CHEST_SHEET := preload("res://assets/sprites/chests.png")
+const SPRING_SHEET := preload("res://assets/sprites/spring.png")
+const SPRING_TEXT := "narrate Clear water wells up, glowing faintly. The party drinks and feels whole again."
+const SPENT_TEXT := "narrate The spring lies still and dark. Its power is spent."
 
 @onready var _tile_map: TileMapLayer = $TileMapLayer
 @onready var _player: Node2D = $TileMapLayer/Player
 
 var _entrances: Dictionary = {}  # cell -> entrance id
+var _secrets: Dictionary = {}    # cell -> true
+var _chests: Dictionary = {}     # cell -> Sprite2D
+var _springs: Dictionary = {}    # cell -> Sprite2D
 
 
 func _ready() -> void:
@@ -63,13 +113,25 @@ func _ready() -> void:
 	Music.play("overworld")
 	_tile_map.y_sort_enabled = true  # characters lower on screen draw in front
 	_paint()
-	if GameManager.has_pending_spawn:
+	# The camera stops at the map's edges instead of showing the void past them
+	# (the scene places the TileMapLayer off the origin, hence the offset).
+	var cam: Camera2D = _player.get_node("Camera2D")
+	var origin := Vector2i(_tile_map.global_position)
+	cam.limit_left = origin.x
+	cam.limit_top = origin.y
+	cam.limit_right = origin.x + MAP[0].length() * 16
+	cam.limit_bottom = origin.y + MAP.size() * 16
+	# A saved spot that isn't open ground anymore (a save from before the map
+	# grew) puts you outside Verdance instead.
+	var saved_cell := _tile_map.local_to_map(GameManager.pending_spawn_position)
+	if GameManager.has_pending_spawn and _walkable(saved_cell):
 		_player.snap_to(GameManager.pending_spawn_position)
-		GameManager.has_pending_spawn = false
 	else:
 		var id := GameManager.arrival if GameManager.arrival != "" else "verdance"
 		_player.snap_to(_tile_map.map_to_local(_outside(id)))
+	GameManager.has_pending_spawn = false
 	GameManager.arrival = ""
+	on_player_moved(_tile_map.local_to_map(_player.position))
 
 
 func _paint() -> void:
@@ -83,8 +145,42 @@ func _paint() -> void:
 				var id: String = ENTRANCES[ch]
 				_entrances[cell] = id
 				_tile_map.set_cell(cell, 0, GATE if TOWNS.has(id) else ARCH)
-			else:
-				_tile_map.set_cell(cell, 0, TILES.get(ch, TILES["T"]))
+				continue
+			_tile_map.set_cell(cell, 0, TILES.get(ch, TILES["T"]))
+			match ch:
+				"t":
+					_secrets[cell] = true
+				"c":
+					_chests[cell] = _add_sprite(CHEST_SHEET, 6, cell)
+				"s":
+					_springs[cell] = _add_sprite(SPRING_SHEET, 3, cell)
+	_show_treasure()
+	var shimmer := Timer.new()
+	shimmer.wait_time = 0.45
+	shimmer.autostart = true
+	shimmer.timeout.connect(_show_treasure)
+	add_child(shimmer)
+
+
+func _add_sprite(sheet: Texture2D, frames: int, cell: Vector2i) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.texture = sheet
+	sprite.hframes = frames
+	sprite.position = _tile_map.map_to_local(cell)
+	_tile_map.add_child(sprite)
+	return sprite
+
+
+func _opened(cell: Vector2i) -> bool:
+	return GameManager.is_chest_opened(GameManager.current_location, cell)
+
+
+func _show_treasure() -> void:
+	for cell: Vector2i in _chests:
+		_chests[cell].frame = 1 if _opened(cell) else 0
+	var tick := int(Time.get_ticks_msec() / 450) % 2
+	for cell: Vector2i in _springs:
+		_springs[cell].frame = 2 if _opened(cell) else tick
 
 
 ## The walkable tile just outside an entrance (south first, then the rest).
@@ -93,10 +189,16 @@ func _outside(id: String) -> Vector2i:
 		if _entrances[cell] != id:
 			continue
 		for d: Vector2i in [Vector2i.DOWN, Vector2i.UP, Vector2i.RIGHT, Vector2i.LEFT]:
-			var n := cell + d
-			if _tile_map.get_cell_atlas_coords(n) in [TILES["."], TILES["="], TILES["*"]]:
-				return n
-	return Vector2i(9, 13)
+			if _walkable(cell + d):
+				return cell + d
+	return Vector2i(16, 25)
+
+
+func _walkable(cell: Vector2i) -> bool:
+	var coords := _tile_map.get_cell_atlas_coords(cell)
+	if coords == Vector2i(-1, -1) or _entrances.has(cell):
+		return false
+	return is_secret_path(cell) or (coords != TILES["T"] and not is_blocked(cell))
 
 
 func is_door(cell: Vector2i) -> bool:
@@ -104,7 +206,33 @@ func is_door(cell: Vector2i) -> bool:
 
 
 func is_blocked(cell: Vector2i) -> bool:
-	return _tile_map.get_cell_atlas_coords(cell) == WATER
+	return _tile_map.get_cell_atlas_coords(cell) == WATER or _chests.has(cell) or _springs.has(cell)
+
+
+## Trees you can walk through (Player.gd asks before treating trees as walls).
+func is_secret_path(cell: Vector2i) -> bool:
+	return _secrets.has(cell)
+
+
+## A on the tile you're facing: open a chest, drink from the spring.
+func interact(cell: Vector2i, _facing: String) -> void:
+	if _springs.has(cell):
+		if _opened(cell):
+			await Cutscene.play_text(SPENT_TEXT)
+			return
+		GameManager.mark_chest_opened(GameManager.current_location, cell)
+		for m: Combatant in GameManager.party:
+			if not m.is_ko:  # like an inn: no revival (Frank and items only)
+				m.hp = m.max_hp
+				m.mp = m.max_mp
+		Sfx.play("heal")
+		_show_treasure()
+		await Cutscene.play_text(SPRING_TEXT)
+	elif _chests.has(cell) and not _opened(cell):
+		GameManager.mark_chest_opened(GameManager.current_location, cell)
+		_show_treasure()
+		Sfx.play("chest")
+		await Cutscene.play_text("narrate " + Loot.give(CHEST_LOOT.get(cell, {"item": "Potion", "count": 1})))
 
 
 func get_door_destination(cell: Vector2i) -> Dictionary:
@@ -122,3 +250,46 @@ func get_door_destination(cell: Vector2i) -> Dictionary:
 	if dungeon["scene"] == "":
 		return {"blocked": "%s lies ahead, but the way isn't open yet. (Coming in a later update.)" % dungeon["name"]}
 	return {"scene": dungeon["scene"]}
+
+
+## The overworld is big now (23c), so fights come a little less often here
+## than in dungeons: walking between places shouldn't be a slog.
+func encounter_steps() -> Vector2i:
+	return Vector2i(14, 26)
+
+
+# ---------------------------------------------------------------- map
+
+## Fog of war (Player.gd calls this every tile): you've seen what's been on
+## screen around you - 10 tiles either side, 6 up and down.
+func on_player_moved(cell: Vector2i) -> void:
+	var seen: Array = []
+	for dx in range(-10, 11):
+		for dy in range(-6, 7):
+			seen.append(cell + Vector2i(dx, dy))
+	GameManager.mark_explored(GameManager.current_location, seen)
+
+
+func map_fog() -> bool:
+	return true
+
+
+## Every town (gold) and dungeon (red, grey once cleared) you've seen, with
+## its name; unopened chests and the spring once seen.
+func map_markers() -> Array:
+	var markers: Array = []
+	for cell in _entrances:
+		if not GameManager.is_explored(GameManager.current_location, cell):
+			continue
+		var id: String = _entrances[cell]
+		var color := Color(0.95, 0.78, 0.3)
+		if ActOne.DUNGEONS.has(id):
+			color = Color(0.6, 0.6, 0.66) if ActOne.is_cleared(id) else Color(0.95, 0.25, 0.25)
+		markers.append({"cell": cell, "color": color, "label": GameManager.location_name(id)})
+	for cell: Vector2i in _chests:
+		if GameManager.is_explored(GameManager.current_location, cell) and not _opened(cell):
+			markers.append({"cell": cell, "color": Color(0.8, 0.55, 0.3), "legend": "Chest"})
+	for cell: Vector2i in _springs:
+		if GameManager.is_explored(GameManager.current_location, cell) and not _opened(cell):
+			markers.append({"cell": cell, "color": Color(0.45, 0.95, 0.55), "legend": "Spring"})
+	return markers

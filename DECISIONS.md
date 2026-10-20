@@ -304,3 +304,64 @@ Cory's calls (asked before building):
 - **Mid-fight suspend restarts that fight** (Cory's call): the same enemies at full strength, the party as it was when the fight began, and Frank's help again in an escape fight. A suspend after the fight is won saves the result instead, so a won fight is never re-fought.
 - **A cutscene in progress isn't saved.** Resuming puts you on the map where you were, with whatever had already happened. Short scenes simply don't replay; it isn't worth saving scene state.
 - **Nothing is saved from the title or class select**: there's no game to suspend.
+
+## Milestone 23 — Exploration & loot (scoped 2026-10-16)
+
+Cory, after playtesting 22: dungeons are "kinda boring to walk through"; the overworld needs to be bigger. His calls:
+- **Chests hold random loot plus set pieces:** each dungeon's captive's Act I armor set in gilded chests, random consumables/gold in plain ones (over random-only or sets-only).
+- **All four twists:** mimics, dead-end side rooms, Silas-locked chests, healing springs (23b).
+- **Overworld about 3x** (~64x44), with dungeons spread out and things to find off the road (23c).
+- Inserted as Milestone 23; APK moves to 24 and everything after shifts +1.
+
+### 23a: calls I made
+
+- **Each dungeon holds its captive's set** (Cathedral: Holy Guardian, Monastery: Iron Monk, Observatory: Arcane Scholar, Guild: Shadow Walker), so you find a hero's gear where you free them.
+- **Sets are sealed in your starting dungeon until the warden falls.** Your own class set is there, but the full set would make the level-1 solo warden trivial (Hollow Warden: ~14 damage a hit on Vael, ~2 with the set). Trying a sealed chest says it will break once the warden falls; it's there when you come back. Plain chests there open as normal (the solo hero can use the potions).
+- **Chests sit one tile in from room corners**, never on a corridor line, so they can't block a path; one set piece per room where possible, never in the entrance room; 2-4 plain chests per dungeon.
+- **Chests don't refill.** Opened is opened, saved per dungeon.
+- **Plain-chest loot table:** Potion 30%, gold 30-90 28%, Antidote 14%, Ether 14%, Elixir 6%, Traveler's Ring 4%, Amber Charm 4%.
+- **Set-piece stats** sit around the Holy Guardian Set's level: Iron Monk (DEF 4 ATK 2 / DEF 2 AGI 1 / ATK 3 / HP 20), Arcane Scholar (DEF 2 RES 4 / INT 3 / INT 2 DEF 1 / MP 15), Shadow Walker (DEF 3 AGI 2 / AGI 3 / ATK 3 / AGI 2). The 4th piece is a universal accessory, like the Guardian Emblem.
+- **Arcane Scholar's free switch** happens the moment you pick it, then the new stance's spells come up and Lyra still takes her action. Switching back and forth is free too.
+- **Shadow Walker's "untargetable for 1 round"** lasts the rest of the round Vanish is used in (same timing as Vanish's evasion; Silas is usually fastest, so that's most of it). It covers attacks and abilities alike; if everyone else is down, enemies can still hit him.
+- **Two chest looks:** wooden with iron bands (random), navy with gold bands (set piece), so you can tell from across the room. One chest-opening sound: a lid creak, then a rising four-note fanfare.
+
+### 23b: calls I made
+
+- **Two side rooms per dungeon**, dead ends off any main room except the boss's, smaller than the main rooms. They're added without changing the rest of the layout.
+- **What a side room holds:** the first is a healing spring 60% of the time; otherwise a side room is a vault of two rich chests (better loot table: elixirs, ethers, 120-240 gold, accessories), each 50% locked. So about half of dungeons have a spring.
+- **Locked chests need Silas in the party** ("Silas picks the lock"). Only vault chests are locked, never set pieces, so a missing Silas never blocks anything essential; you can come back.
+- **Mimics:** 60% of rescue dungeons have one, disguised as a plain chest. None in your starting dungeon: a lone level-1 hero shouldn't meet one. The tell is two teeth poking out of the lid's seam. Beating it gives a rich-table reward plus its XP; running away is allowed and leaves it waiting.
+- **Mimic stats:** 170 HP, 32 ATK, 12 DEF, 9 AGI, 120 XP; weak to fire (it's dry wood); every third turn it telegraphs a big bite ("opens its jaws wide!") for 2.2x, so Defend is the answer, like the Hollow Warden's hammer. Same stats in every dungeon (no level scaling, as decided in 20a).
+- **The spring heals HP and MP of everyone standing, once,** and doesn't revive: the design doc keeps revival to Frank and items, same as inns.
+
+### 23c: calls I made
+
+- **64x44 tiles** (old: 36x24), about 3.3x the area. Every place sits where its `where` text says (Cathedral on the hill north of Verdance, Monastery in the north-east hills, Observatory on the eastern plain, Guild in the southern ravine, Edenmere south-east).
+- **A river runs north to south through the middle**, crossed by two bridges (a new bridge tile). There's a lake in the south-west, reached by a footpath.
+- **Three hidden clearings**, sealed by forest and reached by secret paths you can walk through (they look like trees). You can see the clearings on screen through the trees; each path starts by a patch of flowers, and a Verdance child hints at it. Each clearing has an accessory found nowhere else: Heartwood Charm (HP+30, DEF+1), Moonstone Pendant (MP+20, INT+2), Fox-Eye Ring (AGI+3, ATK+1). The Cathedral-side clearing also has a spring.
+- **Seven chests along the way** with hand-picked contents (potions, ethers, antidotes, gold, an elixir, a Traveler's Ring) rather than random rolls, since the overworld isn't generated.
+- **Overworld fights come every 14-26 steps** (dungeons stay 10-20), so the longer walks don't turn into a grind.
+- **The camera stops at the map's edges** instead of showing the grey void past them.
+
+### Dungeon safety after clearing (Cory, 2026-10-16)
+
+- **Cory's call:** once the boss is beaten, random fights come a fifth as often; once the dungeon is fully cleared (all chests too), it's completely safe.
+- **My calls:** "all chests" includes locked chests and the mimic, but not the healing spring, so you can save it. The boss alone is enough for the 1/5 rate (in a rescue dungeon you don't need to have freed the captive yet). A one-time line marks the moment it goes safe.
+
+## Milestone 24 — Act I side quests (scoped 2026-10-16)
+
+Cory's calls, before anything was built:
+- **Each dungeon is sealed until its 1-2 town quests are done.**
+- **The quest reward is the key** that opens the dungeon: a light convenience, not a boss-fight advantage.
+- **A mix of quest types:** fetch, hunts and errands, with errands that send you to the next town so you explore.
+- **Existing villagers give the quests.**
+- **Quests also give XP and gold.**
+
+## Milestones 27 and 30 — Act II and Act III side quests (scoped 2026-10-18)
+
+Cory's calls, before anything was built:
+- **Two kinds of quest: required and optional.** Optional ones are fun extra content for XP and items.
+- **Act II, per kingdom: 1-2 required quests that help free it, plus a couple of optional ones.**
+- **Optional rewards: XP + gold + potions, and maybe permanent buffs.** Required quests keep Act I's shape (the key the story needs, plus XP and gold).
+- Still open: whether Act III follows the same split (the draft keeps it all optional), and the permanent-buff design (ideas in CLAUDE.md's Milestones 27 and 30 section).
+- **Act III (Cory): 3 required quests, done in order, assemble a complex key that opens the portal into Vorath's dungeon.** The optional Act III quests stay. My sketch (frame -> core -> binding, Frank does the binding as a hint at who he is) is in CLAUDE.md, not decided.

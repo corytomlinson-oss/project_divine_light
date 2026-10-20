@@ -414,10 +414,51 @@ func on_player_moved(cell: Vector2i) -> void:
 			for x in range(walls.position.x, walls.end.x):
 				for y in range(walls.position.y, walls.end.y):
 					seen.append(Vector2i(x, y))
+			seen.append_array(_corridor_stubs(rect))
 	for dx in range(-2, 3):
 		for dy in range(-2, 3):
 			seen.append(cell + Vector2i(dx, dy))
 	GameManager.mark_explored(GameManager.current_location, seen)
+
+
+## A room's exits on the map (Cory, 2026-10-20: rooms were easy to miss when
+## their doorway was a 1px notch): the first CORRIDOR_STUB tiles of every
+## corridor leading out, with their walls, so unexplored ways out show as
+## passages running off into the dark.
+const CORRIDOR_STUB := 4
+
+func _corridor_stubs(rect: Rect2i) -> Array:
+	var cells: Array = []
+	var walls := rect.grow(1)
+	var frontier: Array = []
+	for x in range(walls.position.x, walls.end.x):
+		for y in range(walls.position.y, walls.end.y):
+			var cell := Vector2i(x, y)
+			if not rect.has_point(cell) and _tile_map.get_cell_atlas_coords(cell) == FLOOR_COORDS:
+				frontier.append(cell)  # a doorway in the room's wall
+	var visited := {}
+	for step in CORRIDOR_STUB:
+		var next: Array = []
+		for cell: Vector2i in frontier:
+			if visited.has(cell):
+				continue
+			visited[cell] = true
+			for dx in range(-1, 2):
+				for dy in range(-1, 2):
+					cells.append(cell + Vector2i(dx, dy))
+			for d: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+				var n := cell + d
+				if not walls.has_point(n) and _tile_map.get_cell_atlas_coords(n) == FLOOR_COORDS:
+					next.append(n)
+		frontier = next
+	return cells
+
+
+## For MapScreen's corner: how many chests are open here (the spring doesn't
+## count, like the quiet rule), so you can tell a room was missed.
+func map_note() -> String:
+	var opened := _chests.keys().filter(func(c: Vector2i) -> bool: return _opened(c)).size()
+	return "Chests %d/%d" % [opened, _chests.size()]
 
 
 ## For MapScreen: only explored cells are drawn, plus the exit, captive and

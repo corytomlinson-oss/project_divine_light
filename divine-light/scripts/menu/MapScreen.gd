@@ -9,6 +9,8 @@ extends CanvasLayer
 #                           whole map (dungeons)
 #   map_markers() -> Array  {cell, color, label?, legend?}: labels are written
 #                           next to the marker, legends listed along the bottom
+#   map_note() -> String    a short line in the top-right corner (a dungeon's
+#                           chest count)
 # Pauses the tree while open and puts it back the way it was on close, so it
 # works over the pause menu too.
 
@@ -68,6 +70,14 @@ func _ready() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_color_override("font_color", Color(0.91, 0.77, 0.35))
 	add_child(title)
+	if _map_root.has_method("map_note"):
+		var note := Label.new()
+		note.text = _map_root.map_note()
+		note.position = Vector2(4, 6)
+		note.size = Vector2(304, 10)
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		note.modulate = GREY
+		add_child(note)
 
 	_canvas = Control.new()
 	_canvas.draw.connect(_draw_map)

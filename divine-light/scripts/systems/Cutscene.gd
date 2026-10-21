@@ -8,7 +8,7 @@ extends CanvasLayer
 # In-engine scenes use the real map: the player and spawned characters walk,
 # turn and emote, the camera pans, and a name-tag dialogue box types out
 # lines. Movie mode covers the screen with full-screen pixel shots (pictures,
-# pans, captions, a title) for the intro and ending; Start skips a movie.
+# pans, captions, a title) for the intro and ending; Start (or F3) skips a movie.
 #
 # The tree keeps running during a scene (actors need to animate); Player.gd
 # ignores input while is_playing(). Screen fades reuse Transition's overlay.
@@ -31,6 +31,7 @@ var _spawned: Array = []
 var _async: Array = []             # Tweens started by [async] steps
 var _movie_active := false
 var _holds := 0
+var _f3_held := false
 var _skip_movie := false
 var _images: Dictionary = {}
 
@@ -158,7 +159,12 @@ func play_once(path: String, flag: String) -> void:
 func _process(delta: float) -> void:
 	_blink = fmod(_blink + delta, 0.8)
 	_arrow.visible = _box.visible and _arrow.more_below and _blink < 0.5
-	if _movie_active and not _skip_movie and Input.is_action_just_pressed("pause"):
+	# Start skips a movie; so does F3 (Cory's dev key, the same one that wins
+	# a battle instantly).
+	var f3 := Input.is_key_pressed(KEY_F3)
+	var f3_pressed := f3 and not _f3_held
+	_f3_held = f3
+	if _movie_active and not _skip_movie and (Input.is_action_just_pressed("pause") or f3_pressed):
 		_skip_movie = true
 		for t: Tween in _async:
 			if t.is_valid():

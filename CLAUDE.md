@@ -761,6 +761,7 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - **F3** — instantly KO all enemies and win the current battle (`_debug_auto_win()`), granting XP/level-ups the same as a real victory. No-op if the battle is already over. Added during Milestone 13a playtesting to make repeated dungeon-walk/encounter-transition testing fast — without it, every encounter test requires manually fighting to completion.
 - **F7 / F8** — play the demo cutscene / demo movie (`Cutscene.gd` `_input()`, only on a map with the player, not while paused)
 - **F9** — play the Act I finale movie for this game's route (same conditions)
+- **F3** — besides winning a battle instantly, skips a movie (the intro, the Act I finale), same as Start
 - **F5** — save party + inventory to slot 1 (GameManager.gd `_input()`, works from any scene)
 - **F6** — load slot 1 back into the live party + inventory
 

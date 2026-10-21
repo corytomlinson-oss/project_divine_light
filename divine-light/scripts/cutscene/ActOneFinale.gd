@@ -19,7 +19,7 @@ extends CanvasLayer
 #
 # Timed to the "finale" track (build_music.py FINALE: 140 BPM, 37 bars): every
 # shot starts on a bar (_at() waits on the clock since the music started).
-# Start skips. F9 previews it on any map (Cutscene.gd).
+# Start or F3 skips. F9 previews it on any map (Cutscene.gd).
 
 const BAR := 60.0 / 140.0 * 4.0
 const T_SHOTS := 2 * BAR
@@ -53,6 +53,7 @@ const BOSSES := {
 
 var _start_ms := 0
 var _skipped := false
+var _f3_held := true  # a key already down when the movie starts isn't a press
 var _stage: Node2D        # everything in a shot; cleared between shots, shaken on hits
 var _fx: BattleFx         # Milestone 18's effects, drawn at 2x
 var _black: ColorRect     # this layer's own cut-to-black
@@ -122,7 +123,12 @@ func _label(color: Color) -> Label:
 
 
 func _process(_delta: float) -> void:
-	if not _skipped and Input.is_action_just_pressed("pause"):
+	# Start or F3 (like the intro) skips. F3 only counts as a fresh press, so
+	# holding it from a battle's instant win doesn't skip by accident.
+	var f3 := Input.is_key_pressed(KEY_F3)
+	var f3_pressed := f3 and not _f3_held
+	_f3_held = f3
+	if not _skipped and (Input.is_action_just_pressed("pause") or f3_pressed):
 		_skipped = true
 
 

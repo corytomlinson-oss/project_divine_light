@@ -602,8 +602,72 @@ GUILD = dict(
     ],
 )
 
+# The Act I finale movie (after Milestone 24): E minor, 140 BPM, 37 bars
+# (63s), laid out bar for bar to the movie (ActOneFinale.gd times its shots
+# from the same numbers): a 2-bar pickup, four 5-bar boss shots on one heroic
+# riff (each ending on B to drive into the next; the fourth climbs and holds
+# D), the four together (G C D: the first major lift), three 2-bar kingdom
+# teasers in shifting minor keys, Vorath (F -> B, stabbing), then a C D G
+# cadence under the Act II title.
+FINALE_RIFF_A = [
+    [('E5', 4), ('G5', 2), ('B5', 2), ('E6', 4), ('D6', 2), ('B5', 2)],
+    [('C6', 4), ('B5', 2), ('G5', 2), ('E5', 4), ('G5', 4)],
+    [('D6', 4), ('B5', 2), ('G5', 2), ('B5', 2), ('D6', 2), ('G6', 4)],
+    [('F#6', 6), ('E6', 2), ('D6', 4), ('A5', 4)],
+    [('B5', 2), ('C6', 2), ('D#6', 2), ('F#6', 2), ('B6', 8)],
+]
+FINALE_RIFF_B = [
+    [('B5', 4), ('E6', 2), ('G6', 2), ('E6', 4), ('B5', 4)],
+    [('C6', 2), ('E6', 2), ('G6', 4), ('E6', 4), ('C6', 4)],
+    [('B5', 4), ('D6', 2), ('G6', 2), ('F#6', 2), ('E6', 2), ('D6', 4)],
+    [('A5', 2), ('D6', 2), ('F#6', 4), ('A6', 4), ('F#6', 4)],
+    [('D#6', 4), ('F#6', 4), ('B6', 4), ('A6', 2), ('F#6', 2)],
+]
+FINALE = dict(
+    bpm=140, peak=0.86, loop_from_bar=0,
+    lead_vol=0.30, arp_vol=0.085, bass_vol=0.42, drum_vol=0.22, lead_duty=0.5,
+    bass_pattern=['R', 'R', 'O', 'R', 'R', 'O', 'R', 'O'],
+    kick=[0, 6, 8, 10], snare=[4, 12],
+    drums_from=1, fills=[1, 6, 11, 16, 21, 24, 32],
+    chords=(
+        ['Em', 'Em'] +                                   # pickup
+        ['Em', 'C', 'G', 'D', 'B'] * 3 +                 # bosses 1-3
+        ['Em', 'C', 'Am', 'D', 'D'] +                    # boss 4: climb and hold
+        ['G', 'C', 'D'] +                                # the four together
+        ['Bm', 'Bm', 'Cm', 'Cm', 'Am', 'Am'] +           # tundra, desert, coast
+        ['F', 'B'] +                                     # Vorath
+        ['C', 'D', 'G', 'G']                             # Act II title
+    ),
+    lead=(
+        [[('r', 16)],
+         [('E5', 2), ('r', 2), ('E5', 2), ('r', 2), ('G5', 2), ('A5', 2), ('B5', 2), ('D6', 2)]] +
+        FINALE_RIFF_A + FINALE_RIFF_B + FINALE_RIFF_A +
+        [[('E6', 4), ('B5', 2), ('G5', 2), ('E6', 2), ('F#6', 2), ('G6', 4)],
+         [('G6', 4), ('E6', 2), ('C6', 2), ('G6', 2), ('A6', 2), ('G6', 4)],
+         [('A6', 4), ('E6', 2), ('C6', 2), ('A5', 4), ('C6', 4)],
+         [('D6', 2), ('F#6', 2), ('A6', 2), ('D6', 2), ('F#6', 2), ('A6', 2), ('D7', 4)],
+         [('D7', 12), ('r', 4)]] +
+        [[('G6', 8), ('D6', 4), ('B5', 4)],
+         [('C6', 4), ('E6', 4), ('G6', 8)],
+         [('F#6', 6), ('E6', 2), ('D6', 4), ('F#6', 4)]] +
+        [[('B5', 8), ('F#5', 8)],
+         [('D6', 4), ('C#6', 4), ('B5', 8)],
+         [('C6', 8), ('G5', 8)],
+         [('D#6', 4), ('D6', 4), ('C6', 8)],
+         [('A5', 8), ('E5', 8)],
+         [('C6', 4), ('B5', 4), ('A5', 8)]] +
+        [[('F5', 2), ('r', 2), ('F5', 2), ('r', 2), ('F5', 2), ('G#5', 2), ('C6', 4)],
+         [('B5', 2), ('r', 2), ('B5', 2), ('r', 2), ('D#6', 4), ('F#6', 4)]] +
+        [[('E6', 8), ('G6', 8)],
+         [('F#6', 8), ('A6', 8)],
+         [('B6', 16)],
+         [('B6', 8), ('r', 8)]]
+    ),
+)
+
 TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO,
-          'town': TOWN, 'monastery': MONASTERY, 'observatory': OBSERVATORY, 'guild': GUILD}
+          'town': TOWN, 'monastery': MONASTERY, 'observatory': OBSERVATORY, 'guild': GUILD,
+          'finale': FINALE}
 
 
 if __name__ == '__main__':

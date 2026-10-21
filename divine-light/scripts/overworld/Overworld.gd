@@ -17,6 +17,11 @@ extends Node2D
 # accessory you can't get anywhere else (one has a spring too). They show on
 # screen through the trees; the way in starts by a patch of flowers.
 #
+# Side quests (Milestone 24) put things on the land while a step needs them:
+# a hunt target (walk up to it, or face it and press A, to fight) or
+# something to pick up (Quests.HUNTS / FETCHES). Dungeon doors also check the
+# quest seal (Quests.is_unsealed) after the party-member gate.
+#
 # Leaving a town or dungeon sets GameManager.arrival, and the player appears
 # just outside that entrance. Returning from a battle uses the saved spot.
 
@@ -97,6 +102,7 @@ const CHEST_SHEET := preload("res://assets/sprites/chests.png")
 const SPRING_SHEET := preload("res://assets/sprites/spring.png")
 const SPRING_TEXT := "narrate Clear water wells up, glowing faintly. The party drinks and feels whole again."
 const SPENT_TEXT := "narrate The spring lies still and dark. Its power is spent."
+const QUEST_PROPS := preload("res://assets/sprites/quest_props.png")  # silverleaf A/B, cart wreck
 
 @onready var _tile_map: TileMapLayer = $TileMapLayer
 @onready var _player: Node2D = $TileMapLayer/Player
@@ -105,6 +111,9 @@ var _entrances: Dictionary = {}  # cell -> entrance id
 var _secrets: Dictionary = {}    # cell -> true
 var _chests: Dictionary = {}     # cell -> Sprite2D
 var _springs: Dictionary = {}    # cell -> Sprite2D
+var _spots: Dictionary = {}      # cell -> {kind, id, sprite}: quest hunts and pickups (24)
+var _props: Dictionary = {}      # cell -> Sprite2D: quest scenery (the wrecked cart)
+var _settled := false            # on_player_moved() ignores the arrival itself
 
 
 func _ready() -> void:
@@ -131,7 +140,14 @@ func _ready() -> void:
 		_player.snap_to(_tile_map.map_to_local(_outside(id)))
 	GameManager.has_pending_spawn = false
 	GameManager.arrival = ""
+	var hunt_lines := _settle_hunt()  # before the spots, so a beaten target is gone
+	_add_quest_spots()
 	on_player_moved(_tile_map.local_to_map(_player.position))
+	_settled = true
+	if not hunt_lines.is_empty():
+		if Transition.is_busy():
+			await Transition.finished
+		await Cutscene.play_text("\n".join(hunt_lines))
 
 
 func _paint() -> void:
@@ -181,6 +197,9 @@ func _show_treasure() -> void:
 	var tick := int(Time.get_ticks_msec() / 450) % 2
 	for cell: Vector2i in _springs:
 		_springs[cell].frame = 2 if _opened(cell) else tick
+	for cell: Vector2i in _spots:
+		var sprite: Sprite2D = _spots[cell]["sprite"]
+		sprite.frame = tick if _spots[cell]["kind"] == "fetch" else 1 - tick
 
 
 ## The walkable tile just outside an entrance (south first, then the rest).
@@ -206,7 +225,8 @@ func is_door(cell: Vector2i) -> bool:
 
 
 func is_blocked(cell: Vector2i) -> bool:
-	return _tile_map.get_cell_atlas_coords(cell) == WATER or _chests.has(cell) or _springs.has(cell)
+	return _tile_map.get_cell_atlas_coords(cell) == WATER or _chests.has(cell) or _springs.has(cell) \
+			or _spots.has(cell) or _props.has(cell)
 
 
 ## Trees you can walk through (Player.gd asks before treating trees as walls).
@@ -216,7 +236,9 @@ func is_secret_path(cell: Vector2i) -> bool:
 
 ## A on the tile you're facing: open a chest, drink from the spring.
 func interact(cell: Vector2i, _facing: String) -> void:
-	if _springs.has(cell):
+	if _spots.has(cell):
+		await _use_spot(cell)
+	elif _springs.has(cell):
 		if _opened(cell):
 			await Cutscene.play_text(SPENT_TEXT)
 			return
@@ -247,8 +269,14 @@ func get_door_destination(cell: Vector2i) -> Dictionary:
 	var dungeon: Dictionary = ActOne.DUNGEONS[id]
 	if not ActOne.can_enter(id):
 		return {"blocked": dungeon["gate_text"]}
+	if not Quests.is_unsealed(id):
+		return {"blocked": Quests.SEAL_TEXT[id]}
 	if dungeon["scene"] == "":
 		return {"blocked": "%s lies ahead, but the way isn't open yet. (Coming in a later update.)" % dungeon["name"]}
+	# The first time the quest key opens it, say so on the way in.
+	if Quests.has_key(id) and not GameManager.has_flag("unsealed_" + id):
+		GameManager.story_flags["unsealed_" + id] = true
+		return {"scene": dungeon["scene"], "say": "narrate " + Quests.OPEN_TEXT[id]}
 	return {"scene": dungeon["scene"]}
 
 
@@ -268,6 +296,13 @@ func on_player_moved(cell: Vector2i) -> void:
 		for dy in range(-6, 7):
 			seen.append(cell + Vector2i(dx, dy))
 	GameManager.mark_explored(GameManager.current_location, seen)
+	# Walking up beside a hunt target starts the fight (not on arrival, so
+	# fleeing back to the map doesn't throw you straight back in).
+	if _settled:
+		for d: Vector2i in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]:
+			if _spots.has(cell + d) and _spots[cell + d]["kind"] == "hunt":
+				_use_spot(cell + d)
+				return
 
 
 func map_fog() -> bool:
@@ -292,4 +327,72 @@ func map_markers() -> Array:
 	for cell: Vector2i in _springs:
 		if GameManager.is_explored(GameManager.current_location, cell) and not _opened(cell):
 			markers.append({"cell": cell, "color": Color(0.45, 0.95, 0.55), "legend": "Spring"})
+	# Quest goals (24), seen or not: where to hunt or gather, and any town
+	# with someone to talk to (drawn over that town's own dot).
+	for cell: Vector2i in _spots:
+		markers.append({"cell": cell, "color": Quests.QUEST_COLOR, "legend": "Quest"})
+	for cell: Vector2i in _entrances:
+		if TOWNS.has(_entrances[cell]) and Quests.town_has_business(_entrances[cell]):
+			markers.append({"cell": cell, "color": Quests.QUEST_COLOR, "legend": "Quest"})
 	return markers
+
+
+# ---------------------------------------------------------------- quests (24)
+
+## Back from a quest hunt: if it was won, that step is done. Returns the lines
+## to play once the screen is back (what happened, then any reward).
+func _settle_hunt() -> Array:
+	var hunt := GameManager.pending_hunt
+	GameManager.pending_hunt = ""
+	if hunt == "" or not GameManager.last_battle_won:
+		return []
+	var lines: Array = [Quests.HUNTS[hunt]["won"]]
+	lines.append_array(Quests.complete_spot("hunt", hunt))
+	return lines
+
+
+func _add_quest_spots() -> void:
+	for spot: Dictionary in Quests.active_spots():
+		var cell: Vector2i = spot["cell"]
+		var sprite := Sprite2D.new()
+		if spot["kind"] == "hunt":
+			var enemy_name: String = Quests.HUNTS[spot["id"]]["enemy"]["name"]
+			sprite.texture = load("res://assets/sprites/enemies/%s.png" % enemy_name.to_lower().replace(" ", "_"))
+			sprite.hframes = 2
+			sprite.offset.y = 8 - sprite.texture.get_height() / 2.0  # feet on the tile's bottom edge
+			sprite.flip_h = true  # battle sprites face right; face the road
+		else:
+			sprite.texture = QUEST_PROPS
+			sprite.hframes = 3
+		sprite.position = _tile_map.map_to_local(cell)
+		_tile_map.add_child(sprite)
+		_spots[cell] = {"kind": spot["kind"], "id": spot["id"], "sprite": sprite}
+	# The smith's cart lies where it went off the road once you've heard of it.
+	if Quests.is_started("lost_cart"):
+		var wreck := Sprite2D.new()
+		wreck.texture = QUEST_PROPS
+		wreck.hframes = 3
+		wreck.frame = 2
+		var cell: Vector2i = Quests.HUNTS["wreck_ghoul"]["prop"]
+		wreck.position = _tile_map.map_to_local(cell)
+		_tile_map.add_child(wreck)
+		_props[cell] = wreck
+	_show_treasure()
+
+
+## A hunt target: its line, then the fight. Something to pick up: take it.
+func _use_spot(cell: Vector2i) -> void:
+	var spot: Dictionary = _spots[cell]
+	if spot["kind"] == "hunt":
+		var hunt: Dictionary = Quests.HUNTS[spot["id"]]
+		Sfx.play("menu_cancel")
+		await Cutscene.play_text(hunt["tell"])
+		GameManager.pending_hunt = spot["id"]
+		_player.start_battle_against([Quests.hunt_enemy(spot["id"])])
+		return
+	_spots.erase(cell)
+	spot["sprite"].queue_free()
+	Sfx.play("chest")
+	var lines: Array = [Quests.FETCHES[spot["id"]]["text"]]
+	lines.append_array(Quests.complete_spot("fetch", spot["id"]))
+	await Cutscene.play_text("\n".join(lines))

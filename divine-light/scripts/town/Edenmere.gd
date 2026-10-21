@@ -152,6 +152,8 @@ func interact(cell: Vector2i, facing: String) -> void:
 
 
 func _talk(id: String, facing: String) -> void:
+	if await _quest_talk(id, facing):
+		return
 	var lines: Array = TALK.get(id, [])
 	if _dungeons_cleared >= 2 and TALK.has(id + "_late"):
 		lines = TALK[id + "_late"]

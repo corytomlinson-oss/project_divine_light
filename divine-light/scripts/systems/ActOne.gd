@@ -68,6 +68,7 @@ static func all_cleared() -> bool:
 
 
 ## The door's gate is met when the party includes the class it asks for.
+## (Milestone 24 adds a second lock on top: the quest seal, Quests.is_unsealed.)
 ## Your own starting dungeon has no gate - you're already inside.
 static func can_enter(id: String) -> bool:
 	var gate: String = DUNGEONS[id]["gate"]

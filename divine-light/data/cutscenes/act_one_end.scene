@@ -1,7 +1,8 @@
 # The end of Act I (Milestone 20d). Plays right after the fourth hero is
 # rescued, in whichever dungeon that happens. {a1}-{a3} are the three who
 # joined along the way (party order); the starting hero is "player". Then the
-# Act I / Act II card, and the party is back outside on the overworld.
+# Act I finale movie (ActOneFinale.gd, played by Dungeon.gd right after this),
+# and the party is back outside on the overworld.
 
 spawn {a1} {a1} at ~-1,-1 facing down
 spawn {a2} {a2} at ~0,-1 facing down
@@ -26,25 +27,3 @@ despawn {a1}
 despawn {a2}
 despawn {a3}
 despawn frank
-movie start
-music intro
-image stars res://assets/movie/intro_title.png at 0,0
-fade in 1
-title Act I - The Gathering
-wait 3
-title clear
-caption Four pure souls stand together at last.
-wait 3
-caption Beyond the Forest Heartlands, three kingdoms wait in Vorath's grip.
-wait 3.5
-caption clear
-title Act II - The Purge
-wait 2
-caption Coming in a later update.
-wait 3.5
-caption clear
-title clear
-music stop 1.5
-fade out 1.5
-remove stars
-movie end

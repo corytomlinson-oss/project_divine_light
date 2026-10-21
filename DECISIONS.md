@@ -365,3 +365,25 @@ Cory's calls, before anything was built:
 - **Optional rewards: XP + gold + potions, and maybe permanent buffs.** Required quests keep Act I's shape (the key the story needs, plus XP and gold).
 - Still open: whether Act III follows the same split (the draft keeps it all optional), and the permanent-buff design (ideas in CLAUDE.md's Milestones 27 and 30 section).
 - **Act III (Cory): 3 required quests, done in order, assemble a complex key that opens the portal into Vorath's dungeon.** The optional Act III quests stay. My sketch (frame -> core -> binding, Frank does the binding as a hint at who he is) is in CLAUDE.md, not decided.
+
+## Milestone 24 — Act I side quests (built 2026-10-20)
+
+Cory approved the quest list and the "two quests in order, the second gives the key" shape, and chose to keep both locks (member gate + quest seal). My calls while building:
+- **Why each door is sealed** is in-world: the villagers chained the Cathedral, the monks bar the pilgrim gate, the dome is star-locked, the Guild wants a password. Each seal text ends with a hint to ask in town, and Frank's arrival line now says the same, so nobody's stuck at a locked door wondering. *Change:* `Quests.SEAL_TEXT`, `verdance_arrival.scene`.
+- **Errands are one-way where it reads naturally** (the mayor just hands over the sexton's key; no walk back to the elder). Quests that recover something go back to the giver. *Change:* the `steps` in `Quests.QUESTS`.
+- **One conversation can close a quest and open the next** (the priestess finishes The Closed Gate and hands out Silverleaf on the spot) instead of making you talk twice.
+- **Hunt targets scale with party size, not level.** A quest's dungeon is 2nd, 3rd or 4th depending on the starting class, so a fixed target would be brutal solo or trivial with three heroes. +70% HP, +3 ATK, +1 DEF per extra hero. This doesn't break the earlier "no enemy level scaling" call (that was about level). *Change:* `Quests.hunt_enemy()`.
+- **Walking up beside a hunt target starts the fight** (not just A), the way a visible monster would. Not on arriving back on the map, so fleeing doesn't throw you straight back in. Fleeing is allowed; the target stays.
+- **Rewards scale with how far into Act I you are** (cleared dungeons, 1-3): 90 XP / 50 g for a part 1, 130 XP / 80 g for a part 2, times that. *Change:* `Quests._reward()`.
+- **Quest markers are pink** (the other colors were taken) and show even in unexplored fog, since they're directions.
+- **Art:** the hunt targets are recolors of existing enemies (Cory's "hand-draw everything" still holds: the source sprites are hand-placed; the recolor makes each read as a marked, nastier one of its kind). The silverleaf and the wrecked cart are new hand-placed 16x16 props.
+
+## Act I finale movie (built 2026-10-20)
+
+Cory asked for a movie-style Act I cutscene with the bosses slain and cool effects, then for "more animation, not just pictures". My calls:
+- **The bosses you actually fought**, in your route's order: your starting dungeon's escape warden, not its rescue boss (you never met that one), then the three rescue bosses. *Change:* `ActOneFinale._boss_shot()`.
+- **The newest party member lands each blow** (the starting hero for the first two, then each rescued hero in turn), so three of the four get a strike; the fourth gets the spotlight in the "together" shot. Each captive steps out of the boss's light and joins the line.
+- **It replaces the old Act I / Act II title card** rather than playing after it, so the ending isn't two title cards in a row.
+- **Code-driven, not a .scene script:** walking, dashing, wind-ups and effects need real animation the movie format doesn't have. The kingdom teasers are drawn in code (no Act II art exists yet), with weather to make them move.
+- **A new track** ("finale") rather than reusing the boss or intro theme, laid out bar for bar against the shots so every cut lands on a downbeat.
+- **F9 previews it** on any map, like F7/F8 for the demos.

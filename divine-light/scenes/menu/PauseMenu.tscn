@@ -22,13 +22,13 @@ offset_bottom = 176.0
 offset_left = 244.0
 offset_top = 4.0
 offset_right = 316.0
-offset_bottom = 42.0
+offset_bottom = 52.0
 
 [node name="Options" type="VBoxContainer" parent="CommandWindow"]
 offset_left = 8.0
 offset_top = 4.0
 offset_right = 68.0
-offset_bottom = 34.0
+offset_bottom = 44.0
 theme_override_constants/separation = 0
 
 [node name="Equip" type="Label" parent="CommandWindow/Options"]
@@ -36,6 +36,9 @@ text = "  Equip"
 
 [node name="Map" type="Label" parent="CommandWindow/Options"]
 text = "  Map"
+
+[node name="Quests" type="Label" parent="CommandWindow/Options"]
+text = "  Quests"
 
 [node name="Save" type="Label" parent="CommandWindow/Options"]
 text = "  Save"

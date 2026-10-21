@@ -51,6 +51,15 @@ const KITS := {
 	"Mimic": {"res": 8, "weak": ["fire"], "abilities": [
 		{"name": "Gnash", "kind": "charge", "every": 3, "mult": 2.2, "tell": "opens its jaws wide!"},
 	]},
+	# Side-quest hunts (Milestone 24): marked, nastier versions of a forest
+	# wolf, a farmer gone wrong and a thief, each with a move to watch for.
+	"Grey Fang": {"attack": {"hits": 2}, "abilities": [
+		{"name": "Savage Lunge", "kind": "charge", "every": 3, "mult": 2.0, "tell": "lowers its head and snarls!"},
+	]},
+	"Wreck Ghoul": {"weak": ["fire"], "attack": {"poison_chance": 35, "poison_power": 4, "poison_rounds": 3}, "abilities": [
+		{"name": "Grave Swing", "kind": "charge", "every": 3, "mult": 2.2, "tell": "raises its pitchfork high!"},
+	]},
+	"Cutpurse": {"attack": {"steal": 40}},
 	# The Cathedral
 	"Fallen Priest": {"int": 12, "res": 10, "abilities": [
 		{"name": "Dark Litany", "kind": "party_def_down", "chance": 45, "power": 4, "rounds": 2},

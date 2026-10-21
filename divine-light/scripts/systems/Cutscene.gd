@@ -8,12 +8,13 @@ extends CanvasLayer
 # In-engine scenes use the real map: the player and spawned characters walk,
 # turn and emote, the camera pans, and a name-tag dialogue box types out
 # lines. Movie mode covers the screen with full-screen pixel shots (pictures,
-# pans, captions, a title) for the intro and ending; Start skips a movie.
+# pans, captions, a title) for the intro and ending; Start (or F3) skips a movie.
 #
 # The tree keeps running during a scene (actors need to animate); Player.gd
 # ignores input while is_playing(). Screen fades reuse Transition's overlay.
 #
-# Debug: F7 plays data/cutscenes/demo.scene, F8 demo_movie.scene (on a map).
+# Debug: F7 plays data/cutscenes/demo.scene, F8 demo_movie.scene, F9 the Act I
+# finale movie (ActOneFinale.gd) - all on a map.
 
 signal finished
 
@@ -29,6 +30,8 @@ var _actors: Dictionary = {}       # id -> Node2D (the player or a spawned sprit
 var _spawned: Array = []
 var _async: Array = []             # Tweens started by [async] steps
 var _movie_active := false
+var _holds := 0
+var _f3_held := false
 var _skip_movie := false
 var _images: Dictionary = {}
 
@@ -60,7 +63,17 @@ func _ready() -> void:
 
 
 func is_playing() -> bool:
-	return _playing
+	return _playing or _holds > 0
+
+
+## Something else that plays like a cutscene (ActOneFinale) holds the map
+## still the same way: the player ignores input while held.
+func hold() -> void:
+	_holds += 1
+
+
+func release() -> void:
+	_holds = maxi(0, _holds - 1)
 
 
 ## Plays a scene file to the end. Parse errors are reported (with line
@@ -146,7 +159,12 @@ func play_once(path: String, flag: String) -> void:
 func _process(delta: float) -> void:
 	_blink = fmod(_blink + delta, 0.8)
 	_arrow.visible = _box.visible and _arrow.more_below and _blink < 0.5
-	if _movie_active and not _skip_movie and Input.is_action_just_pressed("pause"):
+	# Start skips a movie; so does F3 (Cory's dev key, the same one that wins
+	# a battle instantly).
+	var f3 := Input.is_key_pressed(KEY_F3)
+	var f3_pressed := f3 and not _f3_held
+	_f3_held = f3
+	if _movie_active and not _skip_movie and (Input.is_action_just_pressed("pause") or f3_pressed):
 		_skip_movie = true
 		for t: Tween in _async:
 			if t.is_valid():
@@ -154,7 +172,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if _playing or get_tree().paused or not (event is InputEventKey and event.pressed and not event.echo):
+	if is_playing() or get_tree().paused or not (event is InputEventKey and event.pressed and not event.echo):
 		return
 	if get_tree().get_first_node_in_group("player") == null:
 		return
@@ -162,6 +180,18 @@ func _input(event: InputEvent) -> void:
 		play("res://data/cutscenes/demo.scene")
 	elif event.keycode == KEY_F8:
 		play("res://data/cutscenes/demo_movie.scene")
+	elif event.keycode == KEY_F9:
+		_preview_finale()
+
+
+## F9: the Act I finale movie (ActOneFinale.gd) for this game's route, then
+## back to the map.
+func _preview_finale() -> void:
+	hold()
+	await Transition.fade_out(0.4)
+	await ActOneFinale.play(self)
+	await Transition.fade_in(0.4)
+	release()
 
 
 # ------------------------------------------------------------------ steps

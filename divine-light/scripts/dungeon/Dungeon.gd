@@ -373,6 +373,7 @@ func on_captive_tile(_cell: Vector2i) -> void:
 	if ActOne.all_cleared() and not GameManager.has_flag("act_one_complete"):
 		GameManager.story_flags["act_one_complete"] = true
 		await Cutscene.play(ACT_ONE_END_SCENE)
+		await ActOneFinale.play(self)  # the bosses fall, then Act II's title
 		GameManager.arrival = dungeon_id
 		GameManager.autosave_pending = true  # saved on arrival outside (22a)
 		Transition.change_scene(OVERWORLD_SCENE_PATH)

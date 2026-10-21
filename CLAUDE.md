@@ -8,7 +8,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-20)
 
-**Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); not playtested by hand yet.** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
+**Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); Cory playtested it 2026-10-20: "the quest system and the quest markers all work great".** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
 
 **Act I finale movie (2026-10-20, Cory's request before Milestone 25; not seen by him yet):** after the Act I ending scene, a ~64s animated movie replaces the old title card: the bosses of your route fall one by one (escape warden first, then the three rescue bosses; the newest party member lands each blow with their class's effect, each captive steps out of the light), the four together, animated teasers of Nordveil / Duskara / Selavon, Vorath, then "Act II - The Purge". New "finale" track. **F9 previews it on any map.** Details in the "Act I finale movie" section.
 
@@ -610,7 +610,7 @@ Built in four steps, each tested and committed on its own:
 | 23a | Exploration & loot — treasure chests, Act I armor sets, set bonuses | ✅ (2026-10-16) — not yet playtested |
 | 23b | Exploration & loot — dungeon twists (side rooms, mimics, Silas-locked chests, healing springs) | ✅ (2026-10-16) — not yet playtested |
 | 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
-| 24 | Act I side quests — 2 town quests before each dungeon, the second gives its key | ✅ (2026-10-20) — not yet playtested |
+| 24 | Act I side quests — 2 town quests before each dungeon, the second gives its key | ✅ (2026-10-20) — playtested by Cory |
 | — | Act I finale movie — animated boss montage into the Act II title (Cory's request, before 25) | ✅ (2026-10-20) — not yet seen by Cory |
 | 25 | Android APK export | Not started |
 | 26a | Act II — Cleansing transformation system | Not started |

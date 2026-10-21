@@ -273,14 +273,21 @@ static func talk(who: String) -> Array:
 	return lines
 
 
-## True if talking to them would do something for a quest (town map markers).
-static func has_business(who: String) -> bool:
+## What to float over their head: "?" if a quest is waiting on them (a step
+## to finish), "!" if they have a new quest for you, "" if neither.
+static func mark_for(who: String) -> String:
 	for id: String in QUESTS:
 		if current_step(id).get("talk", "") == who:
-			return true
+			return "?"
+	for id: String in QUESTS:
 		if QUESTS[id]["giver"] == who and is_available(id):
-			return true
-	return false
+			return "!"
+	return ""
+
+
+## True if talking to them would do something for a quest (town map markers).
+static func has_business(who: String) -> bool:
+	return mark_for(who) != ""
 
 
 ## Someone in this town has quest business (overworld map markers).

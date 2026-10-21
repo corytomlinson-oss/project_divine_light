@@ -41,6 +41,8 @@ const OPPOSITE := {"up": "down", "down": "up", "left": "right", "right": "left"}
 @onready var _player: Node2D = $TileMapLayer/Player
 
 var _npcs: Dictionary = {}  # cell -> actor id
+var _npc_nodes: Dictionary = {}  # actor id -> character node
+var _quest_marks: Dictionary = {}  # actor id -> QuestMark over their head
 
 
 func _paint(map: Array) -> void:
@@ -63,10 +65,14 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 	npc.flip_h = facing == "left"
 	npc.play("idle_" + sheet)
 	_npcs[cell] = id
+	_npc_nodes[id] = npc
 
 
 ## Puts the player at the entry cell, or back where they were before a battle.
+## (Every town calls this last in _ready, once its people are placed - so the
+## quest marks go up here too.)
 func _place_player(entry: Vector2i) -> void:
+	_refresh_quest_marks()
 	if GameManager.has_pending_spawn:
 		_player.snap_to(GameManager.pending_spawn_position)
 		GameManager.has_pending_spawn = false
@@ -90,7 +96,63 @@ func _quest_talk(id: String, facing: String) -> bool:
 	if lines.is_empty():
 		return false
 	await _talk_lines(id, facing, lines)
+	_refresh_quest_marks()
 	return true
+
+
+## A "!" over everyone with a new quest for you, a "?" over anyone a quest is
+## waiting on (Quests.mark_for); none over anyone else.
+func _refresh_quest_marks() -> void:
+	for id: String in _npc_nodes:
+		var kind := Quests.mark_for(GameManager.current_location + "/" + id)
+		var mark: QuestMark = _quest_marks.get(id)
+		if kind == "":
+			if mark != null:
+				mark.queue_free()
+				_quest_marks.erase(id)
+		elif mark == null:
+			mark = QuestMark.new()
+			mark.kind = kind
+			_npc_nodes[id].add_child(mark)
+			_quest_marks[id] = mark
+		else:
+			mark.kind = kind
+			mark.queue_redraw()
+
+
+## A gold "!" or "?" bobbing over a villager's head (outlined, so it reads on
+## any ground). Sits above where cutscene emote bubbles appear.
+class QuestMark extends Node2D:
+	const GLYPHS := {
+		"!": ["###", "###", "###", "###", ".#.", "...", "###", "###"],
+		"?": [".####.", "##..##", "....##", "...##.", "..##..", "......", "..##..", "..##.."],
+	}
+	const FILL := Color(1.0, 0.84, 0.3)
+	const OUTLINE := Color(0.1, 0.07, 0.12)
+	var kind := "!"
+	var _t := 0.0
+
+	func _ready() -> void:
+		z_index = 20
+
+	func _process(delta: float) -> void:
+		_t += delta
+		position = Vector2(0, -36 + roundf(sin(_t * 4.0) * 1.5))
+
+	func _draw() -> void:
+		var rows: Array = GLYPHS[kind]
+		var x0 := -int(rows[0].length() / 2.0 + 0.5)
+		for pass_i in 2:  # outline first, then the fill on top
+			for y in rows.size():
+				var row: String = rows[y]
+				for x in row.length():
+					if row[x] != "#":
+						continue
+					var at := Vector2(x0 + x, y)
+					if pass_i == 0:
+						draw_rect(Rect2(at - Vector2.ONE, Vector2(3, 3)), OUTLINE)
+					else:
+						draw_rect(Rect2(at, Vector2.ONE), FILL)
 
 
 ## For MapScreen: the people with something for you on a quest.

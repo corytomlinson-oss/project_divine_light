@@ -12,9 +12,9 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **Act I finale movie (2026-10-20, Cory's request before Milestone 25; Cory watched it: "works great"):** after the Act I ending scene, a ~64s animated movie replaces the old title card: the bosses of your route fall one by one (escape warden first, then the three rescue bosses; the newest party member lands each blow with their class's effect, each captive steps out of the light), the four together, animated teasers of Nordveil / Duskara / Selavon, Vorath, then "Act II - The Purge". New "finale" track. **F9 previews it on any map.** Details in the "Act I finale movie" section.
 
-**Try it (side quests):** a new game; after the escape, talk to people in Verdance (the map marks who has something, pink). Which quests you get depends on the next dungeon on your route: Vael's start goes to the Monastery (Verdance guard), Ryn's to the Observatory (Edenmere smith), Lyra's to the Guild (Edenmere shopkeeper), Silas's to the Cathedral (Verdance farmer). **Next up: Milestone 25 (Android APK export).**
+**Try it (side quests):** a new game; after the escape, talk to people in Verdance (the map marks who has something, pink). Which quests you get depends on the next dungeon on your route: Vael's start goes to the Monastery (Verdance guard), Ryn's to the Observatory (Edenmere smith), Lyra's to the Guild (Edenmere shopkeeper), Silas's to the Cathedral (Verdance farmer). **Next up: Milestone 25 (Act II content), starting with 25a (the cleansing transformation system).** The APK moved to **28**, after Act II (2026-10-23: Cory's son has the Retroid Pocket 6 for a few months).
 
-**Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (APK is now 25).
+**Milestone 23 (Exploration & loot) is complete (2026-10-16); Cory playtested it 2026-10-20 (all good; he missed a room in two dungeons, which led to the map fixes: corridor stubs + chest count)**. After playtesting 22, Cory asked for more engaging dungeons and a bigger overworld; the roadmap was renumbered for it (the APK is 28 now).
 - **23a:** treasure chests in every dungeon (random loot in wooden ones, the captive's Act I armor set in gilded ones); all four Act I set bonuses work.
 - **23b:** two dead-end side rooms per dungeon holding a healing spring or a vault of rich chests (some locked: Silas picks them); sometimes one plain chest is a mimic (rescue dungeons only).
 - **23c:** the Forest Heartlands is 64x44 (was 36x24): a river with two bridges, a lake, dungeons spread out, 7 chests along the way, and three hidden clearings reached by secret paths through the trees (an accessory found nowhere else in each, plus a spring).
@@ -63,7 +63,7 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 
 
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
-- The gamepad bindings are untested on the RP6 itself until the APK milestone (25).
+- The gamepad bindings are untested on the RP6 itself until the APK milestone (28).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
 - The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.
 
@@ -323,16 +323,16 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
 | Observatory (star-lock) | *The Lost Cart*: Edenmere smith, beat the Wreck Ghoul at the cart W of the Observatory, back to him | *The Star Lock*: smith -> Verdance innkeeper (Mira, the astronomer's sister) -> **Star Chart** |
 | Guild (hatch password) | *Pickpocket*: Edenmere shopkeeper, catch the Cutpurse by the ravine road, back to her | *The Password*: shopkeeper -> Verdance farmer (a retired thief) -> **Guild Password** |
 
-## Milestones 27 and 30 — Act II and Act III side quests (planned, not started)
+## Milestones 26 and 30 — Act II and Act III side quests (planned, not started)
 
 Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act II and Act III too, not just Act I. Both reuse Milestone 24's quest system (quest state, givers, quest log, map markers, key items), so they are content milestones: the quests, their dialogue, any hunt monsters and quest spots, and a little art. Each sits right after the content it needs (the kingdoms and towns must exist first) and before that act's art pass, which then covers the quest art too. Draft only; scope with Cory before building.
 
-**27 — Act II side quests (draft):**
+**26 — Act II side quests (draft):**
 - **Before each cleansing:** like Act I, 1-2 quests in a kingdom's capital lead into its dungeon (Frozen Citadel, Sunken Sanctum, Drowned Fortress). Whether these also *seal* the dungeon, as Act I's do, is a question for Cory. The towns are corrupted at this point, so the quest givers are the few people still around: refugees, a lone guard, a holdout merchant.
 - **After each cleansing:** this is where Act II side quests fit best. The design doc already says towns reopen and new paths unlock once a kingdom is cleansed, so quests can reward going back: Nordveil's thawed passes, Duskara's hidden oasis, Selavon's harbor and sea trade (the design doc calls Selavon "the most reward-rich post-cleanse town"). Optional, never blocking the story.
 - **Errands between kingdoms:** what Cory liked in Act I (errands that send you to the next town), now across the whole continent, e.g. carry word from Nordveil to Selavon. They also bring you back through the Forest Heartlands and Verdance/Edenmere as they change.
 - **Rewards:** XP, gold, and (an idea to raise) the Act II armor set pieces, which the design doc says come from "dungeon chests and town shops"; a quest could award the 4th set piece.
-- Likely split once scoped: 27a Nordveil, 27b Duskara, 27c Selavon (+ the between-kingdom errands), mirroring 26b-26d.
+- Likely split once scoped: 26a Nordveil, 26b Duskara, 26c Selavon (+ the between-kingdom errands), mirroring 25b-25d.
 
 **30 — Act III side quests (draft):**
 - Act III has one town, **The Threshold** (free inn, unlimited shrine), right before The Blighted Maw. So the Act III quests are a short, optional "last preparations" set, not a gate: the final descent should never be blocked by a side quest.
@@ -407,7 +407,7 @@ Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own
 - **Single use:** resuming deletes it, and so do starting a new game and loading a slot.
 - A cutscene in progress isn't saved: resuming puts you on the map at that spot with whatever flags were already set.
 - Verified (15 checks + screenshots): nothing from the title, close -> Resume back in Verdance on the spot with the right gold, used up afterwards, Home/come-back drops it, mid-boss-fight suspend -> the Sparring Master fight restarts at full HP with the party as it began and Frank helping, win -> back on the dungeon map with the warden beaten, new game / load discard it.
-- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's Milestone 25's on-device test.
+- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's the APK milestone's (28) on-device test.
 
 ## Milestone 21 — Act I art & music pass (done)
 
@@ -530,7 +530,7 @@ Built in four steps, each tested and committed on its own:
 - **Movie mode** (`movie start` ... `movie end`): a CanvasLayer (60) over everything but the fade: black background, pictures (`image id path at x,y` in screen pixels, `pan ... over t`), a bottom `caption` that fades in/out, and a centered `title` drawn at 2× (pixel-crisp). **Start skips a movie**: everything up to `movie end` is skipped except `set` and `music` steps.
 - **Story flags:** `set flag` → `GameManager.story_flags` (saved/loaded with the game), `GameManager.has_flag()`.
 - **Demos:** `data/cutscenes/demo.scene` (F7: Ryn appears beside you, talks, a hooded silhouette watches) and `demo_movie.scene` (F8: title card and captions over the forest). They double as format examples.
-- **⚠ For the APK milestone (25):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
+- **⚠ For the APK milestone (28):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
 - Verified by a driver playing both demos on the real overworld (parser incl. error reporting, dialogue advance, flags, cleanup, player control returning, movie skip) plus screenshots.
 
 ### 19b — intro movie + title screen (done, 2026-09-29)
@@ -612,13 +612,13 @@ Built in four steps, each tested and committed on its own:
 | 23c | Exploration & loot — ~3x bigger overworld, overworld chests, hidden clearings | ✅ (2026-10-16) — not yet playtested |
 | 24 | Act I side quests — 2 town quests before each dungeon, the second gives its key | ✅ (2026-10-20) — playtested by Cory |
 | — | Act I finale movie — animated boss montage into the Act II title (Cory's request, before 25) | ✅ (2026-10-20) — approved by Cory |
-| 25 | Android APK export | Not started |
-| 26a | Act II — Cleansing transformation system | Not started |
-| 26b | Act II — Nordveil (Tundra) | Not started |
-| 26c | Act II — Duskara (Desert) | Not started |
-| 26d | Act II — Selavon (Coastal) | Not started |
-| 27 | Act II side quests — town quests in the three kingdoms, before and after each cleansing | Planned — scope with Cory first |
-| 28 | Act II art & music pass | Not started |
+| 25a | Act II — Cleansing transformation system | Not started |
+| 25b | Act II — Nordveil (Tundra) | Not started |
+| 25c | Act II — Duskara (Desert) | Not started |
+| 25d | Act II — Selavon (Coastal) | Not started |
+| 26 | Act II side quests — town quests in the three kingdoms, before and after each cleansing | Planned — scope with Cory first |
+| 27 | Act II art & music pass | Not started |
+| 28 | Android APK export | Not started |
 | 29 | Act III + Vorath (includes the ending movie) | Not started |
 | 30 | Act III side quests — 3 required quests in order that assemble the key to Vorath's portal, plus optional quests from The Threshold | Planned — scope with Cory first |
 | 31 | Act III art & music pass | Not started |
@@ -628,6 +628,10 @@ Detailed per-milestone changelog is in README.md's "Current Status" section — 
 ## Roadmap restructuring
 
 Several restructuring passes so far, most recent first. **Milestone numbers cited in older entries below are historical** — the roadmap has been renumbered more than once since; the Implementation status table above is always the authoritative current numbering, not any number quoted in the prose here.
+
+### APK moved after Act II, to 28 (2026-10-23)
+
+- Cory's son is using the Retroid Pocket 6 for a few months, so the on-hardware milestone waits until after Act II (its content, side quests and art pass). New numbers: Act II **25a-25d**, Act II side quests **26**, Act II art **27**, **APK 28**; Act III + Vorath 29, Act III side quests 30, Act III art 31 unchanged. The APK is now the "Act II complete" checkpoint on the device. Everything stays desktop-testable until then; the Android-only bits (suspend on Home / app switching, gamepad on the real device, `.scene` files in the export filter) are noted in the APK milestone's places.
 
 ### Act II and Act III side quests inserted as 27 and 30 (2026-10-18)
 

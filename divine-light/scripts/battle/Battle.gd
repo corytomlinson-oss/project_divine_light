@@ -84,6 +84,9 @@ const ITEM_DEFS: Dictionary = {
 	"Elixir":   {"name": "Elixir",   "effect": "item_heal",       "power": 120, "target": "ally_choose"},
 	"Ether":    {"name": "Ether",    "effect": "item_restore_mp", "power": 30,  "target": "ally_choose"},
 	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
+	# Act II's stronger stock (25b: freed Nordveil's item shop)
+	"Hi-Potion": {"name": "Hi-Potion", "effect": "item_heal",       "power": 220, "target": "ally_choose"},
+	"Hi-Ether":  {"name": "Hi-Ether",  "effect": "item_restore_mp", "power": 80,  "target": "ally_choose"},
 }
 
 # Enemy stats, kits (abilities, attack modifiers, weaknesses) and encounter

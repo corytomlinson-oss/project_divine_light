@@ -141,7 +141,9 @@ func _ready() -> void:
 	# location in Battle).
 	GameManager.pending_boss_id = _data.get("boss", "") if _is_last_floor() else ""
 	GameManager.current_scene_path = _data["scene"]
-	GameManager.story_flags.erase("edenmere_shrine_used")  # once per dungeon visit (20d)
+	# Town shrines work once per dungeon visit (20d; Nordveil's too, 25b).
+	for shrine_flag in ["edenmere_shrine_used", "nordveil_shrine_used"]:
+		GameManager.story_flags.erase(shrine_flag)
 	Music.play(_data.get("music", "dungeon"), "dungeon")  # each dungeon's own theme (Milestone 21)
 	# Characters lower on screen draw in front (a captive standing just above
 	# the player, cutscene actors walking past each other).

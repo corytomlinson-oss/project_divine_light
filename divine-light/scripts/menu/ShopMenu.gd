@@ -11,6 +11,8 @@ signal closed
 
 const ITEM_TEXT := {
 	"Potion": "Restores 50 HP to one ally.",
+	"Hi-Potion": "Restores 220 HP to one ally.",
+	"Hi-Ether": "Restores 80 MP to one ally.",
 	"Elixir": "Restores 120 HP to one ally.",
 	"Ether": "Restores 30 MP to one ally.",
 	"Antidote": "Cures poison.",

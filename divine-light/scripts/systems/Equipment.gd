@@ -50,6 +50,18 @@ const DEFS: Dictionary = {
 	"Shadow Grips":       {"slot": "gloves",    "class": "Silas", "atk": 3, "set_id": "shadow_walker"},
 	"Shadow Sigil":       {"slot": "accessory", "class": "",      "agi": 2, "set_id": "shadow_walker"},
 
+	# Act II's first tier (25b): freed Nordveil's armory, a step up from
+	# Edenmere's steel.
+	"Frostforged Sword":   {"slot": "weapon", "class": "Vael",  "atk": 19},
+	"Frostforged Claws":   {"slot": "weapon", "class": "Ryn",   "atk": 17},
+	"Frostforged Staff":   {"slot": "weapon", "class": "Lyra",  "atk": 6, "int": 14},
+	"Frostforged Daggers": {"slot": "weapon", "class": "Silas", "atk": 18},
+	"Knight's Mail":       {"slot": "armor",  "class": "Vael",  "def": 8},
+	"Furred Gi":           {"slot": "armor",  "class": "Ryn",   "def": 5, "agi": 1},
+	"Frostweave Robe":     {"slot": "armor",  "class": "Lyra",  "def": 2, "res": 6},
+	"Snowfox Leathers":    {"slot": "armor",  "class": "Silas", "def": 4, "agi": 3},
+	"Hearthstone Charm":   {"slot": "accessory", "class": "", "res": 5, "hp": 25},
+
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
 	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},

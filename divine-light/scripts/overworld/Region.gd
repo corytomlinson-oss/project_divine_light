@@ -41,7 +41,7 @@ const BORDER_CHARS := "^<>v"
 const TOWNS := {
 	"verdance": {"name": "Verdance", "scene": "res://scenes/town/Verdance.tscn"},
 	"edenmere": {"name": "Edenmere", "scene": "res://scenes/town/Edenmere.tscn"},
-	"nordveil": {"name": "Nordveil", "scene": ""},
+	"nordveil": {"name": "Nordveil", "scene": "res://scenes/town/Nordveil.tscn"},
 	"duskara": {"name": "Duskara", "scene": ""},
 	"selavon": {"name": "Selavon", "scene": ""},
 }

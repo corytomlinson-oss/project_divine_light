@@ -482,7 +482,7 @@ func _kingdom(k: int) -> void:
 	_stage.add_child(_sky(info["sky"][0], info["sky"][1]))
 	var land := Node2D.new()
 	_stage.add_child(land)
-	for poly in _silhouettes(k):
+	for poly in silhouettes(k):
 		var p := Polygon2D.new()
 		p.polygon = PackedVector2Array(poly)
 		p.color = info["land"]
@@ -530,7 +530,7 @@ func _sky(top: Color, bottom: Color) -> TextureRect:
 
 ## Each kingdom's skyline (polygons in screen pixels), a little wider than the
 ## screen so the slow push never shows an edge.
-func _silhouettes(k: int) -> Array:
+static func silhouettes(k: int) -> Array:
 	match k:
 		0:  # mountains, and the citadel's spires between them
 			return [
@@ -611,5 +611,6 @@ func _title_card() -> void:
 	_fx.sparkles(_local(Vector2(110, 80)), BattleFx.PALETTES["holy"], true, 1.4)
 	_fx.sparkles(_local(Vector2(210, 80)), BattleFx.PALETTES["holy"], true, 1.4)
 	await _at(T_TITLE + 2 * BAR)
-	_show(_caption, "Coming in a later update.")
+	# Act II begins with Nordveil (25b); the old card said it was coming later.
+	_show(_caption, "The mountain pass to Nordveil lies north." if Kingdoms.is_built("nordveil") else "Coming in a later update.")
 	await _at(T_END)

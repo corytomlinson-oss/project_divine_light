@@ -57,7 +57,7 @@ const DUNGEON_NAMES := {
 
 # Kingdoms whose content is built (25b-25d each add theirs). Until then its
 # road stays closed with a "coming later" note, even after Act I.
-const BUILT: Array = []
+const BUILT: Array = ["nordveil"]
 # Development and tests: treat every kingdom as built.
 static var dev_open := false
 

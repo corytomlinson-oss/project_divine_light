@@ -79,6 +79,7 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 func _place_player(entry: Vector2i) -> void:
 	_refresh_quest_marks()
 	_apply_kingdom_state()
+	_play_victory()
 	if GameManager.has_pending_spawn:
 		_player.snap_to(GameManager.pending_spawn_position)
 		GameManager.has_pending_spawn = false
@@ -98,6 +99,22 @@ func _talk_lines(id: String, facing: String, lines: Array) -> void:
 ## Free of the Unraveling (always true for Verdance and Edenmere).
 func cleansed() -> bool:
 	return kingdom_id == "" or Kingdoms.is_cleansed(kingdom_id)
+
+
+## The first visit after this town's kingdom is freed (25b): its victory
+## scene (data/cutscenes/<kingdom>_victory.scene), then KingdomVictory's
+## movie card.
+func _play_victory() -> void:
+	if kingdom_id == "" or not GameManager.has_flag("victory_pending_" + kingdom_id):
+		return
+	GameManager.story_flags.erase("victory_pending_" + kingdom_id)
+	if Transition.is_busy():
+		await Transition.finished
+	await Cutscene.play("res://data/cutscenes/%s_victory.scene" % kingdom_id)
+	await Transition.fade_out(0.5)
+	await KingdomVictory.play_for(self, kingdom_id)
+	Music.play("town", "overworld")
+	await Transition.fade_in(0.6)
 
 
 func _apply_kingdom_state() -> void:

@@ -21,6 +21,7 @@ say Frank: Now that is a sight. All four of you, still shining clean. Couldn't s
 say Frank: And you're right to ask. The forest was only where Vorath hid you. The real harm is out beyond it.
 say Frank: Three kingdoms - the Tundra, the Desert, the Coast - each one held by souls the Unraveling already turned. Break their hold, and the land starts to breathe again.
 emote player !
+say Frank: Start with the north. The mountain pass above the Cathedral climbs all the way to Nordveil, and its Frozen Sovereign.
 say Frank: Rest first. Stock up. Then we set out together. Somebody has to keep you in potions.
 fade out 1.5
 despawn {a1}

@@ -382,6 +382,12 @@ func _cleansing_wave() -> void:
 	_tile_map.material = null
 	Cutscene.release()
 	await Cutscene.play_text("narrate " + Kingdoms.KINGDOMS[kingdom]["cleansed_text"])
+	# The kingdom celebrates (25b): on to its town, which plays the victory
+	# scene and the movie card (Town._play_victory).
+	var town: String = Kingdoms.KINGDOMS[kingdom]["town"]
+	if String(TOWNS.get(town, {}).get("scene", "")) != "":
+		GameManager.story_flags["victory_pending_" + kingdom] = true
+		Transition.change_scene(TOWNS[town]["scene"])
 
 
 # ---------------------------------------------------------------- map

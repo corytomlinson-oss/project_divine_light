@@ -325,6 +325,17 @@ Made with the milestone, like 23's chests (`assets/sprites/source/build_quest_ar
 - [x] **Finale theme** — `music/finale.wav` (`build_music.py` FINALE), 63s, timed bar for bar to the movie.
 - No new image files: the movie reuses the battle backgrounds, boss and party sprites, `intro_vorath.png` and `intro_title.png`; the kingdom teasers are drawn in code (`ActOneFinale.gd`).
 
+## Act II — Nordveil (Milestone 25b, stand-ins until the Act II art pass, 27)
+
+Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies until 27 draws them properly.
+- [x] **Tundra tileset** `tilesets/tundra_tiles.png` (`source/build_tundra_tiles.py`) and **Nordveil's town tiles** `nordveil_tiles.png` (`source/build_nordveil_tiles.py`)
+- [x] **Frozen Citadel tileset** `citadel_tiles.png` with sliding ice (`source/build_citadel_tiles.py`)
+- [x] **Enemies (recolors):** Frost Wraith, Corrupted Knight, Tundra Troll, Blizzard Hawk, Frost Warden, Ice Knight, Frozen Sovereign (`sprites/source/build_act2_enemies.py`)
+- [x] **Props:** blight brambles, stairs, ice block over a frozen chest (`sprites/source/build_act2_props.py`)
+- [x] **Battle backgrounds:** tundra (aurora over snow), citadel (ice hall) (`ui/source/build_act2_bgs.py`)
+- [ ] Music: a tundra theme and a cold Nordveil theme (`tundra`, `nordveil_cold` fall back to overworld/town) — 27
+- [ ] Real sprites for the seven enemies above — 27
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

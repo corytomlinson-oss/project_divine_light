@@ -70,6 +70,30 @@ const KITS := {
 		{"name": "Avalanche Swing", "kind": "charge", "every": 3, "mult": 1.8, "tell": "hoists its club over its head!"},
 	]},
 	"Blizzard Hawk": {"attack": {"target": "back_row", "hits": 1, "hits_max": 2}, "weak": ["lightning"]},
+	# The Duskara Wastes (Act II, 25c; README "Desert Kingdom")
+	"Sand Viper": {"attack": {"poison_chance": 100, "poison_power": 6, "poison_rounds": 3}, "weak": ["ice"]},
+	"Dust Golem": {"res": 10, "immune": ["earth"], "weak": ["ice"], "abilities": [
+		{"name": "Sandslide", "kind": "charge", "every": 3, "mult": 1.8, "tell": "gathers the sand around its fists..."},
+	]},
+	"Scorched Mage": {"int": 36, "res": 20, "weak": ["ice"], "abilities": [
+		{"name": "Flame Wall", "kind": "burn_row", "chance": 45, "power": 26, "rounds": 3, "burn_power": 8},
+	]},
+	"Dune Marauder": {"attack": {"steal": 35}},
+	# The Sunken Sanctum's guard and boss (25c)
+	"Blazing Sentinel": {"int": 36, "res": 16, "weak": ["ice"], "attack": {"burn_chance": 30, "burn_power": 8}, "abilities": [
+		{"name": "Wildfire", "kind": "burn_all", "every": 3, "power": 22, "rounds": 3, "burn_power": 9},
+		{"name": "Molten Strike", "kind": "charge", "every": 4, "mult": 2.0, "tell": "glows white-hot..."},
+	]},
+	"Burning Tyrant": {"int": 46, "res": 18, "weak": ["ice"], "aura": ["ice", "lightning"],
+		"attack": {"burn_chance": 30, "burn_power": 9}, "abilities": [
+		# Phase 1: fire spells and burning blows
+		{"name": "Flame Lash", "kind": "magic_single", "chance": 40, "max_phase": 0, "power": 44, "palette": "fire"},
+		# Phase 2: the arena itself burns - everyone takes fire every round
+		{"name": "Arena Ablaze", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 26, "palette": "fire"},
+		# Phase 3: ice and lightning, switching every cast - keep up
+		{"name": "Tempest", "kind": "aura_storm", "every": 3, "phase": 2, "power": 30},
+		{"name": "Void Bolt", "kind": "aura_bolt", "every": 1, "phase": 2, "power": 50},
+	]},
 	# The Frozen Citadel's guard and boss (25b)
 	"Frost Warden": {"int": 30, "res": 14, "weak": ["fire"], "abilities": [
 		{"name": "Frostbind", "kind": "freeze", "every": 3, "power": 26},
@@ -301,6 +325,11 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
+# The Sunken Sanctum's mid-dungeon guard (25c; the doc's Blazing Sentinel):
+# burns the whole party every third turn.
+const BLAZING_SENTINEL := {"name": "Blazing Sentinel", "hp": 950, "atk": 56, "def": 20, "agi": 10, "xp": 1200,
+		"tell": "narrate A warrior wreathed in living flame rises from the stairs!"}
+
 # The Frozen Citadel's mid-dungeon guard (25b; the doc's Frost Warden): it
 # stands on its floor's stairs (Dungeon.gd); "tell" is for the map,
 # Battle ignores it. Freezes one hero solid every third turn.
@@ -339,6 +368,31 @@ const CITADEL_ENCOUNTERS: Array = [
 	 {"name": "Blizzard Hawk",    "hp": 95,  "atk": 44, "def": 6,  "agi": 26, "xp": 70}],
 ]
 
+# The Duskara Wastes and the Sunken Sanctum (25c): four heroes around level 9-11.
+const DESERT_ENCOUNTERS: Array = [
+	[{"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Dust Golem",    "hp": 260, "atk": 54, "def": 22, "agi": 4,  "xp": 110},
+	 {"name": "Scorched Mage", "hp": 130, "atk": 40, "def": 8,  "agi": 12, "xp": 95}],
+	[{"name": "Dune Marauder", "hp": 170, "atk": 50, "def": 14, "agi": 18, "xp": 95},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Scorched Mage", "hp": 130, "atk": 40, "def": 8,  "agi": 12, "xp": 95},
+	 {"name": "Dune Marauder", "hp": 170, "atk": 50, "def": 14, "agi": 18, "xp": 95},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Dust Golem",    "hp": 260, "atk": 54, "def": 22, "agi": 4,  "xp": 110}],
+]
+const SANCTUM_ENCOUNTERS: Array = [
+	[{"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100}],
+	[{"name": "Dust Golem",    "hp": 270, "atk": 56, "def": 22, "agi": 4,  "xp": 115},
+	 {"name": "Sand Viper",    "hp": 125, "atk": 50, "def": 8,  "agi": 24, "xp": 90}],
+	[{"name": "Dust Golem",    "hp": 270, "atk": 56, "def": 22, "agi": 4,  "xp": 115},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100},
+	 {"name": "Sand Viper",    "hp": 125, "atk": 50, "def": 8,  "agi": 24, "xp": 90}],
+	[{"name": "Dune Marauder", "hp": 180, "atk": 52, "def": 14, "agi": 18, "xp": 100},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -351,6 +405,8 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"guild_escape": GUILD_ESCAPE_ENCOUNTERS,
 	"tundra": TUNDRA_ENCOUNTERS,
 	"frozen_citadel": CITADEL_ENCOUNTERS,
+	"desert": DESERT_ENCOUNTERS,
+	"sunken_sanctum": SANCTUM_ENCOUNTERS,
 }
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
@@ -359,6 +415,13 @@ const BOSSES := {
 	# 66% / 33% HP - freezing steel, then two Ice Knights and a blizzard every
 	# round, then it swallows the knights and goes berserk. Tuned for four
 	# heroes around level 8-9.
+	# Duskara's boss (25c; README "Act II Kingdom Bosses"): phases at 66% /
+	# 33% - fire and burning blows, then the arena burns every round, then
+	# rapid ice and lightning. Tuned for four heroes around level 10-11.
+	"burning_tyrant": {
+		"name": "Burning Tyrant", "hp": 2000, "atk": 58, "def": 18, "agi": 11, "xp": 3200,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
 	"frozen_sovereign": {
 		"name": "Frozen Sovereign", "hp": 1500, "atk": 54, "def": 18, "agi": 9, "xp": 2400,
 		"phase_hp_thresholds": [0.66, 0.33],

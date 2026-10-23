@@ -53,3 +53,64 @@ ramp_recolor("astral_familiar", "blizzard_hawk", (70, 84, 110), (245, 248, 255),
 ramp_recolor("cursed_paladin", "frost_warden", ICE_DARK, ICE_LIGHT, glow=(140, 220, 255))
 ramp_recolor("iron_sentinel", "ice_knight", (44, 70, 110), (200, 228, 250), glow=(140, 220, 255))
 ramp_recolor("fallen_guardian", "frozen_sovereign", (30, 46, 92), (226, 242, 255), glow=(120, 210, 255))
+
+# The Duskara Wastes (25c; README "Desert Kingdom")
+SAND_DARK, SAND_LIGHT = (92, 60, 34), (236, 204, 146)
+ramp_recolor("iron_sentinel", "dust_golem", (96, 70, 44), (220, 186, 130))
+ramp_recolor("void_mage", "scorched_mage", (90, 26, 20), (255, 178, 96), glow=(255, 150, 40))
+ramp_recolor("shadow_thief", "dune_marauder", SAND_DARK, SAND_LIGHT)
+# The Sunken Sanctum's guard and boss
+ramp_recolor("hired_muscle", "blazing_sentinel", (110, 30, 16), (255, 196, 96), glow=(255, 120, 30))
+ramp_recolor("void_archmage", "burning_tyrant", (80, 20, 16), (255, 170, 80), glow=(255, 210, 90))
+
+# The Sand Viper: a coiled snake, hand-placed (no Act I enemy reads as one).
+SNAKE = [
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "........................",
+    "..............kkkk......",
+    ".............kGGGGk.....",
+    "............kGYGGYGk....",
+    "............kGGGGGGk....",
+    ".............kGGGGk.....",
+    "..............kGGkr.....",
+    "..............kGGk.r....",
+    ".............kGGgk......",
+    "............kGGgk.......",
+    "......kkkkkkGGgk........",
+    ".....kGGGGGGGGgkkkkk....",
+    "....kGgggggGGGGGGGGGk...",
+    "....kGkkkkkgggggggGGk...",
+    "...kGgk....kkkkkkkgGk...",
+    "...kGk..kkkkkkkk..kGk...",
+    "...kGgkkGGGGGGGGkkgGk...",
+    "....kGGGGggggggGGGGk....",
+    ".....kkgggggggggggk.....",
+    ".......kkkkkkkkkkk......",
+    "........................",
+    "........................",
+    "........................",
+]
+PAL = {".": (0, 0, 0, 0), "k": (26, 20, 32, 255), "G": (176, 156, 70, 255), "g": (128, 104, 44, 255),
+       "Y": (255, 230, 90, 255), "r": (200, 40, 50, 255)}
+frames = []
+for shift in (0, 1):
+    im = Image.new("RGBA", (24, 32))
+    for y, row in enumerate(SNAKE):
+        for x, ch in enumerate(row):
+            yy = y - shift if y < 19 else y  # the head bobs on frame 2
+            if 0 <= yy < 32 and ch != ".":
+                im.putpixel((x, yy), PAL[ch])
+    frames.append(im)
+sheet = Image.new("RGBA", (48, 32))
+sheet.paste(frames[0], (0, 0))
+sheet.paste(frames[1], (24, 0))
+sheet.save(ENEMIES / "sand_viper.png")
+print("wrote sand_viper", sheet.size)

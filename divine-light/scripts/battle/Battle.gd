@@ -119,6 +119,8 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	# Act II (25b; every floor of a dungeon goes by its base location)
 	"tundra": "res://assets/ui/battle_bg_tundra.png",
 	"frozen_citadel": "res://assets/ui/battle_bg_citadel.png",
+	"desert": "res://assets/ui/battle_bg_desert.png",
+	"sunken_sanctum": "res://assets/ui/battle_bg_sanctum.png",
 }
 
 # Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on
@@ -373,6 +375,7 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	e.aura_cycle = kit.get("aura", [])
 	e.aura_weakness = bool(kit.get("aura_weakness", false))
 	e.immune_from_phase = int(kit.get("immune_from_phase", -1))
+	e.immune = kit.get("immune", []).duplicate()  # always immune (25c: Dust Golem / earth)
 	return e
 
 
@@ -2328,6 +2331,10 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 		target.is_stunned = true
 		target.stun_rounds = 1
 		status += " Stunned!"
+	if target.is_alive() and randi() % 100 < int(mods.get("burn_chance", 0)):
+		target.burn_rounds = int(mods.get("burn_rounds", 3))
+		target.burn_power = int(mods.get("burn_power", 6))
+		status += " Burned!"
 	if target.is_alive() and randi() % 100 < int(mods.get("random_status", 0)):
 		status += _random_status(target)
 	if target.is_alive() and randi() % 100 < int(mods.get("bleed_chance", 0)):
@@ -2469,6 +2476,25 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			enemy.aura_index += 1
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s! %s\nIts aura shifts to %s." % [enemy.display_name, spell, result, enemy.aura()]
+		"burn_row", "burn_all":
+			# Fire that sets heroes alight (25c): the front row (Scorched Mage)
+			# or everyone (Blazing Sentinel); damage now, burn for a few rounds.
+			var hit: Array = targets
+			if a.get("kind") == "burn_row":
+				hit = targets.filter(func(m: Combatant) -> bool: return m.row == "front")
+				if hit.is_empty():
+					hit = targets
+			_fx.flash(BattleFx.PALETTES["fire"][0], 0.35)
+			Sfx.play("fire")
+			for m: Combatant in hit:
+				_fx_on(m, "burst", "fire")
+				m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+				if m.is_alive():
+					m.burn_rounds = rounds
+					m.burn_power = int(a.get("burn_power", 8))
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!\n%s set ablaze!" % [enemy.display_name, ability_name,
+					"The front row is" if a.get("kind") == "burn_row" and hit != targets else "The whole party is"]
 		"party_agi_down":
 			# Group slow (25b, Frost Wraith): everyone's AGI drops for a while.
 			for m: Combatant in targets:

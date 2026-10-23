@@ -38,7 +38,7 @@ const KINGDOMS := {
 const REGIONS := {
 	"overworld": {"name": "Forest Heartlands", "scene": "res://scenes/overworld/Overworld.tscn", "kingdom": ""},
 	"tundra": {"name": "The Northern Tundra", "scene": "res://scenes/overworld/Tundra.tscn", "kingdom": "nordveil"},
-	"desert": {"name": "The Duskara Wastes", "scene": "", "kingdom": "duskara"},
+	"desert": {"name": "The Duskara Wastes", "scene": "res://scenes/overworld/Desert.tscn", "kingdom": "duskara"},
 	"coast": {"name": "The Selavon Coast", "scene": "", "kingdom": "selavon"},
 }
 

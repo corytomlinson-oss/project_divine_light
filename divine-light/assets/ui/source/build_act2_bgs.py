@@ -110,5 +110,53 @@ def citadel():
     print("wrote battle_bg_citadel.png")
 
 
+def desert():
+    rng = random.Random(27)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 80, (60, 90, 150), (250, 196, 120))
+    d = ImageDraw.Draw(im)
+    d.ellipse([214, 18, 254, 58], fill=(255, 236, 170))       # the sun
+    d.ellipse([220, 24, 248, 52], fill=(255, 250, 220))
+    far = [(0, 82)] + [(x, 64 + 8 * math.sin(x / 31.0) + 4 * math.sin(x / 9.0)) for x in range(0, W + 8, 8)] + [(W, 82)]
+    d.polygon(far, fill=(214, 150, 96))
+    # a half-buried temple on the horizon
+    d.polygon([(118, 74), (130, 58), (150, 58), (162, 74)], fill=(176, 116, 70))
+    dither_gradient(im, 80, 112, (236, 196, 134), (204, 160, 100))
+    for _ in range(16):
+        x, y = rng.randrange(W), 84 + rng.randrange(26)
+        d.line([(x, y), (x + rng.randrange(6, 16), y)], fill=(246, 214, 160))
+    for _ in range(6):  # violet veins of the Unraveling
+        x, y = rng.randrange(W), 90 + rng.randrange(20)
+        d.line([(x + i * 3, y + (1 if i % 2 else -1)) for i in range(6)], fill=(150, 100, 190))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_desert.png")
+    print("wrote battle_bg_desert.png")
+
+
+def sanctum():
+    rng = random.Random(28)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 72, (40, 22, 16), (110, 66, 40))
+    d = ImageDraw.Draw(im)
+    for x in range(10, W, 50):  # sandstone pillars with carved bands
+        d.rectangle([x, 0, x + 18, 72], fill=(170, 120, 74))
+        d.rectangle([x + 2, 0, x + 5, 72], fill=(206, 160, 104))
+        for y in (16, 40):
+            d.rectangle([x, y, x + 18, y + 3], fill=(130, 88, 52))
+    for x in (60, 160, 260):  # braziers
+        d.rectangle([x - 6, 52, x + 6, 60], fill=(90, 60, 36))
+        d.polygon([(x - 6, 52), (x, 34), (x + 6, 52)], fill=(255, 140, 40))
+        d.polygon([(x - 3, 52), (x, 42), (x + 3, 52)], fill=(255, 230, 140))
+    dither_gradient(im, 72, 112, (150, 104, 62), (100, 64, 38))
+    for _ in range(10):  # cracks glowing with heat
+        x, y = rng.randrange(W), 78 + rng.randrange(30)
+        d.line([(x, y), (x + rng.randrange(4, 12), y + rng.randrange(-2, 3))], fill=(230, 100, 40))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_sanctum.png")
+    print("wrote battle_bg_sanctum.png")
+
+
 tundra()
 citadel()
+desert()
+sanctum()

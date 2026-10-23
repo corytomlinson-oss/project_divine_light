@@ -91,6 +91,8 @@ const DEFS: Dictionary = {
 	"Fox-Eye Ring":      {"slot": "accessory", "class": "", "agi": 3, "atk": 1},
 	# The Northern Tundra's hidden clearing (25b)
 	"Snowdrop Charm":    {"slot": "accessory", "class": "", "res": 4, "hp": 40},
+	# The Duskara Wastes' hidden clearing (25c)
+	"Sunstone Ring":     {"slot": "accessory", "class": "", "atk": 3, "int": 3, "hp": 30},
 }
 
 # set_id -> data describing the bonus. Act I's four sets are all wired up

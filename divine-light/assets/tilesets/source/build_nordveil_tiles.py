@@ -28,6 +28,20 @@ def col(im, i):
 tiles = [col(town, i) for i in range(16)]
 for town_col, tundra_col in ((0, 0), (1, 1), (2, 2), (3, 3), (7, 5), (9, 6)):
     tiles[town_col] = col(tundra, tundra_col)
+def degrass(im, ground):
+    """Grass showing behind a copied town tile (fence, stall) -> this town's ground."""
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a and g > r + 18 and g > b + 18:
+                px[x, y] = ground
+    return im
+
+
+for i in range(4, 16):
+    if i not in (7, 9):
+        tiles[i] = degrass(tiles[i], (214, 224, 238, 255))
 # snow on the roofs: a thick cap with a ragged lower edge
 roof = tiles[5]
 rng = random.Random(5)

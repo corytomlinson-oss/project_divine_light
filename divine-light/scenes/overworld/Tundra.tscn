@@ -1,0 +1,29 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/overworld/Tundra.gd" id="1_ow"]
+[ext_resource type="Texture2D" path="res://assets/tilesets/overworld_tiles.png" id="1_sc77d"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fd81m"]
+texture = ExtResource("1_sc77d")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_fd81m"]
+sources/0 = SubResource("TileSetAtlasSource_fd81m")
+
+[node name="Tundra" type="Node2D" unique_id=388229139]
+script = ExtResource("1_ow")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1064080736]
+position = Vector2(92, 214)
+tile_set = SubResource("TileSet_fd81m")
+
+[node name="Player" parent="TileMapLayer" instance=ExtResource("2_player")]
+position = Vector2(168, 88)

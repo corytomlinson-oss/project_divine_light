@@ -44,7 +44,7 @@ func _ready() -> void:
 	_opened_frame = Engine.get_process_frames()
 	# Saving from the menu is an overworld thing (Cory's call, 22a); towns
 	# have their inns, dungeons and battles have only autosaves.
-	var can_save := get_tree().current_scene.name == "Overworld"
+	var can_save := get_tree().current_scene is Region  # any overworld map (25a)
 	if not can_save:
 		var save_option := $CommandWindow/Options/Save
 		$CommandWindow/Options.remove_child(save_option)

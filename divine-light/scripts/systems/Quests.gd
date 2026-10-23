@@ -333,16 +333,26 @@ static func _reward(id: String) -> Array:
 
 # ---------------------------------------------------------------- overworld
 
-## The hunt or fetch spots the current steps call for: {kind, id, cell}.
-static func active_spots() -> Array:
+## The hunt or fetch spots the current steps call for on this region map
+## (HUNTS / FETCHES "region", default the Forest Heartlands): {kind, id, cell}.
+static func active_spots(region := "overworld") -> Array:
 	var spots: Array = []
 	for id: String in QUESTS:
 		var step := current_step(id)
-		if step.has("hunt"):
+		if step.has("hunt") and HUNTS[step["hunt"]].get("region", "overworld") == region:
 			spots.append({"kind": "hunt", "id": step["hunt"], "cell": HUNTS[step["hunt"]]["cell"]})
-		elif step.has("fetch"):
+		elif step.has("fetch") and FETCHES[step["fetch"]].get("region", "overworld") == region:
 			spots.append({"kind": "fetch", "id": step["fetch"], "cell": FETCHES[step["fetch"]]["cell"]})
 	return spots
+
+
+## The quest with a step hunting this target ("" if none).
+static func hunt_quest(hunt_id: String) -> String:
+	for id: String in QUESTS:
+		for step: Dictionary in QUESTS[id]["steps"]:
+			if step.get("hunt", "") == hunt_id:
+				return id
+	return ""
 
 
 ## A hunt or fetch step is done. Returns the quest's lines (reward, if any).

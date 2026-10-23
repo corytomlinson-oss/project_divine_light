@@ -326,13 +326,19 @@ func _generate_encounter() -> Array:
 		return forced
 	if GameManager.pending_boss_battle:
 		GameManager.pending_boss_battle = false
-		var boss_data: Dictionary = EnemyData.BOSSES.get(LOCATION_BOSSES.get(GameManager.current_location, ""), {})
+		# A map can name its boss (Act II floors, 25a); otherwise by location.
+		var boss_id: String = GameManager.pending_boss_id
+		GameManager.pending_boss_id = ""
+		if boss_id == "":
+			boss_id = LOCATION_BOSSES.get(GameManager.current_location, "")
+		var boss_data: Dictionary = EnemyData.BOSSES.get(boss_id, {})
 		if not boss_data.is_empty():
 			var boss: Combatant = _build_enemy(boss_data)
 			boss.is_boss = true
 			boss.phase_hp_thresholds = boss_data.get("phase_hp_thresholds", []).duplicate()
 			return [boss]
-	var table: Array = EnemyData.ENCOUNTER_TABLES.get(GameManager.current_location, EnemyData.FOREST_ENCOUNTERS)
+	var where := GameManager.base_location(GameManager.current_location)  # every floor of a dungeon alike (25a)
+	var table: Array = EnemyData.ENCOUNTER_TABLES.get(GameManager.current_location, EnemyData.ENCOUNTER_TABLES.get(where, EnemyData.FOREST_ENCOUNTERS))
 	# Groups sized to the party (Milestone 20a): at most one enemy more than
 	# there are party members, so a lone hero at the start of Act I isn't
 	# thrown against three at once.
@@ -473,7 +479,7 @@ func _setup_enemy_ui() -> void:
 
 
 func _setup_background() -> void:
-	var path: String = BATTLE_BACKGROUNDS.get(GameManager.current_location, "")
+	var path: String = BATTLE_BACKGROUNDS.get(GameManager.current_location, BATTLE_BACKGROUNDS.get(GameManager.base_location(GameManager.current_location), ""))
 	if path.is_empty() or not ResourceLoader.exists(path):
 		return
 	var art := TextureRect.new()

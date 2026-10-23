@@ -40,6 +40,11 @@ const OPPOSITE := {"up": "down", "down": "up", "left": "right", "right": "left"}
 @onready var _tile_map: TileMapLayer = $TileMapLayer
 @onready var _player: Node2D = $TileMapLayer/Player
 
+# Act II towns (25a) belong to a kingdom: until it's cleansed they draw grey
+# and violet (the region shader) and use their "before" state - each town
+# checks cleansed() for its people, shops and lines. "" = never corrupted.
+var kingdom_id := ""
+
 var _npcs: Dictionary = {}  # cell -> actor id
 var _npc_nodes: Dictionary = {}  # actor id -> character node
 var _quest_marks: Dictionary = {}  # actor id -> QuestMark over their head
@@ -73,6 +78,7 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 ## quest marks go up here too.)
 func _place_player(entry: Vector2i) -> void:
 	_refresh_quest_marks()
+	_apply_kingdom_state()
 	if GameManager.has_pending_spawn:
 		_player.snap_to(GameManager.pending_spawn_position)
 		GameManager.has_pending_spawn = false
@@ -87,6 +93,20 @@ func is_blocked(cell: Vector2i) -> bool:
 ## The person turns to face the player, then says their lines (scene commands).
 func _talk_lines(id: String, facing: String, lines: Array) -> void:
 	await Cutscene.play_text("face %s %s\n%s" % [id, OPPOSITE[facing], "\n".join(lines)])
+
+
+## Free of the Unraveling (always true for Verdance and Edenmere).
+func cleansed() -> bool:
+	return kingdom_id == "" or Kingdoms.is_cleansed(kingdom_id)
+
+
+func _apply_kingdom_state() -> void:
+	if cleansed():
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = Region.CORRUPTION_SHADER
+	mat.set_shader_parameter("amount", 1.0)
+	_tile_map.material = mat
 
 
 ## Side quests (Milestone 24) come first: if this person has quest business,

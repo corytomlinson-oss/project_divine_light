@@ -268,6 +268,14 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
+# Act II stand-ins (25a), so the Frozen Citadel's floors, guard and boss can
+# be played through; 25b replaces them with the real kits and numbers. The
+# guard stands on its floor's stairs (Dungeon.gd); "tell" / "tint" are for
+# the map, Battle ignores them.
+const FROST_WARDEN := {"name": "Frost Warden", "hp": 360, "atk": 40, "def": 14, "agi": 10, "xp": 400,
+		"tell": "narrate An armored knight sheathed in ice turns from the stairs, blade raised!",
+		"tint": Color(0.8, 0.92, 1.15)}
+
 # A mimic (23b) - only in rescue dungeons, so there's always a party.
 const MIMIC := {"name": "Mimic", "hp": 170, "atk": 32, "def": 12, "agi": 9, "xp": 120}
 
@@ -286,6 +294,12 @@ const ENCOUNTER_TABLES: Dictionary = {
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
 const BOSSES := {
+	# Act II stand-in (25a): the Frozen Citadel's boss until 25b builds the
+	# real three-phase Frozen Sovereign.
+	"frozen_sovereign": {
+		"name": "Frozen Sovereign", "hp": 900, "atk": 46, "def": 16, "agi": 9, "xp": 1500,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
 	"hollow_warden": {
 		"name": "Hollow Warden", "hp": 120, "atk": 26, "def": 6, "agi": 3, "xp": 150,
 		"phase_hp_thresholds": [0.5],
@@ -329,7 +343,11 @@ const BOSSES := {
 # "cursed_paladin", "scale": 2, "tint": Color(...)}. Empty since every Act I
 # enemy got real art in Milestone 21; Act II's new enemies can use it until
 # their own art pass.
-const STAND_INS := {}
+# Enemies without their own art yet borrow another's (Battle.gd, Dungeon.gd).
+const STAND_INS := {
+	"Frost Warden": {"sprite": "cursed_paladin"},
+	"Frozen Sovereign": {"sprite": "fallen_guardian"},
+}
 
 
 static func kit(enemy_name: String) -> Dictionary:

@@ -101,6 +101,8 @@ Next: Milestone 22, save/load triggers.
 
 **Act I finale movie:** rescuing the fourth hero now ends Act I with a minute-long animated movie set to a new theme. The bosses you fought fall one by one, each struck down by the newest hero in your party with their own signature effect, and each freed captive steps out of the light to join the line. Then the four stand together, the three kingdoms of Act II flash by in snow, sand and rain, Vorath looms, and \"Act II - The Purge\" takes the screen.
 
+**Completed:** Milestone 25a — Act II foundations (nothing new to play yet). The world can now grow past the Forest Heartlands: each Act II kingdom gets its own region map, reached by a border road off the forest's edge (a mountain pass to the north, roads west and east), opening in order as each kingdom is freed. A corrupted region is drained to a cold violet-grey with thorny blight choking some paths; when its kingdom's boss falls, the color washes back across the land, the brambles wither, and new ways open. Act II dungeons have several floors joined by stairs, with guardians standing on the stairs and the kingdom's boss at the bottom. The roads stay closed until Nordveil is built in 25b.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.

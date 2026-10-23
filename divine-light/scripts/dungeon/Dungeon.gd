@@ -12,6 +12,17 @@ extends Node2D
 # Location ids: "<dungeon>_escape" for the escape variant (its own encounter
 # table, boss and seed), "<dungeon>" for the rescue. Story beats are cutscene
 # files in data/cutscenes/.
+#
+# Act II dungeons (Milestone 25a; entries with "floors") have several floors
+# joined by stairs, one per zone in the design doc. Each floor is its own
+# layout from the dungeon's seed (+ floor * FLOOR_SEED_STEP) and its own
+# location id ("<dungeon>" for the first, "<dungeon>_f<n>" after), so the map,
+# chests and "quiet" state are per floor. Stairs down sit where Act I puts
+# the boss; a floor can have a guard standing on its stairs (a visible
+# single-enemy fight, no escape); the last floor has the boss, and beating it
+# cleanses the dungeon's kingdom (Kingdoms.cleanse) and sends you outside,
+# where the region's color washes back. GameManager.dungeon_floor says which
+# floor you're on (saved).
 
 const FLOOR_COORDS := Vector2i(0, 0)
 const WALL_COORDS := Vector2i(1, 0)
@@ -33,6 +44,9 @@ const MIMIC_TEXT := "narrate The lid creaks open... and the chest bares its teet
 const SPRING_TEXT := "narrate Clear water wells up, glowing faintly. The party drinks and feels whole again."
 const SPENT_TEXT := "narrate The spring lies still and dark. Its power is spent."
 const QUIET_TEXT := "narrate The halls have fallen quiet. Nothing stirs here anymore."
+const STAIRS_SHEET := preload("res://assets/sprites/stairs.png")  # down, up
+const FLOOR_SEED_STEP := 1000003
+const STAIRS_MARKER := Color(0.6, 0.8, 1.0)
 
 # Per-dungeon generation templates (13b) and story scenes (20a).
 const DUNGEONS := {
@@ -72,6 +86,19 @@ const DUNGEONS := {
 		"escaped_scene": "res://data/cutscenes/guild_escaped.scene",
 		"rescue_scene": "res://data/cutscenes/guild_rescue.scene",
 	},
+	# Act II (25a: a stand-in to prove the floors work; 25b builds the real
+	# Frozen Citadel on top - its template, guard, boss and look).
+	"frozen_citadel": {
+		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
+		"scene": "res://scenes/dungeon/FrozenCitadel.tscn",
+		"music": "dungeon",
+		"floors": 4,
+		"kingdom": "nordveil",
+		"boss": "frozen_sovereign",
+		"guards": {2: EnemyData.FROST_WARDEN},
+		"set_floor": 2,
+		"region_scene": "res://scenes/overworld/Tundra.tscn",
+	},
 }
 
 const TAG_TO_COORDS := {
@@ -95,12 +122,24 @@ var _captive_cell: Vector2i
 var _room_rects: Array = []  # Rect2i per room, for the auto-map
 var _chests: Dictionary = {}  # cell -> {cell, kind, reward, sprite}
 var _springs: Dictionary = {}  # cell -> Sprite2D
+# Act II floors (25a)
+var _floors := 1
+var _floor := 0
+var _stairs_up := Vector2i(-9999, -9999)
+var _stairs_down := Vector2i(-9999, -9999)
+var _guard: Sprite2D = null
+var _settled := false
 
 
 func _ready() -> void:
 	_data = DUNGEONS[dungeon_id]
 	_escape = ActOne.is_start_dungeon(dungeon_id)
-	GameManager.current_location = dungeon_id + ("_escape" if _escape else "")
+	_floors = int(_data.get("floors", 1))
+	_floor = clampi(GameManager.dungeon_floor, 0, _floors - 1) if _floors > 1 else 0
+	GameManager.current_location = dungeon_id + ("_escape" if _escape else "") + ("_f%d" % _floor if _floor > 0 else "")
+	# The boss a fight on this floor would be (Act II names it; Act I goes by
+	# location in Battle).
+	GameManager.pending_boss_id = _data.get("boss", "") if _is_last_floor() else ""
 	GameManager.current_scene_path = _data["scene"]
 	GameManager.story_flags.erase("edenmere_shrine_used")  # once per dungeon visit (20d)
 	Music.play(_data.get("music", "dungeon"), "dungeon")  # each dungeon's own theme (Milestone 21)
@@ -110,9 +149,13 @@ func _ready() -> void:
 	_add_backdrop()
 	_generate_and_build()
 	_settle_mimic()
-	_play_arrival_story()
+	_settled = true
+	if _floors > 1:
+		_play_act_two_story()
+	else:
+		_play_arrival_story()
 	# Not while an escape is about to whisk you outside (its scene plays first).
-	if not (_escape and _boss_defeated() and not ActOne.is_cleared(dungeon_id)):
+	if not (_escape and _boss_defeated() and not ActOne.is_cleared(dungeon_id)) and not _kingdom_freed_now():
 		_announce_if_quiet()
 
 
@@ -120,8 +163,14 @@ func _boss_defeated() -> bool:
 	return GameManager.defeated_bosses.get(GameManager.current_location, false)
 
 
+func _is_last_floor() -> bool:
+	return _floor == _floors - 1
+
+
 func _generate_and_build() -> void:
 	var seed_value: int = GameManager.get_dungeon_seed(GameManager.current_location)
+	if _floors > 1:
+		seed_value = GameManager.get_dungeon_seed(dungeon_id) + _floor * FLOOR_SEED_STEP
 	var layout: Dictionary = DungeonGenerator.generate(_data["template"], seed_value)
 	var tiles: Dictionary = layout["tiles"]
 	var deep_door: Vector2i = layout["exit_cell"]
@@ -133,7 +182,10 @@ func _generate_and_build() -> void:
 	# entrance is the only way in or out.
 	tiles[deep_door] = DungeonGenerator.FLOOR
 	_exit_cell = layout["entrance_cell"]
-	if _escape:
+	if _floors > 1:
+		spawn = _build_floor(layout, tiles)
+		_captive_cell = Vector2i(-9999, -9999)
+	elif _escape:
 		# The player's cell is deep inside; the warden waits by the exit.
 		tiles[boss_cell] = DungeonGenerator.FLOOR
 		tiles[spawn] = DungeonGenerator.BOSS_TRIGGER
@@ -155,7 +207,10 @@ func _generate_and_build() -> void:
 
 	for cell in tiles.keys():
 		_tile_map.set_cell(cell, 0, TAG_TO_COORDS[tiles[cell]])
-	_place_captive()
+	if _floors > 1:
+		_place_stairs()
+	else:
+		_place_captive()
 	_place_treasure(layout, seed_value)
 
 	# A saved spot that isn't floor anymore (a save from before the rooms got
@@ -168,6 +223,71 @@ func _generate_and_build() -> void:
 		_player.snap_to(_tile_map.map_to_local(spawn))
 	GameManager.has_pending_spawn = false
 	on_player_moved(_tile_map.local_to_map(_player.position))
+
+
+## An Act II floor (25a): stairs up where the entrance door would be (past
+## the first floor), stairs down where Act I puts the boss (before the last),
+## no captive. Returns where to stand on arriving.
+func _build_floor(layout: Dictionary, tiles: Dictionary) -> Vector2i:
+	var boss_cell: Vector2i = layout["boss_trigger_cell"]
+	tiles[layout["captive_cell"]] = DungeonGenerator.FLOOR
+	if _floor > 0:
+		_stairs_up = _exit_cell
+		tiles[_exit_cell] = DungeonGenerator.FLOOR
+	if not _is_last_floor():
+		_stairs_down = boss_cell
+		tiles[boss_cell] = DungeonGenerator.FLOOR
+	elif _boss_defeated():
+		tiles[boss_cell] = DungeonGenerator.FLOOR
+	# Came up from below: beside the stairs down. Otherwise by the entrance.
+	if GameManager.arrival == "stairs_up" and not _is_last_floor():
+		GameManager.arrival = ""
+		for d: Vector2i in [Vector2i.DOWN, Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT]:
+			if tiles.get(boss_cell + d, "") == DungeonGenerator.FLOOR:
+				return boss_cell + d
+	GameManager.arrival = ""
+	return layout["player_spawn"]
+
+
+func _place_stairs() -> void:
+	if _floor > 0:
+		_add_sprite(STAIRS_SHEET, 2, _stairs_up).frame = 1
+	if not _is_last_floor():
+		_add_sprite(STAIRS_SHEET, 2, _stairs_down).frame = 0
+		var guard: Dictionary = _data.get("guards", {}).get(_floor, {})
+		if not guard.is_empty() and not _boss_defeated():
+			_guard = _guard_sprite(guard)
+
+
+## A floor's guard stands on its stairs down (its battle sprite, or a stand-in).
+func _guard_sprite(guard: Dictionary) -> Sprite2D:
+	var sprite_name: String = String(guard["name"]).to_lower().replace(" ", "_")
+	var path := "res://assets/sprites/enemies/%s.png" % sprite_name
+	if not ResourceLoader.exists(path):
+		path = "res://assets/sprites/enemies/%s.png" % EnemyData.STAND_INS.get(guard["name"], {}).get("sprite", "hollow_warden")
+	var sprite := Sprite2D.new()
+	sprite.texture = load(path)
+	sprite.hframes = 2
+	sprite.offset.y = 8 - sprite.texture.get_height() / 2.0
+	sprite.position = _tile_map.map_to_local(_stairs_down)
+	sprite.modulate = guard.get("tint", Color.WHITE)
+	_tile_map.add_child(sprite)
+	var bob := Timer.new()
+	bob.wait_time = 0.5
+	bob.autostart = true
+	bob.timeout.connect(func() -> void:
+		if is_instance_valid(sprite):
+			sprite.frame = 1 - sprite.frame)
+	add_child(bob)
+	return sprite
+
+
+func _guard_fight() -> void:
+	var guard: Dictionary = _data["guards"][_floor].duplicate()
+	guard["is_boss"] = true  # no running; beating it marks this floor's boss down
+	Sfx.play("menu_cancel")
+	await Cutscene.play_text(String(guard.get("tell", "narrate The guardian of the stairs moves to bar your way!")))
+	_player.start_battle_against([guard])
 
 
 ## Darkness behind the map, so the space outside the walls reads as solid
@@ -206,6 +326,8 @@ func _place_captive() -> void:
 ## or a vault of rich chests, some locked. All of it comes from the seed.
 func _place_treasure(layout: Dictionary, seed_value: int) -> void:
 	var set_items: Array = Loot.DUNGEON_SETS.get(dungeon_id, [])
+	if _floors > 1 and _floor != int(_data.get("set_floor", _floors - 1)):
+		set_items = []  # Act II: the armor set waits on its own floor
 	# Mimics only where there's a party to fight them (not the solo escape).
 	var treasure := DungeonGenerator.place_treasure(layout, set_items, seed_value, not _escape)
 	for chest: Dictionary in treasure["chests"]:
@@ -257,11 +379,19 @@ func _sealed(chest: Dictionary) -> bool:
 
 
 func is_blocked(cell: Vector2i) -> bool:
-	return _chests.has(cell) or _springs.has(cell)
+	return _chests.has(cell) or _springs.has(cell) or (_guard != null and cell == _stairs_down)
+
+
+## Stairs are doors (Player.gd asks): up always, down once its guard is gone.
+func is_door(cell: Vector2i) -> bool:
+	return cell == _stairs_up or (cell == _stairs_down and _guard == null)
 
 
 ## A on the tile you're facing: open a chest, drink from a spring.
 func interact(cell: Vector2i, _facing: String) -> void:
+	if _guard != null and cell == _stairs_down:
+		await _guard_fight()
+		return
 	if _springs.has(cell):
 		await _drink(cell)
 		return
@@ -315,13 +445,21 @@ func _settle_mimic() -> void:
 ## Boss beaten and every chest open (locked ones and the mimic included; the
 ## spring can be saved for later): no more random fights here.
 func is_safe() -> bool:
-	return _boss_defeated() and _chests.keys().all(func(cell: Vector2i) -> bool: return _opened(cell))
+	return _dungeon_done() and _chests.keys().all(func(cell: Vector2i) -> bool: return _opened(cell))
+
+
+## Act I: this dungeon's boss is down. Act II (every floor alike): its kingdom
+## is free - a floor's guard alone doesn't count.
+func _dungeon_done() -> bool:
+	if _floors > 1:
+		return Kingdoms.is_cleansed(_data.get("kingdom", ""))
+	return _boss_defeated()
 
 
 ## With the boss beaten, fights come a fifth as often (every 50-100 steps
 ## instead of 10-20).
 func encounter_steps() -> Vector2i:
-	return Vector2i(50, 100) if _boss_defeated() else Vector2i(10, 20)
+	return Vector2i(50, 100) if _dungeon_done() else Vector2i(10, 20)
 
 
 ## Once per dungeon, the moment it becomes safe.
@@ -379,6 +517,28 @@ func on_captive_tile(_cell: Vector2i) -> void:
 		Transition.change_scene(OVERWORLD_SCENE_PATH)
 
 
+## Act II (25a): back from beating the last floor's boss, the kingdom is free.
+## A line, an autosave, and out to the region, where the color washes back.
+func _play_act_two_story() -> void:
+	if not _kingdom_freed_now():
+		return
+	var kingdom: String = _data["kingdom"]
+	Kingdoms.cleanse(kingdom)
+	await _after_transition()
+	var boss_name: String = EnemyData.BOSSES.get(_data.get("boss", ""), {}).get("name", "The boss")
+	await Cutscene.play_text("narrate %s crumbles, and the Unraveling's hold on %s shatters with it." % [boss_name, Kingdoms.KINGDOMS[kingdom]["name"]])
+	GameManager.arrival = dungeon_id
+	GameManager.dungeon_floor = 0
+	GameManager.autosave_pending = true  # saved on arrival outside (22a)
+	Transition.change_scene(_data.get("region_scene", OVERWORLD_SCENE_PATH))
+
+
+## The last floor's boss is down but its kingdom isn't marked free yet.
+func _kingdom_freed_now() -> bool:
+	return _floors > 1 and _is_last_floor() and _boss_defeated() and _data.has("kingdom") \
+			and not Kingdoms.is_cleansed(_data["kingdom"])
+
+
 ## Story beats when the map loads: waking up (escape, first time), and the
 ## escape itself once the warden is beaten.
 func _play_arrival_story() -> void:
@@ -420,6 +580,10 @@ func on_player_moved(cell: Vector2i) -> void:
 		for dy in range(-2, 3):
 			seen.append(cell + Vector2i(dx, dy))
 	GameManager.mark_explored(GameManager.current_location, seen)
+	# Walking up to a floor's guard starts the fight (not on arrival, so
+	# coming back from a lost or fled fight doesn't throw you straight back in).
+	if _settled and _guard != null and (cell - _stairs_down).length_squared() == 1:
+		_guard_fight()
 
 
 ## A room's exits on the map (Cory, 2026-10-20: rooms were easy to miss when
@@ -483,7 +647,12 @@ func map_markers() -> Array:
 	var markers: Array = []
 	for cell in GameManager.explored.get(GameManager.current_location, {}):
 		var coords := _tile_map.get_cell_atlas_coords(cell)
-		if _chests.has(cell):
+		if cell == _stairs_up or cell == _stairs_down:
+			if _guard != null and cell == _stairs_down:
+				markers.append({"cell": cell, "color": Color(0.95, 0.25, 0.25), "legend": "Guard"})
+			else:
+				markers.append({"cell": cell, "color": STAIRS_MARKER, "legend": "Stairs"})
+		elif _chests.has(cell):
 			if not _opened(cell):
 				var gilded: bool = _chests[cell]["kind"] == "gilded"
 				markers.append({"cell": cell, "color": Color(0.35, 0.9, 0.95) if gilded else Color(0.8, 0.55, 0.3),
@@ -499,10 +668,18 @@ func map_markers() -> Array:
 
 
 func get_door_destination(cell: Vector2i) -> Dictionary:
+	# Act II stairs (25a): the same scene, one floor up or down.
+	if cell == _stairs_up or cell == _stairs_down:
+		var down := cell == _stairs_down
+		GameManager.dungeon_floor = _floor + (1 if down else -1)
+		GameManager.arrival = "stairs_down" if down else "stairs_up"
+		Sfx.play("menu_confirm")
+		return {"scene": _data["scene"]}
 	if cell != _exit_cell:
 		return {}
 	if _escape and not _boss_defeated():
 		# The warden bars the only way out: walking up to the door starts it.
 		return {"boss": true}
 	GameManager.arrival = dungeon_id
-	return {"scene": OVERWORLD_SCENE_PATH}
+	GameManager.dungeon_floor = 0
+	return {"scene": _data.get("region_scene", OVERWORLD_SCENE_PATH)}

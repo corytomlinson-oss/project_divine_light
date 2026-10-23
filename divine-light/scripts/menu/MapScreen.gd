@@ -11,6 +11,7 @@ extends CanvasLayer
 #                           next to the marker, legends listed along the bottom
 #   map_note() -> String    a short line in the top-right corner (a dungeon's
 #                           chest count)
+#   map_corrupted() -> true  draw the colors drained, like the land (25a)
 # Pauses the tree while open and puts it back the way it was on close, so it
 # works over the pause menu too.
 
@@ -101,6 +102,11 @@ func _collect() -> void:
 		if not averages.has(key):
 			averages[key] = _average_color(key[0], key[1])
 		_cells[cell] = averages[key]
+	if _map_root.has_method("map_corrupted") and _map_root.map_corrupted():
+		for cell in _cells:
+			var c: Color = _cells[cell]
+			var g := c.r * 0.299 + c.g * 0.587 + c.b * 0.114
+			_cells[cell] = Color(g * 0.78 + 0.03, g * 0.72 + 0.01, g * 0.86 + 0.07)  # as corruption.gdshader
 	if _map_root.has_method("map_markers"):
 		_markers = _map_root.map_markers()
 

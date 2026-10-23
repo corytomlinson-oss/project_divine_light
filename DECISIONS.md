@@ -394,3 +394,14 @@ Cory's calls, before anything was built:
 - **Region maps** joined by border roads (not one giant continent, not a world-map screen).
 - **Fixed kingdom order: Nordveil, Duskara, Selavon**; cleansing one opens the road to the next.
 - **Generated multi-floor dungeons** (one floor per zone in the doc) with each kingdom's gimmick on top.
+
+### 25a — foundations (built 2026-10-23)
+
+My calls while building (Cory: "I think we are good, let's start"):
+- **Overworld.gd became the `Region` base class + the forest's data**, rather than a second copy for the Tundra: every region (and later ones) behaves the same and gets fixes once.
+- **Corruption is a shader on the tiles** (drained violet-grey), not separate corrupted tilesets: it works on every region and town for free, and the cleansing wave is just tweening it away. Real per-kingdom art can still layer on in 27.
+- **New paths after cleansing are blight brambles** (`x` in a map): a visible, explained barrier ("not while the Unraveling holds this land") instead of invisible walls.
+- **Act II roads stay closed until each kingdom is built** (`Kingdoms.BUILT`), even after Act I, with a "coming in a later update" note, so the stub Tundra and stand-in Citadel never show up in a real game before 25b.
+- **Floors are one scene per dungeon with a saved floor number**, each floor its own location id, so the map, chests and the "quiet" rule work per floor with no changes to those systems.
+- **A floor's guard stands on its stairs down** (the doc's "elite knight guarding the inner sanctum gate"): walking up to it starts a no-escape fight; it blocks the stairs until beaten.
+- **The Tundra's names:** "The Northern Tundra", and placeholders "The Duskara Wastes" / "The Selavon Coast" for the other two regions. *Change:* `Kingdoms.REGIONS`.

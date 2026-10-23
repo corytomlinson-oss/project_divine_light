@@ -113,6 +113,9 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	"observatory_escape": "res://assets/ui/battle_bg_observatory.png",
 	"guild": "res://assets/ui/battle_bg_guild.png",
 	"guild_escape": "res://assets/ui/battle_bg_guild.png",
+	# Act II (25b; every floor of a dungeon goes by its base location)
+	"tundra": "res://assets/ui/battle_bg_tundra.png",
+	"frozen_citadel": "res://assets/ui/battle_bg_citadel.png",
 }
 
 # Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on
@@ -2222,6 +2225,9 @@ func _choose_ability(enemy: Combatant) -> Dictionary:
 			continue
 		if a.get("kind", "") == "silence" and _party.all(func(m: Combatant) -> bool: return not m.is_alive() or m.silence_rounds > 0):
 			continue
+		# Absorbing its summons (25b) only means something while they stand.
+		if a.get("kind", "") == "absorb" and not _enemies.any(func(e: Combatant) -> bool: return e.summoned and e.is_alive()):
+			continue
 		if a.has("every"):
 			if enemy.turns_taken % int(a["every"]) == 0:
 				return a
@@ -2231,7 +2237,8 @@ func _choose_ability(enemy: Combatant) -> Dictionary:
 
 
 ## Taunt wins; back-row hunters (Hollow Archer) pick the back row 75% of the
-## time when anyone's there; otherwise anyone.
+## time when anyone's there; front-row predators (Tundra Troll, 25b) only ever
+## hit the front row while anyone stands there; otherwise anyone.
 func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 	for m: Combatant in targets:
 		if m.taunt_rounds > 0:
@@ -2240,6 +2247,10 @@ func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 		var back := targets.filter(func(m: Combatant) -> bool: return m.row == "back")
 		if not back.is_empty() and randi() % 100 < 75:
 			return back[randi() % back.size()]
+	if enemy.attack_mods.get("target", "") == "front_row":
+		var front := targets.filter(func(m: Combatant) -> bool: return m.row == "front")
+		if not front.is_empty():
+			return front[randi() % front.size()]
 	return targets[randi() % targets.size()]
 
 
@@ -2448,6 +2459,43 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			enemy.aura_index += 1
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s! %s\nIts aura shifts to %s." % [enemy.display_name, spell, result, enemy.aura()]
+		"party_agi_down":
+			# Group slow (25b, Frost Wraith): everyone's AGI drops for a while.
+			for m: Combatant in targets:
+				m.agi_debuff = power
+				m.agi_debuff_rounds = rounds
+				_fx_on(m, "sinking", a.get("palette", "ice"))
+			Sfx.play("ice")
+			message_label.text = phase_note + "%s breathes %s!
+The party slows down!" % [enemy.display_name, ability_name]
+		"freeze":
+			# Ice magic that freezes one hero solid for a round (25b).
+			var target := _pick_target(enemy, targets)
+			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			_fx_on(target, "crystals", "ice")
+			Sfx.play("ice")
+			target.receive_damage(dmg)
+			if target.is_alive():
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!
+%s takes %d and is frozen solid!" % [enemy.display_name, ability_name, target.display_name, dmg]
+		"absorb":
+			# Swallows its summoned minions for power (25b, the Frozen
+			# Sovereign's third phase): each one adds `power` ATK and DEF for good.
+			var eaten := _enemies.filter(func(e: Combatant) -> bool: return e.summoned and e.is_alive())
+			for e: Combatant in eaten:
+				_fx_on(e, "cloud", "ice")
+				e.hp = 0
+				e.is_ko = true
+			enemy.atk += power * eaten.size()
+			enemy.defense += power * eaten.size()
+			_fx_on(enemy, "ring", "ice")
+			Sfx.play("thunder")
+			_update_enemy_ui()
+			message_label.text = phase_note + "%s uses %s!
+It swallows its knights and grows stronger!" % [enemy.display_name, ability_name]
 		"magic_all":
 			_fx.flash(pal[0], 0.4)
 			Sfx.play("thunder")

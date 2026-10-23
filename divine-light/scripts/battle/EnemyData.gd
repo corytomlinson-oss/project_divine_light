@@ -60,6 +60,39 @@ const KITS := {
 		{"name": "Grave Swing", "kind": "charge", "every": 3, "mult": 2.2, "tell": "raises its pitchfork high!"},
 	]},
 	"Cutpurse": {"attack": {"steal": 40}},
+	# The Northern Tundra (Act II, 25b; README "Tundra Kingdom")
+	"Frost Wraith": {"int": 30, "res": 18, "weak": ["fire"], "abilities": [
+		{"name": "Chilling Mist", "kind": "party_agi_down", "chance": 30, "power": 6, "rounds": 2, "palette": "ice"},
+		{"name": "Frost Bolt", "kind": "magic_single", "chance": 40, "power": 30, "palette": "ice"},
+	]},
+	"Corrupted Knight": {"res": 6, "weak": ["holy"], "attack": {"stun_chance": 10}},
+	"Tundra Troll": {"attack": {"target": "front_row"}, "abilities": [
+		{"name": "Avalanche Swing", "kind": "charge", "every": 3, "mult": 1.8, "tell": "hoists its club over its head!"},
+	]},
+	"Blizzard Hawk": {"attack": {"target": "back_row", "hits": 1, "hits_max": 2}, "weak": ["lightning"]},
+	# The Frozen Citadel's guard and boss (25b)
+	"Frost Warden": {"int": 30, "res": 14, "weak": ["fire"], "abilities": [
+		{"name": "Frostbind", "kind": "freeze", "every": 3, "power": 26},
+		{"name": "Shatter Strike", "kind": "charge", "every": 4, "mult": 2.0, "tell": "drives its blade into the ice..."},
+	]},
+	"Ice Knight": {"res": 8, "weak": ["fire"]},
+	"Frozen Sovereign": {"int": 40, "res": 16, "weak": ["fire", "holy"], "abilities": [
+		# Phase 1: ice and steel, freezing one hero at a time
+		{"name": "Frostbind", "kind": "freeze", "every": 3, "max_phase": 0, "power": 30},
+		{"name": "Glacial Edge", "kind": "magic_single", "chance": 35, "max_phase": 0, "power": 40, "palette": "ice"},
+		# Phase 2: two ice knights, and a blizzard every round
+		{"name": "Call the Guard", "kind": "summon", "chance": 100, "phase": 1, "max_phase": 1,
+			"tell": "raises its sword - two Ice Knights crack free of the walls!",
+			"enemies": [
+				{"name": "Ice Knight", "hp": 150, "atk": 46, "def": 20, "agi": 6, "xp": 0},
+				{"name": "Ice Knight", "hp": 150, "atk": 46, "def": 20, "agi": 6, "xp": 0},
+			]},
+		{"name": "Blizzard", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 26, "palette": "ice"},
+		# Phase 3: swallows its knights for power, then berserk ice-and-steel
+		{"name": "Frozen Communion", "kind": "absorb", "every": 1, "phase": 2, "power": 6},
+		{"name": "Frozen Fury", "kind": "charge", "every": 2, "phase": 2, "mult": 2.2, "tell": "glows white-hot with cold..."},
+		{"name": "Glacial Edge", "kind": "magic_single", "chance": 45, "phase": 2, "power": 46, "palette": "ice"},
+	]},
 	# The Cathedral
 	"Fallen Priest": {"int": 12, "res": 10, "abilities": [
 		{"name": "Dark Litany", "kind": "party_def_down", "chance": 45, "power": 4, "rounds": 2},
@@ -268,18 +301,44 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
-# Act II stand-ins (25a), so the Frozen Citadel's floors, guard and boss can
-# be played through; 25b replaces them with the real kits and numbers. The
-# guard stands on its floor's stairs (Dungeon.gd); "tell" / "tint" are for
-# the map, Battle ignores them.
-const FROST_WARDEN := {"name": "Frost Warden", "hp": 360, "atk": 40, "def": 14, "agi": 10, "xp": 400,
-		"tell": "narrate An armored knight sheathed in ice turns from the stairs, blade raised!",
-		"tint": Color(0.8, 0.92, 1.15)}
+# The Frozen Citadel's mid-dungeon guard (25b; the doc's Frost Warden): it
+# stands on its floor's stairs (Dungeon.gd); "tell" is for the map,
+# Battle ignores it. Freezes one hero solid every third turn.
+const FROST_WARDEN := {"name": "Frost Warden", "hp": 700, "atk": 50, "def": 20, "agi": 10, "xp": 900,
+		"tell": "narrate An armored knight sheathed in ice turns from the stairs, blade raised!"}
 
 # A mimic (23b) - only in rescue dungeons, so there's always a party.
 const MIMIC := {"name": "Mimic", "hp": 170, "atk": 32, "def": 12, "agi": 9, "xp": 120}
 
 # Location -> table. "cathedral_escape" is the Cathedral as a starting dungeon.
+# The Northern Tundra (25b): the doc's four, for four heroes around level 7-9
+# (groups are capped at one more than the party, max 3).
+const TUNDRA_ENCOUNTERS: Array = [
+	[{"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65}],
+	[{"name": "Corrupted Knight", "hp": 170, "atk": 46, "def": 26, "agi": 6,  "xp": 85},
+	 {"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70}],
+	[{"name": "Tundra Troll",     "hp": 230, "atk": 52, "def": 12, "agi": 5,  "xp": 95},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65}],
+	[{"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65},
+	 {"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70}],
+	[{"name": "Tundra Troll",     "hp": 230, "atk": 52, "def": 12, "agi": 5,  "xp": 95}],
+]
+# The Frozen Citadel (25b): the knights and wraiths hold the fortress, the
+# trolls guard its gates; a little heavier than the open tundra.
+const CITADEL_ENCOUNTERS: Array = [
+	[{"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90},
+	 {"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90}],
+	[{"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75},
+	 {"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75},
+	 {"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90}],
+	[{"name": "Tundra Troll",     "hp": 240, "atk": 54, "def": 12, "agi": 5,  "xp": 100},
+	 {"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75}],
+	[{"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90},
+	 {"name": "Blizzard Hawk",    "hp": 95,  "atk": 44, "def": 6,  "agi": 26, "xp": 70}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -290,14 +349,18 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"observatory_escape": OBSERVATORY_ESCAPE_ENCOUNTERS,
 	"guild": GUILD_ENCOUNTERS,
 	"guild_escape": GUILD_ESCAPE_ENCOUNTERS,
+	"tundra": TUNDRA_ENCOUNTERS,
+	"frozen_citadel": CITADEL_ENCOUNTERS,
 }
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
 const BOSSES := {
-	# Act II stand-in (25a): the Frozen Citadel's boss until 25b builds the
-	# real three-phase Frozen Sovereign.
+	# Nordveil's boss (25b; README "Act II Kingdom Bosses"): three phases at
+	# 66% / 33% HP - freezing steel, then two Ice Knights and a blizzard every
+	# round, then it swallows the knights and goes berserk. Tuned for four
+	# heroes around level 8-9.
 	"frozen_sovereign": {
-		"name": "Frozen Sovereign", "hp": 900, "atk": 46, "def": 16, "agi": 9, "xp": 1500,
+		"name": "Frozen Sovereign", "hp": 1500, "atk": 54, "def": 18, "agi": 9, "xp": 2400,
 		"phase_hp_thresholds": [0.66, 0.33],
 	},
 	"hollow_warden": {
@@ -344,10 +407,7 @@ const BOSSES := {
 # enemy got real art in Milestone 21; Act II's new enemies can use it until
 # their own art pass.
 # Enemies without their own art yet borrow another's (Battle.gd, Dungeon.gd).
-const STAND_INS := {
-	"Frost Warden": {"sprite": "cursed_paladin"},
-	"Frozen Sovereign": {"sprite": "fallen_guardian"},
-}
+const STAND_INS := {}
 
 
 static func kit(enemy_name: String) -> Dictionary:

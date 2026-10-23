@@ -1,46 +1,74 @@
 extends Region
 
-# The Northern Tundra - Nordveil's region (Milestone 25a stub; 25b builds it
-# out). Reached by the mountain pass north of the Forest Heartlands once Act I
-# is over. Grey and violet while Nordveil is in the Unraveling's grip; the
-# blight brambles seal off the west valley (a chest and a spring) until the
-# Frozen Sovereign falls. Tile letters are in Region.gd.
+# The Northern Tundra - Nordveil's region (Milestone 25a stub, built out in
+# 25b). Reached by the mountain pass north of the Forest Heartlands once Act I
+# is over. Grey and violet while Nordveil is in the Unraveling's grip; when
+# the Frozen Sovereign falls the color washes back and the blight withers.
+# Tile letters are in Region.gd; tiles are tundra_tiles.png (same columns as
+# the forest's: snow, pines, gate, packed-snow road, icy arch, frozen lake,
+# frost tufts, bridge).
 #
-#   F  The Frozen Citadel    N  Nordveil (town gate)    v  the pass south
+#   v  the pass south to the Forest Heartlands
+#   N  Nordveil, on its plateau to the east      F  the Frozen Citadel, up
+#                                                   the mountain road
+# A frozen river crosses the middle (one bridge). Blight seals the west
+# valley (a chest and a spring) and the alcove north of the crossroads. A
+# hidden clearing in the south-west (flowers mark the way through the pines)
+# holds a charm found nowhere else.
 
 const MAP := [
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....F....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....=....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....=..*.TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....=....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....=....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT.*..=....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTT....=....TTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTT.....=.....TTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTT.....=.....TT.........TTTTT",
-	"TTTTT........TTTT.....=.....TT...*.....TTTTT",
-	"TTTTT........TTTT.....============N....TTTTT",
-	"TTTTT..c.....xxTT.....=.....TT.........TTTTT",
-	"TTTTT........xx========.....TT.......c.TTTTT",
-	"TTTTT....s...xxTT.....=.....TT.........TTTTT",
-	"TTTTT........TTTT.....=.....TTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT..*.....=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=.....*..TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTT........=........TTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTvTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTFTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=...T.TTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT...*.=.....TTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TT.......TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TT....c..TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=..*..TT.......TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TT.......TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT..T..=.....TTTTTxTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TTTTTxTT............TTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTT.....=.....TTTTTxTT............TTTT",
+	"TTTT.......TT.................=.......................c.TTTT",
+	"TTTT.......TT.................=.........................TTTT",
+	"TTTT..c....xx.................=.....*...................TTTT",
+	"TTTT.......xx.................=.........................TTTT",
+	"TTTT.......xx.................======================N...TTTT",
+	"TTTT.......xx.................=.........................TTTT",
+	"TTTT.......xx...........*.....=.................*.......TTTT",
+	"TTTT....s..TT.................=.........................TTTT",
+	"TTTT.......TT.........T.......=......T..................TTTT",
+	"TTTTTTTTTTTTT.*...............=....................TTTTTTTTT",
+	"TTTTTTTTTTTTT.................=...............c....TTTTTTTTT",
+	"TTTTTTTTTTTTT.................=....................TTTTTTTTT",
+	"TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~b~~~~~~~~~~~~~~~~~~~~~~~~TTTTT",
+	"TTTTTT~~~~~~~~~~~~~~~~~~~~~~~~b~~~~~~~~~~~~~~~~~~~~~~~~TTTTT",
+	"TTTTTTTTTTTTTTTT..............=..............TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTT..............=...........*..TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT....*.........=..............TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT..............=..............TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT*..T..........=..............TTTTTTTTTTTTTTT",
+	"TTTT..c....ttttt..............=..............TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT*.............=.......*......TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT..............=..............TTTTTTTTTTTTTTT",
+	"TTTT.......TTTTT..c...........=.........T....TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTT..............=..............TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTT..............=..............TTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTvTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
 ]
+# What each chest holds (25b): supplies along the road, better behind the
+# blight, and the Snowdrop Charm in the hidden clearing.
 const CHEST_LOOT := {
-	Vector2i(7, 14): {"item": "Elixir", "count": 1},   # the west valley, behind the blight
-	Vector2i(37, 15): {"item": "Ether", "count": 2},
+	Vector2i(18, 38): {"item": "Potion", "count": 4},
+	Vector2i(46, 26): {"item": "Ether", "count": 2},
+	Vector2i(54, 16): {"gold": 220},
+	Vector2i(6, 18): {"item": "Elixir", "count": 2},     # west valley, behind the blight
+	Vector2i(42, 10): {"gold": 450},                     # north alcove, behind the blight
+	Vector2i(6, 35): {"item": "Snowdrop Charm", "count": 1},  # the hidden clearing
 }
 
 

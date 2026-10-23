@@ -57,6 +57,8 @@ const DEFS: Dictionary = {
 	"Heartwood Charm":   {"slot": "accessory", "class": "", "hp": 30, "def": 1},
 	"Moonstone Pendant": {"slot": "accessory", "class": "", "mp": 20, "int": 2},
 	"Fox-Eye Ring":      {"slot": "accessory", "class": "", "agi": 3, "atk": 1},
+	# The Northern Tundra's hidden clearing (25b)
+	"Snowdrop Charm":    {"slot": "accessory", "class": "", "res": 4, "hp": 40},
 }
 
 # set_id -> data describing the bonus. Act I's four sets are all wired up

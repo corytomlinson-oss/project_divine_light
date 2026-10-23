@@ -1,7 +1,7 @@
 [gd_scene format=4]
 
 [ext_resource type="Script" path="res://scripts/overworld/Tundra.gd" id="1_ow"]
-[ext_resource type="Texture2D" path="res://assets/tilesets/overworld_tiles.png" id="1_sc77d"]
+[ext_resource type="Texture2D" path="res://assets/tilesets/tundra_tiles.png" id="1_sc77d"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fd81m"]

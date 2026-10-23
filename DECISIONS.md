@@ -405,3 +405,9 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Floors are one scene per dungeon with a saved floor number**, each floor its own location id, so the map, chests and the "quiet" rule work per floor with no changes to those systems.
 - **A floor's guard stands on its stairs down** (the doc's "elite knight guarding the inner sanctum gate"): walking up to it starts a no-escape fight; it blocks the stairs until beaten.
 - **The Tundra's names:** "The Northern Tundra", and placeholders "The Duskara Wastes" / "The Selavon Coast" for the other two regions. *Change:* `Kingdoms.REGIONS`.
+
+### 25b-25d calls (Cory, 2026-10-23)
+- **Act II armor sets spread across Act II** (pieces of all four in every Act II dungeon, plus freed towns' armories).
+- **Tune Act II to the current XP curve** (Nordveil ~7-9, Duskara ~9-11, Selavon ~11-13); Act I unchanged.
+- **A victory scene for each freed kingdom:** in-town scene, then a short animated card.
+- **Sliding ice** in the Frozen Citadel.

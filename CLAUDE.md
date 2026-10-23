@@ -332,6 +332,14 @@ The design doc already fixes each kingdom's town (before/after), dungeon + gimmi
 
 **Split:** **25a** foundations (region maps + border roads, kingdom progress, the cleansing system's 3 layers, multi-floor dungeons; tested on a stub region) -> **25b** Nordveil -> **25c** Duskara -> **25d** Selavon + the end of Act II. Content uses stand-in art (recolors) like Act I; real art in 27. Decided inside each kingdom's milestone: its standard enemies, Act II armor sets, level targets (~10 levels per act), Verdance as the hub after Act II.
 
+**Cory's calls for 25b-25d (2026-10-23):**
+1. **Act II armor sets spread across Act II:** every Act II dungeon holds pieces from all four sets, and each freed town's armory sells some; all four complete by the end of Act II.
+2. **Tune to the current curve:** the party leaves Act I around level 6; Nordveil ~7-9, Duskara ~9-11, Selavon ~11-13. Act I unchanged.
+3. **A victory scene for every freed kingdom:** an in-town scene (villagers pour out, the party is thanked, Frank turns up), then a short animated card (~15s, like the Act I finale) of the kingdom restored.
+4. **Sliding ice** in the Frozen Citadel's outer floors (slide until you hit something), on top of the frozen chests.
+
+**25b plan (Nordveil), in steps:** (1) the real Northern Tundra region + a code-drawn snow tileset, Act II opening (the north pass opens after Act I, Frank points the way) -> (2) Nordveil town, before and after -> (3) the Frozen Citadel: ice tileset, 4 floors, sliding ice, frozen chests, the tundra enemies (doc: Frost Wraith, Corrupted Knight, Tundra Troll, Blizzard Hawk), the Frost Warden and the three-phase Frozen Sovereign, Act II set pieces -> (4) the victory scene + movie card, balance pass.
+
 ### 25a — foundations (done 2026-10-23)
 - **`Region`** (`scripts/overworld/Region.gd`, `class_name Region`): everything an overworld map does, pulled out of Overworld.gd (painting from text, chests, springs, secret paths, quest spots, fog of war, map markers, town gates and dungeon arches). A region script overrides `region_id()`, `map_rows()`, `entrances()` (letter -> id), `borders()` (letter -> region), `chest_loot()`, `music()`, `default_arrival()`. **Overworld.gd** is now just the Forest Heartlands' data (MAP, CHEST_LOOT) on top. `current_scene_path` comes from `scene_file_path`; PauseMenu's Save works on any `Region`.
 - **Border roads:** `^ < > v` in a map are road tiles off the edge (`borders()`); stepping on one goes to that region (`GameManager.arrival = "from:<region>"`, you appear one step inside the matching road). Into a kingdom's region only once `Kingdoms.is_open()`; back toward the forest always. The forest now has its three: the north pass at (12,0) above the Cathedral's valley, the west road at (0,23) by Verdance, the east road at (63,24) where the main road runs off the map.

@@ -323,6 +323,15 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
 | Observatory (star-lock) | *The Lost Cart*: Edenmere smith, beat the Wreck Ghoul at the cart W of the Observatory, back to him | *The Star Lock*: smith -> Verdance innkeeper (Mira, the astronomer's sister) -> **Star Chart** |
 | Guild (hatch password) | *Pickpocket*: Edenmere shopkeeper, catch the Cutpurse by the ravine road, back to her | *The Password*: shopkeeper -> Verdance farmer (a retired thief) -> **Guild Password** |
 
+## Milestone 25 — Act II content (scoping, 2026-10-23)
+
+The design doc already fixes each kingdom's town (before/after), dungeon + gimmick + 4-zone structure, mini-boss, 3-phase boss, and the 3-layer cleansing transformation (README "Act II — Kingdom Dungeons", "Act II Kingdom Bosses", "Town State Changes"). Cory's structural calls (2026-10-23, all three as recommended):
+1. **Region maps:** each kingdom gets its own overworld map like the Forest Heartlands, joined by border roads off the forest's edges (Nordveil north, Duskara west, Selavon east). Each region has its own look, music and enemies, and goes from grey wasteland to living land when cleansed.
+2. **Fixed order: Nordveil -> Duskara -> Selavon** (the doc's difficulty ramp). Cleansing a kingdom opens the road to the next. No enemy scaling needed.
+3. **Generated floors:** Act I's generator, extended to several floors joined by stairs (one per doc zone: approach, outer, inner, throne room), plus each kingdom's gimmick (frozen chests, fire tiles, flooded paths).
+
+**Split (proposed):** **25a** foundations (region maps + border roads, kingdom progress, the cleansing system's 3 layers, multi-floor dungeons; tested on a stub region) -> **25b** Nordveil -> **25c** Duskara -> **25d** Selavon + the end of Act II. Content uses stand-in art (recolors) like Act I; real art in 27. Decided inside each kingdom's milestone: its standard enemies, Act II armor sets, level targets (~10 levels per act), Verdance as the hub after Act II.
+
 ## Milestones 26 and 30 — Act II and Act III side quests (planned, not started)
 
 Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act II and Act III too, not just Act I. Both reuse Milestone 24's quest system (quest state, givers, quest log, map markers, key items), so they are content milestones: the quests, their dialogue, any hunt monsters and quest spots, and a little art. Each sits right after the content it needs (the kingdoms and towns must exist first) and before that act's art pass, which then covers the quest art too. Draft only; scope with Cory before building.

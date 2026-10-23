@@ -387,3 +387,10 @@ Cory asked for a movie-style Act I cutscene with the bosses slain and cool effec
 - **Code-driven, not a .scene script:** walking, dashing, wind-ups and effects need real animation the movie format doesn't have. The kingdom teasers are drawn in code (no Act II art exists yet), with weather to make them move.
 - **A new track** ("finale") rather than reusing the boss or intro theme, laid out bar for bar against the shots so every cut lands on a downbeat.
 - **F9 previews it** on any map, like F7/F8 for the demos.
+
+## Milestone 25 — Act II (scoped 2026-10-23)
+
+Cory's calls, before anything was built:
+- **Region maps** joined by border roads (not one giant continent, not a world-map screen).
+- **Fixed kingdom order: Nordveil, Duskara, Selavon**; cleansing one opens the road to the next.
+- **Generated multi-floor dungeons** (one floor per zone in the doc) with each kingdom's gimmick on top.

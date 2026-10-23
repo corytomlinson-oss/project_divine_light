@@ -426,3 +426,14 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Act II opens with Nordveil only:** the west and east roads keep their "coming in a later update" note until 25c/25d. The Act I finale's last caption now points north instead of saying Act II is coming later.
 - **Balance is by formula, not playtested** (like Act I's first pass): tundra enemies hit for roughly 30-40 on the back row and ~10 on Vael at level 7-8; fights give ~150-250 XP, so Nordveil (with the Warden and the Sovereign) should carry the party from ~6 to ~9. Worth a check in Cory's playtest.
 - **Music placeholders:** the Tundra asks for a `tundra` track and uncleansed Nordveil for `nordveil_cold`; neither exists yet, so they fall back to the overworld and town themes (written in the Act II art & music pass, 27).
+
+## Milestone 25c — Duskara (built 2026-10-23, on my recommendations; Cory: "move on to 25c")
+- **Fire tiles keep a safe rim** around every burning room (the doc's "some paths safe, some fast but costly": cut across and pay, or walk round). Damage is 6% of max HP per tile for everyone standing, and **never knocks anyone out** (it leaves them at 1). *Change:* `Dungeon.FIRE_DAMAGE`, `_burn_party()`.
+- **Fire on the first three floors**, levers on floors 2 and 3, the Blazing Sentinel on floor 3's stairs, the Tyrant on floor 4.
+- **Levers seal the side rooms** (the vaults and springs), one lever per floor opens all of them, and it stays pulled. The doc's "set pieces in sealed chambers" became: the helmets sit on floor 3 like the Citadel's armors, and the sealed chambers hold the rich vault chests. *Change:* `_place_levers()`.
+- **Dune Marauders steal consumables, not equipment** (the doc says equipment too; losing a set piece mid-dungeon would feel bad). Items come back if you win, like the Guild's thieves.
+- **The Tyrant's third phase reuses the Void Mage's rotating aura** (ice, lightning, switching every cast) rather than a new system.
+- **Act II's second gear tier is "Sunsteel"** (sold in freed Duskara, ~1100g weapons); the set accessories Prism Focus and Viper Fang Charm are sold there too, completing the four accessories across Nordveil and Duskara.
+- **Duskara's look:** two maps (a house buried in a dune, a dry oasis -> dug out, brimming), a heat haze with blowing sand before cleansing. People: a water-keeper (story), a nomad (hints: vipers, earth-proof golems), a guard; after: a smith, priestess, child, weaver, Frank.
+- **Victory scene:** the water-keeper, the guard, a child and Frank (who points at Selavon next).
+- **Test-process change:** a fresh backup of Cory's saves right before every test (an older backup was restored once this session; he hadn't played in between).

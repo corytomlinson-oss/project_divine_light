@@ -6,6 +6,8 @@ Writes:
     ../blight.png   2 frames: violet brambles of the Unraveling, pulsing
     ../stairs.png   2 frames: stairs down, stairs up (dungeon floors)
     ../ice_block.png  a translucent block of ice over a frozen chest (25b)
+    ../lever.png      2 frames: an old sandstone lever, up / pulled down (25c)
+    ../sealed_door.png  a carved stone slab sealing a chamber (25c)
 """
 from pathlib import Path
 
@@ -103,6 +105,66 @@ def sheet(name, grids):
 
 
 sheet("blight.png", [BLIGHT_A, BLIGHT_B])
+
+PALETTE.update({"o": (120, 84, 50, 255), "O": (176, 128, 78, 255), "Q": (214, 170, 110, 255),
+                "r": (200, 60, 40, 255), "y": (255, 214, 90, 255)})
+LEVER_UP = [
+    "................",
+    "................",
+    "..........kk....",
+    ".........kryk...",
+    ".........kyrk...",
+    "........kok.....",
+    ".......kok......",
+    "......kok.......",
+    ".....kok........",
+    "....kkkkkkkk....",
+    "...kOQQQQQQOk...",
+    "...kOoOOOOoOk...",
+    "...kOOOOOOOOk...",
+    "...kooooooook...",
+    "....kkkkkkkk....",
+    "................",
+]
+LEVER_DOWN = [
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "........kk......",
+    "....kokokryk....",
+    "....kkkkkyrkk...",
+    "...kOQQQQQQOk...",
+    "...kOoOOOOoOk...",
+    "...kOOOOOOOOk...",
+    "...kooooooook...",
+    "....kkkkkkkk....",
+    "................",
+]
+sheet("lever.png", [LEVER_UP, LEVER_DOWN])
+SEALED = [
+    "kkkkkkkkkkkkkkkk",
+    "kQQQQQQQQQQQQQQk",
+    "kQOOOOOOOOOOOOQk",
+    "kQOooooooooooOQk",
+    "kQOoOOOkkOOOoOQk",
+    "kQOoOOkyykOOoOQk",
+    "kQOoOkyrryk OoOQk"[:16],
+    "kQOoOkyrrykOoOQk",
+    "kQOoOOkyykOOoOQk",
+    "kQOoOOOkkOOOoOQk",
+    "kQOooooooooooOQk",
+    "kQOOOOOOOOOOOOQk",
+    "kQOOOOOOOOOOOOQk",
+    "kQQQQQQQQQQQQQQk",
+    "kooooooooooooook",
+    "kkkkkkkkkkkkkkkk",
+]
+SEALED[6] = "kQOoOkyrrykOoOQk"
+sheet("sealed_door.png", [SEALED])
 
 # A block of ice around a chest: translucent so the chest shows through.
 ice = Image.new("RGBA", (16, 16))

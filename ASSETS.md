@@ -336,6 +336,14 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [ ] Music: a tundra theme and a cold Nordveil theme (`tundra`, `nordveil_cold` fall back to overworld/town) — 27
 - [ ] Real sprites for the seven enemies above — 27
 
+## Act II — Duskara (Milestone 25c, stand-ins until 27)
+
+- [x] **Desert, Duskara town and Sunken Sanctum tilesets** (`tilesets/source/build_desert_tiles.py`; the Sanctum's 6th column is burning floor)
+- [x] **Enemies:** Sand Viper (hand-placed), Dust Golem, Scorched Mage, Dune Marauder, Blazing Sentinel, Burning Tyrant (recolors; `sprites/source/build_act2_enemies.py`)
+- [x] **Props:** lever, sealed stone door (`sprites/source/build_act2_props.py`)
+- [x] **Battle backgrounds:** desert, sanctum (`ui/source/build_act2_bgs.py`)
+- [ ] Music: `desert`, `duskara_heat` (fall back to overworld/town) — 27
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

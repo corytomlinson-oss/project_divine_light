@@ -42,7 +42,7 @@ const TOWNS := {
 	"verdance": {"name": "Verdance", "scene": "res://scenes/town/Verdance.tscn"},
 	"edenmere": {"name": "Edenmere", "scene": "res://scenes/town/Edenmere.tscn"},
 	"nordveil": {"name": "Nordveil", "scene": "res://scenes/town/Nordveil.tscn"},
-	"duskara": {"name": "Duskara", "scene": ""},
+	"duskara": {"name": "Duskara", "scene": "res://scenes/town/Duskara.tscn"},
 	"selavon": {"name": "Selavon", "scene": ""},
 }
 const CHEST_SHEET := preload("res://assets/sprites/chests.png")

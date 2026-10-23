@@ -31,6 +31,11 @@ const CAPTIVE_COORDS := Vector2i(3, 0)
 const BOSS_COORDS := Vector2i(4, 0)
 const ICE_COORDS := Vector2i(5, 0)  # sliding ice (25b; only tilesets with a 6th column)
 const ICE := "ice"
+# The same 6th column is burning floor in the Sunken Sanctum's tileset (25c);
+# a dungeon says which it has ("ice_floors" / "fire_floors").
+const FIRE_COORDS := Vector2i(5, 0)
+const FIRE := "fire"
+const FIRE_DAMAGE := 0.06  # of max HP, per tile, for everyone standing (never below 1)
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
 const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 # Treasure (Milestones 23a/23b). chests.png frames: wooden closed/open,
@@ -51,6 +56,11 @@ const ICE_BLOCK := preload("res://assets/sprites/ice_block.png")
 const FROZEN_TEXT := "narrate The chest is sealed inside a block of ancient ice. Only fire could melt it."
 const FROZEN_LYRA_TEXT := "narrate The chest is sealed inside a block of ancient ice. If Lyra were in her Fire stance, she could melt it. (She keeps her stance after a battle.)"
 const THAW_TEXT := "narrate Lyra lays a hand on the ice. Flame blooms under her palm, and the block melts away."
+const LEVER_SHEET := preload("res://assets/sprites/lever.png")
+const SEALED_DOOR := preload("res://assets/sprites/sealed_door.png")
+const SEALED_DOOR_TEXT := "narrate A carved stone slab seals the way. Somewhere on this floor, an old mechanism must open it."
+const LEVER_TEXT := "narrate The lever groans down. Somewhere on this floor, stone grinds against stone."
+const LEVER_DONE_TEXT := "narrate The lever is already pulled down."
 const FLOOR_SEED_STEP := 1000003
 const STAIRS_MARKER := Color(0.6, 0.8, 1.0)
 
@@ -109,6 +119,23 @@ const DUNGEONS := {
 		"set_floor": 2,
 		"region_scene": "res://scenes/overworld/Tundra.tscn",
 	},
+	# Act II (25c): the doc's four zones - the Desert Surface (fire tiles
+	# introduced), the Upper Sanctum (levers open sealed chambers), the Deep
+	# Sanctum (the Blazing Sentinel guards its stairs; the Act II helmets),
+	# the Fire Chamber (the Burning Tyrant).
+	"sunken_sanctum": {
+		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 2},
+		"scene": "res://scenes/dungeon/SunkenSanctum.tscn",
+		"music": "dungeon",
+		"floors": 4,
+		"fire_floors": [0, 1, 2],
+		"levers": [1, 2],
+		"kingdom": "duskara",
+		"boss": "burning_tyrant",
+		"guards": {2: EnemyData.BLAZING_SENTINEL},
+		"set_floor": 2,
+		"region_scene": "res://scenes/overworld/Desert.tscn",
+	},
 }
 
 const TAG_TO_COORDS := {
@@ -118,6 +145,7 @@ const TAG_TO_COORDS := {
 	DungeonGenerator.CAPTIVE_MARKER: CAPTIVE_COORDS,
 	DungeonGenerator.BOSS_TRIGGER: BOSS_COORDS,
 	ICE: ICE_COORDS,
+	FIRE: FIRE_COORDS,
 }
 
 ## Which ActOne dungeon this scene is.
@@ -139,6 +167,9 @@ var _floor := 0
 var _stairs_up := Vector2i(-9999, -9999)
 var _stairs_down := Vector2i(-9999, -9999)
 var _guard: Sprite2D = null
+var _lever_cell := Vector2i(-9999, -9999)
+var _lever: Sprite2D = null
+var _sealed_doors: Dictionary = {}  # doorway cell -> Sprite2D (25c)
 var _settled := false
 
 
@@ -153,7 +184,7 @@ func _ready() -> void:
 	GameManager.pending_boss_id = _data.get("boss", "") if _is_last_floor() else ""
 	GameManager.current_scene_path = _data["scene"]
 	# Town shrines work once per dungeon visit (20d; Nordveil's too, 25b).
-	for shrine_flag in ["edenmere_shrine_used", "nordveil_shrine_used"]:
+	for shrine_flag in ["edenmere_shrine_used", "nordveil_shrine_used", "duskara_shrine_used"]:
 		GameManager.story_flags.erase(shrine_flag)
 	Music.play(_data.get("music", "dungeon"), "dungeon")  # each dungeon's own theme (Milestone 21)
 	# Characters lower on screen draw in front (a captive standing just above
@@ -199,6 +230,8 @@ func _generate_and_build() -> void:
 		spawn = _build_floor(layout, tiles)
 		if _floor in _data.get("ice_floors", []):
 			_add_ice(layout, tiles, seed_value)
+		if _floor in _data.get("fire_floors", []):
+			_add_ice(layout, tiles, seed_value, FIRE)
 		_captive_cell = Vector2i(-9999, -9999)
 	elif _escape:
 		# The player's cell is deep inside; the warden waits by the exit.
@@ -227,6 +260,8 @@ func _generate_and_build() -> void:
 	else:
 		_place_captive()
 	_place_treasure(layout, seed_value)
+	if _floors > 1 and _floor in _data.get("levers", []):
+		_place_levers(layout, tiles, seed_value)
 
 	# A saved spot that isn't floor anymore (a save from before the rooms got
 	# bigger lands somewhere else in the new layout) falls back to the entrance.
@@ -268,7 +303,7 @@ func _build_floor(layout: Dictionary, tiles: Dictionary) -> Vector2i:
 ## their middle, leaving a walkable rim around the walls - so the ice is a
 ## puzzle to cross, never a way to get stuck or cut off from a door. Not the
 ## rooms with the entrance, the stairs or the spawn, and not side rooms.
-func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int) -> void:
+func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int, tag := ICE) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value + 31337
 	var kinds: Array = layout.get("room_kinds", [])
@@ -287,12 +322,86 @@ func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int) -> void:
 		for x in range(inner.position.x, inner.end.x):
 			for y in range(inner.position.y, inner.end.y):
 				if tiles.get(Vector2i(x, y), "") == DungeonGenerator.FLOOR:
-					tiles[Vector2i(x, y)] = ICE
+					tiles[Vector2i(x, y)] = tag
 
 
-## Player.gd slides across these.
+## Player.gd slides across these (only in a dungeon with ice on this floor).
 func is_slippery(cell: Vector2i) -> bool:
-	return _tile_map.get_cell_atlas_coords(cell) == ICE_COORDS
+	return _floor in _data.get("ice_floors", []) and _tile_map.get_cell_atlas_coords(cell) == ICE_COORDS
+
+
+## Burning floor (25c): stepping on it singes everyone a little.
+func _is_fire(cell: Vector2i) -> bool:
+	return _floor in _data.get("fire_floors", []) and _tile_map.get_cell_atlas_coords(cell) == FIRE_COORDS
+
+
+func _burn_party() -> void:
+	for m: Combatant in GameManager.party:
+		if not m.is_ko:
+			m.hp = maxi(1, m.hp - maxi(1, roundi(m.max_hp * FIRE_DAMAGE)))
+	Sfx.play("fire")
+	var flash := create_tween()
+	_player.modulate = Color(1.6, 0.6, 0.4)
+	flash.tween_property(_player, "modulate", Color.WHITE, 0.25)
+
+
+## Levers (25c): on these floors the side rooms are sealed behind stone
+## slabs until a lever somewhere in a main room is pulled (once; remembered).
+func _place_levers(layout: Dictionary, tiles: Dictionary, seed_value: int) -> void:
+	var flag := "lever_" + GameManager.current_location
+	var kinds: Array = layout.get("room_kinds", [])
+	var pulled := GameManager.has_flag(flag)
+	for i in _room_rects.size():
+		if i >= kinds.size() or kinds[i] != "side":
+			continue
+		var rect: Rect2i = _room_rects[i]
+		var ring := rect.grow(1)
+		for x in range(ring.position.x, ring.end.x):
+			for y in range(ring.position.y, ring.end.y):
+				var cell := Vector2i(x, y)
+				if not rect.has_point(cell) and tiles.get(cell, "") == DungeonGenerator.FLOOR and not pulled:
+					_sealed_doors[cell] = _add_sprite(SEALED_DOOR, 1, cell)
+	if _sealed_doors.is_empty() and not pulled:
+		return
+	# the lever: on the top rim of a main room away from the stairs and spawn
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value + 271828
+	var keep: Array = [_exit_cell, _stairs_down, _stairs_up, layout["player_spawn"]]
+	var spots: Array = []
+	for i in _room_rects.size():
+		if i < kinds.size() and kinds[i] == "side":
+			continue
+		var rect: Rect2i = _room_rects[i]
+		if keep.any(func(c: Vector2i) -> bool: return rect.grow(1).has_point(c)):
+			continue
+		var cell := Vector2i(rect.position.x + 2, rect.position.y)
+		if tiles.get(cell, "") == DungeonGenerator.FLOOR:
+			spots.append(cell)
+	if spots.is_empty():
+		for c: Vector2i in _sealed_doors:
+			_sealed_doors[c].queue_free()
+		_sealed_doors.clear()  # nowhere to put a lever: leave the rooms open
+		return
+	_lever_cell = spots[rng.randi_range(0, spots.size() - 1)]
+	_lever = _add_sprite(LEVER_SHEET, 2, _lever_cell)
+	_lever.frame = 1 if pulled else 0
+
+
+func _pull_lever() -> void:
+	var flag := "lever_" + GameManager.current_location
+	if GameManager.has_flag(flag):
+		await Cutscene.play_text(LEVER_DONE_TEXT)
+		return
+	GameManager.story_flags[flag] = true
+	_lever.frame = 1
+	Sfx.play("earth")
+	for cell: Vector2i in _sealed_doors:
+		var slab: Sprite2D = _sealed_doors[cell]
+		var t := create_tween()
+		t.tween_property(slab, "modulate:a", 0.0, 0.5)
+		t.tween_callback(slab.queue_free)
+	_sealed_doors.clear()
+	await Cutscene.play_text(LEVER_TEXT)
 
 
 func _place_stairs() -> void:
@@ -432,7 +541,8 @@ func _sealed(chest: Dictionary) -> bool:
 
 
 func is_blocked(cell: Vector2i) -> bool:
-	return _chests.has(cell) or _springs.has(cell) or (_guard != null and cell == _stairs_down)
+	return _chests.has(cell) or _springs.has(cell) or (_guard != null and cell == _stairs_down) \
+			or _sealed_doors.has(cell) or cell == _lever_cell
 
 
 ## Stairs are doors (Player.gd asks): up always, down once its guard is gone.
@@ -444,6 +554,12 @@ func is_door(cell: Vector2i) -> bool:
 func interact(cell: Vector2i, _facing: String) -> void:
 	if _guard != null and cell == _stairs_down:
 		await _guard_fight()
+		return
+	if cell == _lever_cell:
+		await _pull_lever()
+		return
+	if _sealed_doors.has(cell):
+		await Cutscene.play_text(SEALED_DOOR_TEXT)
 		return
 	if _springs.has(cell):
 		await _drink(cell)
@@ -649,6 +765,8 @@ func on_player_moved(cell: Vector2i) -> void:
 	# coming back from a lost or fled fight doesn't throw you straight back in).
 	if _settled and _guard != null and (cell - _stairs_down).length_squared() == 1:
 		_guard_fight()
+	if _settled and _is_fire(cell):
+		_burn_party()
 
 
 ## A room's exits on the map (Cory, 2026-10-20: rooms were easy to miss when
@@ -712,7 +830,11 @@ func map_markers() -> Array:
 	var markers: Array = []
 	for cell in GameManager.explored.get(GameManager.current_location, {}):
 		var coords := _tile_map.get_cell_atlas_coords(cell)
-		if cell == _stairs_up or cell == _stairs_down:
+		if cell == _lever_cell:
+			markers.append({"cell": cell, "color": Color(0.95, 0.6, 0.2), "legend": "Lever"})
+		elif _sealed_doors.has(cell):
+			markers.append({"cell": cell, "color": Color(0.55, 0.45, 0.35), "legend": "Sealed"})
+		elif cell == _stairs_up or cell == _stairs_down:
 			if _guard != null and cell == _stairs_down:
 				markers.append({"cell": cell, "color": Color(0.95, 0.25, 0.25), "legend": "Guard"})
 			else:

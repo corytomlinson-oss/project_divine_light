@@ -61,6 +61,16 @@ const DEFS: Dictionary = {
 	"Frostweave Robe":     {"slot": "armor",  "class": "Lyra",  "def": 2, "res": 6},
 	"Snowfox Leathers":    {"slot": "armor",  "class": "Silas", "def": 4, "agi": 3},
 	"Hearthstone Charm":   {"slot": "accessory", "class": "", "res": 5, "hp": 25},
+	# Act II's second tier (25c): freed Duskara's armory.
+	"Sunsteel Sword":      {"slot": "weapon", "class": "Vael",  "atk": 25},
+	"Sunsteel Claws":      {"slot": "weapon", "class": "Ryn",   "atk": 23},
+	"Sunsteel Staff":      {"slot": "weapon", "class": "Lyra",  "atk": 8, "int": 19},
+	"Sunsteel Daggers":    {"slot": "weapon", "class": "Silas", "atk": 24},
+	"Desert Mail":         {"slot": "armor",  "class": "Vael",  "def": 11},
+	"Sandwalker Gi":       {"slot": "armor",  "class": "Ryn",   "def": 7, "agi": 2},
+	"Mirage Robe":         {"slot": "armor",  "class": "Lyra",  "def": 3, "res": 9},
+	"Dune Leathers":       {"slot": "armor",  "class": "Silas", "def": 6, "agi": 4},
+	"Oasis Charm":         {"slot": "accessory", "class": "", "res": 6, "hp": 40},
 
 	# Act II armor sets (25b; README "Full Set Bonus"). Spread across Act II
 	# (Cory): the Frozen Citadel holds the four armors, Nordveil's armory sells

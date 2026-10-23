@@ -14,6 +14,7 @@ const DUNGEON_SETS := {
 	"guild": ["Shadow Walker Garb", "Shadow Cowl", "Shadow Grips", "Shadow Sigil"],
 	# Act II (25b): each dungeon holds one kind of piece from all four sets.
 	"frozen_citadel": ["Sacred Aegis Plate", "Storm Dragon Gi", "Elemental Weave Robe", "Venom Weave Garb"],
+	"sunken_sanctum": ["Sacred Aegis Helm", "Storm Dragon Band", "Elemental Weave Hood", "Venom Weave Mask"],
 }
 
 # Plain chests: a weighted pick of an item (count = [min, max]) or gold.

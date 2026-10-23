@@ -45,7 +45,7 @@ const REGIONS := {
 # Act II dungeon scenes ("" until built; Region says "not yet").
 const DUNGEON_SCENES := {
 	"frozen_citadel": "res://scenes/dungeon/FrozenCitadel.tscn",
-	"sunken_sanctum": "",
+	"sunken_sanctum": "res://scenes/dungeon/SunkenSanctum.tscn",
 	"drowned_fortress": "",
 }
 
@@ -57,7 +57,7 @@ const DUNGEON_NAMES := {
 
 # Kingdoms whose content is built (25b-25d each add theirs). Until then its
 # road stays closed with a "coming later" note, even after Act I.
-const BUILT: Array = ["nordveil"]
+const BUILT: Array = ["nordveil", "duskara"]
 # Development and tests: treat every kingdom as built.
 static var dev_open := false
 

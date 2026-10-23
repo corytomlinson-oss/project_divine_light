@@ -1,6 +1,6 @@
 # Divine Light — Asset Checklist
 
-Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 21, Act II in 28, Act III in 31). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
+Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 21, Act II in 27, Act III in 31). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
 
 Each entry's prompt is self-contained and ready to paste into an AI image/music tool as-is — no need to remember to append the style guide separately.
 

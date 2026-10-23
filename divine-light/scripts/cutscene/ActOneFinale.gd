@@ -223,6 +223,7 @@ func _image(path: String) -> TextureRect:
 func _hero(cls: String, at: Vector2) -> AnimatedSprite2D:
 	var s := AnimatedSprite2D.new()
 	s.sprite_frames = load("res://assets/sprites/%s_frames.tres" % cls.to_lower())
+	s.material = SetLooks.material_for(SetLooks.member_for(cls.to_lower()))
 	s.scale = Vector2(2, 2)
 	s.position = at + Vector2(0, -32)  # 16x32 frames at 2x, feet on `at`
 	s.play("idle_side")

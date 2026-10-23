@@ -411,3 +411,12 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Tune Act II to the current XP curve** (Nordveil ~7-9, Duskara ~9-11, Selavon ~11-13); Act I unchanged.
 - **A victory scene for each freed kingdom:** in-town scene, then a short animated card.
 - **Sliding ice** in the Frozen Citadel.
+
+### 25b — my calls while Cory was away (2026-10-23, "keep going through this milestone")
+- **Act II set distribution:** each Act II dungeon holds one kind of piece from all four sets (the Citadel = the four armors, in frozen chests on floor 3), and each freed town's armory sells two of the accessories (Nordveil: Aegis Sigil, Dragon Pearl). Duskara: helmets + the other two accessories; Selavon: gloves. *Change:* `Loot.DUNGEON_SETS`, each town's armory stock.
+- **Set piece stats** sit a little above Act II's shop tier, so a full set is worth chasing without making shop gear pointless. *Change:* `Equipment.DEFS`.
+- **Set looks for all eight sets** (Act I's too), one color scheme each (`SetLooks.LOOKS`): Holy Guardian gold tabard / Sacred Aegis silver, white-gold shield, sky-blue tabard; Iron Monk iron-grey gi / Storm Dragon storm-blue gi, gold headband; Arcane Scholar purple robe / Elemental Weave crimson robe; Shadow Walker black hood, violet scarf / Venom Weave dark-green hood, venom-green scarf.
+- **Sliding ice keeps a walkable rim** around every ice room (no way to get stuck or locked out of a door), on the Citadel's first two floors (the doc's Mountain Approach and Outer Citadel).
+- **Frozen chests replace Silas's locks in the Citadel** (vault chests are frozen, not locked), so the Citadel's gimmick is Lyra's. Lyra must be in Fire stance, which she keeps after a battle; the hint text tells the player.
+- **Tundra enemy numbers** (README roster): tuned for four heroes around level 7-9; the Frost Warden 700 HP, the Sovereign 1500 HP with phases at 66/33%.
+- **Nordveil's people and lines** (a captain, an elder, a huntress hinting at the blight valley; after cleansing a smith, priestess, child, woodcutter and Frank) and its prices (inn 40g -> 20g).

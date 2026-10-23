@@ -29,6 +29,8 @@ const WALL_COORDS := Vector2i(1, 0)
 const DOOR_COORDS := Vector2i(2, 0)
 const CAPTIVE_COORDS := Vector2i(3, 0)
 const BOSS_COORDS := Vector2i(4, 0)
+const ICE_COORDS := Vector2i(5, 0)  # sliding ice (25b; only tilesets with a 6th column)
+const ICE := "ice"
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
 const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 # Treasure (Milestones 23a/23b). chests.png frames: wooden closed/open,
@@ -45,6 +47,10 @@ const SPRING_TEXT := "narrate Clear water wells up, glowing faintly. The party d
 const SPENT_TEXT := "narrate The spring lies still and dark. Its power is spent."
 const QUIET_TEXT := "narrate The halls have fallen quiet. Nothing stirs here anymore."
 const STAIRS_SHEET := preload("res://assets/sprites/stairs.png")  # down, up
+const ICE_BLOCK := preload("res://assets/sprites/ice_block.png")
+const FROZEN_TEXT := "narrate The chest is sealed inside a block of ancient ice. Only fire could melt it."
+const FROZEN_LYRA_TEXT := "narrate The chest is sealed inside a block of ancient ice. If Lyra were in her Fire stance, she could melt it. (She keeps her stance after a battle.)"
+const THAW_TEXT := "narrate Lyra lays a hand on the ice. Flame blooms under her palm, and the block melts away."
 const FLOOR_SEED_STEP := 1000003
 const STAIRS_MARKER := Color(0.6, 0.8, 1.0)
 
@@ -86,13 +92,17 @@ const DUNGEONS := {
 		"escaped_scene": "res://data/cutscenes/guild_escaped.scene",
 		"rescue_scene": "res://data/cutscenes/guild_rescue.scene",
 	},
-	# Act II (25a: a stand-in to prove the floors work; 25b builds the real
-	# Frozen Citadel on top - its template, guard, boss and look).
+	# Act II (25b): the doc's four zones as floors - the Mountain Approach,
+	# the Outer Citadel (sliding ice on these two), the Inner Sanctum (the
+	# Frost Warden guards its stairs; the Act II armors in frozen chests), the
+	# Throne Room (the Frozen Sovereign).
 	"frozen_citadel": {
 		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
 		"scene": "res://scenes/dungeon/FrozenCitadel.tscn",
 		"music": "dungeon",
 		"floors": 4,
+		"ice_floors": [0, 1],
+		"frozen_chests": true,
 		"kingdom": "nordveil",
 		"boss": "frozen_sovereign",
 		"guards": {2: EnemyData.FROST_WARDEN},
@@ -107,6 +117,7 @@ const TAG_TO_COORDS := {
 	DungeonGenerator.DOOR: DOOR_COORDS,
 	DungeonGenerator.CAPTIVE_MARKER: CAPTIVE_COORDS,
 	DungeonGenerator.BOSS_TRIGGER: BOSS_COORDS,
+	ICE: ICE_COORDS,
 }
 
 ## Which ActOne dungeon this scene is.
@@ -186,6 +197,8 @@ func _generate_and_build() -> void:
 	_exit_cell = layout["entrance_cell"]
 	if _floors > 1:
 		spawn = _build_floor(layout, tiles)
+		if _floor in _data.get("ice_floors", []):
+			_add_ice(layout, tiles, seed_value)
 		_captive_cell = Vector2i(-9999, -9999)
 	elif _escape:
 		# The player's cell is deep inside; the warden waits by the exit.
@@ -249,6 +262,37 @@ func _build_floor(layout: Dictionary, tiles: Dictionary) -> Vector2i:
 				return boss_cell + d
 	GameManager.arrival = ""
 	return layout["player_spawn"]
+
+
+## Sliding ice (25b): up to two rooms on this floor get a sheet of ice over
+## their middle, leaving a walkable rim around the walls - so the ice is a
+## puzzle to cross, never a way to get stuck or cut off from a door. Not the
+## rooms with the entrance, the stairs or the spawn, and not side rooms.
+func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value + 31337
+	var kinds: Array = layout.get("room_kinds", [])
+	var keep: Array = [_exit_cell, _stairs_down, layout["player_spawn"], layout["entrance_cell"], layout["boss_trigger_cell"]]
+	var rooms: Array = []
+	for i in _room_rects.size():
+		var rect: Rect2i = _room_rects[i]
+		if i < kinds.size() and kinds[i] == "side":
+			continue
+		if keep.any(func(c: Vector2i) -> bool: return rect.grow(1).has_point(c)):
+			continue
+		rooms.append(rect)
+	for n in mini(2, rooms.size()):
+		var rect: Rect2i = rooms.pop_at(rng.randi_range(0, rooms.size() - 1))
+		var inner := rect.grow(-1)
+		for x in range(inner.position.x, inner.end.x):
+			for y in range(inner.position.y, inner.end.y):
+				if tiles.get(Vector2i(x, y), "") == DungeonGenerator.FLOOR:
+					tiles[Vector2i(x, y)] = ICE
+
+
+## Player.gd slides across these.
+func is_slippery(cell: Vector2i) -> bool:
+	return _tile_map.get_cell_atlas_coords(cell) == ICE_COORDS
 
 
 func _place_stairs() -> void:
@@ -333,7 +377,14 @@ func _place_treasure(layout: Dictionary, seed_value: int) -> void:
 	# Mimics only where there's a party to fight them (not the solo escape).
 	var treasure := DungeonGenerator.place_treasure(layout, set_items, seed_value, not _escape)
 	for chest: Dictionary in treasure["chests"]:
+		if _data.get("frozen_chests", false) and chest["kind"] in ["gilded", "locked"]:
+			# Frozen chests (25b): Lyra's fire opens them, not Silas's picks.
+			if chest["kind"] == "locked":
+				chest["kind"] = "plain"
+			chest["frozen"] = true
 		chest["sprite"] = _add_sprite(CHEST_SHEET, 6, chest["cell"])
+		if chest.get("frozen", false) and not _opened(chest["cell"]):
+			chest["ice"] = _add_sprite(ICE_BLOCK, 1, chest["cell"])
 		_chests[chest["cell"]] = chest
 		_show_chest(chest)
 	for cell: Vector2i in treasure["springs"]:
@@ -403,6 +454,18 @@ func interact(cell: Vector2i, _facing: String) -> void:
 	if _sealed(chest):
 		await Cutscene.play_text(SEALED_TEXT)
 		return
+	if chest.get("frozen", false):
+		var lyra: Combatant = GameManager.party.filter(func(m: Combatant) -> bool: return m.char_class == "Lyra").front() if GameManager.has_member("Lyra") else null
+		if lyra == null:
+			await Cutscene.play_text(FROZEN_TEXT)
+			return
+		if lyra.stance != "Fire":
+			await Cutscene.play_text(FROZEN_LYRA_TEXT)
+			return
+		Sfx.play("fire")
+		if chest.has("ice") and is_instance_valid(chest["ice"]):
+			chest["ice"].queue_free()
+		await Cutscene.play_text(THAW_TEXT)
 	match chest["kind"]:
 		"locked":
 			if not GameManager.has_member("Silas"):

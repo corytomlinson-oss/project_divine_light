@@ -62,6 +62,26 @@ const DEFS: Dictionary = {
 	"Snowfox Leathers":    {"slot": "armor",  "class": "Silas", "def": 4, "agi": 3},
 	"Hearthstone Charm":   {"slot": "accessory", "class": "", "res": 5, "hp": 25},
 
+	# Act II armor sets (25b; README "Full Set Bonus"). Spread across Act II
+	# (Cory): the Frozen Citadel holds the four armors, Nordveil's armory sells
+	# two accessories, the rest come in Duskara and Selavon.
+	"Sacred Aegis Plate":     {"slot": "armor",     "class": "Vael",  "def": 10, "res": 2, "set_id": "sacred_aegis"},
+	"Sacred Aegis Helm":      {"slot": "helmet",    "class": "Vael",  "def": 5, "res": 1, "set_id": "sacred_aegis"},
+	"Sacred Aegis Gauntlets": {"slot": "gloves",    "class": "Vael",  "def": 4, "atk": 2, "set_id": "sacred_aegis"},
+	"Aegis Sigil":            {"slot": "accessory", "class": "",      "res": 5, "hp": 30, "set_id": "sacred_aegis"},
+	"Storm Dragon Gi":        {"slot": "armor",     "class": "Ryn",   "def": 7, "atk": 3, "set_id": "storm_dragon"},
+	"Storm Dragon Band":      {"slot": "helmet",    "class": "Ryn",   "def": 3, "agi": 2, "set_id": "storm_dragon"},
+	"Storm Dragon Fists":     {"slot": "gloves",    "class": "Ryn",   "atk": 5, "set_id": "storm_dragon"},
+	"Dragon Pearl":           {"slot": "accessory", "class": "",      "hp": 40, "agi": 1, "set_id": "storm_dragon"},
+	"Elemental Weave Robe":   {"slot": "armor",     "class": "Lyra",  "def": 4, "res": 7, "set_id": "elemental_weave"},
+	"Elemental Weave Hood":   {"slot": "helmet",    "class": "Lyra",  "int": 5, "res": 2, "set_id": "elemental_weave"},
+	"Elemental Weave Gloves": {"slot": "gloves",    "class": "Lyra",  "int": 4, "def": 2, "set_id": "elemental_weave"},
+	"Prism Focus":            {"slot": "accessory", "class": "",      "mp": 30, "int": 2, "set_id": "elemental_weave"},
+	"Venom Weave Garb":       {"slot": "armor",     "class": "Silas", "def": 6, "agi": 3, "set_id": "venom_weave"},
+	"Venom Weave Mask":       {"slot": "helmet",    "class": "Silas", "agi": 4, "def": 1, "set_id": "venom_weave"},
+	"Venom Weave Wraps":      {"slot": "gloves",    "class": "Silas", "atk": 5, "set_id": "venom_weave"},
+	"Viper Fang Charm":       {"slot": "accessory", "class": "",      "agi": 3, "atk": 2, "set_id": "venom_weave"},
+
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
 	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},
@@ -84,6 +104,11 @@ const SET_BONUSES: Dictionary = {
 	"iron_monk": {"name": "Iron Monk Set", "desc": "Basic attacks build +1 extra Qi"},
 	"arcane_scholar": {"name": "Arcane Scholar Set", "desc": "Switching stance is a free action"},
 	"shadow_walker": {"name": "Shadow Walker Set", "desc": "Vanish makes Silas untargetable for the round"},
+	# Act II (25b)
+	"sacred_aegis": {"name": "Sacred Aegis Set", "desc": "Divine Shield protects the whole party"},
+	"storm_dragon": {"name": "Storm Dragon Set", "desc": "Ryn's healing restores 30% more"},
+	"elemental_weave": {"name": "Elemental Weave Set", "desc": "Back-row Tremor deals full damage"},
+	"venom_weave": {"name": "Venom Weave Set", "desc": "Silas's poison lasts 5 rounds"},
 }
 
 

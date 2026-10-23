@@ -70,6 +70,9 @@ const ARMORY_STOCK: Array = [
 	{"item": "Frostweave Robe", "price": 450},
 	{"item": "Snowfox Leathers", "price": 450},
 	{"item": "Hearthstone Charm", "price": 600},
+	# Two Act II set accessories (25b; the sets are spread across Act II)
+	{"item": "Aegis Sigil", "price": 900},
+	{"item": "Dragon Pearl", "price": 900},
 ]
 
 # People (sprite ids from build_townsfolk.py, tinted for winter coats).

@@ -8,6 +8,7 @@ const BOSS_ATLAS_COORDS := Vector2i(4, 0)
 const CAPTIVE_ATLAS_COORDS := Vector2i(3, 0)
 
 var _moving: bool = false
+var _sliding: bool = false  # on ice (25b): carried along, no input, until it ends
 var _target: Vector2
 var _steps_to_encounter: int = 0
 ## "down" / "up" / "left" / "right". Left has no art of its own - it plays the
@@ -26,6 +27,7 @@ func _ready() -> void:
 		var path := "res://assets/sprites/%s_frames.tres" % GameManager.party[0].char_class.to_lower()
 		if ResourceLoader.exists(path):
 			_sprite.sprite_frames = load(path)
+		_sprite.material = SetLooks.material_for(GameManager.party[0])  # armor set look (25b)
 	_reset_encounter_counter()
 	# Deferred: by then the map has put the player in place (Milestone 22a).
 	GameManager.autosave_if_pending.call_deferred()
@@ -36,7 +38,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _moving:
-		var step: float = MOVE_SPEED * delta
+		var step: float = MOVE_SPEED * (1.6 if _sliding else 1.0) * delta
 		var left_to_go: float = position.distance_to(_target)
 		if step < left_to_go:
 			position = position.move_toward(_target, step)
@@ -44,6 +46,15 @@ func _process(delta: float) -> void:
 		position = _target
 		_moving = false
 		_on_tile_entered()
+		# Sliding ice (25b): keep going the same way until something stops you
+		# or the ice ends; no steering on the way.
+		var slide := _slide_direction()
+		_sliding = slide != Vector2.ZERO
+		if _sliding:
+			_target = position + slide * TILE_SIZE
+			_moving = true
+			position = position.move_toward(_target, step - left_to_go)
+			return
 		# Still holding a direction: start the next tile this same frame and
 		# spend the leftover distance on it. Waiting a frame stalled the walk
 		# for one frame on every tile, which read as stutter.
@@ -120,6 +131,22 @@ func _handle_input() -> void:
 	_target = next_target
 	_moving = true
 	_play_anim("walk")
+
+
+## Standing on ice (the map says which tiles are slippery) with open floor
+## ahead in the direction you're facing: that's where you slide.
+func _slide_direction() -> Vector2:
+	if Transition.is_busy() or Cutscene.is_playing() or get_tree().paused:
+		return Vector2.ZERO
+	var map_root: Node = _tile_map.get_parent()
+	if not (map_root.has_method("is_slippery") and map_root.is_slippery(_tile_map.local_to_map(position))):
+		return Vector2.ZERO
+	var dirs := {"up": Vector2.UP, "down": Vector2.DOWN, "left": Vector2.LEFT, "right": Vector2.RIGHT}
+	var dir: Vector2 = dirs[_facing]
+	if not _is_walkable(position + dir * TILE_SIZE):
+		return Vector2.ZERO
+	_play_anim("idle")  # a still pose while gliding
+	return dir
 
 
 func _face(dir: Vector2) -> void:

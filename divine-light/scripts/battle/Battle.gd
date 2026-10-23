@@ -518,6 +518,7 @@ func _setup_party_sprites() -> void:
 		if ResourceLoader.exists(path):
 			sprite = AnimatedSprite2D.new()
 			sprite.sprite_frames = load(path)
+			sprite.material = SetLooks.material_for(member)  # armor set look (25b)
 			sprite.flip_h = true
 			sprite.play(&"idle_side")
 			sprite.position = _party_home(i)
@@ -1129,7 +1130,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 			var back_row_tremor: Dictionary = skill.duplicate()
 			back_row_tremor["name"] = "Tremor (AoE)"
 			back_row_tremor["effect"] = "earth_aoe"
-			back_row_tremor["power"] = 14
+			back_row_tremor["power"] = skill["power"] if Equipment.has_set_bonus(member, "elemental_weave") else 14  # full with Elemental Weave (25b)
 			back_row_tremor["target"] = "enemy_all"
 			_active_skills.append(back_row_tremor)
 		else:
@@ -1648,6 +1649,8 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"heal":
 			var target: Combatant = _get_ally_target(member, skill)
 			var amount: int = power + member.int_stat / 2
+			if member.char_class == "Ryn" and Equipment.has_set_bonus(member, "storm_dragon"):
+				amount = roundi(amount * 1.3)  # Storm Dragon (25b)
 			target.hp = mini(target.max_hp, target.hp + amount)
 			_update_ui()
 			message_label.text = "%s uses %s!\n%s restored %d HP!" % [member.display_name, skill["name"], target.display_name, amount]
@@ -1729,12 +1732,16 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 
 		"divine_shield":
 			var rounds: int = _buff_duration(member, 2)
+			var whole_party := Equipment.has_set_bonus(member, "sacred_aegis")  # Sacred Aegis (25b)
 			for ally in _party:
-				if ally.is_alive() and ally.row == member.row:
+				if ally.is_alive() and (whole_party or ally.row == member.row):
 					ally.def_buff = maxi(ally.def_buff, int(power))
 					ally.def_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s raises %s!\n%s row DEF increased for %d rounds!" % [member.display_name, skill["name"], member.row.capitalize(), rounds]
+			if whole_party:
+				message_label.text = "%s raises %s!\nThe whole party's DEF increased for %d rounds!" % [member.display_name, skill["name"], rounds]
+			else:
+				message_label.text = "%s raises %s!\n%s row DEF increased for %d rounds!" % [member.display_name, skill["name"], member.row.capitalize(), rounds]
 
 		"battle_hymn":
 			var rounds: int = _buff_duration(member, 2)
@@ -2043,11 +2050,11 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg *= 2
 			dmg = _hit(target, dmg)
 			if not target.is_ko:
-				target.poison_rounds = 3
+				target.poison_rounds = _poison_rounds(member)
 				target.poison_power = 8 + member.atk / 6
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
-			message_label.text = "%s uses %s on %s for %d!%s\nPoisoned for 3 rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
+			message_label.text = "%s uses %s on %s for %d!%s\nPoisoned for %d rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag, _poison_rounds(member)]
 			if _foes_defeated():
 				_end_battle(true)
 
@@ -2117,7 +2124,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
 				if not enemy.is_ko:
-					enemy.poison_rounds = 3
+					enemy.poison_rounds = _poison_rounds(member)
 					enemy.poison_power = 8 + member.atk / 6
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies poisoned!" % [member.display_name, skill["name"]]
@@ -2145,7 +2152,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg *= 2
 			dmg = _hit(target, dmg)
 			if not target.is_ko:
-				target.poison_rounds = 3
+				target.poison_rounds = _poison_rounds(member)
 				target.poison_power = 10 + member.atk / 6
 				target.bleed_rounds = 4
 				target.bleed_power = 12 + member.atk / 5
@@ -2541,6 +2548,11 @@ func _summon(summoner: Combatant, group: Array) -> void:
 			_fx.impact({"impact": "cloud", "palette": "shadow", "size": 12.0}, [sprite])
 	Sfx.play("encounter")
 	_update_enemy_ui()
+
+
+## How long Silas's poisons last: 3 rounds, 5 with Venom Weave (25b).
+func _poison_rounds(member: Combatant) -> int:
+	return 5 if Equipment.has_set_bonus(member, "venom_weave") else 3
 
 
 ## One BattleFx impact of `kind` in `palette` on a fighter.

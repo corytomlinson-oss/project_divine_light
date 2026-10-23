@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/dungeon/Dungeon.gd" id="1_dungeon"]
-[ext_resource type="Texture2D" path="res://assets/tilesets/cathedral_tiles.png" id="2_tiles"]
+[ext_resource type="Texture2D" path="res://assets/tilesets/citadel_tiles.png" id="2_tiles"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="3_player"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_cathedral"]
@@ -11,6 +11,7 @@ texture = ExtResource("2_tiles")
 2:0/0 = 0
 3:0/0 = 0
 4:0/0 = 0
+5:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_cathedral"]
 sources/0 = SubResource("TileSetAtlasSource_cathedral")
@@ -20,7 +21,6 @@ script = ExtResource("1_dungeon")
 dungeon_id = "frozen_citadel"
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
-modulate = Color(0.78, 0.9, 1.15, 1)
 tile_set = SubResource("TileSet_cathedral")
 
 [node name="Player" parent="TileMapLayer" instance=ExtResource("3_player")]

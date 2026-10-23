@@ -5,6 +5,7 @@
 Writes:
     ../blight.png   2 frames: violet brambles of the Unraveling, pulsing
     ../stairs.png   2 frames: stairs down, stairs up (dungeon floors)
+    ../ice_block.png  a translucent block of ice over a frozen chest (25b)
 """
 from pathlib import Path
 
@@ -102,4 +103,15 @@ def sheet(name, grids):
 
 
 sheet("blight.png", [BLIGHT_A, BLIGHT_B])
+
+# A block of ice around a chest: translucent so the chest shows through.
+ice = Image.new("RGBA", (16, 16))
+for y in range(1, 16):
+    for x in range(1, 15):
+        edge = x in (1, 14) or y in (1, 15)
+        ice.putpixel((x, y), (220, 244, 255, 230) if edge else (150, 210, 245, 120))
+for x, y in ((3, 3), (4, 3), (3, 4), (11, 9), (12, 8), (5, 12)):
+    ice.putpixel((x, y), (255, 255, 255, 240))
+ice.save(HERE.parent / "ice_block.png")
+print("wrote ice_block.png")
 sheet("stairs.png", [STAIRS_DOWN, STAIRS_UP])

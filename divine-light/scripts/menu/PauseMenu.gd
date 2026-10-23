@@ -135,6 +135,7 @@ func _add_party_row(member: Combatant, y: float) -> void:
 		frame.region = Rect2(0, 0, 16, 32)  # idle, facing down
 		var portrait := TextureRect.new()
 		portrait.texture = frame
+		portrait.material = SetLooks.material_for(member)  # armor set look (25b)
 		portrait.position = Vector2(8, y)
 		if member.is_ko:
 			portrait.modulate = Color(0.45, 0.4, 0.55)

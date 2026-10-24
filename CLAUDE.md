@@ -6,7 +6,7 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 **User:** Cory. First-time game dev, new to Godot. Explain concepts clearly, guide step by step, don't assume prior game-dev knowledge. Home hobby project — no deadlines.
 
-## Picking back up (last touched 2026-10-20)
+## Picking back up (last touched 2026-10-24)
 
 **Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); Cory playtested it 2026-10-20: "the quest system and the quest markers all work great".** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
 

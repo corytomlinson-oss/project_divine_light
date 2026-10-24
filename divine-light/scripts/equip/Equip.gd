@@ -19,11 +19,17 @@ var _item_options: Array = []  # item names; "" means "Unequip"
 
 var _option_labels: Array = []
 var _menu_cursor := MenuCursor.new()
+# The item list shows ROWS at a time and scrolls (playtest pass, 2026-10-24:
+# with more than 5 accessories in the bag it read past its 5 labels).
+const ROWS := 5
+var _scroll := 0
+var _hint := ScrollHint.new()
 
 
 func _ready() -> void:
 	add_child(_menu_cursor)
-	for i in 5:
+	add_child(_hint)
+	for i in ROWS:
 		var label := Label.new()
 		option_list.add_child(label)
 		_option_labels.append(label)
@@ -31,6 +37,10 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	# The arrows follow the list's real layout (not known until it's drawn).
+	var last: Label = _option_labels[ROWS - 1]
+	_hint.position = option_list.position + Vector2(option_list.size.x - 8, 2)
+	_hint.height = maxf(10.0, last.position.y + last.size.y - 6)
 	match _state:
 		MenuState.CHARACTER_SELECT:
 			_handle_list_input(GameManager.party.size(), _confirm_character, _exit_to_map)
@@ -82,6 +92,7 @@ func _confirm_slot() -> void:
 	if member.equipment.get(_slot, "") != "":
 		_item_options.append("")
 	_cursor = 0
+	_scroll = 0
 	_state = MenuState.ITEM_SELECT
 	_update_ui()
 
@@ -128,7 +139,10 @@ func _set_progress_text(member: Combatant, set_id: String) -> String:
 func _update_ui() -> void:
 	for label in _option_labels:
 		label.visible = false
-	_menu_cursor.target = _option_labels[_cursor]
+	_hint.more_above = false
+	_hint.more_below = false
+	if _state != MenuState.ITEM_SELECT:
+		_menu_cursor.target = _option_labels[mini(_cursor, ROWS - 1)]
 
 	match _state:
 		MenuState.CHARACTER_SELECT:
@@ -166,7 +180,13 @@ func _update_ui() -> void:
 				_menu_cursor.target = null
 				_option_labels[0].visible = true
 			else:
-				for i in _item_options.size():
+				# keep the cursor's row in the visible window
+				_scroll = clampi(_scroll, maxi(0, _cursor - ROWS + 1), mini(_cursor, maxi(0, _item_options.size() - ROWS)))
+				_menu_cursor.target = _option_labels[_cursor - _scroll]
+				_hint.more_above = _scroll > 0
+				_hint.more_below = _scroll + ROWS < _item_options.size()
+				for row in mini(ROWS, _item_options.size() - _scroll):
+					var i: int = _scroll + row
 					var item_name: String = _item_options[i]
 					var shown: String
 					if item_name == "":
@@ -176,5 +196,5 @@ func _update_ui() -> void:
 						var set_id: String = Equipment.DEFS.get(item_name, {}).get("set_id", "")
 						if set_id != "":
 							shown += " [%s]" % Equipment.SET_BONUSES.get(set_id, {}).get("name", set_id)
-					_option_labels[i].text = "  " + shown
-					_option_labels[i].visible = true
+					_option_labels[row].text = "  " + shown
+					_option_labels[row].visible = true

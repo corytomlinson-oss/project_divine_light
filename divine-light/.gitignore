@@ -4,3 +4,4 @@
 
 # Python bytecode from the asset generators (build_music.py imports build_sfx.py)
 __pycache__/
+_tmp_test/

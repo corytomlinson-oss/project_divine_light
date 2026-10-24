@@ -54,6 +54,11 @@ const ARMORY_STOCK: Array = [
 	{"item": "Starforged Robe", "price": 1600},
 	{"item": "Starforged Leathers", "price": 1600},
 	{"item": "Star Charm", "price": 1800},
+	# The Act III set gloves (28b; the rest wait in the Maw)
+	{"item": "Divine Champion Gauntlets", "price": 2400},
+	{"item": "Rising Force Fists", "price": 2400},
+	{"item": "Cosmic Conduit Gloves", "price": 2400},
+	{"item": "Death's Hand Wraps", "price": 2400},
 ]
 
 const PEOPLE: Array = [

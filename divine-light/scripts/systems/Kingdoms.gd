@@ -56,7 +56,7 @@ const DUNGEON_SCENES := {
 	"frozen_citadel": "res://scenes/dungeon/FrozenCitadel.tscn",
 	"sunken_sanctum": "res://scenes/dungeon/SunkenSanctum.tscn",
 	"drowned_fortress": "res://scenes/dungeon/DrownedFortress.tscn",
-	"blighted_maw": "",  # 28b
+	"blighted_maw": "res://scenes/dungeon/BlightedMaw.tscn",
 }
 
 const DUNGEON_NAMES := {

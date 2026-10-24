@@ -388,6 +388,10 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
+# The Blighted Maw's guard (28b): an Architect's Thrall on floor 4's stairs.
+const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 1600, "atk": 76, "def": 26, "agi": 16, "xp": 2200,
+		"tell": "narrate Something tall and wrong unfolds from the dark at the foot of the stairs. It has the Architect's mark burned into its chest."}
+
 # The Drowned Fortress's mid-dungeon guard (25d; the doc's Admiral's First
 # Mate): very high AGI - often acts before Silas - and a party-wide storm.
 const FIRST_MATE := {"name": "First Mate", "hp": 1150, "atk": 60, "def": 20, "agi": 40, "xp": 1600,
@@ -497,6 +501,19 @@ const REACH_ENCOUNTERS: Array = [
 	[{"name": "Architect's Thrall", "hp": 520, "atk": 70, "def": 24, "agi": 14, "xp": 300}],
 ]
 
+# The Blighted Maw (28b): heavier than the Reach, four heroes ~level 16-21.
+const MAW_ENCOUNTERS: Array = [
+	[{"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 190},
+	 {"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 190},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 170}],
+	[{"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 180},
+	 {"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 180}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 170}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320},
+	 {"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -513,6 +530,7 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"sunken_sanctum": SANCTUM_ENCOUNTERS,
 	"coast": COAST_ENCOUNTERS,
 	"reach": REACH_ENCOUNTERS,
+	"blighted_maw": MAW_ENCOUNTERS,
 	"drowned_fortress": FORTRESS_ENCOUNTERS,
 }
 

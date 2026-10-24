@@ -472,3 +472,9 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **The portal key quests:** the frame from a Hollow Custodian at a ruined shrine, the core from Nordveil's priestess (the shard of pure light in her shrine's flame), the binding by Frank, with a slip that hints at his past.
 - **"Void Sentinel" renamed "Null Sentinel"** for Act III (the name was taken in Act I).
 - **The Threshold:** free inn, unlimited shrine, Starforged gear, the cheapest potions, refugees from every kingdom.
+
+## Milestone 28b — the Blighted Maw (2026-10-24)
+- **The Maw echoes the three kingdoms:** a frozen floor (ice), a burning floor (fire), a drowned floor (wading), then the depths and Vorath's chamber — 5 floors, reusing the Act II hazards so the last dungeon tests everything.
+- **Two Act III set bonuses redefined** because the doc's versions don't apply in this game: Cosmic Conduit = Lyra's spells -25% MP (no summons exist); Death's Hand = Shadowstep +30% damage (it has no row limit). The other two as written.
+- **Resurrection auto-targets** the fallen ally with the most max HP (no target menu for KO'd allies exists); level 21, 30 MP.
+- **Act III sets are all findable in the Maw except the gloves** (Threshold armory), so they don't depend on optional quests.

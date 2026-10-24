@@ -221,9 +221,30 @@ def reach():
     print("wrote battle_bg_reach.png")
 
 
+def maw():
+    rng = random.Random(32)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 72, (6, 2, 12), (40, 16, 60))
+    d = ImageDraw.Draw(im)
+    for x in range(0, W, 46):  # ribs of the Maw's walls
+        d.polygon([(x, 0), (x + 14, 0), (x + 8, 72), (x + 2, 72)], fill=(30, 18, 40))
+        d.line([(x + 6, 0), (x + 5, 72)], fill=(90, 40, 120))
+    for _ in range(40):  # motes of the Unraveling
+        x, y = rng.randrange(W), rng.randrange(72)
+        im.putpixel((x, y), (200, 120, 255, 255))
+    dither_gradient(im, 72, 112, (44, 30, 56), (24, 14, 32))
+    for _ in range(12):
+        x, y = rng.randrange(W), 76 + rng.randrange(32)
+        d.line([(x + i * 3, y + (1 if i % 2 else -1)) for i in range(7)], fill=(170, 80, 220))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_maw.png")
+    print("wrote battle_bg_maw.png")
+
+
 tundra()
 citadel()
 reach()
+maw()
 desert()
 sanctum()
 coast()

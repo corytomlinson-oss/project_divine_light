@@ -112,6 +112,25 @@ const DEFS: Dictionary = {
 	"Venom Weave Wraps":      {"slot": "gloves",    "class": "Silas", "atk": 5, "set_id": "venom_weave"},
 	"Viper Fang Charm":       {"slot": "accessory", "class": "",      "agi": 3, "atk": 2, "set_id": "venom_weave"},
 
+	# Act III armor sets (28b; README "Full Set Bonus"): armors, helmets and
+	# accessories in the Blighted Maw (floors 2-4), gloves at the Threshold.
+	"Divine Champion Plate":     {"slot": "armor",     "class": "Vael",  "def": 14, "res": 4, "set_id": "divine_champion"},
+	"Divine Champion Helm":      {"slot": "helmet",    "class": "Vael",  "def": 7, "res": 2, "set_id": "divine_champion"},
+	"Divine Champion Gauntlets": {"slot": "gloves",    "class": "Vael",  "def": 6, "atk": 3, "set_id": "divine_champion"},
+	"Champion's Halo":           {"slot": "accessory", "class": "",      "res": 7, "hp": 60, "set_id": "divine_champion"},
+	"Rising Force Gi":           {"slot": "armor",     "class": "Ryn",   "def": 10, "atk": 5, "set_id": "rising_force"},
+	"Rising Force Band":         {"slot": "helmet",    "class": "Ryn",   "def": 5, "agi": 3, "set_id": "rising_force"},
+	"Rising Force Fists":        {"slot": "gloves",    "class": "Ryn",   "atk": 7, "set_id": "rising_force"},
+	"Phoenix Pearl":             {"slot": "accessory", "class": "",      "hp": 70, "agi": 2, "set_id": "rising_force"},
+	"Cosmic Conduit Robe":       {"slot": "armor",     "class": "Lyra",  "def": 6, "res": 10, "set_id": "cosmic_conduit"},
+	"Cosmic Conduit Crown":      {"slot": "helmet",    "class": "Lyra",  "int": 7, "res": 3, "set_id": "cosmic_conduit"},
+	"Cosmic Conduit Gloves":     {"slot": "gloves",    "class": "Lyra",  "int": 6, "def": 3, "set_id": "cosmic_conduit"},
+	"Starlight Focus":           {"slot": "accessory", "class": "",      "mp": 45, "int": 3, "set_id": "cosmic_conduit"},
+	"Death's Hand Garb":         {"slot": "armor",     "class": "Silas", "def": 9, "agi": 4, "set_id": "deaths_hand"},
+	"Death's Hand Mask":         {"slot": "helmet",    "class": "Silas", "agi": 6, "def": 2, "set_id": "deaths_hand"},
+	"Death's Hand Wraps":        {"slot": "gloves",    "class": "Silas", "atk": 7, "set_id": "deaths_hand"},
+	"Reaper's Sigil":            {"slot": "accessory", "class": "",      "agi": 4, "atk": 3, "set_id": "deaths_hand"},
+
 	# Universal (any class - accessories have no class restriction per the design doc)
 	"Traveler's Ring": {"slot": "accessory", "class": "", "agi": 2},
 	"Amber Charm":     {"slot": "accessory", "class": "", "res": 3},
@@ -143,6 +162,11 @@ const SET_BONUSES: Dictionary = {
 	"storm_dragon": {"name": "Storm Dragon Set", "desc": "Ryn's healing restores 30% more"},
 	"elemental_weave": {"name": "Elemental Weave Set", "desc": "Back-row Tremor deals full damage"},
 	"venom_weave": {"name": "Venom Weave Set", "desc": "Silas's poison lasts 5 rounds"},
+	# Act III (28b)
+	"divine_champion": {"name": "Divine Champion Set", "desc": "Resurrection revives at full HP"},
+	"rising_force": {"name": "Rising Force Set", "desc": "Rising Dragon costs 4 Qi instead of 6"},
+	"cosmic_conduit": {"name": "Cosmic Conduit Set", "desc": "Lyra's spells cost 25% less MP"},
+	"deaths_hand": {"name": "Death's Hand Set", "desc": "Shadowstep deals 30% more damage"},
 }
 
 

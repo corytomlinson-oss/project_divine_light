@@ -16,6 +16,9 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 18},
 		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 20},
 		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 21},
+		# Act III (28b; Cory: Vael learns it late): revives the fallen ally with
+		# the most max HP, at half HP (full with Divine Champion).
+		{"name": "Resurrection", "cost": 30, "cost_type": "mp", "target": "self", "effect": "resurrect", "power": 0, "min_level": 21},
 		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 23},
 	],
 	"Ryn": [
@@ -123,6 +126,7 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	"sunken_sanctum": "res://assets/ui/battle_bg_sanctum.png",
 	"coast": "res://assets/ui/battle_bg_coast.png",
 	"reach": "res://assets/ui/battle_bg_reach.png",
+	"blighted_maw": "res://assets/ui/battle_bg_maw.png",
 	"drowned_fortress": "res://assets/ui/battle_bg_fortress.png",
 }
 
@@ -1119,6 +1123,7 @@ func _open_skill_menu(member: Combatant) -> void:
 		func(s):
 			return member.level >= int(s.get("min_level", 1)) and (s.get("row_restrict", "") == "" or member.row == s["row_restrict"])
 	)
+	_active_skills = _active_skills.map(func(s: Dictionary) -> Dictionary: return _set_cost(member, s))
 	if _active_skills.is_empty():
 		message_label.text = "No skills learned yet."
 		return
@@ -1155,6 +1160,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 				"target": "self", "effect": "switch_stance", "power": 0,
 				"to_stance": s, "min_level": 1,
 			})
+	_active_skills = _active_skills.map(func(sk: Dictionary) -> Dictionary: return _set_cost(member, sk))
 	_menu_state = MenuState.SKILL
 	_list_scroll = 0
 	_menu_options = []
@@ -1659,6 +1665,20 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 	var power: int = int(skill["power"])
 
 	match effect:
+		"resurrect":
+			# Vael's Resurrection (28b): the fallen ally with the most max HP.
+			var fallen: Array = _party.filter(func(c: Combatant) -> bool: return c.is_ko)
+			if fallen.is_empty():
+				message_label.text = "%s calls on %s...\nbut no one has fallen." % [member.display_name, skill["name"]]
+				return
+			fallen.sort_custom(func(a, b): return a.max_hp > b.max_hp)
+			var who: Combatant = fallen[0]
+			who.is_ko = false
+			who.hp = who.max_hp if Equipment.has_set_bonus(member, "divine_champion") else who.max_hp / 2
+			_fx_on(who, "pillar", "holy")
+			Sfx.play("holy")
+			_update_ui()
+			message_label.text = "%s calls on %s!\n%s rises again!" % [member.display_name, skill["name"], who.display_name]
 		"heal":
 			var target: Combatant = _get_ally_target(member, skill)
 			var amount: int = power + member.int_stat / 2
@@ -2160,6 +2180,8 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
+			if Equipment.has_set_bonus(member, "deaths_hand"):
+				dmg = roundi(dmg * 1.3)  # Death's Hand (28b)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -2646,6 +2668,22 @@ func _storm_strike(enemy: Combatant, targets: Array, phase_note: String, a: Dict
 	message_label.text = phase_note + "%s unleashes %s!\nLightning tears through the party!" % [enemy.display_name, a.get("name", "the storm")]
 	if _party.filter(func(c): return c.is_alive()).is_empty():
 		_end_battle(false)
+
+
+## Act III set bonuses that change a skill's cost (28b): Rising Force makes
+## Rising Dragon 4 Qi; Cosmic Conduit takes 25% off Lyra's spells.
+func _set_cost(member: Combatant, skill: Dictionary) -> Dictionary:
+	if skill.get("effect", "") == "switch_stance":
+		return skill
+	if skill.get("name", "") == "Rising Dragon" and Equipment.has_set_bonus(member, "rising_force"):
+		var s := skill.duplicate()
+		s["cost"] = 4
+		return s
+	if member.char_class == "Lyra" and skill.get("cost_type", "") == "mp" and Equipment.has_set_bonus(member, "cosmic_conduit"):
+		var s2 := skill.duplicate()
+		s2["cost"] = maxi(1, roundi(int(skill["cost"]) * 0.75))
+		return s2
+	return skill
 
 
 ## How long Silas's poisons last: 3 rounds, 5 with Venom Weave (25b).

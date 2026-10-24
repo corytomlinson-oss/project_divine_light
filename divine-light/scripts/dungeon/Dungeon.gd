@@ -161,6 +161,32 @@ const DUNGEONS := {
 		"set_floor": 2,
 		"region_scene": "res://scenes/overworld/Coast.tscn",
 	},
+	# Act III (28b): the Blighted Maw, five floors down. The kingdoms'
+	# corruption echoes through it - a frozen floor (sliding ice), a burning
+	# floor, a drowned floor (wading) - then the Thrall-guarded depths, then
+	# Vorath's chamber. The Act III armors / helmets / accessories wait on
+	# floors 2-4 (gloves at the Threshold).
+	"blighted_maw": {
+		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
+		"scene": "res://scenes/dungeon/BlightedMaw.tscn",
+		"music": "maw",
+		"floors": 5,
+		"ice_floors": [0],
+		"fire_floors": [1],
+		"water_floors": [2],
+		"frozen_chests": false,
+		"levers": [3],
+		"tile_columns": {"ice": Vector2i(5, 0), "fire": Vector2i(6, 0), "water": Vector2i(7, 0)},
+		"kingdom": "maw",
+		"boss": "vorath",
+		"guards": {3: EnemyData.THRALL_GUARD},
+		"set_floors": {
+			1: ["Divine Champion Plate", "Rising Force Gi", "Cosmic Conduit Robe", "Death's Hand Garb"],
+			2: ["Divine Champion Helm", "Rising Force Band", "Cosmic Conduit Crown", "Death's Hand Mask"],
+			3: ["Champion's Halo", "Phoenix Pearl", "Starlight Focus", "Reaper's Sigil"],
+		},
+		"region_scene": "res://scenes/overworld/Reach.tscn",
+	},
 }
 
 const TAG_TO_COORDS := {
@@ -284,7 +310,7 @@ func _generate_and_build() -> void:
 		tiles[boss_cell] = DungeonGenerator.FLOOR
 
 	for cell in tiles.keys():
-		_tile_map.set_cell(cell, 0, TAG_TO_COORDS[tiles[cell]])
+		_tile_map.set_cell(cell, 0, _coords(tiles[cell]))
 	if _floors > 1:
 		_place_stairs()
 	else:
@@ -357,15 +383,22 @@ func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int, tag := ICE
 					tiles[Vector2i(x, y)] = tag
 
 
+## A tile tag's atlas column. Most dungeons put their one special floor (ice,
+## fire or water) in column 5; the Maw has all three (28b: "tile_columns").
+func _coords(tag: String) -> Vector2i:
+	var cols: Dictionary = _data.get("tile_columns", {})
+	return cols[tag] if cols.has(tag) else TAG_TO_COORDS[tag]
+
+
 ## Player.gd slides across these (only in a dungeon with ice on this floor).
 func is_slippery(cell: Vector2i) -> bool:
-	return _floor in _data.get("ice_floors", []) and _tile_map.get_cell_atlas_coords(cell) == ICE_COORDS
+	return _floor in _data.get("ice_floors", []) and _tile_map.get_cell_atlas_coords(cell) == _coords(ICE)
 
 
 ## Flood water (25d): Player.gd wades through it; battles that start in it
 ## give the enemies +30% AGI.
 func is_wading(cell: Vector2i) -> bool:
-	return _floor in _data.get("water_floors", []) and _tile_map.get_cell_atlas_coords(cell) == WATER_COORDS
+	return _floor in _data.get("water_floors", []) and _tile_map.get_cell_atlas_coords(cell) == _coords(WATER)
 
 
 ## Lightning rods (25d): one at the middle of up to two dry rooms on these
@@ -410,7 +443,7 @@ func _tick_rods(cell: Vector2i) -> void:
 
 ## Burning floor (25c): stepping on it singes everyone a little.
 func _is_fire(cell: Vector2i) -> bool:
-	return _floor in _data.get("fire_floors", []) and _tile_map.get_cell_atlas_coords(cell) == FIRE_COORDS
+	return _floor in _data.get("fire_floors", []) and _tile_map.get_cell_atlas_coords(cell) == _coords(FIRE)
 
 
 func _burn_party() -> void:
@@ -559,7 +592,9 @@ func _place_captive() -> void:
 ## or a vault of rich chests, some locked. All of it comes from the seed.
 func _place_treasure(layout: Dictionary, seed_value: int) -> void:
 	var set_items: Array = Loot.DUNGEON_SETS.get(dungeon_id, [])
-	if _floors > 1 and _floor != int(_data.get("set_floor", _floors - 1)):
+	if _data.has("set_floors"):
+		set_items = _data["set_floors"].get(_floor, [])  # the Maw spreads its sets over floors (28b)
+	elif _floors > 1 and _floor != int(_data.get("set_floor", _floors - 1)):
 		set_items = []  # Act II: the armor set waits on its own floor
 	# Mimics only where there's a party to fight them (not the solo escape).
 	var treasure := DungeonGenerator.place_treasure(layout, set_items, seed_value, not _escape)

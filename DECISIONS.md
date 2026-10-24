@@ -457,3 +457,4 @@ My calls while building (Cory: "I think we are good, let's start"):
 ## Milestone 27 — Act II art & music (2026-10-23, Cory asleep)
 - **Music first:** six tracks (three regions, three dungeons). Corrupted towns reuse their region's theme instead of three extra "cursed town" tracks (the freed towns already have the warm town theme); the three Act II bosses keep the existing boss theme. *Change:* `build_music.py`, the towns' `Music.play` lines.
 - **Art priorities:** the code-made tilesets, backgrounds and props from 25 stay; the next step replaces the recolor stand-ins for the three kingdom bosses with hand-placed sprites (the most visible stand-ins). Regular enemies stay recolors for now.
+- **27 step 2:** hand-placed sprites for the three kingdom bosses only; the regular Act II enemies, mini-bosses and hunts stay recolors (ASSETS.md lists them as still to do). Stopped after 27 as Cory asked; 28 (the APK) needs the device.

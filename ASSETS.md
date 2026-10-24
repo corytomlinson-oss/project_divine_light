@@ -352,6 +352,12 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Battle backgrounds:** coast (storm, sunken hull), fortress (flooded hall)
 - [x] Music: `coast` (region; corrupted Selavon plays it too), `fortress` — Milestone 27
 
+## Milestone 27 — Act II art & music pass
+
+- [x] Six music tracks (see the per-kingdom sections above)
+- [x] **Hand-placed kingdom bosses:** Frozen Sovereign, Burning Tyrant, Drowned Admiral (`sprites/source/build_act2_bosses.py`)
+- [ ] Hand-placed sprites for the regular Act II enemies, the three mini-bosses, the Ice Knight and the four side-quest hunts (recolors for now)
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

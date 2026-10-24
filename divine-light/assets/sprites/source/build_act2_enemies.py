@@ -52,7 +52,7 @@ ramp_recolor("astral_familiar", "blizzard_hawk", (70, 84, 110), (245, 248, 255),
 # The Frozen Citadel's guard, boss and the boss's summoned knights
 ramp_recolor("cursed_paladin", "frost_warden", ICE_DARK, ICE_LIGHT, glow=(140, 220, 255))
 ramp_recolor("iron_sentinel", "ice_knight", (44, 70, 110), (200, 228, 250), glow=(140, 220, 255))
-ramp_recolor("fallen_guardian", "frozen_sovereign", (30, 46, 92), (226, 242, 255), glow=(120, 210, 255))
+# (the kingdom boss's sprite is hand-placed since Milestone 27: build_act2_bosses.py)
 
 # The Duskara Wastes (25c; README "Desert Kingdom")
 SAND_DARK, SAND_LIGHT = (92, 60, 34), (236, 204, 146)
@@ -61,7 +61,7 @@ ramp_recolor("void_mage", "scorched_mage", (90, 26, 20), (255, 178, 96), glow=(2
 ramp_recolor("shadow_thief", "dune_marauder", SAND_DARK, SAND_LIGHT)
 # The Sunken Sanctum's guard and boss
 ramp_recolor("hired_muscle", "blazing_sentinel", (110, 30, 16), (255, 196, 96), glow=(255, 120, 30))
-ramp_recolor("void_archmage", "burning_tyrant", (80, 20, 16), (255, 170, 80), glow=(255, 210, 90))
+# (the kingdom boss's sprite is hand-placed since Milestone 27: build_act2_bosses.py)
 
 # The Sand Viper: a coiled snake, hand-placed (no Act I enemy reads as one).
 SNAKE = [
@@ -122,7 +122,7 @@ ramp_recolor("void_mage", "tidal_witch", (20, 60, 80), (120, 220, 220), glow=(14
 ramp_recolor("astral_familiar", "storm_gull", (60, 66, 80), (236, 238, 244), glow=(255, 230, 90))
 # The Drowned Fortress's guard and boss
 ramp_recolor("corrupted_enforcer", "first_mate", (20, 30, 60), (140, 170, 210), glow=(255, 240, 120))
-ramp_recolor("shadow_lord", "drowned_admiral", (14, 40, 50), (120, 200, 190), glow=(255, 240, 120))
+# (the kingdom boss's sprite is hand-placed since Milestone 27: build_act2_bosses.py)
 
 # Act II side-quest hunts (26)
 ramp_recolor("shadow_thief", "marauder_chief", (110, 30, 30), (240, 190, 120), glow=(255, 220, 90))

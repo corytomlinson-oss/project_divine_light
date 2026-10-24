@@ -495,3 +495,10 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **The lore quest stays a hint, not a reveal:** Frank deflects ("wide hats come back into fashion"); the real reveal stays in the Vorath fight.
 - **Verdance hub = three envoys + new lines for everyone**, not new shops or systems: the doc only asks that representatives appear and the town feel thriving.
 - **Frank after the ending is a faint echo who still keeps his stall** — the ending has him fade into the light, but removing him would cut post-game shopping and revives in six towns.
+
+## Milestone 30 — Act III art & music (2026-10-24, Cory away)
+- **Music first, three tracks:** the Reach, the Maw, and a Vorath battle theme (the last fight deserves its own; the other bosses share "boss"). The Threshold stays on the warm town theme on purpose: it's the last safe place.
+- **The Vorath theme loops at 25s** (16 bars at 152 BPM, like the other battle themes' length in bars). Easy to lengthen if it wears thin.
+- **Art: only Vorath hand-placed**, at 64x64 so the final boss stands taller than everything else. The regular Act III enemies, the Hollow Custodian and the 29 hunts stay recolors, as Act II's regular enemies did in 27; the most visible stand-in got the effort.
+- **No separate sprite for Frank's true form:** his revelation already glows him up in battle; a real true-form sprite is a good candidate for a later art pass.
+- **Stopped before 31** (the APK), as Cory asked.

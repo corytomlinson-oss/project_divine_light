@@ -292,7 +292,8 @@ func _ready() -> void:
 		"xp": e.xp_reward, "is_boss": e.is_boss, "phase_hp_thresholds": e.phase_hp_thresholds.duplicate(),
 	}))
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
-	Music.play("boss" if boss_fight else "battle", "battle")
+	var vorath_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.display_name == "Vorath")
+	Music.play("vorath" if vorath_fight else ("boss" if boss_fight else "battle"), "battle")  # Vorath's own theme (30)
 	_setup_enemy_ui()
 	_setup_party_sprites()
 	_setup_fx()

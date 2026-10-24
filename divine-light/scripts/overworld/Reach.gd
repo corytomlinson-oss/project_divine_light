@@ -79,7 +79,7 @@ func chest_loot() -> Dictionary:
 
 
 func music() -> String:
-	return "reach"  # falls back to the overworld theme until 30 writes one
+	return "reach"  # Milestone 30
 
 
 func default_arrival() -> String:

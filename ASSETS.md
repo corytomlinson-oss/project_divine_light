@@ -363,8 +363,10 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Reach tileset** (`reach_tiles.png`: ash, dead trees, cracked road, portal arch, chasms, bones) and **Blighted Maw tileset** (`maw_tiles.png`, 8 columns; ice / fire / water in 5 / 6 / 7)
 - [x] **Enemies (recolors):** Null Sentinel, Unraveled Soul, Entropy Shade, Architect's Thrall, Hollow Custodian, **Vorath**, and the 29 hunts Oathbreaker and Grave Robber (`sprites/source/build_act2_enemies.py`)
 - [x] **Battle backgrounds:** reach, maw
-- [ ] Music: `reach`, `maw`, a Vorath theme (Milestone 30; the Reach and Maw borrow existing tracks until then)
-- [ ] Hand-placed Vorath and Act III enemies (Milestone 30)
+- [x] Music: `reach`, `maw`, `vorath` (the final battle) — Milestone 30
+- [x] **Hand-placed Vorath** (64x64, `sprites/source/build_act3_bosses.py`) — Milestone 30
+- [ ] Hand-placed sprites for the regular Act III enemies, the Hollow Custodian and the Oathbreaker / Grave Robber hunts (recolors for now)
+- [ ] Frank's true form (his revelation reuses his sprite with a glow)
 
 ## Deferred to later passes
 

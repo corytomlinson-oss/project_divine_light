@@ -847,11 +847,102 @@ FORTRESS = dict(
     ],
 )
 
+# ------------------------------------------------------------ Act III (30)
+# The Blighted Reach: D minor, 84 BPM - a weary, sparse theme over ash; a soft
+# pad, slow 8th arpeggios, a distant kick that only joins in bar 5.
+REACH = dict(
+    bpm=84, peak=0.76, loop_from_bar=0,
+    lead_vol=0.24, arp_vol=0.06, bass_vol=0.36, drum_vol=0.12, lead_duty=0.25,
+    arp_div=2, pad=True, pad_vol=0.05, hats=False,
+    bass_pattern=['R', '-', '-', '-', 'F', '-', 'O', '-'],
+    kick=[0, 8], snare=[], drums_from=4, fills=[],
+    chords=['Dm', 'Dm', 'Bb', 'A', 'Dm', 'Gm', 'Bb', 'A',
+            'Gm', 'Dm', 'Bb', 'F', 'Gm', 'Bb', 'A', 'A'],
+    lead=[
+        [('D5', 8), ('F5', 4), ('A5', 4)],
+        [('G5', 6), ('F5', 2), ('E5', 8)],
+        [('F5', 4), ('D5', 4), ('A#4', 8)],
+        [('A4', 12), ('r', 4)],
+        [('D5', 4), ('F5', 4), ('A5', 8)],
+        [('A#5', 6), ('A5', 2), ('G5', 8)],
+        [('F5', 4), ('A#5', 4), ('D6', 8)],
+        [('C#6', 12), ('r', 4)],
+        [('D6', 8), ('A#5', 8)],
+        [('A5', 6), ('F5', 2), ('D5', 8)],
+        [('F5', 4), ('A#5', 4), ('A5', 4), ('F5', 4)],
+        [('A5', 12), ('r', 4)],
+        [('G5', 4), ('A#5', 4), ('D6', 8)],
+        [('D6', 6), ('C6', 2), ('A#5', 8)],
+        [('A5', 4), ('C#6', 4), ('E6', 8)],
+        [('D6', 8), ('C#6', 4), ('A5', 4)],
+    ],
+)
+
+# The Blighted Maw: C minor, 70 BPM - a heartbeat kick, a dark organ pad, a
+# low melody circling the diminished chord: the bottom of the world.
+MAW = dict(
+    bpm=70, peak=0.78, loop_from_bar=0,
+    lead_vol=0.25, arp_vol=0.06, bass_vol=0.44, drum_vol=0.16, lead_duty=0.5,
+    arp_div=2, pad=True, pad_vol=0.06, hats=False,
+    bass_pattern=['R', '-', '-', '-', 'R', '-', '-', '-'],
+    kick=[0, 3], snare=[], drums_from=0, fills=[],
+    chords=['Cm', 'Cm', 'G#dim', 'G', 'Cm', 'Eb', 'G#dim', 'G',
+            'Cm', 'Bb', 'G#dim', 'G', 'Eb', 'Cm', 'G#dim', 'G'],
+    lead=[
+        [('C5', 12), ('D#5', 4)],
+        [('D5', 8), ('C5', 8)],
+        [('G#4', 8), ('B4', 8)],
+        [('G4', 12), ('r', 4)],
+        [('C5', 4), ('D#5', 4), ('G5', 8)],
+        [('A#5', 6), ('G5', 2), ('D#5', 8)],
+        [('D5', 4), ('F5', 4), ('G#5', 8)],
+        [('G5', 12), ('r', 4)],
+        [('G5', 8), ('D#5', 8)],
+        [('D5', 6), ('F5', 2), ('A#4', 8)],
+        [('B4', 4), ('D5', 4), ('G#5', 8)],
+        [('G5', 12), ('r', 4)],
+        [('A#5', 8), ('G5', 8)],
+        [('G5', 6), ('D#5', 2), ('C5', 8)],
+        [('D5', 4), ('F5', 4), ('G#5', 4), ('B5', 4)],
+        [('B5', 12), ('r', 4)],
+    ],
+)
+
+# Vorath: D minor, 152 BPM - the last battle. Driving octave bass, a restless
+# 16th-note melody that climbs to A6, fills every fourth bar.
+VORATH = dict(
+    bpm=152, peak=0.86, loop_from_bar=0,
+    lead_vol=0.28, arp_vol=0.08, bass_vol=0.44, drum_vol=0.22, lead_duty=0.5,
+    bass_pattern=['R', 'O', 'R', 'O', 'R', 'O', 'F', 'O'],
+    kick=[0, 6, 8, 14], snare=[4, 12], drums_from=0, fills=[3, 7, 11, 15],
+    chords=['Dm', 'Dm', 'Bb', 'C', 'Dm', 'Dm', 'Bb', 'A',
+            'Gm', 'Gm', 'Dm', 'Dm', 'Bb', 'C', 'A', 'A'],
+    lead=[
+        [('D5', 2), ('D5', 2), ('A5', 4), ('F5', 2), ('E5', 2), ('D5', 4)],
+        [('A5', 2), ('A#5', 2), ('A5', 2), ('G5', 2), ('F5', 4), ('A5', 4)],
+        [('A#5', 4), ('D6', 4), ('F6', 4), ('D6', 4)],
+        [('E6', 6), ('D6', 2), ('C6', 8)],
+        [('D6', 2), ('D6', 2), ('A5', 4), ('F6', 2), ('E6', 2), ('D6', 4)],
+        [('C6', 2), ('D6', 2), ('C6', 2), ('A#5', 2), ('A5', 8)],
+        [('A#5', 4), ('F5', 4), ('D5', 4), ('F5', 4)],
+        [('C#6', 4), ('E6', 4), ('A6', 8)],
+        [('G6', 4), ('F6', 2), ('D6', 2), ('A#5', 8)],
+        [('A#5', 2), ('D6', 2), ('G6', 4), ('F6', 2), ('D6', 2), ('A#5', 4)],
+        [('A5', 4), ('D6', 4), ('F6', 8)],
+        [('E6', 2), ('F6', 2), ('E6', 2), ('D6', 2), ('A5', 8)],
+        [('A#5', 4), ('D6', 4), ('F6', 4), ('A#6', 4)],
+        [('A6', 4), ('G6', 4), ('E6', 8)],
+        [('E6', 4), ('C#6', 4), ('A5', 4), ('C#6', 4)],
+        [('E6', 12), ('r', 4)],
+    ],
+)
+
 TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO,
           'town': TOWN, 'monastery': MONASTERY, 'observatory': OBSERVATORY, 'guild': GUILD,
           'finale': FINALE,
           'tundra': TUNDRA, 'desert': DESERT, 'coast': COAST,
-          'citadel': CITADEL, 'sanctum': SANCTUM, 'fortress': FORTRESS}
+          'citadel': CITADEL, 'sanctum': SANCTUM, 'fortress': FORTRESS,
+          'reach': REACH, 'maw': MAW, 'vorath': VORATH}
 
 
 if __name__ == '__main__':

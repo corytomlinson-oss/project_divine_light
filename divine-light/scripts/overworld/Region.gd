@@ -330,7 +330,12 @@ func _kingdom_dungeon(id: String) -> Dictionary:
 	var scene: String = Kingdoms.DUNGEON_SCENES.get(id, "")
 	if scene == "":
 		return {"blocked": "%s looms ahead, but the way isn't open yet. (Coming in a later update.)" % Kingdoms.location_name(id)}
+	if not Quests.is_unsealed(id):  # its required quest (26)
+		return {"blocked": Quests.SEAL_TEXT[id]}
 	GameManager.dungeon_floor = 0
+	if Quests.has_key(id) and not GameManager.has_flag("unsealed_" + id):
+		GameManager.story_flags["unsealed_" + id] = true
+		return {"scene": scene, "say": "narrate " + Quests.OPEN_TEXT[id]}
 	return {"scene": scene}
 
 

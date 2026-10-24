@@ -60,6 +60,19 @@ const KITS := {
 		{"name": "Grave Swing", "kind": "charge", "every": 3, "mult": 2.2, "tell": "raises its pitchfork high!"},
 	]},
 	"Cutpurse": {"attack": {"steal": 40}},
+	# Act II side-quest hunts (Milestone 26)
+	"Marauder Chief": {"attack": {"steal": 40, "hits": 1, "hits_max": 2}},
+	"Snowmane": {"weak": ["fire"], "attack": {"hits": 2}, "abilities": [
+		{"name": "Blizzard Howl", "kind": "party_agi_down", "every": 4, "power": 8, "rounds": 2},
+		{"name": "Savage Lunge", "kind": "charge", "every": 3, "mult": 2.0, "tell": "crouches low in the snow..."},
+	]},
+	"Dune Stalker": {"res": 12, "immune": ["earth"], "weak": ["ice"], "abilities": [
+		{"name": "Sand Crush", "kind": "charge", "every": 3, "mult": 2.1, "tell": "draws the dunes up around its fists..."},
+	]},
+	"Reef Horror": {"res": 14, "immune": ["ice"], "weak": ["lightning"], "attack": {"stun_chance": 15}, "abilities": [
+		{"name": "Brine Mend", "kind": "heal_allies", "every": 4, "power": 120},
+		{"name": "Coral Crush", "kind": "charge", "every": 3, "mult": 2.1, "tell": "hunches, coral spines bristling..."},
+	]},
 	# The Northern Tundra (Act II, 25b; README "Tundra Kingdom")
 	"Frost Wraith": {"int": 30, "res": 18, "weak": ["fire"], "abilities": [
 		{"name": "Chilling Mist", "kind": "party_agi_down", "chance": 30, "power": 6, "rounds": 2, "palette": "ice"},

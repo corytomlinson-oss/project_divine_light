@@ -144,6 +144,116 @@ const QUESTS := {
 		],
 		"key": "Guild Password",
 	},
+	# ======================================================= Act II (Milestone 26)
+	# Per kingdom (Cory, 2026-10-18): one required quest that seals its
+	# dungeon until done (the second step hands over the key), and two
+	# optional ones once it's free - XP, gold and potions, and the second
+	# grants the kingdom's blessing (a permanent party-wide stat boost).
+	# "kingdom" marks an Act II quest; "optional" ones need the kingdom freed.
+	"frozen_gate": {
+		"name": "The Frozen Gate", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 1, "giver": "nordveil/captain",
+		"offer": [
+			"say Captain: Before you climb - the Citadel's gate is sealed under a wall of black ice. Steel won't scratch it.",
+			"say Captain: My last scout carried an Ember Seal, a relic that melts any ice it touches. He fell on the mountain road. His pack must still be up there.",
+		],
+		"remind": ["say Captain: The scout's pack - up the mountain road, north of the crossroads. Bring me the Ember Seal."],
+		"steps": [
+			{"log": "Find the fallen scout's pack on the mountain road north of the crossroads.", "fetch": "scout_pack"},
+			{"log": "Bring the scout's pack to Nordveil's captain.", "talk": "nordveil/captain", "lines": [
+				"say Captain: His pack... and the Ember Seal, still warm. He'd have wanted it used. Take it to the gate.",
+			]},
+		],
+		"key": "Ember Seal", "xp": 500, "gold": 300,
+	},
+	"lost_axe": {
+		"name": "The Lost Axe", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 2, "optional": true, "giver": "nordveil/woodcutter",
+		"offer": ["say Woodcutter: When the cold broke I went straight back to my old cutting grove... and dropped my grandfather's axe in a drift. West of the river crossing. Would you?"],
+		"remind": ["say Woodcutter: My axe - in the snow west of the crossing, by the river."],
+		"steps": [
+			{"log": "Find the woodcutter's axe in the snow west of the river crossing.", "fetch": "woodcutter_axe"},
+			{"log": "Return the axe to Nordveil's woodcutter.", "talk": "nordveil/woodcutter", "lines": ["say Woodcutter: That's the one! Three generations of Nordveil firewood in that handle. Thank you."]},
+		],
+		"xp": 600, "gold": 300, "items": {"Hi-Potion": 3},
+	},
+	"white_wolf": {
+		"name": "The White Wolf", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 3, "optional": true, "giver": "nordveil/huntress",
+		"offer": [
+			"say Huntress: There's a white wolf in the southern basin - Snowmane, we call him. The Sovereign's cold made him huge and cruel, and it didn't wear off.",
+			"say Huntress: Bring him down and Nordveil will remember it. The old ones say the land blesses those who protect it.",
+		],
+		"remind": ["say Huntress: Snowmane hunts the southern basin, west of the road."],
+		"steps": [
+			{"log": "Hunt Snowmane in the Tundra's southern basin.", "hunt": "snowmane"},
+			{"log": "Tell Nordveil's huntress Snowmane is dead.", "talk": "nordveil/huntress", "lines": ["say Huntress: Snowmane, gone... The tundra feels lighter already. Stand still a moment - can you feel it?"]},
+		],
+		"xp": 800, "gold": 400, "blessing": "nordveil",
+	},
+	"sun_disc": {
+		"name": "The Sun Disc", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 1, "giver": "duskara/keeper",
+		"offer": [
+			"say Water-Keeper: The Sanctum's great doors open only to the Sun Disc. It was ours to keep - until a marauder chief snatched it from the shrine.",
+			"say Water-Keeper: He camps south of the road, east of the Sanctum path. Take it back from him.",
+		],
+		"remind": ["say Water-Keeper: The marauder chief camps south of the road. Get the Sun Disc back."],
+		"steps": [
+			{"log": "Take the Sun Disc back from the marauder chief, south of the desert road.", "hunt": "marauder_chief"},
+			{"log": "Bring the Sun Disc to Duskara's water-keeper.", "talk": "duskara/keeper", "lines": ["say Water-Keeper: The Sun Disc, home again. Hold it up to the Sanctum's doors - they will know it."]},
+		],
+		"key": "Sun Disc", "xp": 700, "gold": 400,
+	},
+	"dye_root": {
+		"name": "Dye-Root", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 2, "optional": true, "giver": "duskara/weaver",
+		"offer": ["say Weaver: My looms are back, but no color to weave with. Crimson dye-root grows in the far west of the wastes, past the crossroads. Could you dig me some?"],
+		"remind": ["say Weaver: Dye-root - the far west of the wastes, along the road."],
+		"steps": [
+			{"log": "Dig up dye-root in the far west of the Duskara Wastes.", "fetch": "dye_root"},
+			{"log": "Bring the dye-root to Duskara's weaver.", "talk": "duskara/weaver", "lines": ["say Weaver: Oh, it's perfect - deep as a sunset. The first new cloth in Duskara will be crimson."]},
+		],
+		"xp": 700, "gold": 350, "items": {"Hi-Ether": 2},
+	},
+	"dune_stalker": {
+		"name": "The Dune Stalker", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 3, "optional": true, "giver": "duskara/guard",
+		"offer": ["say Guard: Something big still prowls the south-western dunes by the Sanctum. A golem the Tyrant left behind, they say - it smashes caravans for no reason at all."],
+		"remind": ["say Guard: The Dune Stalker - south-western dunes, near the Sanctum."],
+		"steps": [
+			{"log": "Destroy the Dune Stalker in the south-western dunes.", "hunt": "dune_stalker"},
+			{"log": "Tell Duskara's guard the Dune Stalker is gone.", "talk": "duskara/guard", "lines": ["say Guard: The caravans can run again. Hold on - the sand around you just glittered. The desert's thanking you."]},
+		],
+		"xp": 900, "gold": 450, "blessing": "duskara",
+	},
+	"tide_chart": {
+		"name": "The Tide Chart", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 1, "giver": "selavon/harbormaster",
+		"offer": [
+			"say Harbormaster: The pier's end is choked with wreckage and breakers - no way onto the island without the old tide chart, which shows when the channel opens.",
+			"say Harbormaster: It went down with a fishing boat that washed up on the beach south of the coast road. Search the wreck.",
+		],
+		"remind": ["say Harbormaster: The tide chart - in the wrecked boat on the beach south of the road."],
+		"steps": [
+			{"log": "Find the tide chart in the wrecked boat south of the coast road.", "fetch": "tide_chart"},
+			{"log": "Bring the tide chart to Selavon's harbormaster.", "talk": "selavon/harbormaster", "lines": ["say Harbormaster: Soaked, but readable. There - the channel opens at low tide. Go when the water draws back."]},
+		],
+		"key": "Tide Chart", "xp": 900, "gold": 500,
+	},
+	"sailors_compass": {
+		"name": "The Sailor's Compass", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 2, "optional": true, "giver": "selavon/sailor",
+		"offer": ["say Sailor: First clear sky in a month and I can't steer by it - lost my compass in the storm, washed up somewhere along the western shore. Find it for me?"],
+		"remind": ["say Sailor: My compass - the western shore of the coast, by the road."],
+		"steps": [
+			{"log": "Find the sailor's compass on the coast's western shore.", "fetch": "compass"},
+			{"log": "Return the compass to Selavon's sailor.", "talk": "selavon/sailor", "lines": ["say Sailor: Still points true! I'll be out past the reef by morning. Here - for your trouble."]},
+		],
+		"xp": 800, "gold": 400, "items": {"Elixir": 3},
+	},
+	"reef_horror": {
+		"name": "The Reef Horror", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 3, "optional": true, "giver": "selavon/fisher",
+		"offer": ["say Fisher: The fish are back, but so is something that eats them - a coral-crusted brute east of the pier road. Kill it and the bay is ours again."],
+		"remind": ["say Fisher: The Reef Horror - east of the pier road, on the shore."],
+		"steps": [
+			{"log": "Slay the Reef Horror east of the pier road.", "hunt": "reef_horror"},
+			{"log": "Tell Selavon's fisher the Reef Horror is dead.", "talk": "selavon/fisher", "lines": ["say Fisher: The bay's safe! Listen - the sea's humming. They say the tide blesses the ones who free it."]},
+		],
+		"xp": 1000, "gold": 500, "blessing": "selavon",
+	},
 }
 
 # Visible overworld monsters (24b). Stats are for a lone hero around level 4
@@ -162,11 +272,34 @@ const HUNTS := {
 		"enemy": {"name": "Cutpurse", "hp": 120, "atk": 25, "def": 5, "agi": 22, "xp": 110},
 		"tell": "say Cutpurse: You again? Nobody's taking this box off me!",
 		"won": "narrate The cutpurse drops the strongbox and bolts into the trees."},
+	# Act II hunts (26): tuned for the whole party, so no party-size scaling.
+	"marauder_chief": {"cell": Vector2i(26, 25), "region": "desert", "scale": false,
+		"enemy": {"name": "Marauder Chief", "hp": 720, "atk": 56, "def": 16, "agi": 22, "xp": 700},
+		"tell": "say Marauder Chief: Come for the shiny disc? Come and take it, then!",
+		"won": "narrate The marauder chief drops the Sun Disc in the sand and flees into the dunes."},
+	"snowmane": {"cell": Vector2i(20, 36), "region": "tundra", "scale": false,
+		"enemy": {"name": "Snowmane", "hp": 820, "atk": 58, "def": 14, "agi": 26, "xp": 800},
+		"tell": "narrate A white wolf the size of a horse rises from the snow, eyes like cold coals!",
+		"won": "narrate Snowmane falls. The snow around him glitters, and the wind drops to a whisper."},
+	"dune_stalker": {"cell": Vector2i(20, 34), "region": "desert", "scale": false,
+		"enemy": {"name": "Dune Stalker", "hp": 1100, "atk": 64, "def": 24, "agi": 8, "xp": 1000},
+		"tell": "narrate The dune heaves - a golem of fused sand and stone stands up out of it!",
+		"won": "narrate The Dune Stalker crumbles back into the desert it came from."},
+	"reef_horror": {"cell": Vector2i(36, 28), "region": "coast", "scale": false,
+		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 1200},
+		"tell": "narrate Coral and barnacles shift on the shore - the Reef Horror lurches toward you!",
+		"won": "narrate The Reef Horror collapses into a heap of coral, and the waves wash it away."},
 }
 
 const FETCHES := {
 	"silverleaf": {"cell": Vector2i(54, 4),
 		"text": "narrate Silver-veined leaves, cool to the touch. You gather a good handful."},
+	# Act II (26)
+	"scout_pack": {"cell": Vector2i(34, 13), "region": "tundra", "text": "narrate Half-buried in the snow: a scout's pack. Inside, wrapped in oilcloth, a disc of red glass that's warm to the touch."},
+	"woodcutter_axe": {"cell": Vector2i(14, 24), "region": "tundra", "text": "narrate An old axe juts from a snowdrift, its handle worn smooth by three generations of hands."},
+	"dye_root": {"cell": Vector2i(12, 20), "region": "desert", "text": "narrate You dig up a tangle of crimson dye-root. It stains your fingers red."},
+	"tide_chart": {"cell": Vector2i(24, 30), "region": "coast", "text": "narrate Wedged in the wreck's cabin: a rolled chart in a waxed tube. The tide tables are still readable."},
+	"compass": {"cell": Vector2i(8, 16), "region": "coast", "text": "narrate Something glints in the grass: a brass compass, still pointing faithfully north."},
 }
 
 # What a dungeon's door says while it's sealed (the member gate is checked
@@ -176,12 +309,20 @@ const SEAL_TEXT := {
 	"monastery": "The pilgrim gate is barred. A carved sign reads: \"Pilgrims, show your token.\" Someone in the towns may know how to get one.",
 	"observatory": "The dome door has no handle - only a ring of brass stars that turn. Without knowing the pattern, it won't budge. Someone in the towns may know it.",
 	"guild": "A voice hisses through the hatch: \"Word?\" You don't know it, and the hatch stays shut. Someone in the towns may know the word.",
+	# Act II (26)
+	"frozen_citadel": "The Citadel's gate is sealed under a wall of black ice. Nordveil's captain may know a way through.",
+	"sunken_sanctum": "The Sanctum's great doors bear a carved sun, and won't move. Duskara's water-keeper may know how they open.",
+	"drowned_fortress": "Wreckage and breaking waves block the way onto the island. Selavon's harbormaster may know a safer path.",
 }
 const OPEN_TEXT := {
 	"cathedral": "The sexton's key turns with a groan, and the chains slide to the ground.",
 	"monastery": "You hold up the pilgrim's token. After a long moment, the bar on the other side scrapes back.",
 	"observatory": "You turn the brass stars to match the chart. Something deep in the door clicks.",
 	"guild": "\"Lantern in the dark,\" you whisper. The hatch creaks open.",
+	# Act II (26)
+	"frozen_citadel": "You press the Ember Seal to the black ice. It hisses, cracks, and slumps away from the gate.",
+	"sunken_sanctum": "You raise the Sun Disc. Light pours from it into the carved sun on the doors, and they grind open.",
+	"drowned_fortress": "The tide draws back exactly as the chart said. A path of wet stone opens to the fortress gate.",
 }
 
 const QUEST_COLOR := Color(1.0, 0.55, 0.85)  # map markers
@@ -223,6 +364,14 @@ static func _previous(id: String) -> String:
 static func is_available(id: String) -> bool:
 	if is_started(id):
 		return false
+	var q: Dictionary = QUESTS[id]
+	if q.has("kingdom"):  # Act II (26)
+		var kingdom: String = q["kingdom"]
+		if q.get("optional", false):
+			return Kingdoms.is_cleansed(kingdom)
+		var prev2 := _previous(id)
+		return Kingdoms.is_open(kingdom) and not Kingdoms.is_cleansed(kingdom) and not has_key(q["dungeon"]) \
+				and (prev2 == "" or is_done(prev2))
 	var dungeon: String = QUESTS[id]["dungeon"]
 	if ActOne.next_dungeon() != dungeon or ActOne.is_start_dungeon(dungeon) or has_key(dungeon):
 		return false
@@ -243,6 +392,9 @@ static func has_key(dungeon: String) -> bool:
 
 ## The quest seal: open if you started here, already cleared it, or have the key.
 static func is_unsealed(dungeon: String) -> bool:
+	var kingdom := Kingdoms.for_dungeon(dungeon)
+	if kingdom != "":  # Act II (26): open once freed, or with the key
+		return Kingdoms.is_cleansed(kingdom) or has_key(dungeon)
 	return ActOne.is_start_dungeon(dungeon) or ActOne.is_cleared(dungeon) or has_key(dungeon)
 
 
@@ -321,14 +473,41 @@ static func _reward(id: String) -> Array:
 		if ActOne.is_cleared(d):
 			depth += 1
 	depth = clampi(depth, 1, 3)
-	var xp: int = (90 if q["part"] == 1 else 130) * depth
-	var gold: int = (50 if q["part"] == 1 else 80) * depth
+	var xp: int = int(q.get("xp", (90 if q["part"] == 1 else 130) * depth))
+	var gold: int = int(q.get("gold", (50 if q["part"] == 1 else 80) * depth))
+	for item: String in q.get("items", {}):
+		GameManager.inventory[item] = mini(99, int(GameManager.inventory.get(item, 0)) + int(q["items"][item]))
+		lines.append("narrate Received %d %s." % [q["items"][item], item + ("s" if int(q["items"][item]) > 1 and not item.ends_with("s") else "")])
+	if q.has("blessing"):
+		lines.append_array(_bless(q["blessing"]))
 	GameManager.gold += gold
 	lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
 	for m: Combatant in GameManager.party:
 		if m.gain_xp(xp):
 			lines.append("narrate %s reached Level %d!" % [m.display_name, m.level])
 	return lines
+
+
+# The kingdoms' blessings (26): finishing a freed kingdom's second optional
+# quest raises one stat for all four heroes, for good (applied straight to
+# their stats, which the save already keeps; once each - flag blessing_<id>).
+const BLESSINGS := {
+	"nordveil": {"name": "Blessing of Nordveil", "stat": "res_stat", "label": "RES", "amount": 3},
+	"duskara": {"name": "Blessing of Duskara", "stat": "defense", "label": "DEF", "amount": 3},
+	"selavon": {"name": "Blessing of Selavon", "stat": "agi", "label": "AGI", "amount": 3},
+}
+
+
+static func _bless(kingdom: String) -> Array:
+	var flag := "blessing_" + kingdom
+	if GameManager.has_flag(flag):
+		return []
+	GameManager.story_flags[flag] = true
+	var b: Dictionary = BLESSINGS[kingdom]
+	for cls: String in GameManager.roster:
+		var m: Combatant = GameManager.roster[cls]
+		m.set(b["stat"], int(m.get(b["stat"])) + int(b["amount"]))
+	return ["sound holy", "narrate The %s settles over the party: +%d %s for everyone, for good." % [b["name"], b["amount"], b["label"]]]
 
 
 # ---------------------------------------------------------------- overworld
@@ -368,6 +547,8 @@ static func complete_spot(kind: String, spot_id: String) -> Array:
 ## whether its dungeon is 2nd or 4th on the route.
 static func hunt_enemy(hunt_id: String) -> Dictionary:
 	var e: Dictionary = HUNTS[hunt_id]["enemy"].duplicate()
+	if not HUNTS[hunt_id].get("scale", true):
+		return e  # Act II hunts are tuned for the whole party (26)
 	var extra := maxi(0, GameManager.party.size() - 1)
 	e["hp"] = int(e["hp"] * (1.0 + 0.7 * extra))
 	e["atk"] = int(e["atk"]) + 3 * extra

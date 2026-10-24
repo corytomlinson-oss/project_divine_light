@@ -446,3 +446,10 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Selavon's reward:** the harbormaster's one-time gift (2000 gold + 3 Elixirs), the cheapest shop prices in Act II, and the Stormsilver tier.
 - **The end of Act II's kingdoms:** the victory card adds "Act II - The Purge" -> "Act III - The Source: coming in a later update" (no separate scene); flag `act_two_complete`. The doc's "Verdance becomes a hub after Act II" is left for later (not in 25's scope; noted here).
 - **Tidestone Ring** (the coast's hidden clearing): +5 RES, +3 AGI, +25 MP.
+
+## Milestone 26 — Act II side quests (built 2026-10-23, Cory asleep)
+- **One required quest per kingdom** (Cory said "one or two"; one keeps each kingdom's opening brisk), two steps each, sealing its dungeon until done — the same shape as Act I's.
+- **Two optional quests per kingdom, offered only after it's freed** (the doc's freed towns reward revisiting; the before-state towns have few people out).
+- **Permanent buffs = kingdom blessings:** +3 RES / DEF / AGI for all four heroes, for finishing each kingdom's second optional quest. Small and fixed (three in all), applied to base stats so they survive saves and level-ups. *Change:* `Quests.BLESSINGS`.
+- **Act II hunt targets aren't scaled by party size** (the party is always four in Act II); their numbers are tuned for four heroes at that point.
+- **Rewards:** required quests 500-900 XP + gold and the key; optional 600-1000 XP + gold + potions (Hi-Potions, Hi-Ethers, Elixirs).

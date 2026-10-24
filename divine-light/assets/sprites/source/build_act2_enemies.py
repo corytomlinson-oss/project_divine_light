@@ -123,3 +123,9 @@ ramp_recolor("astral_familiar", "storm_gull", (60, 66, 80), (236, 238, 244), glo
 # The Drowned Fortress's guard and boss
 ramp_recolor("corrupted_enforcer", "first_mate", (20, 30, 60), (140, 170, 210), glow=(255, 240, 120))
 ramp_recolor("shadow_lord", "drowned_admiral", (14, 40, 50), (120, 200, 190), glow=(255, 240, 120))
+
+# Act II side-quest hunts (26)
+ramp_recolor("shadow_thief", "marauder_chief", (110, 30, 30), (240, 190, 120), glow=(255, 220, 90))
+ramp_recolor("blighted_wolf", "snowmane", (110, 130, 170), (250, 252, 255), glow=(150, 220, 255))
+ramp_recolor("iron_sentinel", "dune_stalker", (70, 40, 24), (196, 150, 96), glow=(255, 150, 40))
+ramp_recolor("hired_muscle", "reef_horror", (60, 30, 70), (230, 130, 150), glow=(140, 255, 220))

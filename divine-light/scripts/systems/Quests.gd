@@ -297,6 +297,100 @@ const QUESTS := {
 		],
 		"key": "Portal Key", "xp": 2000, "gold": 1200,
 	},
+	# ======================================================= Act III (29)
+	# "Last preparations" (README roadmap): optional, offered as soon as the
+	# Reach is open ("anytime": before or after Vorath). One errand per hero
+	# from the Threshold's refugees - each ends with that hero's best
+	# accessory and a permanent stat boost for them - and one from Verdance's
+	# archivist that follows Frank back through the ages.
+	"paladins_oath": {
+		"name": "A Paladin's Oath", "dungeon": "blighted_maw", "kingdom": "maw", "part": 4, "optional": true, "anytime": true, "giver": "threshold/northerner",
+		"offer": [
+			"say Northerner: There was a knight of Nordveil, Ser Aldric. He rode into the Reach a year ago, sworn to find the portal and seal it for good.",
+			"say Northerner: Travelers say a knight in black armor walks the east plain now, past the road. It wears his crest. Please - if it's him, give him rest.",
+		],
+		"remind": ["say Northerner: The knight in black - the east plain, beyond the road."],
+		"steps": [
+			{"log": "Find the black knight on the Reach's east plain.", "hunt": "oathbreaker"},
+			{"log": "Bring Ser Aldric's crest to the Threshold's northerner.", "talk": "threshold/northerner", "lines": [
+				"say Northerner: So it was him. The Unraveling took even Aldric...",
+				"say Northerner: He'd want his oath carried by someone who can still keep it. Vael - this was his. Kneel a moment. He taught us a prayer for this.",
+			]},
+		],
+		"xp": 1600, "gold": 800, "items": {"Dawn Oath Medallion": 1}, "blessing": "vael_oath",
+	},
+	"last_lesson": {
+		"name": "The Last Lesson", "dungeon": "blighted_maw", "kingdom": "maw", "part": 5, "optional": true, "anytime": true, "giver": "threshold/nomad",
+		"offer": [
+			"say Nomad: An old monk came through before the portal was sealed. He meant to carry the Monastery's last scroll into the Reach and read it to the dark, to see if it would listen.",
+			"say Nomad: We found his staff by the chasm on the east plain. Not the scroll. If it's still there... your monk should have it.",
+		],
+		"remind": ["say Nomad: The scroll - by the chasm on the east plain."],
+		"steps": [
+			{"log": "Search the east chasm's edge for the monk's scroll.", "fetch": "monk_scroll"},
+			{"log": "Bring the scroll to the Threshold's nomad.", "talk": "threshold/nomad", "lines": [
+				"say Nomad: Open it? ...No. You're right. It's for Ryn.",
+				"narrate Ryn reads the scroll in silence. Whatever it says, Ryn stands a little straighter afterward.",
+			]},
+		],
+		"xp": 1600, "gold": 800, "items": {"Grandmaster's Beads": 1}, "blessing": "ryn_lesson",
+	},
+	"fallen_star": {
+		"name": "The Fallen Star", "dungeon": "blighted_maw", "kingdom": "maw", "part": 6, "optional": true, "anytime": true, "giver": "threshold/sailor",
+		"offer": [
+			"say Sailor: The night the portal sealed, Selavon's watchmen saw a star fall into the Reach - west, by the chasm there.",
+			"say Sailor: Star-glass, they call what's left. Sorcerers once paid fortunes for a sliver. Your sorceress might do more with it than anyone.",
+		],
+		"remind": ["say Sailor: The fallen star - by the western chasm."],
+		"steps": [
+			{"log": "Find the fallen star by the Reach's western chasm.", "fetch": "star_glass"},
+			{"log": "Show the star-glass to the Threshold's sailor.", "talk": "threshold/sailor", "lines": [
+				"say Sailor: It's still glowing! Here, Lyra - the smith can set it, but you're the one who'll know what to do with it.",
+			]},
+		],
+		"xp": 1600, "gold": 800, "items": {"Astral Lens": 1}, "blessing": "lyra_stars",
+	},
+	"one_last_job": {
+		"name": "One Last Job", "dungeon": "blighted_maw", "kingdom": "maw", "part": 7, "optional": true, "anytime": true, "giver": "threshold/child",
+		"offer": [
+			"say Child: A man in a grey hood took my mama's locket. He digs in the old graves south-west of here and takes things that aren't his.",
+			"say Child: Everyone says he's dangerous. But you're not scared of anything, right?",
+		],
+		"remind": ["say Child: The grey hood man - the old graves, south-west."],
+		"steps": [
+			{"log": "Get the locket back from the grave robber, south-west of the Threshold.", "hunt": "grave_robber"},
+			{"log": "Return the locket to the Threshold's child.", "talk": "threshold/child", "lines": [
+				"say Child: Mama's locket! You got it back!",
+				"say Child: Mama says you should have this - she found it in the ash. It's a lucky charm. Silas, it looks like yours.",
+			]},
+		],
+		"xp": 1600, "gold": 800, "items": {"Ghoststep Charm": 1}, "blessing": "silas_job",
+	},
+	"merchant_of_ages": {
+		"name": "The Merchant of Every Age", "dungeon": "blighted_maw", "kingdom": "maw", "part": 8, "optional": true, "anytime": true, "giver": "verdance/archivist",
+		"offer": [
+			"say Archivist: I keep Selavon's sea archive - what the flood left of it. I've been reading the oldest chronicles, from ages back. Something strange keeps turning up.",
+			"say Archivist: In every age, when the darkness rose, a merchant appeared. A wide hat, a heavy pack, and far too much to say about prices.",
+			"say Archivist: Ask the old keepers of the kingdoms - Nordveil's priestess, Duskara's water-keeper. See what they remember.",
+		],
+		"remind": ["say Archivist: Nordveil's priestess, Duskara's water-keeper - see what they remember."],
+		"steps": [
+			{"log": "Ask Nordveil's priestess about a merchant in the old days.", "talk": "nordveil/priestess", "lines": [
+				"say Priestess: A merchant? ...Yes. The shrine's oldest carving shows the first priestess taking a flame from a man with a pack on his back. His hat is very wide.",
+				"say Priestess: We always thought the carver had a sense of humor.",
+			]},
+			{"log": "Ask Duskara's water-keeper about a merchant in the old days.", "talk": "duskara/keeper", "lines": [
+				"say Water-Keeper: The great drought, four hundred years ago. The songs say a stranger sold Duskara a map to the Sanctum spring - for one copper.",
+				"say Water-Keeper: He haggled for an hour to get that copper. The songs are very clear on that.",
+			]},
+			{"log": "Ask Frank about the merchant of every age.", "talk": "threshold/frank", "lines": [
+				"say Frank: The archivist's chronicles? Hmm. Wide hats come back into fashion every few centuries.",
+				"say Frank: ...You're looking at me like that again. Fine. Whoever he was, he never stopped hoping someone would finish the job.",
+				"say Frank: Here - take these. On the house. Don't tell anyone, it'd ruin my reputation.",
+			]},
+		],
+		"xp": 2000, "gold": 1000, "items": {"Elixir": 5}, "blessing": "ages",
+	},
 	"reef_horror": {
 		"name": "The Reef Horror", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 3, "optional": true, "giver": "selavon/fisher",
 		"offer": ["say Fisher: The fish are back, but so is something that eats them - a coral-crusted brute east of the pier road. Kill it and the bay is ours again."],
@@ -346,6 +440,15 @@ const HUNTS := {
 		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 1200},
 		"tell": "narrate Coral and barnacles shift on the shore - the Reef Horror lurches toward you!",
 		"won": "narrate The Reef Horror collapses into a heap of coral, and the waves wash it away."},
+	# Act III side-quest hunts (29)
+	"oathbreaker": {"cell": Vector2i(40, 13), "region": "reach", "scale": false,
+		"enemy": {"name": "Oathbreaker", "hp": 2000, "atk": 74, "def": 28, "agi": 14, "xp": 1800},
+		"tell": "say Oathbreaker: ...I swore... to close it... I swore...",
+		"won": "narrate The black armor falls empty. A Nordveil crest, scratched but whole, lies in the ash."},
+	"grave_robber": {"cell": Vector2i(10, 25), "region": "reach", "scale": false,
+		"enemy": {"name": "Grave Robber", "hp": 1700, "atk": 70, "def": 20, "agi": 32, "xp": 1600},
+		"tell": "say Grave Robber: More visitors for the graves? Turn out your pockets.",
+		"won": "narrate The grave robber flees into the ash, dropping a sack of stolen trinkets. A small silver locket is among them."},
 }
 
 const FETCHES := {
@@ -357,6 +460,9 @@ const FETCHES := {
 	"dye_root": {"cell": Vector2i(12, 20), "region": "desert", "text": "narrate You dig up a tangle of crimson dye-root. It stains your fingers red."},
 	"tide_chart": {"cell": Vector2i(24, 30), "region": "coast", "text": "narrate Wedged in the wreck's cabin: a rolled chart in a waxed tube. The tide tables are still readable."},
 	"compass": {"cell": Vector2i(8, 16), "region": "coast", "text": "narrate Something glints in the grass: a brass compass, still pointing faithfully north."},
+	# Act III (29)
+	"monk_scroll": {"cell": Vector2i(42, 15), "region": "reach", "text": "narrate Half-buried in grey ash at the chasm's edge: a scroll case stamped with the Monastery's sign. The seal hasn't been broken."},
+	"star_glass": {"cell": Vector2i(13, 23), "region": "reach", "text": "narrate At the chasm's edge, a shard of glass the size of a fist glows a soft, steady blue. It's warm, like something alive."},
 }
 
 # What a dungeon's door says while it's sealed (the member gate is checked
@@ -427,6 +533,8 @@ static func is_available(id: String) -> bool:
 	if q.has("kingdom"):  # Act II (26)
 		var kingdom: String = q["kingdom"]
 		if q.get("optional", false):
+			if q.get("anytime", false):  # Act III's last preparations (29)
+				return Kingdoms.is_open(kingdom)
 			return Kingdoms.is_cleansed(kingdom)
 		var prev2 := _previous(id)
 		return Kingdoms.is_open(kingdom) and not Kingdoms.is_cleansed(kingdom) and not has_key(q["dungeon"]) \
@@ -554,6 +662,12 @@ const BLESSINGS := {
 	"nordveil": {"name": "Blessing of Nordveil", "stat": "res_stat", "label": "RES", "amount": 3},
 	"duskara": {"name": "Blessing of Duskara", "stat": "defense", "label": "DEF", "amount": 3},
 	"selavon": {"name": "Blessing of Selavon", "stat": "agi", "label": "AGI", "amount": 3},
+	# Act III (29): the heroes' errands bless only that hero ("who").
+	"vael_oath": {"name": "Oath of the Dawn", "stat": "defense", "label": "DEF", "amount": 4, "who": "Vael"},
+	"ryn_lesson": {"name": "Grandmaster's Lesson", "stat": "atk", "label": "ATK", "amount": 4, "who": "Ryn"},
+	"lyra_stars": {"name": "Starlight", "stat": "int_stat", "label": "INT", "amount": 4, "who": "Lyra"},
+	"silas_job": {"name": "Ghost's Luck", "stat": "agi", "label": "AGI", "amount": 4, "who": "Silas"},
+	"ages": {"name": "Blessing of the Ages", "stat": "atk", "label": "ATK", "amount": 3},
 }
 
 
@@ -563,9 +677,14 @@ static func _bless(kingdom: String) -> Array:
 		return []
 	GameManager.story_flags[flag] = true
 	var b: Dictionary = BLESSINGS[kingdom]
+	var who: String = b.get("who", "")
 	for cls: String in GameManager.roster:
+		if who != "" and cls != who:
+			continue
 		var m: Combatant = GameManager.roster[cls]
 		m.set(b["stat"], int(m.get(b["stat"])) + int(b["amount"]))
+	if who != "":
+		return ["sound holy", "narrate %s: +%d %s for %s, for good." % [b["name"], b["amount"], b["label"], who]]
 	return ["sound holy", "narrate The %s settles over the party: +%d %s for everyone, for good." % [b["name"], b["amount"], b["label"]]]
 
 

@@ -50,6 +50,10 @@ var _npc_nodes: Dictionary = {}  # actor id -> character node
 var _quest_marks: Dictionary = {}  # actor id -> QuestMark over their head
 
 
+# After the ending (29): Frank is a faint echo of light, still minding the stall.
+const FRANK_ECHO := Color(1.0, 0.95, 0.7, 0.45)
+var _frank_echo_seen := false
+
 func _paint(map: Array) -> void:
 	_tile_map.clear()
 	for y in map.size():
@@ -59,6 +63,8 @@ func _paint(map: Array) -> void:
 
 
 func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, tint := Color.WHITE) -> void:
+	if id == "frank" and GameManager.has_flag("game_complete"):
+		tint = FRANK_ECHO  # he faded into the light at the end (28d); an echo keeps the stall
 	var npc := Cutscene.make_character(sprite_name)
 	if tint != Color.WHITE:
 		npc.self_modulate = tint
@@ -236,6 +242,9 @@ func _restore_party() -> void:
 
 
 func _frank() -> void:
+	if GameManager.has_flag("game_complete") and not _frank_echo_seen:
+		_frank_echo_seen = true
+		await Cutscene.play_text("narrate Frank's outline shimmers in the light, faint as a memory. Somehow, the stall is still open.")
 	var fallen := GameManager.party.filter(func(m: Combatant) -> bool: return m.is_ko)
 	var options: Array = ["Buy"]
 	if not fallen.is_empty():

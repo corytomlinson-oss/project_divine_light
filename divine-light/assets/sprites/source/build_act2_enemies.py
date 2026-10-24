@@ -137,5 +137,9 @@ ramp_recolor("shade_wisp", "entropy_shade", (10, 6, 20), (110, 80, 150), glow=(2
 ramp_recolor("cursed_paladin", "architect's_thrall", (24, 10, 36), (160, 110, 200), glow=(255, 120, 200))
 ramp_recolor("hollow_warden", "hollow_custodian", (30, 26, 36), (170, 160, 180), glow=(220, 150, 255))
 
+# Act III side-quest hunts (29)
+ramp_recolor("cursed_paladin", "oathbreaker", (16, 16, 22), (150, 150, 170), glow=(255, 120, 200))
+ramp_recolor("cutpurse", "grave_robber", (40, 36, 34), (180, 170, 150), glow=(220, 150, 255))
+
 # Vorath (28c) - a void-black stand-in until the art pass (30)
 ramp_recolor("shadow_lord", "vorath", (8, 2, 14), (150, 90, 200), glow=(255, 255, 255))

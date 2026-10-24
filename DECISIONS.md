@@ -488,3 +488,10 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **After the credits the game returns to the Title**, with an autosave placed in the cleansed Reach and flag `game_complete`, so loading it continues in the freed world (post-game wandering; 29 adds things to do).
 - **Battle ignores input while a Cutscene is playing** (found in testing: the revelation's dialogue and the battle menu shared the confirm button).
 - **Credits text** is mine ("A game by Cory Tomlinson", "Story, design and direction: Cory Tomlinson", "Built with Claude") — edit in `EndingMovie.gd`.
+
+## Milestone 29 — Act III side quests + Verdance hub (2026-10-24, Cory away)
+- **Five optional quests:** one "last errand" per hero (the roadmap's "each hero's last errand") plus one Frank-lore quest ("hints about Frank"). All optional, offered as soon as the Reach is open and still doable after the ending (`"anytime"`), so they never gate Vorath.
+- **Rewards:** each hero's errand gives that hero's best accessory (class-locked) and a permanent +4 to one stat for that hero only; the lore quest gives the whole party +3 ATK and 5 Elixirs ("the best gear" + "permanent buffs" from the roadmap).
+- **The lore quest stays a hint, not a reveal:** Frank deflects ("wide hats come back into fashion"); the real reveal stays in the Vorath fight.
+- **Verdance hub = three envoys + new lines for everyone**, not new shops or systems: the doc only asks that representatives appear and the town feel thriving.
+- **Frank after the ending is a faint echo who still keeps his stall** — the ending has him fade into the light, but removing him would cut post-game shopping and revives in six towns.

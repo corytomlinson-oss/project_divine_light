@@ -91,6 +91,11 @@ const DEFS: Dictionary = {
 	"Starforged Robe":     {"slot": "armor",  "class": "Lyra",  "def": 5, "res": 15},
 	"Starforged Leathers": {"slot": "armor",  "class": "Silas", "def": 10, "agi": 6},
 	"Star Charm":          {"slot": "accessory", "class": "", "res": 10, "hp": 80},
+	# Act III side-quest rewards (29): each hero's best accessory.
+	"Dawn Oath Medallion": {"slot": "accessory", "class": "Vael",  "res": 12, "def": 4, "hp": 100},
+	"Grandmaster's Beads": {"slot": "accessory", "class": "Ryn",   "atk": 6, "agi": 4, "hp": 60},
+	"Astral Lens":         {"slot": "accessory", "class": "Lyra",  "int": 8, "mp": 50},
+	"Ghoststep Charm":     {"slot": "accessory", "class": "Silas", "agi": 7, "atk": 4},
 
 	# Act II armor sets (25b; README "Full Set Bonus"). Spread across Act II
 	# (Cory): the Frozen Citadel holds the four armors, Nordveil's armory sells

@@ -117,7 +117,7 @@ const DUNGEONS := {
 	"frozen_citadel": {
 		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
 		"scene": "res://scenes/dungeon/FrozenCitadel.tscn",
-		"music": "dungeon",
+		"music": "citadel",
 		"floors": 4,
 		"ice_floors": [0, 1],
 		"frozen_chests": true,
@@ -134,7 +134,7 @@ const DUNGEONS := {
 	"sunken_sanctum": {
 		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 2},
 		"scene": "res://scenes/dungeon/SunkenSanctum.tscn",
-		"music": "dungeon",
+		"music": "sanctum",
 		"floors": 4,
 		"fire_floors": [0, 1, 2],
 		"levers": [1, 2],
@@ -151,7 +151,7 @@ const DUNGEONS := {
 	"drowned_fortress": {
 		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
 		"scene": "res://scenes/dungeon/DrownedFortress.tscn",
-		"music": "dungeon",
+		"music": "fortress",
 		"floors": 4,
 		"water_floors": [0, 1, 2],
 		"rod_floors": [1],

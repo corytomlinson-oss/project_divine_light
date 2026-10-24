@@ -333,7 +333,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Enemies (recolors):** Frost Wraith, Corrupted Knight, Tundra Troll, Blizzard Hawk, Frost Warden, Ice Knight, Frozen Sovereign (`sprites/source/build_act2_enemies.py`)
 - [x] **Props:** blight brambles, stairs, ice block over a frozen chest (`sprites/source/build_act2_props.py`)
 - [x] **Battle backgrounds:** tundra (aurora over snow), citadel (ice hall) (`ui/source/build_act2_bgs.py`)
-- [ ] Music: a tundra theme and a cold Nordveil theme (`tundra`, `nordveil_cold` fall back to overworld/town) — 27
+- [x] Music: `tundra` (region; corrupted Nordveil plays it too), `citadel` — Milestone 27
 - [ ] Real sprites for the seven enemies above — 27
 
 ## Act II — Duskara (Milestone 25c, stand-ins until 27)
@@ -342,7 +342,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Enemies:** Sand Viper (hand-placed), Dust Golem, Scorched Mage, Dune Marauder, Blazing Sentinel, Burning Tyrant (recolors; `sprites/source/build_act2_enemies.py`)
 - [x] **Props:** lever, sealed stone door (`sprites/source/build_act2_props.py`)
 - [x] **Battle backgrounds:** desert, sanctum (`ui/source/build_act2_bgs.py`)
-- [ ] Music: `desert`, `duskara_heat` (fall back to overworld/town) — 27
+- [x] Music: `desert` (region; corrupted Duskara plays it too), `sanctum` — Milestone 27
 
 ## Act II — Selavon (Milestone 25d, stand-ins until 27)
 
@@ -350,7 +350,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Enemies (recolors):** Sea Specter, Coral Brute, Tidal Witch, Storm Gull, First Mate, Drowned Admiral
 - [x] **Props:** lightning rod (2 frames)
 - [x] **Battle backgrounds:** coast (storm, sunken hull), fortress (flooded hall)
-- [ ] Music: `coast`, `selavon_storm` (fall back to overworld/town) — 27
+- [x] Music: `coast` (region; corrupted Selavon plays it too), `fortress` — Milestone 27
 
 ## Deferred to later passes
 

@@ -144,7 +144,7 @@ func _ready() -> void:
 	kingdom_id = "duskara"
 	GameManager.current_location = "duskara"
 	GameManager.current_scene_path = "res://scenes/town/Duskara.tscn"
-	Music.play("town" if cleansed() else "duskara_heat", "town")
+	Music.play("town" if cleansed() else "desert", "town")  # the region theme until freed (27)
 	_tile_map.y_sort_enabled = true
 	_paint(MAP_AFTER if cleansed() else MAP_BEFORE)
 	for p: Dictionary in PEOPLE_BEFORE:

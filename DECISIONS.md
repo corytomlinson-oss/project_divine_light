@@ -453,3 +453,7 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Permanent buffs = kingdom blessings:** +3 RES / DEF / AGI for all four heroes, for finishing each kingdom's second optional quest. Small and fixed (three in all), applied to base stats so they survive saves and level-ups. *Change:* `Quests.BLESSINGS`.
 - **Act II hunt targets aren't scaled by party size** (the party is always four in Act II); their numbers are tuned for four heroes at that point.
 - **Rewards:** required quests 500-900 XP + gold and the key; optional 600-1000 XP + gold + potions (Hi-Potions, Hi-Ethers, Elixirs).
+
+## Milestone 27 — Act II art & music (2026-10-23, Cory asleep)
+- **Music first:** six tracks (three regions, three dungeons). Corrupted towns reuse their region's theme instead of three extra "cursed town" tracks (the freed towns already have the warm town theme); the three Act II bosses keep the existing boss theme. *Change:* `build_music.py`, the towns' `Music.play` lines.
+- **Art priorities:** the code-made tilesets, backgrounds and props from 25 stay; the next step replaces the recolor stand-ins for the three kingdom bosses with hand-placed sprites (the most visible stand-ins). Regular enemies stay recolors for now.

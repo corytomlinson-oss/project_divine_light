@@ -128,7 +128,7 @@ func _ready() -> void:
 	kingdom_id = "nordveil"
 	GameManager.current_location = "nordveil"
 	GameManager.current_scene_path = "res://scenes/town/Nordveil.tscn"
-	Music.play("town" if cleansed() else "nordveil_cold", "town")
+	Music.play("town" if cleansed() else "tundra", "town")  # the region theme until freed (27)
 	_tile_map.y_sort_enabled = true
 	_paint(MAP)
 	for p: Dictionary in PEOPLE_BEFORE:

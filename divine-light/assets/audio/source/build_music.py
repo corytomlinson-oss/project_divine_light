@@ -665,9 +665,193 @@ FINALE = dict(
     ),
 )
 
+
+# ======================================================= Act II (Milestone 27)
+# Three region themes and three dungeon themes, one pair per kingdom. Corrupted
+# towns play their region's theme until they're freed (then "town").
+
+# The Northern Tundra: A minor, 92 BPM - cold and wide, a slow pulse-wave
+# melody over gentle eighth-note arpeggios, a soft kick like footsteps in snow.
+TUNDRA = dict(
+    bpm=92, peak=0.78, loop_from_bar=0,
+    lead_vol=0.27, arp_vol=0.08, bass_vol=0.38, drum_vol=0.14, lead_duty=0.25,
+    arp_div=2, hats=False,
+    bass_pattern=['R', '-', '-', 'F', 'O', '-', 'F', '-'],
+    kick=[0, 8], snare=[], drums_from=4, fills=[],
+    chords=['Am', 'Am', 'F', 'G', 'Am', 'Em', 'F', 'E',
+            'F', 'G', 'Am', 'Am', 'Dm', 'Em', 'F', 'E'],
+    lead=[
+        [('r', 8), ('E5', 4), ('A5', 4)],
+        [('B5', 6), ('C6', 2), ('B5', 4), ('A5', 4)],
+        [('A5', 8), ('F5', 4), ('A5', 4)],
+        [('G5', 12), ('r', 4)],
+        [('E5', 4), ('A5', 4), ('C6', 4), ('E6', 4)],
+        [('D6', 6), ('C6', 2), ('B5', 8)],
+        [('C6', 4), ('A5', 4), ('F5', 4), ('A5', 4)],
+        [('G#5', 12), ('r', 4)],
+        [('A5', 6), ('C6', 2), ('F6', 8)],
+        [('E6', 4), ('D6', 4), ('B5', 8)],
+        [('C6', 4), ('B5', 4), ('A5', 8)],
+        [('E5', 8), ('r', 8)],
+        [('F5', 4), ('A5', 4), ('D6', 8)],
+        [('E6', 4), ('D6', 2), ('B5', 2), ('G5', 8)],
+        [('A5', 4), ('C6', 4), ('F6', 4), ('E6', 4)],
+        [('E6', 12), ('r', 4)],
+    ],
+)
+
+# The Duskara Wastes: E Phrygian (E and F), 104 BPM - heat-shimmer arpeggios,
+# a winding melody leaning on the half-step, a slow hand-drum beat.
+DESERT = dict(
+    bpm=104, peak=0.8, loop_from_bar=0,
+    lead_vol=0.28, arp_vol=0.08, bass_vol=0.4, drum_vol=0.18, lead_duty=0.5,
+    bass_pattern=['R', '-', 'R', 'F', 'R', '-', 'O', 'F'],
+    kick=[0, 6, 10], snare=[8], drums_from=2, fills=[7, 15],
+    chords=['E', 'F', 'E', 'F', 'Am', 'G', 'F', 'E',
+            'E', 'F', 'G', 'F', 'Am', 'Dm', 'F', 'E'],
+    lead=[
+        [('E5', 4), ('F5', 2), ('G#5', 2), ('B5', 8)],
+        [('A5', 4), ('G#5', 2), ('F5', 2), ('E5', 8)],
+        [('B5', 2), ('C6', 2), ('B5', 2), ('G#5', 2), ('E5', 8)],
+        [('F5', 6), ('A5', 2), ('C6', 8)],
+        [('E6', 4), ('C6', 4), ('A5', 4), ('C6', 4)],
+        [('B5', 6), ('A5', 2), ('G5', 8)],
+        [('A5', 2), ('C6', 2), ('F6', 4), ('E6', 2), ('C6', 2), ('A5', 4)],
+        [('G#5', 12), ('r', 4)],
+        [('B4', 4), ('E5', 4), ('G#5', 4), ('B5', 4)],
+        [('C6', 6), ('B5', 2), ('A5', 8)],
+        [('B5', 4), ('D6', 4), ('G5', 8)],
+        [('A5', 2), ('G#5', 2), ('F5', 4), ('A5', 8)],
+        [('C6', 4), ('E6', 4), ('A6', 8)],
+        [('F6', 4), ('E6', 2), ('D6', 2), ('A5', 8)],
+        [('C6', 2), ('B5', 2), ('A5', 2), ('G#5', 2), ('F5', 4), ('A5', 4)],
+        [('E5', 12), ('r', 4)],
+    ],
+)
+
+# The Selavon Coast: G minor, 128 BPM - rolling waves in the bass, a seafaring
+# melody that climbs into B-flat, steady drums with a pushing kick.
+COAST = dict(
+    bpm=128, peak=0.84, loop_from_bar=0,
+    lead_vol=0.29, arp_vol=0.08, bass_vol=0.42, drum_vol=0.2, lead_duty=0.5,
+    bass_pattern=['R', 'F', 'O', 'F', 'R', 'F', 'O', 'F'],
+    kick=[0, 6, 8], snare=[4, 12], drums_from=0, fills=[7, 15],
+    chords=['Gm', 'Gm', 'Eb', 'F', 'Gm', 'Bb', 'Cm', 'D',
+            'Eb', 'F', 'Bb', 'Gm', 'Cm', 'Gm', 'Eb', 'D'],
+    lead=[
+        [('G5', 4), ('A#5', 4), ('D6', 6), ('C6', 2)],
+        [('A#5', 4), ('A5', 4), ('G5', 8)],
+        [('G5', 4), ('A#5', 2), ('D#6', 2), ('D6', 4), ('C6', 4)],
+        [('C6', 6), ('A5', 2), ('F5', 8)],
+        [('D6', 4), ('G6', 4), ('F6', 4), ('D6', 4)],
+        [('D6', 6), ('C6', 2), ('A#5', 8)],
+        [('C6', 4), ('D#6', 4), ('G6', 4), ('D#6', 4)],
+        [('F#6', 12), ('r', 4)],
+        [('G6', 4), ('F6', 2), ('D#6', 2), ('D6', 4), ('A#5', 4)],
+        [('A5', 4), ('C6', 4), ('F6', 8)],
+        [('F6', 4), ('D6', 4), ('A#5', 4), ('D6', 4)],
+        [('G5', 12), ('r', 4)],
+        [('C6', 4), ('D#6', 4), ('G6', 6), ('F6', 2)],
+        [('D6', 4), ('A#5', 4), ('G5', 8)],
+        [('G5', 2), ('A#5', 2), ('D#6', 4), ('D6', 2), ('C6', 2), ('A#5', 4)],
+        [('A5', 4), ('F#5', 4), ('D5', 8)],
+    ],
+)
+
+# The Frozen Citadel: B minor, 72 BPM - an icy organ pad, a lonely high melody,
+# no drums: vast and cold.
+CITADEL = dict(
+    bpm=72, peak=0.74, loop_from_bar=0,
+    lead_vol=0.24, arp_vol=0.05, bass_vol=0.34, drum_vol=0.1, lead_duty=0.25,
+    arp=False, pad=True, pad_vol=0.06,
+    bass_pattern=['R', '-', '-', '-', 'F', '-', '-', '-'],
+    kick=[], snare=[], drums_from=99, fills=[],
+    chords=['Bm', 'Bm', 'G', 'A', 'Bm', 'Em', 'G', 'D',
+            'G', 'A', 'Bm', 'Bm', 'Em', 'G', 'A', 'B'],
+    lead=[
+        [('F#5', 8), ('B5', 8)],
+        [('A5', 6), ('G5', 2), ('F#5', 8)],
+        [('D6', 8), ('B5', 8)],
+        [('C#6', 12), ('r', 4)],
+        [('F#5', 4), ('B5', 4), ('D6', 8)],
+        [('E6', 6), ('D6', 2), ('B5', 8)],
+        [('D6', 4), ('B5', 4), ('G5', 8)],
+        [('A5', 12), ('r', 4)],
+        [('B5', 8), ('D6', 8)],
+        [('C#6', 6), ('E6', 2), ('A5', 8)],
+        [('B5', 4), ('D6', 4), ('F#6', 8)],
+        [('F#6', 12), ('r', 4)],
+        [('G6', 8), ('E6', 8)],
+        [('D6', 6), ('B5', 2), ('G5', 8)],
+        [('A5', 4), ('C#6', 4), ('E6', 8)],
+        [('D#6', 12), ('r', 4)],
+    ],
+)
+
+# The Sunken Sanctum: E Phrygian, 88 BPM - a slow, heavy ritual drum, buzzing
+# arpeggios, a melody coiling around the half-step like smoke.
+SANCTUM = dict(
+    bpm=88, peak=0.8, loop_from_bar=0,
+    lead_vol=0.26, arp_vol=0.07, bass_vol=0.42, drum_vol=0.2, lead_duty=0.5,
+    bass_pattern=['R', '-', '-', 'R', 'O', '-', 'R', '-'],
+    kick=[0, 3, 8], snare=[12], drums_from=0, fills=[7, 15], hats=False,
+    chords=['Em', 'F', 'Em', 'F', 'Em', 'G', 'F', 'E',
+            'Am', 'G', 'F', 'E', 'Am', 'F', 'G', 'E'],
+    lead=[
+        [('E5', 8), ('F5', 8)],
+        [('A5', 6), ('G5', 2), ('F5', 8)],
+        [('G5', 4), ('F5', 4), ('E5', 8)],
+        [('F5', 4), ('A5', 4), ('C6', 8)],
+        [('B5', 6), ('A5', 2), ('G5', 8)],
+        [('B5', 4), ('D6', 4), ('G5', 8)],
+        [('A5', 4), ('F5', 4), ('C6', 8)],
+        [('G#5', 12), ('r', 4)],
+        [('A5', 4), ('C6', 4), ('E6', 8)],
+        [('D6', 6), ('B5', 2), ('G5', 8)],
+        [('F5', 4), ('A5', 4), ('C6', 4), ('A5', 4)],
+        [('G#5', 8), ('B5', 8)],
+        [('C6', 6), ('B5', 2), ('A5', 8)],
+        [('A5', 4), ('F5', 4), ('C6', 8)],
+        [('B5', 4), ('D6', 4), ('F6', 4), ('D6', 4)],
+        [('E6', 12), ('r', 4)],
+    ],
+)
+
+# The Drowned Fortress: C minor, 80 BPM - dripping arpeggios, a sunken bass,
+# a melody like a drowned bell, a muffled heartbeat kick.
+FORTRESS = dict(
+    bpm=80, peak=0.78, loop_from_bar=0,
+    lead_vol=0.25, arp_vol=0.07, bass_vol=0.42, drum_vol=0.14, lead_duty=0.25,
+    arp_div=2, hats=False,
+    bass_pattern=['R', '-', '-', '-', 'O', '-', 'F', '-'],
+    kick=[0, 2], snare=[], drums_from=2, fills=[],
+    chords=['Cm', 'Cm', 'Gm', 'Eb', 'Cm', 'Bb', 'Eb', 'G',
+            'Cm', 'Eb', 'Bb', 'Gm', 'Cm', 'Gm', 'Eb', 'G'],
+    lead=[
+        [('C5', 8), ('G5', 8)],
+        [('D#5', 6), ('D5', 2), ('C5', 8)],
+        [('G5', 6), ('A#5', 2), ('D6', 8)],
+        [('D#6', 12), ('r', 4)],
+        [('C6', 4), ('G5', 4), ('D#5', 8)],
+        [('D5', 6), ('F5', 2), ('A#5', 8)],
+        [('G5', 4), ('A#5', 4), ('D#6', 8)],
+        [('D6', 12), ('r', 4)],
+        [('G5', 8), ('C6', 8)],
+        [('A#5', 6), ('G5', 2), ('D#6', 8)],
+        [('D6', 4), ('A#5', 4), ('F5', 8)],
+        [('G5', 12), ('r', 4)],
+        [('C6', 4), ('D#6', 4), ('G6', 8)],
+        [('F6', 6), ('D6', 2), ('A#5', 8)],
+        [('G5', 4), ('A#5', 4), ('D#6', 4), ('D6', 4)],
+        [('B5', 12), ('r', 4)],
+    ],
+)
+
 TRACKS = {'battle': BATTLE, 'overworld': OVERWORLD, 'dungeon': DUNGEON, 'boss': BOSS, 'intro': INTRO,
           'town': TOWN, 'monastery': MONASTERY, 'observatory': OBSERVATORY, 'guild': GUILD,
-          'finale': FINALE}
+          'finale': FINALE,
+          'tundra': TUNDRA, 'desert': DESERT, 'coast': COAST,
+          'citadel': CITADEL, 'sanctum': SANCTUM, 'fortress': FORTRESS}
 
 
 if __name__ == '__main__':

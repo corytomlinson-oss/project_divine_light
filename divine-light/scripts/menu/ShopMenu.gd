@@ -13,7 +13,7 @@ const ITEM_TEXT := {
 	"Potion": "Restores 50 HP to one ally.",
 	"Hi-Potion": "Restores 220 HP to one ally.",
 	"Hi-Ether": "Restores 80 MP to one ally.",
-	"Elixir": "Restores 120 HP to one ally.",
+	"Elixir": "Fully restores one ally's HP and MP.",
 	"Ether": "Restores 30 MP to one ally.",
 	"Antidote": "Cures poison.",
 	"Phoenix Feather": "Revives a fallen ally at 1/4 HP. (In battle.)",

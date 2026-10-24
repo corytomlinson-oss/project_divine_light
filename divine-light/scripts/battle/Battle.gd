@@ -87,7 +87,9 @@ const LYRA_SKILLS: Dictionary = {
 
 const ITEM_DEFS: Dictionary = {
 	"Potion":   {"name": "Potion",   "effect": "item_heal",       "power": 50,  "target": "ally_choose"},
-	"Elixir":   {"name": "Elixir",   "effect": "item_heal",       "power": 120, "target": "ally_choose"},
+	# Elixir: full HP and MP (playtest pass, 2026-10-24: at 120 HP it cost more
+	# than a Hi-Potion and healed less, so every Elixir reward was a dud).
+	"Elixir":   {"name": "Elixir",   "effect": "item_full_restore", "power": 0, "target": "ally_choose"},
 	"Ether":    {"name": "Ether",    "effect": "item_restore_mp", "power": 30,  "target": "ally_choose"},
 	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
 	# The design doc's revival consumable (added in the 2026-10-24 playtest
@@ -2278,6 +2280,12 @@ func _do_item(member: Combatant, item_def: Dictionary) -> void:
 			target.hp = mini(target.max_hp, target.hp + power)
 			_update_ui()
 			message_label.text = "%s uses %s on %s!\nRestored %d HP!" % [member.display_name, item_name, target.display_name, power]
+		"item_full_restore":
+			target.hp = target.max_hp
+			target.mp = target.max_mp
+			_update_ui()
+			message_label.text = "%s uses %s on %s!
+Fully restored!" % [member.display_name, item_name, target.display_name]
 		"item_restore_mp":
 			target.mp = mini(target.max_mp, target.mp + power)
 			_update_ui()

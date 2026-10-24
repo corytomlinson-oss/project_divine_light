@@ -257,6 +257,14 @@ var _acting := false
 var _skill_element := ""
 var _weak_hit := false
 var _immune_hit := false
+# The Vorath fight (28c)
+const UNRAVEL_TURNS := 4  # Vorath turns in phase 3 before the Final Unraveling lands
+var _frank_joined := false
+var _frank_sprite: AnimatedSprite2D = null
+var _frank_invoiced := false
+var _unravel_charge := 0
+var _unravel_grace := false
+var _immune_turn := 0
 # Frank's help in an escape warden fight (Milestone 20a): a blinding vial at
 # the start, one potion when a hero is about to fall.
 var _actor: Combatant = null     # the party member whose action is resolving
@@ -830,6 +838,8 @@ func _process(delta: float) -> void:
 	_cursor.target = _cursor_target()
 	_update_windows()
 	_update_advance_hint(delta)
+	if Cutscene.is_playing():
+		return  # dialogue over the battle (Frank's revelation, 28c) owns the buttons
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
@@ -2253,6 +2263,10 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 		else:
 			await _enemy_attack(enemy, targets, phase_note, charged)
 		return
+	if enemy.display_name == "Vorath":
+		phase_note = await _vorath_turn(enemy, phase_note)
+		if not _party.any(func(c): return c.is_alive()) or not enemy.is_alive():
+			return
 	var ability := _choose_ability(enemy)
 	if not ability.is_empty():
 		await _enemy_ability(enemy, ability, targets, phase_note)
@@ -2480,9 +2494,15 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s!\n%s takes %d!%s" % [enemy.display_name, ability_name, target.display_name, dmg, para]
 		"dot_strike":
-			# A basic hit that always poisons and bleeds (20d).
+			# A basic hit that always poisons and bleeds (20d); Vorath's Death
+			# Touch stuns too (28c).
 			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, 1,
-					{"poison_chance": 100, "bleed_chance": 100, "poison_power": int(a.get("poison_power", 4)), "bleed_power": int(a.get("bleed_power", 5))})
+					{"poison_chance": 100, "bleed_chance": 100, "poison_power": int(a.get("poison_power", 4)), "bleed_power": int(a.get("bleed_power", 5)),
+					"stun_chance": int(a.get("stun_chance", 0))})
+			return
+		"multi_strike":
+			# Several blows in one turn (28c, Vorath's Void Strike).
+			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, int(a.get("hits", 3)))
 			return
 		"summon":
 			await _summon(enemy, a.get("enemies", []))
@@ -2686,6 +2706,121 @@ func _set_cost(member: Combatant, skill: Dictionary) -> Dictionary:
 	return skill
 
 
+# ------------------------------------------------------------ Vorath (28c)
+
+## Before each of Vorath's moves: Frank's revelation when phase 3 begins,
+## the rotating immunity in phase 2, Frank's own action and the Final
+## Unraveling countdown in phase 3. Returns the message prefix to show.
+func _vorath_turn(vorath: Combatant, note: String) -> String:
+	if vorath.boss_phase == 1:
+		var elements := ["fire", "ice", "lightning", "earth", "holy"]
+		var element: String = elements[_immune_turn % elements.size()]
+		_immune_turn += 1
+		vorath.immune = [element]
+		note += "Vorath drinks in %s - immune to %s this round!\n" % [ELEMENT_NOUNS[element], element]
+	elif vorath.boss_phase >= 2:
+		if not _frank_joined:
+			await _frank_revelation(vorath)
+		vorath.immune = []
+		await _frank_acts(vorath)
+		if not vorath.is_alive():
+			return note
+		if _unravel_grace:
+			_unravel_grace = false
+			note += "%s's seal holds the Final Unraveling back - one free round!\n" % GameManager.FRANK_TRUE_NAME
+		else:
+			_unravel_charge += 1
+			if _unravel_charge >= UNRAVEL_TURNS:
+				await _final_unraveling(vorath)
+				return note
+			note += "The Final Unraveling gathers... (%d/%d)\n" % [_unravel_charge, UNRAVEL_TURNS]
+	return note
+
+
+## Between phases 2 and 3: Frank drops the merchant's mask (the doc), says his
+## true name, weakens Vorath and joins the fight. Vorath's Void Form: DEF and
+## RES fall, his damage spikes.
+func _frank_revelation(vorath: Combatant) -> void:
+	_frank_joined = true
+	_unravel_grace = true
+	var true_name := GameManager.FRANK_TRUE_NAME
+	await Cutscene.play_text("\n".join([
+		"say Vorath: Enough. This age ends now - and the next, and the next. I will unmake the cycle itself.",
+		"say Frank: No. You won't.",
+		"narrate Frank steps forward. The merchant's coat falls away, and light pours out of him like a door opening.",
+		"say Vorath: ...You. I know that light. I thought you faded ages ago.",
+		"say Frank: I stayed. That's the difference between us, old friend. You refused the cycle. I chose to keep it.",
+		"say Frank: Four pure souls of an older age. You were one. I was another. My name is %s." % true_name,
+		"say %s: And I've been waiting a very long time to stand beside these four." % true_name,
+		"narrate %s's light pins Vorath in place. The Architect's form cracks open into raw void." % true_name,
+	]))
+	vorath.defense = roundi(vorath.defense * 0.5)
+	vorath.res_stat = roundi(vorath.res_stat * 0.5)
+	vorath.atk += 20
+	vorath.int_stat += 20
+	var area: Node = get_node_or_null("PartyArea")
+	if area != null and ResourceLoader.exists("res://assets/sprites/frank_frames.tres"):
+		_frank_sprite = AnimatedSprite2D.new()
+		_frank_sprite.sprite_frames = load("res://assets/sprites/frank_frames.tres")
+		_frank_sprite.flip_h = true
+		_frank_sprite.play(&"idle_side")
+		_frank_sprite.position = _party_home(0) + Vector2(-30, 8)
+		_frank_sprite.modulate = Color(1.3, 1.25, 1.1)
+		area.add_child(_frank_sprite)
+		_fx.impact({"impact": "pillar", "palette": "holy", "size": 14.0}, [_frank_sprite])
+	Sfx.play("holy")
+	_fx.flash(Color(1, 1, 0.85), 0.8, 0.6)
+
+
+## Frank fights on his own (the doc's three skills): Blessing when the party
+## is hurt, the Final Invoice once Vorath is nearly gone, Balance's Judgment
+## otherwise. Shown for a moment before Vorath moves.
+func _frank_acts(vorath: Combatant) -> void:
+	var true_name := GameManager.FRANK_TRUE_NAME
+	var hurt := _party.any(func(c: Combatant) -> bool: return c.is_ko or float(c.hp) / c.max_hp < 0.45)
+	if hurt:
+		for c: Combatant in _party:
+			if c.is_ko:
+				c.is_ko = false
+				c.hp = c.max_hp / 3
+			else:
+				c.hp = mini(c.max_hp, c.hp + c.max_hp / 2)
+			_fx_on(c, "sparkles", "heal")
+		Sfx.play("heal")
+		message_label.text = "%s uses %s's Blessing!\n\"On the house - one last time.\"" % [true_name, true_name]
+	elif not _frank_invoiced and float(vorath.hp) / vorath.max_hp < 0.15:
+		_frank_invoiced = true
+		var dmg := 1500
+		vorath.receive_damage(dmg)
+		_fx.flash(Color(1, 0.95, 0.6), 0.9, 0.5)
+		_fx_on(vorath, "pillar", "holy")
+		Sfx.play("thunder")
+		message_label.text = "%s presents The Final Invoice!\n\"For everything you've destroyed.\" %d damage!" % [true_name, dmg]
+	else:
+		var dmg := 420 + randi_range(-30, 30)
+		vorath.receive_damage(dmg)
+		_fx_on(vorath, "burst", "holy")
+		Sfx.play("holy")
+		message_label.text = "%s strikes with Balance's Judgment!\nVorath takes %d!" % [true_name, dmg]
+	_update_ui()
+	await get_tree().create_timer(1.4).timeout
+	if not vorath.is_alive() and not _foes_defeated():
+		return
+	if _foes_defeated():
+		_end_battle(true)
+
+
+## The Final Unraveling completes: the party is unmade.
+func _final_unraveling(vorath: Combatant) -> void:
+	_fx.flash(Color(0.1, 0, 0.15), 1.0, 1.2)
+	Sfx.play("thunder")
+	for c: Combatant in _party:
+		c.receive_damage(c.hp)
+	_update_ui()
+	message_label.text = "Vorath completes The Final Unraveling!\nEverything goes dark..."
+	_end_battle(false)
+
+
 ## How long Silas's poisons last: 3 rounds, 5 with Venom Weave (25b).
 func _poison_rounds(member: Combatant) -> int:
 	return 5 if Equipment.has_set_bonus(member, "venom_weave") else 3
@@ -2724,6 +2859,9 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if enemy.counter_from_phase >= 0 and enemy.boss_phase >= enemy.counter_from_phase:
 		enemy.counter_rounds = 999  # from here on it's always countering (20b)
 		return "%s enters a new phase! It will counter every blow!\n" % enemy.display_name
+	if enemy.display_name == "Vorath":
+		return ["", "Vorath channels the Unraveling itself! Every attack strikes the whole party!\n",
+				"Vorath's form cracks open into the Void!\n"][mini(enemy.boss_phase, 2)]
 	return "%s enters a new phase!\n" % enemy.display_name
 
 

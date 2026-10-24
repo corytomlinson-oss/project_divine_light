@@ -3,6 +3,10 @@ extends Node
 signal party_loaded
 
 const SAVE_DIR: String = "user://saves/"
+# Frank's true name, spoken for the first time in the Vorath fight (28c).
+# A placeholder Cory hasn't confirmed (suggested: Faranoth / Aldaran / Ithriel
+# / Solmund) - change it here and every line that says it follows.
+const FRANK_TRUE_NAME := "Faranoth"
 const SAVE_SLOTS: int = 3
 # Slot 0 is the autosave (Milestone 22a): its own file, so it never overwrites
 # one of the three manual slots.

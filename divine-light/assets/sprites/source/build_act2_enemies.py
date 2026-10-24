@@ -136,3 +136,6 @@ ramp_recolor("corrupted_scholar", "unraveled_soul", (40, 20, 60), (200, 170, 240
 ramp_recolor("shade_wisp", "entropy_shade", (10, 6, 20), (110, 80, 150), glow=(220, 150, 255))
 ramp_recolor("cursed_paladin", "architect's_thrall", (24, 10, 36), (160, 110, 200), glow=(255, 120, 200))
 ramp_recolor("hollow_warden", "hollow_custodian", (30, 26, 36), (170, 160, 180), glow=(220, 150, 255))
+
+# Vorath (28c) - a void-black stand-in until the art pass (30)
+ramp_recolor("shadow_lord", "vorath", (8, 2, 14), (150, 90, 200), glow=(255, 255, 255))

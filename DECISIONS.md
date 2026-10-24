@@ -478,3 +478,13 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Two Act III set bonuses redefined** because the doc's versions don't apply in this game: Cosmic Conduit = Lyra's spells -25% MP (no summons exist); Death's Hand = Shadowstep +30% damage (it has no row limit). The other two as written.
 - **Resurrection auto-targets** the fallen ally with the most max HP (no target menu for KO'd allies exists); level 21, 30 MP.
 - **Act III sets are all findable in the Maw except the gloves** (Threshold armory), so they don't depend on optional quests.
+
+## Milestones 28c + 28d — Vorath and the ending (2026-10-24, Cory away)
+- **Frank acts on his own, not as a menu-driven 5th member:** the battle UI (party panel, targeting, turn order) is built for four; he acts right after each Vorath turn with a fixed priority (Final Invoice once under 15% HP, Blessing when the party is hurt, else Balance's Judgment). *Change:* `Battle._frank_acts()`.
+- **Frank's true name is a placeholder: "Faranoth"** (first of my suggestions). One constant: `GameManager.FRANK_TRUE_NAME`.
+- **Vorath tuning:** 6000 HP / ATK 80 / DEF 30, phases at 66% and 33%, for a level ~20-22 party with Act III sets. A by-formula guess; needs a playtest.
+- **Phase 2 immunity rotates every Vorath turn** (fire, ice, lightning, earth, holy) and is announced, so it rewards reading the log rather than punishing a fixed element.
+- **The Final Unraveling:** one grace round after the revelation, then 4 Vorath turns of charge; at 4 the party is wiped (a normal defeat -> Game Over / retry). Frank's Final Invoice is there to make the race winnable. *Change:* `Battle.UNRAVEL_TURNS`.
+- **After the credits the game returns to the Title**, with an autosave placed in the cleansed Reach and flag `game_complete`, so loading it continues in the freed world (post-game wandering; 29 adds things to do).
+- **Battle ignores input while a Cutscene is playing** (found in testing: the revelation's dialogue and the battle menu shared the confirm button).
+- **Credits text** is mine ("A game by Cory Tomlinson", "Story, design and direction: Cory Tomlinson", "Built with Claude") — edit in `EndingMovie.gd`.

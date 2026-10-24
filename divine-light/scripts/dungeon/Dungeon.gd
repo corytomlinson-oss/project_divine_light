@@ -816,6 +816,9 @@ func on_captive_tile(_cell: Vector2i) -> void:
 func _play_act_two_story() -> void:
 	if not _kingdom_freed_now():
 		return
+	if dungeon_id == "blighted_maw":
+		await _play_ending()  # Vorath has fallen (28d)
+		return
 	var kingdom: String = _data["kingdom"]
 	Kingdoms.cleanse(kingdom)
 	await _after_transition()
@@ -825,6 +828,23 @@ func _play_act_two_story() -> void:
 	GameManager.dungeon_floor = 0
 	GameManager.autosave_pending = true  # saved on arrival outside (22a)
 	Transition.change_scene(_data.get("region_scene", OVERWORLD_SCENE_PATH))
+
+
+## The end of the game (28d): the farewell scene in Vorath's chamber, the
+## ending movie (credits, The End), then a save and back to the title.
+func _play_ending() -> void:
+	Kingdoms.cleanse("maw")
+	GameManager.story_flags["game_complete"] = true
+	GameManager.dungeon_floor = 0
+	await _after_transition()
+	await Cutscene.play("res://data/cutscenes/ending.scene")
+	await EndingMovie.play_ending(self)
+	GameManager.arrival = "threshold"
+	GameManager.current_scene_path = "res://scenes/overworld/Reach.tscn"
+	GameManager.current_location = "reach"
+	GameManager.has_pending_spawn = false
+	GameManager.autosave()
+	Transition.change_scene("res://scenes/title/Title.tscn")
 
 
 ## The last floor's boss is down but its kingdom isn't marked free yet.

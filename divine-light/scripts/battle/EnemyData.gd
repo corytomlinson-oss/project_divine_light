@@ -80,6 +80,18 @@ const KITS := {
 		{"name": "Seal of Ruin", "kind": "magic_all", "every": 3, "power": 34, "palette": "debuff"},
 		{"name": "Grave Hammer", "kind": "charge", "every": 4, "mult": 2.2, "tell": "raises its broken hammer..."},
 	]},
+	# Vorath, the Architect (28c; README "Vorath"): phase 1 mirrors the four
+	# classes, phase 2 is all area attacks with a rotating immunity (Battle),
+	# phase 3 is the Void Form race against the Final Unraveling (Battle).
+	"Vorath": {"int": 60, "res": 28, "aura": ["fire", "ice", "lightning", "earth"], "abilities": [
+		{"name": "Dark Smite", "kind": "magic_all", "chance": 30, "max_phase": 0, "power": 40, "palette": "debuff"},
+		{"name": "Death Touch", "kind": "dot_strike", "every": 4, "max_phase": 0, "poison_power": 10, "bleed_power": 10, "stun_chance": 100},
+		{"name": "Void Strike", "kind": "multi_strike", "chance": 30, "max_phase": 0, "hits": 3},
+		{"name": "Chaos Bolt", "kind": "aura_bolt", "chance": 60, "max_phase": 0, "power": 55},
+		{"name": "Unraveling Wave", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 48, "palette": "debuff"},
+		{"name": "Void Cataclysm", "kind": "magic_all", "chance": 50, "phase": 2, "power": 62, "palette": "debuff"},
+		{"name": "Void Strike", "kind": "multi_strike", "chance": 60, "phase": 2, "hits": 3},
+	]},
 	# Act II side-quest hunts (Milestone 26)
 	"Marauder Chief": {"attack": {"steal": 40, "hits": 1, "hits_max": 2}},
 	"Snowmane": {"weak": ["fire"], "attack": {"hits": 2}, "abilities": [
@@ -546,6 +558,12 @@ const BOSSES := {
 	# Selavon's boss (25d): phases at 66% / 33% - paralyzing lightning, then
 	# Sea Specters and a storm every round, then a strike charged over two
 	# rounds that only Defend or Sanctuary softens. Four heroes ~level 12-13.
+	# The final boss (28c): phases at 66% / 33%. Tuned for four heroes around
+	# level 21-23 with Act III gear, plus Frank in phase 3.
+	"vorath": {
+		"name": "Vorath", "hp": 6000, "atk": 80, "def": 30, "agi": 16, "xp": 0,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
 	"drowned_admiral": {
 		"name": "Drowned Admiral", "hp": 2600, "atk": 62, "def": 20, "agi": 13, "xp": 4200,
 		"phase_hp_thresholds": [0.66, 0.33],

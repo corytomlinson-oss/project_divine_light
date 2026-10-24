@@ -502,3 +502,8 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Art: only Vorath hand-placed**, at 64x64 so the final boss stands taller than everything else. The regular Act III enemies, the Hollow Custodian and the 29 hunts stay recolors, as Act II's regular enemies did in 27; the most visible stand-in got the effort.
 - **No separate sprite for Frank's true form:** his revelation already glows him up in battle; a real true-form sprite is a good candidate for a later art pass.
 - **Stopped before 31** (the APK), as Cory asked.
+
+## Documentation review (2026-10-24, Cory asked for it)
+- **CLAUDE.md's "Picking back up" rewritten as a short current-state summary** (status, what's playtested, next steps, open questions, an APK checklist gathered from the milestone notes). The old stacked notes, which contradicted each other ("28 = the APK", "Act III coming later"), moved below it as history.
+- **README gets an "As built" section** listing where the game differs from the design doc, rather than rewriting the design sections; small inline notes mark the same spots. The skill tables now show the real (compressed) unlock levels, plus Resurrection.
+- **One in-game fix found along the way:** the end-of-Act II card still said "Act III - The Source / Coming in a later update." It now says the road south of the Guild leads to the Blighted Reach (same pattern as the Act I finale's caption). *Change:* `KingdomVictory.gd`.

@@ -8,6 +8,28 @@ Retro SNES-style turn-based RPG for the Retroid Pocket 6 (Android). Godot 4.7, G
 
 ## Picking back up (last touched 2026-10-24)
 
+**Where things stand:** every milestone except **31 (the Android APK)** is built and pushed to `cjt`. The game plays start to finish: Act I (four dungeons from any starting class) -> Act II (Nordveil, Duskara, Selavon) -> Act III (the Blighted Reach, the Threshold, the portal key, the Blighted Maw, Vorath) -> the ending movie and credits -> back to the title, with a post-game save in the cleansed world. `cjt` is far ahead of `main`; no PR has been opened for 25b onward.
+- **Playtested by Cory:** everything through Milestone 24, plus the Act I finale movie.
+- **Not yet playtested by hand:** 25b-30 (Act II's kingdoms, Act II side quests, Act II art & music, all of Act III, Act III side quests, Act III art & music). Most of it was built on my recommendations while Cory was away; every call is at the bottom of `DECISIONS.md`.
+- **Next:** Cory playtests from an Act I-complete save -> fixes -> PRs into `main` -> **31, the APK**, once the Retroid Pocket 6 is back (checklist below).
+- **Open for Cory:** Frank's true name (placeholder "Faranoth", `GameManager.FRANK_TRUE_NAME`); the credits text (`EndingMovie.gd`); Vorath's tuning (6000 HP, the 4-turn Final Unraveling) and Act II/III difficulty generally (tuned by formula); the Vorath theme's 25s loop.
+- **Still stand-ins (recolors):** the regular Act II and III enemies, the Act II mini-bosses and Ice Knight, every Act II/III side-quest hunt, the Hollow Custodian; Frank has no true-form sprite. See `ASSETS.md`.
+
+**Try it (quickest route to the new content):** an Act I-complete save -> the north pass above the Cathedral (Nordveil), then the west road (Duskara), then the east road (Selavon), then the road south of the Guild into the Blighted Reach. Expected levels by formula: Nordveil ~7-9, Duskara ~9-11, Selavon ~11-13, Act III ~14-21. Things worth checking: sliding ice / frozen chests (Lyra in Fire stance), fire floors + levers, flood water + lightning rods, set looks, the victory scenes, Vorath's phases and Frank's revelation, the ending.
+
+**For 31 (the APK), collected from the milestone notes:**
+- `.scene` files aren't Godot resources: add `*.scene` to Export -> Resources -> "Filters to export non-resource files" (19a).
+- Give the suspend save its real test: Home, app switching, the OS killing a backgrounded app (22b).
+- Test the gamepad bindings on the device itself (17c).
+- The F-key debug shortcuts (see Debug tooling) are still in the code; decide whether to strip them from release builds.
+- Environment setup (Android SDK, JDK, export templates): `DEV-ENV.md`.
+
+**Reading this file:** each milestone section was written as that milestone was built. Headings show the current status, but "next up" lines and milestone numbers inside older sections are historical (the roadmap was renumbered several times; the Implementation status table is authoritative).
+
+Review images live in `previews/` at the repo root (git-ignored). Clickable links to files outside the workspace don't open in Cory's VS Code, so anything shown for review goes there.
+
+### Older handoff notes (superseded by the summary above; kept for history)
+
 **Milestone 24 (Act I side quests) is complete (2026-10-20), built in one go after Cory approved the quest list ("sounds perfect"); Cory playtested it 2026-10-20: "the quest system and the quest markers all work great".** Every dungeon but your starting one is sealed until its two town quests are done; the second hands over the key. 8 quests in all (2 per dungeon), quest log in the pause menu, quest markers on the map, three visible hunt targets on the overworld. Details in the Milestone 24 section; my calls in `DECISIONS.md`.
 
 **Act I finale movie (2026-10-20, Cory's request before Milestone 25; Cory watched it: "works great"):** after the Act I ending scene, a ~64s animated movie replaces the old title card: the bosses of your route fall one by one (escape warden first, then the three rescue bosses; the newest party member lands each blow with their class's effect, each captive steps out of the light), the four together, animated teasers of Nordveil / Duskara / Selavon, Vorath, then "Act II - The Purge". New "finale" track. **F9 previews it on any map.** Details in the "Act I finale movie" section.
@@ -42,9 +64,6 @@ Cory scoped it; his calls and mine are in `DECISIONS.md`. **Try it:** save at th
 
 The checklist and per-asset notes are in `ASSETS.md`; how it's built is in the Milestone 21 section below; the judgment calls are in `DECISIONS.md`. **Next up: Milestone 22 (save/load triggers)**: save points at inns/shrines and autosaves after bosses, rescues and region clears (see README's save system). Still open from Milestone 20: the design doc uses "Void Sentinel" twice (the Observatory's warden and an Act III enemy); the Act III one needs a new name or kit.
 
-Review images from this milestone live in `previews/` at the repo root (git-ignored). Clickable links to files outside the workspace don't open in Cory's VS Code, so anything shown for review goes there.
-
-
 **Milestone 20 (Act I content) is complete** (2026-09-29): 20a The Cathedral, 20b The Monastery, 20c The Observatory, 20d The Underground Guild + Edenmere + the end of Act I. 20b-20d were built on an autonomous run while Cory was away (he asked me to finish Milestone 20 on my recommendations and stop there); every judgment call is logged at the bottom of `DECISIONS.md`. **All local commits on `cjt`, not pushed; Cory hasn't playtested 20b-20d.** All four characters are playable from the class select, each route runs through all four dungeons, and rescuing the fourth hero ends Act I.
 
 **For Cory (from the autonomous run, now merged):**
@@ -52,18 +71,14 @@ Review images from this milestone live in `previews/` at the repo root (git-igno
 - **Known limits:** the art limits listed here originally (stand-in sprites, recolored tiles) were resolved in Milestone 21. Still true: nothing after the Act I card yet (Act II, 26), and save points aren't placed yet (22).
 - **One naming note:** the design doc uses "Void Sentinel" twice, for the Observatory's warden and for an Act III Blighted Maw enemy. I used it for the warden; the Act III one will need a different name or kit.
 
-
 **Milestone 20a (Act I: The Cathedral) is done** (2026-09-29), in four steps, pushed to `cjt` on Cory's go-ahead (he hasn't playtested it yet): foundations (class select, roster/party, gates, routes), enemy abilities, the Cathedral's escape + rescue variants, and Verdance + the Forest Heartlands overworld. Built on my recommendations while Cory was away; every call is logged in `DECISIONS.md`. **Try it:** New Game → skip the intro (Start) → pick Vael → wake in the Cathedral. **Next up: 20b (The Monastery, Ryn)**, which reuses all of 20a's systems: a Monastery template + tileset, its enemy kits (Corrupted Monk, Berserk Warrior, Iron Sentinel) and bosses (the sparring-master escape warden for a Ryn start, the Corrupted Grandmaster for the rescue), its scenes, the Ryn start in `ActOne.PLAYABLE_STARTS`, and the Monastery scene path in `ActOne.DUNGEONS`.
-
 
 **Milestone 19 (Cutscenes) is complete** (2026-09-29): 19a cutscene system + movie mode, 19b intro movie + title screen. Cory playtested and approved both (intro theme included); pushed to `cjt`. The game starts on the title screen (New Game plays the intro); F7/F8 play the demo scene/movie on a map. Built on my recommendations while he was away; every call is logged in `DECISIONS.md`. **Next up: Act I content, starting with 20a (The Cathedral)**. It's design-heavy (enemy abilities, real bosses, enemy level scaling, the Act I opening scenes), so talk it through with Cory before building.
 
-
 **Milestone 18 (Spell & combat VFX) is complete** (2026-09-29): 18a effect system, 18b Vael + Ryn, 18c Lyra + Silas, 18d status markers + polish. Cory approved the scope, then left me to build all four on my recommendations; Cory playtested 18a-18d (sounds included) and approved them; pushed to `cjt`. Every call made without him is logged in `DECISIONS.md`. **Next up: Milestone 19 (Cutscenes)** — 19a cutscene system + movie mode, then 19b the intro movie — and after that Act I content, starting with 20a (The Cathedral) — that's where enemy abilities, real bosses and the enemy-level-scaling question come in (see "Open design questions"); flag it to Cory as a design-heavy milestone before starting.
 
-
 **Milestone 17 (UI/UX polish) is complete** as of 2026-09-29: 17a pixel rendering + text, 17b SNES-style battle layout, 17c controller + pause menu, 17d transitions + feedback. Cory scoped it and picked the font and layout, then left me to finish 17b-17d on my recommendations. Cory playtested 17b-17d (encounter sound included) and approved them; all pushed to `cjt`. **Next up: Milestone 18 (Spell & combat VFX).** Known follow-ups:
-- The gamepad bindings are untested on the RP6 itself until the APK milestone (28).
+- The gamepad bindings are untested on the RP6 itself until the APK milestone (31).
 - The overworld's default spawn puts the player on the unpainted grey area next to the gate (noticed in 17a screenshots, not touched).
 - The Equip screen is still plain text with no windows; it's out of 17's scope (Milestone 15's own screen), but the theme's Panel style would frame it for free.
 
@@ -179,7 +194,7 @@ Overworld tileset + Cathedral tileset + message box panel + enemy display backdr
   - The specific warnings seen ("GDScript::reload: Integer division. Decimal part will be discarded.") were not a real bug — they're from long-standing intentional integer math in `Battle.gd`'s damage formulas (`member.atk / 2`, `attacker.agi / 4`, etc., deliberately producing whole-number damage). Editing `Battle.gd` today caused Godot to recompile the file and reprint every warning in it, not just ones near the edit. Worth remembering if this resurfaces again: check whether the flagged lines are actually new before assuming a regression.
 - **Walk-cycle animation and spell VFX — planned, not yet built.** Cory's stated end goal: full directional walk cycles (character turns to face up/down/left/right while moving), deferred until enough sprite frames exist to make wiring it up worthwhile — every sprite today (Vael included) is a single static frame, and `Player.gd` computes a movement direction each frame but never stores it or drives any animation. When this gets built: `AnimatedSprite2D` + a `SpriteFrames` resource on `Player.tscn` (replacing the current plain `Sprite2D`), `Player.gd` tracking a `_facing` direction and calling `play("walk_" + facing)` while `_moving`, an idle frame otherwise; left-facing can reuse the right-facing frames via a horizontal flip (`flip_h`) instead of needing separate art. **Asset cost estimated for the current party+enemy roster** (given to Cory before the break): ~20 more generations for full 2-frame-per-direction walk cycles across all 4 classes (down/up/side, have 1 of 6 frames per class already) + 8 static enemy sprites (no walk cycle needed — enemies don't move in battle) + 1 battle background ≈ 29 generations, roughly $5–6 at Vael's actual $0.18/sprite cost — covers only this content pass, not future Act I/II/III rosters which aren't designed yet. **Spell/combat VFX are planned as mostly code**, not dedicated art — Godot's `Tween` (flashes, shakes, color pulses), `GPUParticles2D`/`CPUParticles2D` (bursts, elemental trails), and procedural shapes (`_draw()`, gradients) cover most SNES-JRPG-style hit/cast effects, and are a better fit for the code-based technique than character sprites were (abstract/geometric rather than needing to read as a recognizable figure). A handful of effects (e.g. a distinctive projectile) might still get dedicated small sprites later if code alone doesn't read well — optional, not scoped yet.
 
-## Milestone 17 — UI/UX polish (in progress)
+## Milestone 17 — UI/UX polish (done)
 
 Scoped 2026-09-29 by auditing what exists against the roadmap's "HUD composition, transitions, readability, controller-nav feel". Split like 8a-8d; order matters because the font sets every text metric the layout depends on:
 
@@ -323,7 +338,7 @@ Cory's request (2026-10-16), after Milestone 23: instead of heading straight fro
 | Observatory (star-lock) | *The Lost Cart*: Edenmere smith, beat the Wreck Ghoul at the cart W of the Observatory, back to him | *The Star Lock*: smith -> Verdance innkeeper (Mira, the astronomer's sister) -> **Star Chart** |
 | Guild (hatch password) | *Pickpocket*: Edenmere shopkeeper, catch the Cutpurse by the ravine road, back to her | *The Password*: shopkeeper -> Verdance farmer (a retired thief) -> **Guild Password** |
 
-## Milestone 25 — Act II content (scoping, 2026-10-23)
+## Milestone 25 — Act II content (done 2026-10-23; the scoping notes come first, then 25a-25d)
 
 The design doc already fixes each kingdom's town (before/after), dungeon + gimmick + 4-zone structure, mini-boss, 3-phase boss, and the 3-layer cleansing transformation (README "Act II — Kingdom Dungeons", "Act II Kingdom Bosses", "Town State Changes"). Cory's structural calls (2026-10-23, all three as recommended):
 1. **Region maps:** each kingdom gets its own overworld map like the Forest Heartlands, joined by border roads off the forest's edges (Nordveil north, Duskara west, Selavon east). Each region has its own look, music and enemies, and goes from grey wasteland to living land when cleansed.
@@ -435,7 +450,7 @@ Built on Cory's calls (2026-10-18: required + optional; 1-2 that help free each 
 - **Hunt targets** (`Quests.HUNTS` with `"region"` and `"scale": false` — tuned for the whole party): Marauder Chief (720 HP, steals, 1-2 hits), Snowmane (820, double bite, Blizzard Howl slow, Savage Lunge), Dune Stalker (1100, earth-immune, Sand Crush), Reef Horror (1300, ice-immune, heals itself, Coral Crush). Recolor sprites (`build_act2_enemies.py`).
 - **Tested** (16 checks): each dungeon sealed until its key, the quest marks, offers only in the right state, spots on the right region maps, keys opening the doors with their line, optional quests after cleansing, rewards, the blessing (the test's RES delta also includes the quest XP's level-ups, so it read +5/+6 rather than +3; the blessing itself is +3).
 
-## Milestones 26 and 30 — Act II and Act III side quests (planning notes; 26 built above, 30 not started)
+## Milestones 26 and 29 — Act II and Act III side quests (planning notes, kept for history; both built: see the Milestone 26 and 29 sections. "30" below is the old number of today's 29)
 
 Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act II and Act III too, not just Act I. Both reuse Milestone 24's quest system (quest state, givers, quest log, map markers, key items), so they are content milestones: the quests, their dialogue, any hunt monsters and quest spots, and a little art. Each sits right after the content it needs (the kingdoms and towns must exist first) and before that act's art pass, which then covers the quest art too. Draft only; scope with Cory before building.
 
@@ -467,7 +482,7 @@ Cory's request (2026-10-18), while playtesting Milestone 23: side quests for Act
 2. **The Core:** a shard of pure light the four pure entities left behind (the design doc says Vorath was one of four). The frame leads you across Valdris to it, maybe held by one of the freed kingdoms, so the errand revisits Act II places.
 3. **The Binding:** the parts won't join on their own. Frank knows how to bind them, more than a merchant should. A quiet hint at who he is, paid off when his identity is revealed in the Vorath fight. The finished key opens the portal.
 
-**Still open:** which exact quests go in each kingdom (Act II, 2 required + a couple optional each), the optional Act III quests, the permanent-buff design, and whether the hub (Verdance, after Act II) gets quests too.
+**Still open (then):** which exact quests go in each kingdom (Act II, 2 required + a couple optional each), the optional Act III quests, the permanent-buff design, and whether the hub (Verdance, after Act II) gets quests too. **All resolved since:** see the Milestone 26 and 29 sections. Permanent buffs ended up applied straight to the heroes' base stats once each (a `blessing_<id>` flag guards against doubling), not as a separate `permanent_bonuses` record; Verdance's archivist gives one Act III quest.
 
 ## Milestone 23 — Exploration & loot (done)
 
@@ -519,7 +534,7 @@ Scoped with Cory 2026-10-12 (his calls in `DECISIONS.md`): autosave gets its own
 - **Single use:** resuming deletes it, and so do starting a new game and loading a slot.
 - A cutscene in progress isn't saved: resuming puts you on the map at that spot with whatever flags were already set.
 - Verified (15 checks + screenshots): nothing from the title, close -> Resume back in Verdance on the spot with the right gold, used up afterwards, Home/come-back drops it, mid-boss-fight suspend -> the Sparring Master fight restarts at full HP with the party as it began and Frank helping, win -> back on the dungeon map with the warden beaten, new game / load discard it.
-- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's the APK milestone's (28) on-device test.
+- **Not testable on the desktop:** the Android lifecycle (Home, the OS killing a backgrounded app). That's the APK milestone's (31) on-device test.
 
 ## Milestone 21 — Act I art & music pass (done)
 
@@ -642,7 +657,7 @@ Built in four steps, each tested and committed on its own:
 - **Movie mode** (`movie start` ... `movie end`): a CanvasLayer (60) over everything but the fade: black background, pictures (`image id path at x,y` in screen pixels, `pan ... over t`), a bottom `caption` that fades in/out, and a centered `title` drawn at 2× (pixel-crisp). **Start skips a movie**: everything up to `movie end` is skipped except `set` and `music` steps.
 - **Story flags:** `set flag` → `GameManager.story_flags` (saved/loaded with the game), `GameManager.has_flag()`.
 - **Demos:** `data/cutscenes/demo.scene` (F7: Ryn appears beside you, talks, a hooded silhouette watches) and `demo_movie.scene` (F8: title card and captions over the forest). They double as format examples.
-- **⚠ For the APK milestone (28):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
+- **⚠ For the APK milestone (31):** `.scene` files aren't Godot resources, so the Android export must include them explicitly (Export → Resources → "Filters to export non-resource files": `*.scene`).
 - Verified by a driver playing both demos on the real overworld (parser incl. error reporting, dialogue advance, flags, cleanup, player control returning, movie skip) plus screenshots.
 
 ### 19b — intro movie + title screen (done, 2026-09-29)
@@ -663,17 +678,23 @@ Built in four steps, each tested and committed on its own:
 - Battle scene: `divine-light/scenes/battle/Battle.tscn`
 - Player (reusable, instanced by every map scene): `divine-light/scripts/player/Player.gd` + `divine-light/scenes/player/Player.tscn`
 - Overworld: `divine-light/scripts/overworld/Overworld.gd` + `divine-light/scenes/overworld/Overworld.tscn`
-- Dungeon (generic controller, currently drives the one Cathedral room): `divine-light/scripts/dungeon/Dungeon.gd` + `divine-light/scenes/dungeon/CathedralDungeon.tscn`
+- Dungeons (one generic controller; per-dungeon data such as floors, hazards, guards and bosses lives in its table): `divine-light/scripts/dungeon/Dungeon.gd` + one scene per dungeon in `divine-light/scenes/dungeon/` (4 Act I, 3 Act II, `BlightedMaw.tscn`)
+- Region maps (overworld-style maps painted from text): `divine-light/scripts/overworld/Region.gd` (base) + `Overworld.gd` (Forest Heartlands), `Tundra.gd`, `Desert.gd`, `Coast.gd`, `Reach.gd`; scenes in `divine-light/scenes/overworld/`
+- Towns: `divine-light/scripts/town/Town.gd` (base: inn, shrine, Frank, talking, quest marks) + Verdance, Edenmere, Nordveil, Duskara, Selavon, Threshold; scenes in `divine-light/scenes/town/`
+- Story progress: `divine-light/scripts/systems/ActOne.gd` (Act I routes), `Kingdoms.gd` (Act II kingdoms + the Maw, road order, cleansing), `Quests.gd` (every quest, hunt, fetch, blessing), `Loot.gd` (chest loot, armor-set placement), `SetLooks.gd` (set recolors)
+- Movies: `divine-light/scripts/cutscene/ActOneFinale.gd` (Act I finale), `KingdomVictory.gd` (each freed kingdom, the end of Act II), `EndingMovie.gd` (the ending + credits)
+- Map screen and quest log: `divine-light/scripts/menu/MapScreen.gd`, `QuestLog.gd`; save screen `SaveMenu.gd`
 - Procedural dungeon generator (pure logic, no scene dependencies): `divine-light/scripts/dungeon/DungeonGenerator.gd` (`class_name DungeonGenerator`)
 - Equipment system (pure logic, only touches the GameManager autoload for inventory): `divine-light/scripts/systems/Equipment.gd` (`class_name Equipment`)
-- Equip screen (first overworld-accessible UI): `divine-light/scripts/equip/Equip.gd` + `divine-light/scenes/equip/Equip.tscn`
+- Equip screen (opened from the pause menu): `divine-light/scripts/equip/Equip.gd` + `divine-light/scenes/equip/Equip.tscn`
 - UI font + theme: `divine-light/assets/fonts/` (m5x7 + `m5x7_ui.tres` variation), `divine-light/assets/ui/theme.tres` (project-wide via `gui/theme/custom`)
-- Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `divine-light/scripts/ui/QiPips.gd`, `divine-light/scripts/ui/ScrollHint.gd`
+- Shared UI widgets: `divine-light/scripts/ui/MenuCursor.gd`, `QiPips.gd`, `ScrollHint.gd`, `StatusIcons.gd`
+- Asset generators (rerun to rebuild art/audio): `source/` folders next to their output, e.g. `assets/sprites/source/build_act1_bosses.py`, `build_act2_bosses.py`, `build_act3_bosses.py`, `build_act2_enemies.py` (recolor stand-ins), `assets/audio/source/build_music.py`
 - Pause menu: `divine-light/scripts/menu/PauseMenu.gd` + `divine-light/scenes/menu/PauseMenu.tscn`; menu input repeat: `divine-light/scripts/systems/UiInput.gd` (autoload)
 - Scene transitions: `divine-light/scripts/systems/Transition.gd` (autoload) + `divine-light/assets/shaders/mosaic.gdshader`
 - Enemy stats, behavior kits, encounter tables, bosses: `divine-light/scripts/battle/EnemyData.gd`
 - Act I data (dungeons, captives, gates, routes): `divine-light/scripts/systems/ActOne.gd`; class select: `divine-light/scenes/title/ClassSelect.tscn` + `divine-light/scripts/title/ClassSelect.gd`
-- Verdance: `divine-light/scenes/town/Verdance.tscn` + `divine-light/scripts/town/Verdance.gd`; shop screen: `divine-light/scripts/menu/ShopMenu.gd`; Act I map tiles: `divine-light/assets/tilesets/source/build_act1_tiles.py`
+- Shop screen: `divine-light/scripts/menu/ShopMenu.gd`; Act I map tiles: `divine-light/assets/tilesets/source/build_act1_tiles.py`
 - Title screen: `divine-light/scenes/title/Title.tscn` + `divine-light/scripts/title/Title.gd` (the main scene); intro movie art: `divine-light/assets/movie/` (generator in `source/`)
 - Cutscenes: `divine-light/scripts/systems/Cutscene.gd` (autoload player) + `divine-light/scripts/cutscene/SceneScript.gd` (parser, command reference) + scene files in `divine-light/data/cutscenes/`
 - Combat effects: `divine-light/scripts/battle/BattleFx.gd` (effect library) + `divine-light/scripts/battle/FxRecipes.gd` (which action plays what)
@@ -747,8 +768,8 @@ Several restructuring passes so far, most recent first. **Milestone numbers cite
 ### Act III split; APK moved to last, 31 (2026-10-24)
 
 - Cory: move on to Act III and push the Retroid work to the very last step. Act III + Vorath split like Act II: **28a** the Threshold + the portal key (the three required key quests move here from the side-quest milestone, since they open the Maw), **28b** the Blighted Maw, **28c** Vorath (design-heavy: scope with Cory), **28d** the ending; **29** optional Act III side quests + Verdance as the hub (the doc's post-Act II Verdance); **30** Act III art & music (+ Act II's remaining recolor stand-ins); **31** the APK.
-- **Cory's calls:** Vael learns **Resurrection** late in Act III (the doc's Vorath fight and Divine Champion set need it; Frank and items stop being the only revives). Frank's true name: Cory asked for suggestions (Faranoth — "Frank" as the worn-down remnant of it — Aldaran, Ithriel, Solmund); not chosen yet.
-- **Open (raise before 28b's tuning):** skills unlock up to level 35 but the party finishes Act II around level 13, so Act II's Sacred Aegis bonus (Divine Shield, L20) and the Admiral's "use Sanctuary" (L29) arrive too early. Either compress the unlock levels to the real curve or raise XP across Acts II-III.
+- **Cory's calls:** Vael learns **Resurrection** late in Act III (the doc's Vorath fight and Divine Champion set need it; Frank and items stop being the only revives). Frank's true name: Cory asked for suggestions (Faranoth — "Frank" as the worn-down remnant of it — Aldaran, Ithriel, Solmund); not chosen yet ("Faranoth" is the placeholder since 28c).
+- **Resolved in 28a (compressed the unlock levels; DECISIONS.md):** skills unlocked up to level 35 but the party finishes Act II around level 13, so Act II's Sacred Aegis bonus (Divine Shield, L20) and the Admiral's "use Sanctuary" (L29) arrive too early. Either compress the unlock levels to the real curve or raise XP across Acts II-III.
 
 ### APK moved after Act II, to 28 (2026-10-23)
 
@@ -887,8 +908,10 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - **F7 / F8** — play the demo cutscene / demo movie (`Cutscene.gd` `_input()`, only on a map with the player, not while paused)
 - **F9** — play the Act I finale movie for this game's route (same conditions)
 - **F3** — besides winning a battle instantly, skips a movie (the intro, the Act I finale), same as Start
-- **F5** — save party + inventory to slot 1 (GameManager.gd `_input()`, works from any scene)
-- **F6** — load slot 1 back into the live party + inventory
+- **F5** — save to slot 1 (GameManager.gd `_input()`, works from any scene)
+- **F6** — load slot 1
+- All of these are still live in the game code (Milestone 12 said to remove F5/F6 once real saves existed; they were kept as dev tools). Decide before the APK (31) whether to strip them from release builds.
+- `Kingdoms.dev_open = true` (tests only) treats every kingdom as built/open.
 
 ## GDScript gotchas hit so far
 
@@ -900,10 +923,21 @@ Closed three gaps found during the post-Milestone-8 docs-vs-code audit:
 - Autoload singletons live under Project Settings → **Globals** tab in Godot 4 (not "Autoload").
 - `Input.is_key_just_pressed()` doesn't exist as a static — use `_input(event)` with `event is InputEventKey and event.pressed and not event.echo` instead.
 - GDScript arrays/objects are references — assigning `_party = GameManager.party` means mutations persist automatically, no manual sync needed.
+- The project treats "variable type inferred from a Variant" as an error: give explicit types (`var x: int = d["k"]`), especially for loop variables over untyped arrays.
+- A subclass can't declare a member with the same name as a parent method (e.g. `_kingdom` vs `ActOneFinale._kingdom()`): a parse error that cascades into every script using it.
+- Don't name locals `name` (it shadows `Node.name`).
+- Canvas-item shaders: `COLOR` in `fragment()` already includes the texture; multiplying by `texture(TEXTURE, UV)` again squares it. Pass the modulate through a `varying` from `vertex()`.
 
 ## Testing workflow
 
-No automated tests — this is manual playtesting in the Godot editor. When a milestone's skills are implemented, walk through a test scenario per skill/system (level gating, buff application + expiry, targeting UI, edge cases like KO'd allies or already-dead enemies). Use F1 to skip the grind to reach higher-level skills.
+No committed test suite. Cory playtests in the editor; Claude verifies each milestone with throwaway headless test scenes before handing it over. The current routine:
+- **Close the editor first** (check `tasklist` for Godot), then run an import + parse pass: `Godot_v4.7-stable_win64_console.exe --headless --editor --quit-after 40 --path .` and grep the output for "parse error" / "script error". New asset files need this pass before anything can load them.
+- **Back up the saves** (`%APPDATA%/Godot/app_userdata/divine_light/saves`) to the scratchpad right before every test run, and restore + diff them afterwards. `start_new_game()`, loading a save or reaching an autosave in a test changes or consumes the real saves (including the single-use suspend save).
+- **Test scene:** `divine-light/_tmp_test/Test.gd` + `Test.tscn` (deleted afterwards). The script adds a copy of itself to the root as a "driver" (`get_tree().root.add_child.call_deferred(driver)`, `process_mode = ALWAYS`), so it survives `change_scene_to_file` into real scenes. It sets up state through `GameManager` / story flags, calls real functions, and prints PASS/FAIL lines.
+- **Input:** send `InputEventAction` through `Input.parse_input_event()` (`Input.action_press()` doesn't reach the cutscene text box); a background "clicker" coroutine can keep advancing dialogue.
+- **Always grep the log for "Parse Error" / "SCRIPT ERROR"** before trusting PASS lines: a parse error in one script cascades into others.
+- **Rewards vs. stat checks:** quest XP can level the party up in the same call, so check a stat boost on its own (e.g. `Quests._bless()`), not across a whole reward.
+Use F1 to skip the grind to reach higher-level skills when testing by hand.
 
 **Real screenshots without the editor (used for 17a):** a throwaway scene (e.g. `res://_tmp_shot/Shot.tscn` + script) run **non-headless** with `Godot_console.exe --path . res://_tmp_shot/Shot.tscn -- <out_dir>` renders in a real window, so it can instance Battle/Equip/maps, call their functions to reach a state, `await RenderingServer.frame_post_draw`, and save `get_viewport().get_texture().get_image()`: native 320×180 PNGs Claude can view. Run an editor import pass first if assets are new, confirm the editor is closed, and delete the temp folder afterwards. Headless runs can't render, so they're only for logic and sizes (`get_combined_minimum_size()`). `Label.get_line_count()` read right after setting text can be stale; measure wrapping with PIL and the font file instead.
 

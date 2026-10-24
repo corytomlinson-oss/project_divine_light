@@ -1,6 +1,6 @@
 # Divine Light — Asset Checklist
 
-Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 21, Act II in 27, Act III in 31). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
+Living tracker for real (non-placeholder) art and audio. Organized by the art/music milestone that requested it — a new section gets added for each future pass (Act I art in Milestone 21, Act II in 27, Act III in 30). Check an item off once it's generated **and** dropped into the project; a generated-but-not-yet-imported asset should stay unchecked.
 
 Each entry's prompt is self-contained and ready to paste into an AI image/music tool as-is — no need to remember to append the style guide separately.
 
@@ -330,16 +330,16 @@ Made with the milestone, like 23's chests (`assets/sprites/source/build_quest_ar
 Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies until 27 draws them properly.
 - [x] **Tundra tileset** `tilesets/tundra_tiles.png` (`source/build_tundra_tiles.py`) and **Nordveil's town tiles** `nordveil_tiles.png` (`source/build_nordveil_tiles.py`)
 - [x] **Frozen Citadel tileset** `citadel_tiles.png` with sliding ice (`source/build_citadel_tiles.py`)
-- [x] **Enemies (recolors):** Frost Wraith, Corrupted Knight, Tundra Troll, Blizzard Hawk, Frost Warden, Ice Knight, Frozen Sovereign (`sprites/source/build_act2_enemies.py`)
+- [x] **Enemies (recolors):** Frost Wraith, Corrupted Knight, Tundra Troll, Blizzard Hawk, Frost Warden, Ice Knight (`sprites/source/build_act2_enemies.py`); the Frozen Sovereign is hand-placed since 27
 - [x] **Props:** blight brambles, stairs, ice block over a frozen chest (`sprites/source/build_act2_props.py`)
 - [x] **Battle backgrounds:** tundra (aurora over snow), citadel (ice hall) (`ui/source/build_act2_bgs.py`)
 - [x] Music: `tundra` (region; corrupted Nordveil plays it too), `citadel` — Milestone 27
-- [ ] Real sprites for the seven enemies above — 27
+- [ ] Real sprites for the six recolors above (27 did the boss only)
 
 ## Act II — Duskara (Milestone 25c, stand-ins until 27)
 
 - [x] **Desert, Duskara town and Sunken Sanctum tilesets** (`tilesets/source/build_desert_tiles.py`; the Sanctum's 6th column is burning floor)
-- [x] **Enemies:** Sand Viper (hand-placed), Dust Golem, Scorched Mage, Dune Marauder, Blazing Sentinel, Burning Tyrant (recolors; `sprites/source/build_act2_enemies.py`)
+- [x] **Enemies:** Sand Viper (hand-placed), Dust Golem, Scorched Mage, Dune Marauder, Blazing Sentinel (recolors; `sprites/source/build_act2_enemies.py`); the Burning Tyrant is hand-placed since 27
 - [x] **Props:** lever, sealed stone door (`sprites/source/build_act2_props.py`)
 - [x] **Battle backgrounds:** desert, sanctum (`ui/source/build_act2_bgs.py`)
 - [x] Music: `desert` (region; corrupted Duskara plays it too), `sanctum` — Milestone 27
@@ -347,7 +347,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 ## Act II — Selavon (Milestone 25d, stand-ins until 27)
 
 - [x] **Coast, Selavon town and Drowned Fortress tilesets** (`tilesets/source/build_coast_tiles.py`; the fortress's 6th column is flood water)
-- [x] **Enemies (recolors):** Sea Specter, Coral Brute, Tidal Witch, Storm Gull, First Mate, Drowned Admiral
+- [x] **Enemies (recolors):** Sea Specter, Coral Brute, Tidal Witch, Storm Gull, First Mate; the Drowned Admiral is hand-placed since 27
 - [x] **Props:** lightning rod (2 frames)
 - [x] **Battle backgrounds:** coast (storm, sunken hull), fortress (flooded hall)
 - [x] Music: `coast` (region; corrupted Selavon plays it too), `fortress` — Milestone 27
@@ -361,7 +361,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 ## Act III (Milestone 28, stand-ins until 30)
 
 - [x] **Reach tileset** (`reach_tiles.png`: ash, dead trees, cracked road, portal arch, chasms, bones) and **Blighted Maw tileset** (`maw_tiles.png`, 8 columns; ice / fire / water in 5 / 6 / 7)
-- [x] **Enemies (recolors):** Null Sentinel, Unraveled Soul, Entropy Shade, Architect's Thrall, Hollow Custodian, **Vorath**, and the 29 hunts Oathbreaker and Grave Robber (`sprites/source/build_act2_enemies.py`)
+- [x] **Enemies (recolors):** Null Sentinel, Unraveled Soul, Entropy Shade, Architect's Thrall, Hollow Custodian, and the 29 hunts Oathbreaker and Grave Robber (Vorath was a recolor until 30) (`sprites/source/build_act2_enemies.py`)
 - [x] **Battle backgrounds:** reach, maw
 - [x] Music: `reach`, `maw`, `vorath` (the final battle) — Milestone 30
 - [x] **Hand-placed Vorath** (64x64, `sprites/source/build_act3_bosses.py`) — Milestone 30

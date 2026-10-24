@@ -106,7 +106,7 @@ func _run() -> void:
 		_show(_title, "Act II - The Purge")
 		await _at(10 * BAR)
 		_show(_title, "Act III - The Source")
-		_show(_caption, "Coming in a later update.")
+		_show(_caption, "The road south of the Guild leads to the Blighted Reach." if Kingdoms.is_built("maw") else "Coming in a later update.")
 		await _at(13 * BAR)
 	elif Kingdoms.all_cleansed():
 		GameManager.story_flags["act_two_complete"] = true

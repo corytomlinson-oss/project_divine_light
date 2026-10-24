@@ -58,6 +58,21 @@ const CHEST_LOOT := {
 }
 
 
+const RESTORED_TILES := preload("res://assets/tilesets/reach_tiles_restored.png")
+
+
+## After Vorath (playtest pass, 2026-10-24): the Reach is drawn dead, so the
+## cleansing shader alone would leave it grey. Swap in the restored atlas
+## (same columns) on a copy of the tileset, so an older save loaded later in
+## the same session still sees the ash.
+func _ready() -> void:
+	if Kingdoms.is_cleansed("maw"):
+		_tile_map.tile_set = _tile_map.tile_set.duplicate(true)
+		var src := _tile_map.tile_set.get_source(_tile_map.tile_set.get_source_id(0)) as TileSetAtlasSource
+		src.texture = RESTORED_TILES
+	super._ready()
+
+
 func region_id() -> String:
 	return "reach"
 
@@ -79,7 +94,7 @@ func chest_loot() -> Dictionary:
 
 
 func music() -> String:
-	return "reach"  # Milestone 30
+	return "overworld" if Kingdoms.is_cleansed("maw") else "reach"  # 30; the forest's theme once it's alive again
 
 
 func default_arrival() -> String:

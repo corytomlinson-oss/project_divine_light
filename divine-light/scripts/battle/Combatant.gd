@@ -29,6 +29,7 @@ var is_enemy: bool = false
 var is_ko: bool = false
 var is_stunned: bool = false
 var stun_rounds: int = 0
+var stun_guard: int = 0  # bosses: own turns left shrugging off stuns after one lands (playtest pass)
 var defending: bool = false
 var def_buff: int = 0
 var def_buff_rounds: int = 0

@@ -16,6 +16,7 @@ const ITEM_TEXT := {
 	"Elixir": "Restores 120 HP to one ally.",
 	"Ether": "Restores 30 MP to one ally.",
 	"Antidote": "Cures poison.",
+	"Phoenix Feather": "Revives a fallen ally at 1/4 HP. (In battle.)",
 }
 const MAX_STACK := 99
 

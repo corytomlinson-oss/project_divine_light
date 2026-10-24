@@ -3,6 +3,9 @@ extends Node2D
 enum State { SELECTING, RESOLVING, BATTLE_OVER }
 enum MenuState { MAIN, SKILL, ITEM, TARGETING, ALLY_TARGETING }
 
+# Unlock levels (28a, then the playtest pass of 2026-10-24): above level 8
+# compressed to 8 + (old - 8) * 0.55, then above 15 again to 15 + (x - 15) * 0.4,
+# so the whole kit (ultimates at 18) arrives by the end of Act III's main path.
 const CLASS_SKILLS: Dictionary = {
 	"Vael": [
 		{"name": "Holy Light",    "cost": 10, "cost_type": "mp", "target": "ally",        "effect": "heal",         "power": 25, "min_level": 1},
@@ -12,14 +15,14 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Fortify",       "cost": 15, "cost_type": "mp", "target": "ally_all",    "effect": "fortify",      "power": 10, "min_level": 11},
 		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "min_level": 13},
 		{"name": "Divine Shield", "cost": 20, "cost_type": "mp", "target": "ally_all",    "effect": "divine_shield","power": 12, "min_level": 15},
-		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 16},
-		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 18},
-		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 20},
-		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 21},
+		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 15},
+		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 16},
+		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 17},
+		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 17},
 		# Act III (28b; Cory: Vael learns it late): revives the fallen ally with
 		# the most max HP, at half HP (full with Divine Champion).
-		{"name": "Resurrection", "cost": 30, "cost_type": "mp", "target": "self", "effect": "resurrect", "power": 0, "min_level": 21},
-		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 23},
+		{"name": "Resurrection", "cost": 30, "cost_type": "mp", "target": "self", "effect": "resurrect", "power": 0, "min_level": 17},
+		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 18},
 	],
 	"Ryn": [
 		{"name": "Iron Fist",        "cost": 1, "cost_type": "qi", "target": "enemy",       "effect": "physical",     "power": 18, "min_level": 1},
@@ -29,11 +32,11 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 11},
 		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 13, "ranged": true},
 		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 15},
-		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 16},
-		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 18},
-		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 20},
-		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 21},
-		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 23},
+		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 15},
+		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 16},
+		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 17},
+		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 17},
+		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 18},
 	],
 	"Silas": [
 		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "min_level": 1},
@@ -43,11 +46,11 @@ const CLASS_SKILLS: Dictionary = {
 		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 11},
 		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 12},
 		{"name": "Expose",        "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "expose",      "power": 10, "min_level": 14},
-		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 16},
-		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 17, "hits": 4},
-		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 19},
-		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 21},
-		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 23},
+		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 15},
+		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 16, "hits": 4},
+		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 17},
+		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 17},
+		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 18},
 	],
 }
 
@@ -64,21 +67,21 @@ const LYRA_SKILLS: Dictionary = {
 	"Fire": [
 		{"name": "Ember",   "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 14, "min_level": 1},
 		{"name": "Flare",   "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 26, "min_level": 8},
-		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "min_level": 17},
+		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "min_level": 16},
 	],
 	"Ice": [
 		{"name": "Frost",    "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "ice_slow",      "power": 14, "min_level": 4},
 		{"name": "Blizzard", "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "ice_freeze",    "power": 28, "min_level": 11},
-		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "min_level": 19},
+		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "min_level": 17},
 	],
 	"Lightning": [
 		{"name": "Spark",         "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "lightning",          "power": 16, "min_level": 6},
 		{"name": "Bolt",          "cost": 18, "cost_type": "mp", "target": "enemy_all", "effect": "lightning_aoe",      "power": 18, "min_level": 14},
-		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "min_level": 21},
+		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "min_level": 17},
 	],
 	"Earth": [
 		{"name": "Tremor", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "earth",        "power": 24, "min_level": 9},
-		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "min_level": 16},
+		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "min_level": 15},
 	],
 }
 
@@ -87,6 +90,10 @@ const ITEM_DEFS: Dictionary = {
 	"Elixir":   {"name": "Elixir",   "effect": "item_heal",       "power": 120, "target": "ally_choose"},
 	"Ether":    {"name": "Ether",    "effect": "item_restore_mp", "power": 30,  "target": "ally_choose"},
 	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
+	# The design doc's revival consumable (added in the 2026-10-24 playtest
+	# pass: it was missing, so a hero who fell deep in a dungeon stayed down
+	# until Frank). Revives the fallen ally with the most max HP at 25%.
+	"Phoenix Feather": {"name": "Phoenix Feather", "effect": "item_revive", "power": 25, "target": "fallen"},
 	# Act II's stronger stock (25b: freed Nordveil's item shop)
 	"Hi-Potion": {"name": "Hi-Potion", "effect": "item_heal",       "power": 220, "target": "ally_choose"},
 	"Hi-Ether":  {"name": "Hi-Ether",  "effect": "item_restore_mp", "power": 80,  "target": "ally_choose"},
@@ -1288,6 +1295,18 @@ func _confirm_item() -> void:
 	if _active_items.is_empty():
 		return
 	var item_def: Dictionary = _active_items[_menu_cursor]
+	if item_def["target"] == "fallen":
+		# No target to pick: like Resurrection, it finds the fallen ally.
+		if not _party.any(func(c: Combatant) -> bool: return c.is_ko):
+			message_label.text = "No one has fallen."
+			return
+		var member: Combatant = _party[_selecting_index]
+		member.queued_action = "item_use"
+		member.queued_skill = item_def
+		member.queued_target = -1
+		_menu_state = MenuState.MAIN
+		_advance_selection()
+		return
 	_enter_ally_targeting("item_use", item_def)
 
 
@@ -1405,6 +1424,16 @@ func _execute_next_turn() -> void:
 		if combatant.stun_rounds <= 0:
 			combatant.is_stunned = false
 		message_label.text = "%s is stunned and cannot act!" % combatant.display_name
+		if combatant.is_enemy and combatant.is_boss:
+			# Bosses can't be stun-locked (found in the 2026-10-24 playtest:
+			# Pressure Point / Garrote / the ultimates kept Vorath frozen in
+			# phase 1): after losing a turn they shrug off stuns for their
+			# next two turns, and a phase change still happens on time.
+			combatant.stun_guard = 2
+			var note := _check_boss_phase_transition(combatant)
+			if note != "":
+				await _play_boss_phase_change(combatant)
+				message_label.text = note + message_label.text
 		return
 	if combatant.is_enemy:
 		await _execute_enemy_turn(combatant)
@@ -1488,6 +1517,12 @@ func _execute_party_turn(member: Combatant) -> void:
 	if _counter_note != "":
 		message_label.text += "
 " + _counter_note
+	for e: Combatant in _enemies:
+		if e.is_boss and e.is_stunned and e.stun_guard > 0 and e.is_alive():
+			e.is_stunned = false
+			e.stun_rounds = 0
+			message_label.text += "\n%s resists the stun!" % e.display_name
+			_update_ui()
 	_skill_element = ""
 	_actor = null
 
@@ -2217,6 +2252,21 @@ func _do_item(member: Combatant, item_def: Dictionary) -> void:
 	if count <= 0:
 		message_label.text = "No %s left!" % item_name
 		return
+	if item_def["effect"] == "item_revive":
+		var fallen: Array = _party.filter(func(c: Combatant) -> bool: return c.is_ko)
+		if fallen.is_empty():
+			message_label.text = "%s holds up the %s...\nbut no one has fallen." % [member.display_name, item_name]
+			return
+		GameManager.inventory[item_name] = count - 1
+		fallen.sort_custom(func(a, b): return a.max_hp > b.max_hp)
+		var who: Combatant = fallen[0]
+		who.is_ko = false
+		who.hp = maxi(1, who.max_hp * int(item_def["power"]) / 100)
+		_fx_on(who, "pillar", "holy")
+		Sfx.play("heal")
+		_update_ui()
+		message_label.text = "%s uses a %s!\n%s is back on their feet!" % [member.display_name, item_name, who.display_name]
+		return
 	GameManager.inventory[item_name] = count - 1
 
 	var target: Combatant = _get_ally_target(member, item_def)
@@ -2251,6 +2301,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not in_sight.is_empty():
 		targets = in_sight
 	enemy.turns_taken += 1
+	enemy.stun_guard = maxi(0, enemy.stun_guard - 1)
 	var phase_note := ""
 	if enemy.is_boss:
 		phase_note = _check_boss_phase_transition(enemy)

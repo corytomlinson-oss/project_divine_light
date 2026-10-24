@@ -83,7 +83,7 @@ const KITS := {
 	# Vorath, the Architect (28c; README "Vorath"): phase 1 mirrors the four
 	# classes, phase 2 is all area attacks with a rotating immunity (Battle),
 	# phase 3 is the Void Form race against the Final Unraveling (Battle).
-	"Vorath": {"int": 60, "res": 28, "aura": ["fire", "ice", "lightning", "earth"], "abilities": [
+	"Vorath": {"int": 72, "res": 28, "aura": ["fire", "ice", "lightning", "earth"], "abilities": [
 		{"name": "Dark Smite", "kind": "magic_all", "chance": 30, "max_phase": 0, "power": 40, "palette": "debuff"},
 		{"name": "Death Touch", "kind": "dot_strike", "every": 4, "max_phase": 0, "poison_power": 10, "bleed_power": 10, "stun_chance": 100},
 		{"name": "Void Strike", "kind": "multi_strike", "chance": 30, "max_phase": 0, "hits": 3},
@@ -401,7 +401,7 @@ const GUILD_ENCOUNTERS: Array = [
 ]
 
 # The Blighted Maw's guard (28b): an Architect's Thrall on floor 4's stairs.
-const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 1600, "atk": 76, "def": 26, "agi": 16, "xp": 2200,
+const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 1600, "atk": 76, "def": 26, "agi": 16, "xp": 3500,
 		"tell": "narrate Something tall and wrong unfolds from the dark at the foot of the stairs. It has the Architect's mark burned into its chest."}
 
 # The Drowned Fortress's mid-dungeon guard (25d; the doc's Admiral's First
@@ -504,26 +504,26 @@ const FORTRESS_ENCOUNTERS: Array = [
 
 # The Blighted Reach (28a): four heroes around level 14-16.
 const REACH_ENCOUNTERS: Array = [
-	[{"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 150},
-	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170}],
-	[{"name": "Null Sentinel",  "hp": 300, "atk": 64, "def": 28, "agi": 8,  "xp": 160},
-	 {"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 150}],
-	[{"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170},
-	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170}],
-	[{"name": "Architect's Thrall", "hp": 520, "atk": 70, "def": 24, "agi": 14, "xp": 300}],
+	[{"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 240},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270}],
+	[{"name": "Null Sentinel",  "hp": 300, "atk": 64, "def": 28, "agi": 8,  "xp": 260},
+	 {"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 240}],
+	[{"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270}],
+	[{"name": "Architect's Thrall", "hp": 520, "atk": 70, "def": 24, "agi": 14, "xp": 480}],
 ]
 
 # The Blighted Maw (28b): heavier than the Reach, four heroes ~level 16-21.
 const MAW_ENCOUNTERS: Array = [
-	[{"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 190},
-	 {"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 190},
-	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 170}],
-	[{"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 180},
-	 {"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 180}],
-	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320},
-	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 170}],
-	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320},
-	 {"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 320}],
+	[{"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 300},
+	 {"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 300},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 270}],
+	[{"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 290},
+	 {"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 290}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 270}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510},
+	 {"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510}],
 ]
 
 const ENCOUNTER_TABLES: Dictionary = {
@@ -561,8 +561,8 @@ const BOSSES := {
 	# The final boss (28c): phases at 66% / 33%. Tuned for four heroes around
 	# level 21-23 with Act III gear, plus Frank in phase 3.
 	"vorath": {
-		"name": "Vorath", "hp": 6000, "atk": 80, "def": 30, "agi": 16, "xp": 0,
-		"phase_hp_thresholds": [0.66, 0.33],
+		"name": "Vorath", "hp": 9000, "atk": 95, "def": 30, "agi": 16, "xp": 0,
+		"phase_hp_thresholds": [0.7, 0.4],  # playtest pass: phase 3 long enough for the Final Unraveling race
 	},
 	"drowned_admiral": {
 		"name": "Drowned Admiral", "hp": 2600, "atk": 62, "def": 20, "agi": 13, "xp": 4200,

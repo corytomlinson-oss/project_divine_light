@@ -41,6 +41,7 @@ const ITEM_STOCK: Array = [
 	{"item": "Antidote", "price": 10},
 	{"item": "Ether", "price": 50},
 	{"item": "Elixir", "price": 120},
+	{"item": "Phoenix Feather", "price": 100},
 	{"item": "Hi-Potion", "price": 90},
 	{"item": "Hi-Ether", "price": 240},
 ]

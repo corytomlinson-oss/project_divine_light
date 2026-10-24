@@ -57,6 +57,7 @@ const STOCK_AFTER: Array = [
 	{"item": "Antidote", "price": 15},
 	{"item": "Ether", "price": 60},
 	{"item": "Elixir", "price": 150},
+	{"item": "Phoenix Feather", "price": 150},
 	{"item": "Hi-Potion", "price": 120},
 	{"item": "Hi-Ether", "price": 300},
 ]

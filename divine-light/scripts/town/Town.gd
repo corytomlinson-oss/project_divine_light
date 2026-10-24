@@ -27,6 +27,7 @@ const FRANK_STOCK: Array = [
 	{"item": "Antidote", "price": 15},
 	{"item": "Ether", "price": 60},
 	{"item": "Elixir", "price": 150},
+	{"item": "Phoenix Feather", "price": 150},
 	{"item": "Iron Sword", "price": 120},
 	{"item": "Iron Claws", "price": 120},
 	{"item": "Apprentice Staff", "price": 120},

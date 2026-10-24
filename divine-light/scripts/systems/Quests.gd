@@ -433,7 +433,7 @@ const HUNTS := {
 		"tell": "narrate The dune heaves - a golem of fused sand and stone stands up out of it!",
 		"won": "narrate The Dune Stalker crumbles back into the desert it came from."},
 	"hollow_custodian": {"cell": Vector2i(8, 17), "region": "reach", "scale": false,
-		"enemy": {"name": "Hollow Custodian", "hp": 1600, "atk": 68, "def": 24, "agi": 14, "xp": 1600},
+		"enemy": {"name": "Hollow Custodian", "hp": 1600, "atk": 68, "def": 24, "agi": 14, "xp": 2600},
 		"tell": "narrate The shrine's broken statue turns its head. It was never a statue.",
 		"won": "narrate The Hollow Custodian crumbles to grey dust. In the rubble lies a ring of black metal, humming faintly: the frame."},
 	"reef_horror": {"cell": Vector2i(36, 28), "region": "coast", "scale": false,

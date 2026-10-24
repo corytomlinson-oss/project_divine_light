@@ -360,7 +360,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 
 ## Act III (Milestone 28, stand-ins until 30)
 
-- [x] **Reach tileset** (`reach_tiles.png`: ash, dead trees, cracked road, portal arch, chasms, bones) and **Blighted Maw tileset** (`maw_tiles.png`, 8 columns; ice / fire / water in 5 / 6 / 7)
+- [x] **Reach tileset** (`reach_tiles.png`: ash, dead trees, cracked road, portal arch, chasms, bones) and its **restored** version for after the ending (`reach_tiles_restored.png`, playtest pass) and **Blighted Maw tileset** (`maw_tiles.png`, 8 columns; ice / fire / water in 5 / 6 / 7)
 - [x] **Enemies (recolors):** Null Sentinel, Unraveled Soul, Entropy Shade, Architect's Thrall, Hollow Custodian, and the 29 hunts Oathbreaker and Grave Robber (Vorath was a recolor until 30) (`sprites/source/build_act2_enemies.py`)
 - [x] **Battle backgrounds:** reach, maw
 - [x] Music: `reach`, `maw`, `vorath` (the final battle) — Milestone 30

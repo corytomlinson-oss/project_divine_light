@@ -119,6 +119,8 @@ Next: Milestone 22, save/load triggers.
 
 **Completed:** Milestone 30 — Act III art & music. The end of the game has its own sound now: a weary, sparse theme for the Blighted Reach, a heartbeat-and-organ dread for the Blighted Maw, and a driving final battle theme that plays only against Vorath. Vorath himself is drawn by hand, the biggest sprite in the game: a floating hooded titan whose robe is a hole in the world full of stars, crowned with shattered light under a broken golden halo, one hand raising a void orb and the other reaching for the party with the threads of the Unraveling crackling from his fingers. (The regular Act II and III enemies are still recolors of older sprites.)
 
+**Playtest pass (2026-10-24, while Cory was away):** a simulated run of the whole main path from the end of Act I to Vorath (about 90 real battles), plus data, map, save/load and screen checks. Fixed: bosses could be stun-locked (and then never changed phase); the equip screen crashed with 6+ items for a slot; the quest log overflowed; there was no revival item (the Phoenix Feather now); the Elixir was worse than a Hi-Potion (now a full restore); Act III and Vorath were too easy and the end-game skills came too late (rebalanced); the Reach stayed grey after the ending (restored tiles). Details in DECISIONS.md.
+
 **What's next:** Cory playtests 25b-30, then the PRs into `main`, then Milestone 31 (the Android APK on the Retroid Pocket 6). Where the finished game differs from the design below, see **As built** right after this section.
 
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
@@ -143,13 +145,16 @@ See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification c
 
 The design sections below are the original plan and are kept as written, except where marked. Where the built game went another way (Cory's calls or logged decisions in `DECISIONS.md`):
 
-- **Skill unlock levels are compressed** above level 8 (`round(8 + (old - 8) * 0.55)`), so every class has its whole kit by about level 23, matching the real XP curve (the party ends Act II around 13). The skill tables below show the built levels.
-- **Vael learns Resurrection** (level 21, 30 MP): revives the fallen ally with the most max HP at half HP (full with the Divine Champion set). Frank and revival items are no longer the only revives.
+- **Skill unlock levels are compressed** above level 8 (`8 + (old - 8) * 0.55`), then again above 15 (`15 + (x - 15) * 0.4`), so every class has its whole kit by level 18, which the main path reaches at Vorath (the party ends Act II around 14). The skill tables below show the built levels.
+- **Vael learns Resurrection** (level 17, 30 MP): revives the fallen ally with the most max HP at half HP (full with the Divine Champion set). Frank and revival items are no longer the only revives.
 - **Lyra has no summons.** Ignus/Glacius were never built; so the Cosmic Conduit set became "Lyra's spells cost 25% less MP", and Death's Hand became "Shadowstep +30% damage" (it has no row limit to lift).
 - **Silas uses MP.** Ryn's Qi caps at 6.
 - **Act III's "Void Sentinel" is the Null Sentinel** (the Observatory's escape warden already has that name).
 - **Frank in the Vorath fight acts on his own** after every Vorath turn (Blessing, Balance's Judgment, the Final Invoice under 15% HP) instead of being a menu-controlled 5th member; the battle UI is built for four. His true name is a placeholder until Cory picks one ("Faranoth", `GameManager.FRANK_TRUE_NAME`).
-- **Vorath:** phase 2's immunity rotates every turn (fire, ice, lightning, earth, holy); in phase 3 the Final Unraveling wipes the party 4 turns after one free round.
+- **Vorath:** 9000 HP; phase 2 (from 70%) rotates his immunity every turn (fire, ice, lightning, earth, holy); phase 3 (from 40%) brings Frank in, and the Final Unraveling wipes the party 4 turns after one free round.
+- **Bosses can't be stun-locked:** after losing a turn to a stun, a boss shrugs off stuns for its next two turns, and it still changes phase on time.
+- **Items:** a revival item exists, the **Phoenix Feather** (revives the fallen ally with the most max HP at 1/4 HP; Frank, freed kingdoms, the Threshold). The **Elixir fully restores** one ally's HP and MP (it was 120 HP).
+- **After the ending** the Reach turns green (a restored tileset) and has no random fights.
 - **The Blighted Maw is reached through a portal** in the Blighted Reach, opened by a three-part Portal Key from three required quests (Cory's idea). The Threshold sits at the Reach's edge.
 - **Frank's shop has a fixed stock** (no level-scaled random accessories); kingdom armories and the Threshold sell the higher tiers. After the ending Frank is a faint echo of light who still keeps his stall.
 - **Shrines:** Edenmere's and the freed kingdoms' heal once per dungeon trip; the Threshold's is unlimited.
@@ -339,7 +344,7 @@ All four party members are pure entities — one is the player's chosen class, t
 
 Frank's merchant persona is a mask. His true identity — an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin — is concealed until the final confrontation. He has quietly guided the party since the moment they met. His real name is never spoken until the Vorath battle. In Phase 3 he drops the mask entirely, joins the fight as a 5th party member, and deploys power he has never once revealed.
 
-Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill. *(As built: Vael learns Resurrection late in Act III, Cory's call.)*
+Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill. *(As built: Vael learns Resurrection late in Act III, Cory's call; the revival consumable is the Phoenix Feather.)*
 
 ### The Antagonist
 
@@ -496,7 +501,7 @@ A high-tier skill for Lyra. When activated:
 
 ## Class Skill Lists
 
-*Levels below are the built ones (compressed in 28a; the original plan ran to level 35). The level cap is still 35.*
+*Levels below are the built ones (compressed in 28a and again in the 2026-10-24 playtest pass; the original plan ran to level 35). The level cap is still 35.*
 
 ### Status Effects
 
@@ -522,12 +527,12 @@ A high-tier skill for Lyra. When activated:
 | 11 | **Fortify** | Medium | Raise DEF for all allies for 2 rounds |
 | 13 | **Divine Strike** | Medium | Strong holy damage + chance to stun corrupted enemies |
 | 15 | **Divine Shield** | Medium | Reduce damage taken by all allies in Vael's row for 2 rounds |
-| 16 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
-| 18 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
-| 20 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
-| 21 | **Purify** | Low | Remove all status effects from one ally |
-| 21 | **Resurrection** | 30 MP | Revive the fallen ally with the most max HP at 50% HP (full with Divine Champion). *Added in 28b* |
-| 23 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
+| 15 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
+| 16 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
+| 17 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
+| 17 | **Purify** | Low | Remove all status effects from one ally |
+| 17 | **Resurrection** | 30 MP | Revive the fallen ally with the most max HP at 50% HP (full with Divine Champion). *Added in 28b* |
+| 18 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
 
 ---
 
@@ -544,11 +549,11 @@ Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Qi can be spent on da
 | 11 | **Ki Burst** | 3 Qi | Damage | Concentrated ki energy — ignores a portion of enemy defense |
 | 13 | **Ki Blast** | 3 Qi | Damage | Ranged ki projectile — full damage usable from back row |
 | 15 | **Mending Flow** | 4 Qi | Healing | Restore significant HP to one ally |
-| 16 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
-| 18 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
-| 20 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
-| 21 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
-| 23 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
+| 15 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
+| 16 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
+| 17 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
+| 17 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
+| 18 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
 
 ---
 
@@ -562,7 +567,7 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 |---|---|---|---|
 | 1 | **Ember** | Low | Fire damage to one enemy |
 | 8 | **Flare** | Medium | Strong fire damage to one enemy |
-| 17 | **Inferno** | High | Massive fire damage to one enemy + burn for 3 rounds |
+| 16 | **Inferno** | High | Massive fire damage to one enemy + burn for 3 rounds |
 
 **Ice Stance** — Damage + speed and control debuffs
 
@@ -570,7 +575,7 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 |---|---|---|---|
 | 4 | **Frost** | Low | Ice damage to one enemy + lower their AGI for 1 round |
 | 11 | **Blizzard** | Medium | Ice damage to one enemy + chance to freeze (skip their next turn) |
-| 19 | **Glacier** | High | Ice damage to all enemies + freeze chance on each |
+| 17 | **Glacier** | High | Ice damage to all enemies + freeze chance on each |
 
 **Lightning Stance** — Multi-target damage, paralysis
 
@@ -578,14 +583,14 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 |---|---|---|---|
 | 6 | **Spark** | Low | Lightning damage to one enemy |
 | 14 | **Bolt** | Medium | Lightning damage to all enemies |
-| 21 | **Thunderstrike** | High | Massive lightning damage to one enemy + guaranteed paralysis |
+| 17 | **Thunderstrike** | High | Massive lightning damage to one enemy + guaranteed paralysis |
 
 **Earth Stance** — AoE damage, defense reduction, row-dependent
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
 | 9 | **Tremor** | Medium | Front row: heavy earth smash on one enemy / Back row: AoE tremor hitting all enemies at reduced damage |
-| 16 | **Quake** | High | AoE earth damage to all enemies + lower defense on all for 2 rounds |
+| 15 | **Quake** | High | AoE earth damage to all enemies + lower defense on all for 2 rounds |
 
 **Summons** — Stance-independent, activated on any turn regardless of current stance *(not built)*
 
@@ -607,11 +612,11 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 | 11 | **Lacerate** | Medium | Apply bleed to one enemy — high damage for 4 rounds, cannot be cured by antidotes |
 | 12 | **Smoke Bomb** | Medium | Lower all enemies' accuracy for 2 rounds |
 | 14 | **Expose** | Low | Lower one enemy's defense — entire party deals bonus damage to them |
-| 16 | **Garrote** | Medium | Inflict stun on one enemy — guaranteed on non-boss enemies |
-| 17 | **Flurry** | Medium | 4 rapid strikes on one target — each hit rolls for crit independently |
-| 19 | **Toxic Cloud** | High | Apply poison to all enemies simultaneously |
-| 21 | **Death Mark** | High | Mark one enemy — they take increased damage from all sources for 3 rounds |
-| 23 | **Shadowstep** | Very High | Silas's ultimate — massive single-target damage + applies poison, bleed, and stun simultaneously |
+| 15 | **Garrote** | Medium | Inflict stun on one enemy — guaranteed on non-boss enemies |
+| 16 | **Flurry** | Medium | 4 rapid strikes on one target — each hit rolls for crit independently |
+| 17 | **Toxic Cloud** | High | Apply poison to all enemies simultaneously |
+| 17 | **Death Mark** | High | Mark one enemy — they take increased damage from all sources for 3 rounds |
+| 18 | **Shadowstep** | Very High | Silas's ultimate — massive single-target damage + applies poison, bleed, and stun simultaneously |
 
 ---
 

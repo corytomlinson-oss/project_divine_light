@@ -114,3 +114,12 @@ sheet.paste(frames[0], (0, 0))
 sheet.paste(frames[1], (24, 0))
 sheet.save(ENEMIES / "sand_viper.png")
 print("wrote sand_viper", sheet.size)
+
+# The Selavon Coast (25d; README "Coastal Kingdom")
+ramp_recolor("shade_wisp", "sea_specter", (20, 70, 80), (170, 240, 230), glow=(140, 255, 220))
+ramp_recolor("hired_muscle", "coral_brute", (110, 50, 60), (250, 160, 150))
+ramp_recolor("void_mage", "tidal_witch", (20, 60, 80), (120, 220, 220), glow=(140, 255, 240))
+ramp_recolor("astral_familiar", "storm_gull", (60, 66, 80), (236, 238, 244), glow=(255, 230, 90))
+# The Drowned Fortress's guard and boss
+ramp_recolor("corrupted_enforcer", "first_mate", (20, 30, 60), (140, 170, 210), glow=(255, 240, 120))
+ramp_recolor("shadow_lord", "drowned_admiral", (14, 40, 50), (120, 200, 190), glow=(255, 240, 120))

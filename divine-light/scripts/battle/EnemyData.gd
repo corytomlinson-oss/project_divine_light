@@ -79,6 +79,36 @@ const KITS := {
 		{"name": "Flame Wall", "kind": "burn_row", "chance": 45, "power": 26, "rounds": 3, "burn_power": 8},
 	]},
 	"Dune Marauder": {"attack": {"steal": 35}},
+	# The Selavon Coast (Act II, 25d; README "Coastal Kingdom")
+	"Sea Specter": {"int": 34, "res": 20, "weak": ["holy"], "abilities": [
+		{"name": "Charged Mist", "kind": "magic_single", "chance": 60, "power": 34, "stun_chance": 30, "palette": "lightning"},
+	]},
+	"Coral Brute": {"res": 12, "immune": ["ice"], "weak": ["lightning"], "attack": {"stun_chance": 10}},
+	"Tidal Witch": {"int": 34, "res": 18, "weak": ["lightning"], "abilities": [
+		{"name": "Healing Tide", "kind": "heal_allies", "every": 2, "power": 60},
+		{"name": "Undertow", "kind": "magic_single", "chance": 35, "power": 30, "palette": "ice"},
+	]},
+	"Storm Gull": {"attack": {"hits": 2}},
+	# The Drowned Fortress's guard and boss (25d)
+	"First Mate": {"int": 36, "res": 16, "weak": ["earth"], "attack": {"hits": 1, "hits_max": 2}, "abilities": [
+		{"name": "Call the Storm", "kind": "magic_all", "every": 4, "power": 30, "palette": "lightning"},
+	]},
+	"Drowned Admiral": {"int": 48, "res": 20, "weak": ["earth"], "abilities": [
+		# Phase 1: lightning with a chance to paralyze
+		{"name": "Thunderclap", "kind": "magic_single", "chance": 50, "max_phase": 0, "power": 46, "stun_chance": 30, "palette": "lightning"},
+		# Phase 2: Sea Specters, and a storm aura striking everyone every round
+		{"name": "Raise the Drowned", "kind": "summon", "chance": 100, "phase": 1, "max_phase": 1,
+			"tell": "raises his cutlass - Sea Specters rise from the flooded deck!",
+			"enemies": [
+				{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8, "agi": 16, "xp": 0},
+				{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8, "agi": 16, "xp": 0},
+			]},
+		{"name": "Storm Aura", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 28, "palette": "lightning"},
+		# Phase 3: a massive strike charged over two rounds - Defend or Sanctuary
+		{"name": "Maelstrom Bolt", "kind": "charge_all", "every": 2, "phase": 2, "power": 110,
+			"tell": "lifts his cutlass to the sky - the storm gathers around him! (Defend!)"},
+		{"name": "Thunderclap", "kind": "magic_single", "chance": 60, "phase": 2, "power": 50, "stun_chance": 30, "palette": "lightning"},
+	]},
 	# The Sunken Sanctum's guard and boss (25c)
 	"Blazing Sentinel": {"int": 36, "res": 16, "weak": ["ice"], "attack": {"burn_chance": 30, "burn_power": 8}, "abilities": [
 		{"name": "Wildfire", "kind": "burn_all", "every": 3, "power": 22, "rounds": 3, "burn_power": 9},
@@ -325,6 +355,11 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
+# The Drowned Fortress's mid-dungeon guard (25d; the doc's Admiral's First
+# Mate): very high AGI - often acts before Silas - and a party-wide storm.
+const FIRST_MATE := {"name": "First Mate", "hp": 1150, "atk": 60, "def": 20, "agi": 40, "xp": 1600,
+		"tell": "say First Mate: The Admiral's orders - none get past this deck alive!"}
+
 # The Sunken Sanctum's mid-dungeon guard (25c; the doc's Blazing Sentinel):
 # burns the whole party every third turn.
 const BLAZING_SENTINEL := {"name": "Blazing Sentinel", "hp": 950, "atk": 56, "def": 20, "agi": 10, "xp": 1200,
@@ -393,6 +428,31 @@ const SANCTUM_ENCOUNTERS: Array = [
 	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100}],
 ]
 
+# The Selavon Coast and the Drowned Fortress (25d): four heroes ~level 11-13.
+const COAST_ENCOUNTERS: Array = [
+	[{"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Coral Brute", "hp": 320, "atk": 60, "def": 26, "agi": 5,  "xp": 130},
+	 {"name": "Tidal Witch", "hp": 150, "atk": 42, "def": 10, "agi": 14, "xp": 115}],
+	[{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8,  "agi": 16, "xp": 110},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Tidal Witch", "hp": 150, "atk": 42, "def": 10, "agi": 14, "xp": 115},
+	 {"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8,  "agi": 16, "xp": 110},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Coral Brute", "hp": 320, "atk": 60, "def": 26, "agi": 5,  "xp": 130}],
+]
+const FORTRESS_ENCOUNTERS: Array = [
+	[{"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115}],
+	[{"name": "Coral Brute", "hp": 330, "atk": 62, "def": 26, "agi": 5,  "xp": 135},
+	 {"name": "Tidal Witch", "hp": 160, "atk": 44, "def": 10, "agi": 14, "xp": 120}],
+	[{"name": "Coral Brute", "hp": 330, "atk": 62, "def": 26, "agi": 5,  "xp": 135},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115},
+	 {"name": "Tidal Witch", "hp": 160, "atk": 44, "def": 10, "agi": 14, "xp": 120}],
+	[{"name": "Storm Gull",  "hp": 125, "atk": 52, "def": 8,  "agi": 28, "xp": 105},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -407,6 +467,8 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"frozen_citadel": CITADEL_ENCOUNTERS,
 	"desert": DESERT_ENCOUNTERS,
 	"sunken_sanctum": SANCTUM_ENCOUNTERS,
+	"coast": COAST_ENCOUNTERS,
+	"drowned_fortress": FORTRESS_ENCOUNTERS,
 }
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
@@ -418,6 +480,13 @@ const BOSSES := {
 	# Duskara's boss (25c; README "Act II Kingdom Bosses"): phases at 66% /
 	# 33% - fire and burning blows, then the arena burns every round, then
 	# rapid ice and lightning. Tuned for four heroes around level 10-11.
+	# Selavon's boss (25d): phases at 66% / 33% - paralyzing lightning, then
+	# Sea Specters and a storm every round, then a strike charged over two
+	# rounds that only Defend or Sanctuary softens. Four heroes ~level 12-13.
+	"drowned_admiral": {
+		"name": "Drowned Admiral", "hp": 2600, "atk": 62, "def": 20, "agi": 13, "xp": 4200,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
 	"burning_tyrant": {
 		"name": "Burning Tyrant", "hp": 2000, "atk": 58, "def": 18, "agi": 11, "xp": 3200,
 		"phase_hp_thresholds": [0.66, 0.33],

@@ -43,7 +43,7 @@ const TOWNS := {
 	"edenmere": {"name": "Edenmere", "scene": "res://scenes/town/Edenmere.tscn"},
 	"nordveil": {"name": "Nordveil", "scene": "res://scenes/town/Nordveil.tscn"},
 	"duskara": {"name": "Duskara", "scene": "res://scenes/town/Duskara.tscn"},
-	"selavon": {"name": "Selavon", "scene": ""},
+	"selavon": {"name": "Selavon", "scene": "res://scenes/town/Selavon.tscn"},
 }
 const CHEST_SHEET := preload("res://assets/sprites/chests.png")
 const SPRING_SHEET := preload("res://assets/sprites/spring.png")

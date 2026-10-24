@@ -95,6 +95,21 @@ func _run() -> void:
 			_show(_caption, "Every kingdom is free. Only the Blighted Maw remains.")
 		else:
 			_show(_caption, "%s still %s in Vorath's grip." % [" and ".join(names), "lies" if names.size() == 1 else "lie"])
+	# The last kingdom freed (25d): the end of Act II's kingdoms.
+	if Kingdoms.all_cleansed() and not _skipped:
+		await _at(8 * BAR)
+		GameManager.story_flags["act_two_complete"] = true
+		_show(_caption, "")
+		_title.position = Vector2(0, 70)
+		_white(0.8, 0.6)
+		Sfx.play("level_up")
+		_show(_title, "Act II - The Purge")
+		await _at(10 * BAR)
+		_show(_title, "Act III - The Source")
+		_show(_caption, "Coming in a later update.")
+		await _at(13 * BAR)
+	elif Kingdoms.all_cleansed():
+		GameManager.story_flags["act_two_complete"] = true
 	await _at(8 * BAR)
 	await Transition.fade_out(0.3 if _skipped else 0.8)
 	Music.stop(0.4 if _skipped else 1.0)

@@ -38,7 +38,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _moving:
-		var step: float = MOVE_SPEED * (1.6 if _sliding else 1.0) * delta
+		var step: float = MOVE_SPEED * (1.6 if _sliding else _wade_factor()) * delta
 		var left_to_go: float = position.distance_to(_target)
 		if step < left_to_go:
 			position = position.move_toward(_target, step)
@@ -131,6 +131,14 @@ func _handle_input() -> void:
 	_target = next_target
 	_moving = true
 	_play_anim("walk")
+
+
+## Flood water (25d) slows you to a wade.
+func _wade_factor() -> float:
+	var map_root: Node = _tile_map.get_parent()
+	if map_root.has_method("is_wading") and map_root.is_wading(_tile_map.local_to_map(position)):
+		return 0.6
+	return 1.0
 
 
 ## Standing on ice (the map says which tiles are slippery) with open floor
@@ -232,6 +240,8 @@ func _check_encounter() -> void:
 	_steps_to_encounter -= 1
 	if _steps_to_encounter <= 0:
 		_reset_encounter_counter()
+		# Caught wading in flood water (25d): the enemies are quicker.
+		GameManager.battle_in_water = map_root.has_method("is_wading") and map_root.is_wading(_tile_map.local_to_map(position))
 		GameManager.pending_spawn_position = position
 		GameManager.has_pending_spawn = true
 		Transition.to_battle()

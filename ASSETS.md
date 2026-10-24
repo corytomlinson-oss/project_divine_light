@@ -344,6 +344,14 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Battle backgrounds:** desert, sanctum (`ui/source/build_act2_bgs.py`)
 - [ ] Music: `desert`, `duskara_heat` (fall back to overworld/town) — 27
 
+## Act II — Selavon (Milestone 25d, stand-ins until 27)
+
+- [x] **Coast, Selavon town and Drowned Fortress tilesets** (`tilesets/source/build_coast_tiles.py`; the fortress's 6th column is flood water)
+- [x] **Enemies (recolors):** Sea Specter, Coral Brute, Tidal Witch, Storm Gull, First Mate, Drowned Admiral
+- [x] **Props:** lightning rod (2 frames)
+- [x] **Battle backgrounds:** coast (storm, sunken hull), fortress (flooded hall)
+- [ ] Music: `coast`, `selavon_storm` (fall back to overworld/town) — 27
+
 ## Deferred to later passes
 
 - **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.

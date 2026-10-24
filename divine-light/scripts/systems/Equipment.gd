@@ -71,6 +71,16 @@ const DEFS: Dictionary = {
 	"Mirage Robe":         {"slot": "armor",  "class": "Lyra",  "def": 3, "res": 9},
 	"Dune Leathers":       {"slot": "armor",  "class": "Silas", "def": 6, "agi": 4},
 	"Oasis Charm":         {"slot": "accessory", "class": "", "res": 6, "hp": 40},
+	# Act II's third tier (25d): freed Selavon's armory.
+	"Stormsilver Sword":   {"slot": "weapon", "class": "Vael",  "atk": 31},
+	"Stormsilver Claws":   {"slot": "weapon", "class": "Ryn",   "atk": 29},
+	"Stormsilver Staff":   {"slot": "weapon", "class": "Lyra",  "atk": 10, "int": 24},
+	"Stormsilver Daggers": {"slot": "weapon", "class": "Silas", "atk": 30},
+	"Tideguard Plate":     {"slot": "armor",  "class": "Vael",  "def": 14},
+	"Seafoam Gi":          {"slot": "armor",  "class": "Ryn",   "def": 9, "agi": 3},
+	"Tidecaller Robe":     {"slot": "armor",  "class": "Lyra",  "def": 4, "res": 12},
+	"Reefrunner Leathers": {"slot": "armor",  "class": "Silas", "def": 8, "agi": 5},
+	"Tide Charm":          {"slot": "accessory", "class": "", "res": 8, "hp": 60},
 
 	# Act II armor sets (25b; README "Full Set Bonus"). Spread across Act II
 	# (Cory): the Frozen Citadel holds the four armors, Nordveil's armory sells
@@ -103,6 +113,8 @@ const DEFS: Dictionary = {
 	"Snowdrop Charm":    {"slot": "accessory", "class": "", "res": 4, "hp": 40},
 	# The Duskara Wastes' hidden clearing (25c)
 	"Sunstone Ring":     {"slot": "accessory", "class": "", "atk": 3, "int": 3, "hp": 30},
+	# The Selavon Coast's hidden clearing (25d)
+	"Tidestone Ring":    {"slot": "accessory", "class": "", "res": 5, "agi": 3, "mp": 25},
 }
 
 # set_id -> data describing the bonus. Act I's four sets are all wired up

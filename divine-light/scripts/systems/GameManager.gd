@@ -63,6 +63,9 @@ var dungeon_floor: int = 0
 # A boss fight a map started itself names its boss here (Act II floors use
 # per-floor location ids, so Battle.LOCATION_BOSSES can't), cleared by Battle.
 var pending_boss_id: String = ""
+# The next battle starts with the party wading (25d: flooded floors) - its
+# enemies get +30% AGI. Set by Player.gd, cleared by Battle after setup.
+var battle_in_water: bool = false
 # Development/testing: when set (a list of enemy dicts, EnemyData format), the
 # next battle fights exactly this group - bosses too, via "is_boss" and
 # "phase_hp_thresholds" - then it's cleared (Milestone 20a).

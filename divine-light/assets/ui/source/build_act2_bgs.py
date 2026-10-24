@@ -156,7 +156,52 @@ def sanctum():
     print("wrote battle_bg_sanctum.png")
 
 
+def coast():
+    rng = random.Random(29)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 70, (30, 36, 52), (90, 104, 120))
+    d = ImageDraw.Draw(im)
+    for _ in range(5):  # storm clouds
+        x, y = rng.randrange(-20, W), rng.randrange(4, 30)
+        d.ellipse([x, y, x + 70, y + 18], fill=(46, 52, 70))
+    d.line([(244, 8), (236, 30), (246, 30), (232, 58)], fill=(255, 250, 190), width=2)  # lightning
+    dither_gradient(im, 62, 88, (40, 80, 110), (30, 64, 96))   # the sea
+    for _ in range(18):
+        x, y = rng.randrange(W), 64 + rng.randrange(22)
+        d.line([(x, y), (x + rng.randrange(5, 12), y)], fill=(150, 196, 214))
+    d.polygon([(60, 74), (96, 66), (104, 76)], fill=(70, 50, 36))      # a sunken hull
+    d.line([(84, 70), (78, 46)], fill=(70, 50, 36), width=2)           # its broken mast
+    dither_gradient(im, 88, 112, (196, 184, 150), (160, 150, 120))  # the beach
+    for _ in range(6):
+        x, y = rng.randrange(W), 92 + rng.randrange(18)
+        d.line([(x + i * 3, y + (1 if i % 2 else -1)) for i in range(6)], fill=(150, 100, 190))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_coast.png")
+    print("wrote battle_bg_coast.png")
+
+
+def fortress():
+    rng = random.Random(30)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 70, (16, 24, 30), (44, 58, 66))
+    d = ImageDraw.Draw(im)
+    for x in range(0, W, 64):  # arches of wet stone, weed hanging
+        d.rectangle([x, 0, x + 12, 70], fill=(70, 86, 92))
+        d.rectangle([x + 2, 0, x + 4, 70], fill=(110, 130, 136))
+        for k in range(3):
+            d.line([(x + 3 + k * 3, 0), (x + 3 + k * 3, 10 + rng.randrange(14))], fill=(60, 110, 70))
+    dither_gradient(im, 70, 112, (40, 92, 116), (28, 70, 96))  # the flooded floor
+    for _ in range(20):
+        x, y = rng.randrange(W), 74 + rng.randrange(34)
+        d.line([(x, y), (x + rng.randrange(4, 10), y)], fill=(110, 170, 196))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_fortress.png")
+    print("wrote battle_bg_fortress.png")
+
+
 tundra()
 citadel()
 desert()
 sanctum()
+coast()
+fortress()

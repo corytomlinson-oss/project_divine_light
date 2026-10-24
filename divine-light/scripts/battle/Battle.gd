@@ -121,6 +121,8 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	"frozen_citadel": "res://assets/ui/battle_bg_citadel.png",
 	"desert": "res://assets/ui/battle_bg_desert.png",
 	"sunken_sanctum": "res://assets/ui/battle_bg_sanctum.png",
+	"coast": "res://assets/ui/battle_bg_coast.png",
+	"drowned_fortress": "res://assets/ui/battle_bg_fortress.png",
 }
 
 # Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on
@@ -269,6 +271,7 @@ func _ready() -> void:
 	_setup_background()
 	_setup_party_window()
 	_enemies = _generate_encounter()
+	GameManager.battle_in_water = false  # used up by this battle's enemies (25d)
 	GameManager.last_battle_won = false
 	# For a suspend mid-fight (22b): the game as the fight began, and its enemies.
 	GameManager.begin_battle(_enemies.map(func(e: Combatant) -> Dictionary: return {
@@ -376,6 +379,8 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	e.aura_weakness = bool(kit.get("aura_weakness", false))
 	e.immune_from_phase = int(kit.get("immune_from_phase", -1))
 	e.immune = kit.get("immune", []).duplicate()  # always immune (25c: Dust Golem / earth)
+	if GameManager.battle_in_water:
+		e.agi = roundi(e.agi * 1.3)  # the party was caught wading (25d)
 	return e
 
 
@@ -2216,7 +2221,10 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not enemy.charging.is_empty():
 		var charged: Dictionary = enemy.charging
 		enemy.charging = {}
-		await _enemy_attack(enemy, targets, phase_note, charged)
+		if charged.get("kind", "") == "charge_all":
+			await _storm_strike(enemy, targets, phase_note, charged)
+		else:
+			await _enemy_attack(enemy, targets, phase_note, charged)
 		return
 	var ability := _choose_ability(enemy)
 	if not ability.is_empty():
@@ -2435,10 +2443,15 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			var target := _pick_target(enemy, targets)
 			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
 			_fx_on(target, "pillar", a.get("palette", "debuff"))
-			Sfx.play("holy")
+			Sfx.play("thunder" if a.get("palette", "") == "lightning" else "holy")
 			target.receive_damage(dmg)
+			var para := ""
+			if target.is_alive() and randi() % 100 < int(a.get("stun_chance", 0)):
+				target.is_stunned = true  # paralysis (25d, Sea Specter)
+				target.stun_rounds = 1
+				para = " Paralyzed!"
 			_update_ui()
-			message_label.text = phase_note + "%s casts %s!\n%s takes %d!" % [enemy.display_name, ability_name, target.display_name, dmg]
+			message_label.text = phase_note + "%s casts %s!\n%s takes %d!%s" % [enemy.display_name, ability_name, target.display_name, dmg, para]
 		"dot_strike":
 			# A basic hit that always poisons and bleeds (20d).
 			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, 1,
@@ -2476,6 +2489,21 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			enemy.aura_index += 1
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s! %s\nIts aura shifts to %s." % [enemy.display_name, spell, result, enemy.aura()]
+		"heal_allies":
+			# An enemy healer (25d, Tidal Witch): mends every ally still standing.
+			for e: Combatant in _enemies:
+				if e.is_alive():
+					e.hp = mini(e.max_hp, e.hp + power)
+					_fx_on(e, "sparkles", "heal")
+			Sfx.play("heal")
+			_update_enemy_ui()
+			message_label.text = phase_note + "%s casts %s!\nThe enemies' wounds close!" % [enemy.display_name, ability_name]
+		"charge_all":
+			# Telegraphed this turn, unleashed on the whole party next turn
+			# (25d, the Drowned Admiral's storm): Defend halves it, Sanctuary stops it.
+			enemy.charging = a
+			_fx_on(enemy, "stars", "lightning")
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "gathers a storm...")]
 		"burn_row", "burn_all":
 			# Fire that sets heroes alight (25c): the front row (Scorched Mage)
 			# or everyone (Blazing Sentinel); damage now, burn for a few rounds.
@@ -2574,6 +2602,27 @@ func _summon(summoner: Combatant, group: Array) -> void:
 			_fx.impact({"impact": "cloud", "palette": "shadow", "size": 12.0}, [sprite])
 	Sfx.play("encounter")
 	_update_enemy_ui()
+
+
+## The Drowned Admiral's charged storm (25d) lands on everyone: half damage
+## while defending, nothing behind a Sanctuary.
+func _storm_strike(enemy: Combatant, targets: Array, phase_note: String, a: Dictionary) -> void:
+	_fx.flash(Color(1, 1, 0.8), 0.7)
+	Sfx.play("thunder")
+	var power: int = int(a.get("power", 60))
+	for m: Combatant in targets:
+		if m.sanctuary:
+			m.sanctuary = false
+			continue
+		var dmg := maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-3, 3))
+		if m.defending:
+			dmg /= 2
+		_fx_on(m, "bolt", "lightning")
+		m.receive_damage(dmg)
+	_update_ui()
+	message_label.text = phase_note + "%s unleashes %s!\nLightning tears through the party!" % [enemy.display_name, a.get("name", "the storm")]
+	if _party.filter(func(c): return c.is_alive()).is_empty():
+		_end_battle(false)
 
 
 ## How long Silas's poisons last: 3 rounds, 5 with Venom Weave (25b).

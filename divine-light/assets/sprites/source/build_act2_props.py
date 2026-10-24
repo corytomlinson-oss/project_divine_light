@@ -145,6 +145,28 @@ LEVER_DOWN = [
     "................",
 ]
 sheet("lever.png", [LEVER_UP, LEVER_DOWN])
+
+PALETTE.update({"m": (150, 150, 164, 255), "M": (210, 210, 226, 255), "z": (255, 250, 150, 255)})
+ROD = [
+    "......kzk.......",
+    ".......k........",
+    ".......kMk......",
+    ".......kmk......",
+    ".......kMk......",
+    ".......kmk......",
+    ".......kMk......",
+    ".......kmk......",
+    ".......kMk......",
+    ".......kmk......",
+    "......kkmkk.....",
+    ".....kmmMmmk....",
+    "....kmMMMMMmk...",
+    "....kmmmmmmmk...",
+    ".....kkkkkkk....",
+    "................",
+]
+ROD_LIT = [row.replace("M", "z") for row in ROD]
+sheet("lightning_rod.png", [ROD, ROD_LIT])
 SEALED = [
     "kkkkkkkkkkkkkkkk",
     "kQQQQQQQQQQQQQQk",

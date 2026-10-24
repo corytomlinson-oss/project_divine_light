@@ -36,6 +36,14 @@ const ICE := "ice"
 const FIRE_COORDS := Vector2i(5, 0)
 const FIRE := "fire"
 const FIRE_DAMAGE := 0.06  # of max HP, per tile, for everyone standing (never below 1)
+# ...and flood water in the Drowned Fortress's (25d: "water_floors"): slows
+# you to a wade, and enemies that catch you in it are quicker.
+const WATER_COORDS := Vector2i(5, 0)
+const WATER := "water"
+const ROD_SHEET := preload("res://assets/sprites/lightning_rod.png")
+const ROD_PERIOD := 6     # steps between strikes; it crackles the step before
+const ROD_REACH := 2      # tiles around a rod the strike reaches
+const ROD_DAMAGE := 0.1   # of max HP, for everyone (never below 1)
 const OVERWORLD_SCENE_PATH := "res://scenes/overworld/Overworld.tscn"
 const ACT_ONE_END_SCENE := "res://data/cutscenes/act_one_end.scene"
 # Treasure (Milestones 23a/23b). chests.png frames: wooden closed/open,
@@ -136,6 +144,23 @@ const DUNGEONS := {
 		"set_floor": 2,
 		"region_scene": "res://scenes/overworld/Desert.tscn",
 	},
+	# Act II (25d): the doc's four zones - the Destroyed Harbor (flooding
+	# introduced), the Fortress Exterior (lightning rods), the Flooded
+	# Interior (the First Mate guards its stairs; the Act II gloves), the
+	# Admiral's Deck (the Drowned Admiral).
+	"drowned_fortress": {
+		"template": {"min_rooms": 5, "max_rooms": 7, "room_min_size": Vector2i(10, 7), "room_max_size": Vector2i(15, 10), "side_rooms": 1},
+		"scene": "res://scenes/dungeon/DrownedFortress.tscn",
+		"music": "dungeon",
+		"floors": 4,
+		"water_floors": [0, 1, 2],
+		"rod_floors": [1],
+		"kingdom": "selavon",
+		"boss": "drowned_admiral",
+		"guards": {2: EnemyData.FIRST_MATE},
+		"set_floor": 2,
+		"region_scene": "res://scenes/overworld/Coast.tscn",
+	},
 }
 
 const TAG_TO_COORDS := {
@@ -146,6 +171,7 @@ const TAG_TO_COORDS := {
 	DungeonGenerator.BOSS_TRIGGER: BOSS_COORDS,
 	ICE: ICE_COORDS,
 	FIRE: FIRE_COORDS,
+	WATER: WATER_COORDS,
 }
 
 ## Which ActOne dungeon this scene is.
@@ -170,6 +196,8 @@ var _guard: Sprite2D = null
 var _lever_cell := Vector2i(-9999, -9999)
 var _lever: Sprite2D = null
 var _sealed_doors: Dictionary = {}  # doorway cell -> Sprite2D (25c)
+var _rods: Dictionary = {}  # cell -> Sprite2D (25d)
+var _rod_steps := 0
 var _settled := false
 
 
@@ -184,7 +212,7 @@ func _ready() -> void:
 	GameManager.pending_boss_id = _data.get("boss", "") if _is_last_floor() else ""
 	GameManager.current_scene_path = _data["scene"]
 	# Town shrines work once per dungeon visit (20d; Nordveil's too, 25b).
-	for shrine_flag in ["edenmere_shrine_used", "nordveil_shrine_used", "duskara_shrine_used"]:
+	for shrine_flag in ["edenmere_shrine_used", "nordveil_shrine_used", "duskara_shrine_used", "selavon_shrine_used"]:
 		GameManager.story_flags.erase(shrine_flag)
 	Music.play(_data.get("music", "dungeon"), "dungeon")  # each dungeon's own theme (Milestone 21)
 	# Characters lower on screen draw in front (a captive standing just above
@@ -232,6 +260,8 @@ func _generate_and_build() -> void:
 			_add_ice(layout, tiles, seed_value)
 		if _floor in _data.get("fire_floors", []):
 			_add_ice(layout, tiles, seed_value, FIRE)
+		if _floor in _data.get("water_floors", []):
+			_add_ice(layout, tiles, seed_value, WATER)
 		_captive_cell = Vector2i(-9999, -9999)
 	elif _escape:
 		# The player's cell is deep inside; the warden waits by the exit.
@@ -262,6 +292,8 @@ func _generate_and_build() -> void:
 	_place_treasure(layout, seed_value)
 	if _floors > 1 and _floor in _data.get("levers", []):
 		_place_levers(layout, tiles, seed_value)
+	if _floors > 1 and _floor in _data.get("rod_floors", []):
+		_place_rods(tiles, seed_value)
 
 	# A saved spot that isn't floor anymore (a save from before the rooms got
 	# bigger lands somewhere else in the new layout) falls back to the entrance.
@@ -328,6 +360,52 @@ func _add_ice(layout: Dictionary, tiles: Dictionary, seed_value: int, tag := ICE
 ## Player.gd slides across these (only in a dungeon with ice on this floor).
 func is_slippery(cell: Vector2i) -> bool:
 	return _floor in _data.get("ice_floors", []) and _tile_map.get_cell_atlas_coords(cell) == ICE_COORDS
+
+
+## Flood water (25d): Player.gd wades through it; battles that start in it
+## give the enemies +30% AGI.
+func is_wading(cell: Vector2i) -> bool:
+	return _floor in _data.get("water_floors", []) and _tile_map.get_cell_atlas_coords(cell) == WATER_COORDS
+
+
+## Lightning rods (25d): one at the middle of up to two dry rooms on these
+## floors. Every ROD_PERIOD steps they crackle, then strike everything within
+## ROD_REACH tiles.
+func _place_rods(tiles: Dictionary, seed_value: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value + 161803
+	var keep: Array = [_exit_cell, _stairs_down, _stairs_up]
+	var spots: Array = []
+	for rect: Rect2i in _room_rects:
+		var mid := rect.position + rect.size / 2
+		if tiles.get(mid, "") == DungeonGenerator.FLOOR and not keep.any(func(c: Vector2i) -> bool: return rect.grow(1).has_point(c)) \
+				and not _chests.has(mid) and not _springs.has(mid):
+			spots.append(mid)
+	for n in mini(2, spots.size()):
+		var cell: Vector2i = spots.pop_at(rng.randi_range(0, spots.size() - 1))
+		_rods[cell] = _add_sprite(ROD_SHEET, 2, cell)
+
+
+func _tick_rods(cell: Vector2i) -> void:
+	if _rods.is_empty():
+		return
+	_rod_steps += 1
+	var phase := _rod_steps % ROD_PERIOD
+	for rod: Vector2i in _rods:
+		_rods[rod].frame = 1 if phase == ROD_PERIOD - 1 else 0
+	if phase == ROD_PERIOD - 1:
+		Sfx.play("menu_move")  # the crackle before the strike
+	elif phase == 0:
+		Sfx.play("thunder")
+		for rod: Vector2i in _rods:
+			if absi(cell.x - rod.x) <= ROD_REACH and absi(cell.y - rod.y) <= ROD_REACH:
+				for m: Combatant in GameManager.party:
+					if not m.is_ko:
+						m.hp = maxi(1, m.hp - maxi(1, roundi(m.max_hp * ROD_DAMAGE)))
+				var flash := create_tween()
+				_player.modulate = Color(2.0, 2.0, 1.4)
+				flash.tween_property(_player, "modulate", Color.WHITE, 0.3)
+				break
 
 
 ## Burning floor (25c): stepping on it singes everyone a little.
@@ -542,7 +620,7 @@ func _sealed(chest: Dictionary) -> bool:
 
 func is_blocked(cell: Vector2i) -> bool:
 	return _chests.has(cell) or _springs.has(cell) or (_guard != null and cell == _stairs_down) \
-			or _sealed_doors.has(cell) or cell == _lever_cell
+			or _sealed_doors.has(cell) or cell == _lever_cell or _rods.has(cell)
 
 
 ## Stairs are doors (Player.gd asks): up always, down once its guard is gone.
@@ -767,6 +845,8 @@ func on_player_moved(cell: Vector2i) -> void:
 		_guard_fight()
 	if _settled and _is_fire(cell):
 		_burn_party()
+	if _settled:
+		_tick_rods(cell)
 
 
 ## A room's exits on the map (Cory, 2026-10-20: rooms were easy to miss when
@@ -830,7 +910,9 @@ func map_markers() -> Array:
 	var markers: Array = []
 	for cell in GameManager.explored.get(GameManager.current_location, {}):
 		var coords := _tile_map.get_cell_atlas_coords(cell)
-		if cell == _lever_cell:
+		if _rods.has(cell):
+			markers.append({"cell": cell, "color": Color(1.0, 0.95, 0.5), "legend": "Lightning rod"})
+		elif cell == _lever_cell:
 			markers.append({"cell": cell, "color": Color(0.95, 0.6, 0.2), "legend": "Lever"})
 		elif _sealed_doors.has(cell):
 			markers.append({"cell": cell, "color": Color(0.55, 0.45, 0.35), "legend": "Sealed"})

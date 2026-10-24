@@ -437,3 +437,12 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **Duskara's look:** two maps (a house buried in a dune, a dry oasis -> dug out, brimming), a heat haze with blowing sand before cleansing. People: a water-keeper (story), a nomad (hints: vipers, earth-proof golems), a guard; after: a smith, priestess, child, weaver, Frank.
 - **Victory scene:** the water-keeper, the guard, a child and Frank (who points at Selavon next).
 - **Test-process change:** a fresh backup of Cory's saves right before every test (an older backup was restored once this session; he hadn't played in between).
+
+## Milestone 25d — Selavon (built 2026-10-23, Cory asleep: "do 25d, then 26 and 27")
+- **Flooded rooms, not flooded corridors:** the doc's "flooded corridors" became flooded room middles with a dry rim (like ice and fire), so wading is a choice (cut through slowly, or walk round); corridors are the only links between rooms and flooding them would make the slow path mandatory. Wading = 60% speed; a fight that starts in water gives the enemies +30% AGI (the doc's "AGI bonus in water").
+- **Lightning rods** strike every 6 steps (a crackle the step before), 10% max HP within 2 tiles, never below 1 HP; only on floor 2 (the doc's Fortress Exterior).
+- **"Immune to water" = immune to ice** (the game has no water element); Coral Brutes are weak to lightning instead.
+- **The Admiral's two-round bolt:** telegraphed one turn, lands the next (110 power to everyone), halved by Defend and stopped by Sanctuary, as the doc asks. Repeats every other turn in phase 3.
+- **Selavon's reward:** the harbormaster's one-time gift (2000 gold + 3 Elixirs), the cheapest shop prices in Act II, and the Stormsilver tier.
+- **The end of Act II's kingdoms:** the victory card adds "Act II - The Purge" -> "Act III - The Source: coming in a later update" (no separate scene); flag `act_two_complete`. The doc's "Verdance becomes a hub after Act II" is left for later (not in 25's scope; noted here).
+- **Tidestone Ring** (the coast's hidden clearing): +5 RES, +3 AGI, +25 MP.

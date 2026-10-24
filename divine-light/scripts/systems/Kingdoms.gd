@@ -39,14 +39,14 @@ const REGIONS := {
 	"overworld": {"name": "Forest Heartlands", "scene": "res://scenes/overworld/Overworld.tscn", "kingdom": ""},
 	"tundra": {"name": "The Northern Tundra", "scene": "res://scenes/overworld/Tundra.tscn", "kingdom": "nordveil"},
 	"desert": {"name": "The Duskara Wastes", "scene": "res://scenes/overworld/Desert.tscn", "kingdom": "duskara"},
-	"coast": {"name": "The Selavon Coast", "scene": "", "kingdom": "selavon"},
+	"coast": {"name": "The Selavon Coast", "scene": "res://scenes/overworld/Coast.tscn", "kingdom": "selavon"},
 }
 
 # Act II dungeon scenes ("" until built; Region says "not yet").
 const DUNGEON_SCENES := {
 	"frozen_citadel": "res://scenes/dungeon/FrozenCitadel.tscn",
 	"sunken_sanctum": "res://scenes/dungeon/SunkenSanctum.tscn",
-	"drowned_fortress": "",
+	"drowned_fortress": "res://scenes/dungeon/DrownedFortress.tscn",
 }
 
 const DUNGEON_NAMES := {
@@ -57,7 +57,7 @@ const DUNGEON_NAMES := {
 
 # Kingdoms whose content is built (25b-25d each add theirs). Until then its
 # road stays closed with a "coming later" note, even after Act I.
-const BUILT: Array = ["nordveil", "duskara"]
+const BUILT: Array = ["nordveil", "duskara", "selavon"]
 # Development and tests: treat every kingdom as built.
 static var dev_open := false
 

@@ -288,6 +288,7 @@ static func location_name(location: String) -> String:
 		"overworld": return "Forest Heartlands"
 		"verdance": return "Verdance"
 		"edenmere": return "Edenmere"
+		"threshold": return "The Threshold"
 	return id.capitalize()
 
 

@@ -60,6 +60,26 @@ const KITS := {
 		{"name": "Grave Swing", "kind": "charge", "every": 3, "mult": 2.2, "tell": "raises its pitchfork high!"},
 	]},
 	"Cutpurse": {"attack": {"steal": 40}},
+	# The Blighted Reach and the Maw (Act III, 28a; README "The Blighted Maw").
+	# The doc calls the first one a Void Sentinel; the Observatory's escape
+	# warden already has that name, so it's a Null Sentinel here.
+	"Null Sentinel": {"res": 20, "random_immune": 2},
+	"Unraveled Soul": {"int": 44, "res": 18, "attack": {"hits": 1, "hits_max": 3}, "abilities": [
+		{"name": "Dark Smite", "kind": "magic_all", "chance": 25, "power": 30, "palette": "debuff"},
+		{"name": "Death Touch", "kind": "dot_strike", "chance": 25, "poison_power": 8, "bleed_power": 8},
+		{"name": "Chaos Bolt", "kind": "magic_single", "chance": 35, "power": 44, "palette": "arcane", "stun_chance": 10},
+	]},
+	"Entropy Shade": {"int": 40, "res": 26, "weak": ["holy"], "abilities": [
+		{"name": "Entropy", "kind": "drain_mp", "chance": 55, "power": 24},
+	]},
+	"Architect's Thrall": {"int": 46, "res": 22, "weak": ["holy"], "abilities": [
+		{"name": "Unmaking", "kind": "charge", "every": 3, "mult": 2.2, "tell": "pulls the light out of the air around it..."},
+		{"name": "Void Lance", "kind": "magic_single", "chance": 35, "power": 48, "palette": "debuff"},
+	]},
+	"Hollow Custodian": {"int": 46, "res": 24, "weak": ["holy"], "random_immune": 1, "abilities": [
+		{"name": "Seal of Ruin", "kind": "magic_all", "every": 3, "power": 34, "palette": "debuff"},
+		{"name": "Grave Hammer", "kind": "charge", "every": 4, "mult": 2.2, "tell": "raises its broken hammer..."},
+	]},
 	# Act II side-quest hunts (Milestone 26)
 	"Marauder Chief": {"attack": {"steal": 40, "hits": 1, "hits_max": 2}},
 	"Snowmane": {"weak": ["fire"], "attack": {"hits": 2}, "abilities": [
@@ -466,6 +486,17 @@ const FORTRESS_ENCOUNTERS: Array = [
 	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115}],
 ]
 
+# The Blighted Reach (28a): four heroes around level 14-16.
+const REACH_ENCOUNTERS: Array = [
+	[{"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 150},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170}],
+	[{"name": "Null Sentinel",  "hp": 300, "atk": 64, "def": 28, "agi": 8,  "xp": 160},
+	 {"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 150}],
+	[{"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 170}],
+	[{"name": "Architect's Thrall", "hp": 520, "atk": 70, "def": 24, "agi": 14, "xp": 300}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -481,6 +512,7 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"desert": DESERT_ENCOUNTERS,
 	"sunken_sanctum": SANCTUM_ENCOUNTERS,
 	"coast": COAST_ENCOUNTERS,
+	"reach": REACH_ENCOUNTERS,
 	"drowned_fortress": FORTRESS_ENCOUNTERS,
 }
 

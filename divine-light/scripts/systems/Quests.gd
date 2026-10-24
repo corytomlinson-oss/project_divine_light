@@ -244,6 +244,59 @@ const QUESTS := {
 		],
 		"xp": 800, "gold": 400, "items": {"Elixir": 3},
 	},
+	# ======================================================= Act III (28a)
+	# The portal key (Cory, 2026-10-18): three required quests in order that
+	# assemble the key into the Blighted Maw - the frame, the core, the
+	# binding (Frank binds it, a hint at who he is).
+	"the_frame": {
+		"name": "The Frame", "dungeon": "blighted_maw", "kingdom": "maw", "part": 1, "giver": "threshold/keeper",
+		"offer": [
+			"say Keeper: The portal key was a ring of three parts: a frame, a core, and the binding that made them one. When the portal was sealed, the parts were scattered.",
+			"say Keeper: The frame lies in the ruined shrine west of the road. Something the Unraveling made guards it - a custodian of the old seal. It will not give the frame up gently.",
+		],
+		"remind": ["say Keeper: The ruined shrine - west across the plain, past the chasm."],
+		"steps": [
+			{"log": "Take the key's frame from the Hollow Custodian at the ruined shrine, west of the road.", "hunt": "hollow_custodian"},
+			{"log": "Bring the frame to the keeper of the Threshold.", "talk": "threshold/keeper", "lines": [
+				"say Keeper: The frame... cold as the void, and still humming. Look - it turns in your hand. It's pointing north. Toward the core.",
+			]},
+		],
+		"xp": 1500, "gold": 800,
+	},
+	"the_core": {
+		"name": "The Core", "dungeon": "blighted_maw", "kingdom": "maw", "part": 2, "giver": "threshold/keeper",
+		"offer": [
+			"say Keeper: The core is a shard of pure light, left behind by the four pure souls of an older age. One of them was Vorath, before he fell.",
+			"say Keeper: The frame points north - to Nordveil. Their shrine has burned for ages. If anyone kept the shard, it was them. Ask their priestess.",
+		],
+		"remind": ["say Keeper: The core - Nordveil's priestess. The frame points to her."],
+		"steps": [
+			{"log": "Ask Nordveil's priestess about the shard of pure light.", "talk": "nordveil/priestess", "lines": [
+				"say Priestess: The shard... yes. It sat at the heart of our shrine's flame for longer than Nordveil has had a name. I always wondered what it was waiting for.",
+				"say Priestess: Take it. When the Sovereign came, it was the one thing the cold could never touch.",
+			]},
+			{"log": "Bring the core to the keeper of the Threshold.", "talk": "threshold/keeper", "lines": [
+				"say Keeper: Frame and core. They won't join - I can't make them. The binding was never a thing you could find. It was a someone.",
+				"say Keeper: Your merchant friend. Ask him. I have a feeling he's done this before.",
+			]},
+		],
+		"xp": 1800, "gold": 1000,
+	},
+	"the_binding": {
+		"name": "The Binding", "dungeon": "blighted_maw", "kingdom": "maw", "part": 3, "giver": "threshold/keeper",
+		"offer": ["say Keeper: Go on. Take them to Frank."],
+		"remind": ["say Keeper: Frank. His stall's in the square."],
+		"steps": [
+			{"log": "Ask Frank to bind the frame and the core.", "talk": "threshold/frank", "lines": [
+				"say Frank: ...Ah. The keeper sent you. Of course she did.",
+				"say Frank: Hold them out. Both hands. And don't ask me how I know the words.",
+				"narrate Frank lays a hand over the frame and the core and says something under his breath, in a language none of you know. Light pours between his fingers.",
+				"say Frank: There. One key. It hasn't been whole since the last time someone was foolish enough to go down there.",
+				"say Frank: ...Last time? Did I say that? Long day. Go on, you'll want to rest before the Maw.",
+			]},
+		],
+		"key": "Portal Key", "xp": 2000, "gold": 1200,
+	},
 	"reef_horror": {
 		"name": "The Reef Horror", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 3, "optional": true, "giver": "selavon/fisher",
 		"offer": ["say Fisher: The fish are back, but so is something that eats them - a coral-crusted brute east of the pier road. Kill it and the bay is ours again."],
@@ -285,6 +338,10 @@ const HUNTS := {
 		"enemy": {"name": "Dune Stalker", "hp": 1100, "atk": 64, "def": 24, "agi": 8, "xp": 1000},
 		"tell": "narrate The dune heaves - a golem of fused sand and stone stands up out of it!",
 		"won": "narrate The Dune Stalker crumbles back into the desert it came from."},
+	"hollow_custodian": {"cell": Vector2i(8, 17), "region": "reach", "scale": false,
+		"enemy": {"name": "Hollow Custodian", "hp": 1600, "atk": 68, "def": 24, "agi": 14, "xp": 1600},
+		"tell": "narrate The shrine's broken statue turns its head. It was never a statue.",
+		"won": "narrate The Hollow Custodian crumbles to grey dust. In the rubble lies a ring of black metal, humming faintly: the frame."},
 	"reef_horror": {"cell": Vector2i(36, 28), "region": "coast", "scale": false,
 		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 1200},
 		"tell": "narrate Coral and barnacles shift on the shore - the Reef Horror lurches toward you!",
@@ -313,6 +370,7 @@ const SEAL_TEXT := {
 	"frozen_citadel": "The Citadel's gate is sealed under a wall of black ice. Nordveil's captain may know a way through.",
 	"sunken_sanctum": "The Sanctum's great doors bear a carved sun, and won't move. Duskara's water-keeper may know how they open.",
 	"drowned_fortress": "Wreckage and breaking waves block the way onto the island. Selavon's harbormaster may know a safer path.",
+	"blighted_maw": "The portal is a ring of black stone around nothing at all. It wants a key. The keeper of the Threshold may know where it went.",
 }
 const OPEN_TEXT := {
 	"cathedral": "The sexton's key turns with a groan, and the chains slide to the ground.",
@@ -323,6 +381,7 @@ const OPEN_TEXT := {
 	"frozen_citadel": "You press the Ember Seal to the black ice. It hisses, cracks, and slumps away from the gate.",
 	"sunken_sanctum": "You raise the Sun Disc. Light pours from it into the carved sun on the doors, and they grind open.",
 	"drowned_fortress": "The tide draws back exactly as the chart said. A path of wet stone opens to the fortress gate.",
+	"blighted_maw": "The key's three parts flare as one. The ring of black stone tears open onto a darkness that goes down forever.",
 }
 
 const QUEST_COLOR := Color(1.0, 0.55, 0.85)  # map markers

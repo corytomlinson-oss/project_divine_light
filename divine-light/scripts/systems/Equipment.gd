@@ -81,6 +81,16 @@ const DEFS: Dictionary = {
 	"Tidecaller Robe":     {"slot": "armor",  "class": "Lyra",  "def": 4, "res": 12},
 	"Reefrunner Leathers": {"slot": "armor",  "class": "Silas", "def": 8, "agi": 5},
 	"Tide Charm":          {"slot": "accessory", "class": "", "res": 8, "hp": 60},
+	# Act III's tier (28a): the Threshold's forge.
+	"Starforged Sword":    {"slot": "weapon", "class": "Vael",  "atk": 37},
+	"Starforged Claws":    {"slot": "weapon", "class": "Ryn",   "atk": 35},
+	"Starforged Staff":    {"slot": "weapon", "class": "Lyra",  "atk": 12, "int": 29},
+	"Starforged Daggers":  {"slot": "weapon", "class": "Silas", "atk": 36},
+	"Starforged Plate":    {"slot": "armor",  "class": "Vael",  "def": 17},
+	"Starforged Gi":       {"slot": "armor",  "class": "Ryn",   "def": 11, "agi": 4},
+	"Starforged Robe":     {"slot": "armor",  "class": "Lyra",  "def": 5, "res": 15},
+	"Starforged Leathers": {"slot": "armor",  "class": "Silas", "def": 10, "agi": 6},
+	"Star Charm":          {"slot": "accessory", "class": "", "res": 10, "hp": 80},
 
 	# Act II armor sets (25b; README "Full Set Bonus"). Spread across Act II
 	# (Cory): the Frozen Citadel holds the four armors, Nordveil's armory sells

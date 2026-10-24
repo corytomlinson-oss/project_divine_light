@@ -10,6 +10,8 @@ extends Region
 #   ^  the mountain pass north to the Tundra (Nordveil)          (25a)
 #   <  the west road to the Duskara Wastes, >  the east road to the Selavon
 #      Coast; each opens once the kingdom before it is freed
+#   v  the south road below the Guild to the Blighted Reach (Act III, 28a):
+#      opens once all three kingdoms are free
 #
 # Three hidden clearings sit in the forest, each holding a chest with an
 # accessory you can't get anywhere else (one has a spring too). They show on
@@ -59,7 +61,7 @@ const MAP := [
 	"TTTT....TTTTTTTT...*.ttt**..........~~.TTTTTTT......TT.....TTTTT",
 	"TTTTT.TTTTTTTTTT.....TTT**...TTTTTT.~~.TTTTTTTT..*.TTTTTTTTTTTTT",
 	"TTTTTTTTTTTTTTTTTTTTTTTTT...TTTTTTT.~~.TTTTTTTTTTTTTTTTTTTTTTTTT",
-	"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTT",
+	"TTTTTTTTTTTTTTTTTTTTTTTTTTvTTTTTTTTT~~TTTTTTTTTTTTTTTTTTTTTTTTTT",
 ]
 # What each chest holds (23c), hand-picked: supplies along the way, and an
 # accessory found nowhere else in each hidden clearing.
@@ -89,7 +91,7 @@ func entrances() -> Dictionary:
 
 
 func borders() -> Dictionary:
-	return {"^": "tundra", "<": "desert", ">": "coast"}
+	return {"^": "tundra", "<": "desert", ">": "coast", "v": "reach"}
 
 
 func chest_loot() -> Dictionary:

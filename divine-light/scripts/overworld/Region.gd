@@ -44,6 +44,7 @@ const TOWNS := {
 	"nordveil": {"name": "Nordveil", "scene": "res://scenes/town/Nordveil.tscn"},
 	"duskara": {"name": "Duskara", "scene": "res://scenes/town/Duskara.tscn"},
 	"selavon": {"name": "Selavon", "scene": "res://scenes/town/Selavon.tscn"},
+	"threshold": {"name": "The Threshold", "scene": "res://scenes/town/Threshold.tscn"},
 }
 const CHEST_SHEET := preload("res://assets/sprites/chests.png")
 const SPRING_SHEET := preload("res://assets/sprites/spring.png")
@@ -328,10 +329,10 @@ func _act_one_dungeon(id: String) -> Dictionary:
 ## An Act II dungeon (25a): enters on its first floor.
 func _kingdom_dungeon(id: String) -> Dictionary:
 	var scene: String = Kingdoms.DUNGEON_SCENES.get(id, "")
-	if scene == "":
-		return {"blocked": "%s looms ahead, but the way isn't open yet. (Coming in a later update.)" % Kingdoms.location_name(id)}
 	if not Quests.is_unsealed(id):  # its required quest (26)
 		return {"blocked": Quests.SEAL_TEXT[id]}
+	if scene == "":
+		return {"blocked": "%s looms ahead, but the way isn't open yet. (Coming in a later update.)" % Kingdoms.location_name(id)}
 	GameManager.dungeon_floor = 0
 	if Quests.has_key(id) and not GameManager.has_flag("unsealed_" + id):
 		GameManager.story_flags["unsealed_" + id] = true

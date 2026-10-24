@@ -199,8 +199,31 @@ def fortress():
     print("wrote battle_bg_fortress.png")
 
 
+def reach():
+    rng = random.Random(31)
+    im = Image.new("RGBA", (W, H))
+    dither_gradient(im, 0, 76, (16, 10, 24), (70, 50, 80))
+    d = ImageDraw.Draw(im)
+    d.ellipse([130, 52, 190, 92], fill=(120, 50, 170))   # the Maw's glow on the horizon
+    d.ellipse([144, 60, 176, 84], fill=(200, 120, 255))
+    far = [(0, 80)] + [(x, 70 + 6 * math.sin(x / 19.0)) for x in range(0, W + 8, 8)] + [(W, 80)]
+    d.polygon(far, fill=(40, 32, 48))
+    for x in range(8, W, 37):  # dead trees
+        d.line([(x, 80), (x, 60)], fill=(30, 24, 34), width=2)
+        d.line([(x, 66), (x - 6, 60)], fill=(30, 24, 34))
+        d.line([(x, 70), (x + 5, 64)], fill=(30, 24, 34))
+    dither_gradient(im, 80, 112, (100, 96, 104), (70, 66, 76))
+    for _ in range(10):
+        x, y = rng.randrange(W), 84 + rng.randrange(24)
+        d.line([(x + i * 3, y + (1 if i % 2 else -1)) for i in range(6)], fill=(150, 80, 200))
+    fade_bottom(im, 108)
+    im.save(OUT / "battle_bg_reach.png")
+    print("wrote battle_bg_reach.png")
+
+
 tundra()
 citadel()
+reach()
 desert()
 sanctum()
 coast()

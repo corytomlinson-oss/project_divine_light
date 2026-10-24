@@ -129,3 +129,10 @@ ramp_recolor("shadow_thief", "marauder_chief", (110, 30, 30), (240, 190, 120), g
 ramp_recolor("blighted_wolf", "snowmane", (110, 130, 170), (250, 252, 255), glow=(150, 220, 255))
 ramp_recolor("iron_sentinel", "dune_stalker", (70, 40, 24), (196, 150, 96), glow=(255, 150, 40))
 ramp_recolor("hired_muscle", "reef_horror", (60, 30, 70), (230, 130, 150), glow=(140, 255, 220))
+
+# Act III (28a; README "The Blighted Maw") - void-touched stand-ins until 30
+ramp_recolor("void_sentinel", "null_sentinel", (20, 16, 28), (150, 140, 170), glow=(220, 150, 255))
+ramp_recolor("corrupted_scholar", "unraveled_soul", (40, 20, 60), (200, 170, 240), glow=(255, 255, 255))
+ramp_recolor("shade_wisp", "entropy_shade", (10, 6, 20), (110, 80, 150), glow=(220, 150, 255))
+ramp_recolor("cursed_paladin", "architect's_thrall", (24, 10, 36), (160, 110, 200), glow=(255, 120, 200))
+ramp_recolor("hollow_warden", "hollow_custodian", (30, 26, 36), (170, 160, 180), glow=(220, 150, 255))

@@ -464,3 +464,11 @@ My calls while building (Cory: "I think we are good, let's start"):
 - **The portal-key quests move into 28a** (they gate the Maw, so they have to come before it).
 - **Vael gets Resurrection late in Act III.**
 - **Frank's true name:** suggestions given (Faranoth, Aldaran, Ithriel, Solmund); Cory to choose by 28c.
+
+## Milestone 28a — the Threshold + portal key (2026-10-24, Cory away: "go as far as you can")
+- **Level curve: compress skill unlocks above level 8** (formula `8 + (old - 8) * 0.55`), not raise XP: one table, Act I untouched, and Act II/III enemies don't need retuning. Sanctuary is now L20, Divine Wrath L23, Divine Shield L15.
+- **The Reach is south of the forest** (the doc's world map: the Maw below the Heartlands, between the Desert and the Coast), reached by a new road below the Guild once all three kingdoms are free.
+- **The Maw is a pseudo-kingdom** in `Kingdoms` (drained land, a road gate after Selavon, "cleansed" when Vorath falls) — reuses the whole cleansing system instead of special cases.
+- **The portal key quests:** the frame from a Hollow Custodian at a ruined shrine, the core from Nordveil's priestess (the shard of pure light in her shrine's flame), the binding by Frank, with a slip that hints at his past.
+- **"Void Sentinel" renamed "Null Sentinel"** for Act III (the name was taken in Act I).
+- **The Threshold:** free inn, unlimited shrine, Starforged gear, the cheapest potions, refugees from every kingdom.

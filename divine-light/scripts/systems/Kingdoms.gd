@@ -25,6 +25,14 @@ const KINGDOMS := {
 		"road_text": "The western road vanishes into a wall of blowing, burning sand. Better to free Nordveil first.",
 		"cleansed_text": "The heat breaks. A cool wind rolls across the dunes of Duskara.",
 	},
+	# Act III (28a): the Maw is treated like a fourth "kingdom" so its land
+	# is drained until Vorath falls and its road opens after Selavon. Not in
+	# ORDER (Act II's three).
+	"maw": {
+		"name": "the Blighted Maw", "region": "reach", "town": "threshold", "dungeon": "blighted_maw", "after": "selavon",
+		"road_text": "A wall of grey fog rolls up from the south, and nothing living stirs beyond it. Free the three kingdoms first.",
+		"cleansed_text": "The grey fog lifts from the Reach. For the first time in an age, the edge of the Maw is quiet.",
+	},
 	"selavon": {
 		"name": "Selavon", "region": "coast", "town": "selavon", "dungeon": "drowned_fortress", "after": "duskara",
 		"road_text": "Storm surf has swallowed the eastern road. Better to free Duskara first.",
@@ -39,6 +47,7 @@ const REGIONS := {
 	"overworld": {"name": "Forest Heartlands", "scene": "res://scenes/overworld/Overworld.tscn", "kingdom": ""},
 	"tundra": {"name": "The Northern Tundra", "scene": "res://scenes/overworld/Tundra.tscn", "kingdom": "nordveil"},
 	"desert": {"name": "The Duskara Wastes", "scene": "res://scenes/overworld/Desert.tscn", "kingdom": "duskara"},
+	"reach": {"name": "The Blighted Reach", "scene": "res://scenes/overworld/Reach.tscn", "kingdom": "maw"},
 	"coast": {"name": "The Selavon Coast", "scene": "res://scenes/overworld/Coast.tscn", "kingdom": "selavon"},
 }
 
@@ -47,17 +56,19 @@ const DUNGEON_SCENES := {
 	"frozen_citadel": "res://scenes/dungeon/FrozenCitadel.tscn",
 	"sunken_sanctum": "res://scenes/dungeon/SunkenSanctum.tscn",
 	"drowned_fortress": "res://scenes/dungeon/DrownedFortress.tscn",
+	"blighted_maw": "",  # 28b
 }
 
 const DUNGEON_NAMES := {
 	"frozen_citadel": "The Frozen Citadel",
 	"sunken_sanctum": "The Sunken Sanctum",
 	"drowned_fortress": "The Drowned Fortress",
+	"blighted_maw": "The Blighted Maw",
 }
 
 # Kingdoms whose content is built (25b-25d each add theirs). Until then its
 # road stays closed with a "coming later" note, even after Act I.
-const BUILT: Array = ["nordveil", "duskara", "selavon"]
+const BUILT: Array = ["nordveil", "duskara", "selavon", "maw"]
 # Development and tests: treat every kingdom as built.
 static var dev_open := false
 

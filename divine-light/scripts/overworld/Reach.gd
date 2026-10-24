@@ -73,6 +73,12 @@ func _ready() -> void:
 	super._ready()
 
 
+## Once Vorath falls the Unraveling's creatures are gone: no random fights in
+## the restored Reach (the visible side-quest hunts still stand).
+func is_safe() -> bool:
+	return Kingdoms.is_cleansed("maw")
+
+
 func region_id() -> String:
 	return "reach"
 

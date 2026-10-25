@@ -367,7 +367,7 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 - [x] **Hand-placed Vorath** (64x64, `sprites/source/build_act3_bosses.py`) — Milestone 30
 - [ ] Hand-placed sprites for the regular Act III enemies, the Hollow Custodian and the Oathbreaker / Grave Robber hunts (recolors for now)
 - [ ] Frank's true form (his revelation reuses his sprite with a glow)
-- [x] **Act III hero forms** (2026-10-25, Cory's request): a full new walk sheet per hero for wearing the Act III set, 24x32 frames (`sprites/source/build_act3_forms.py` -> `<hero>_ascended_walk.png`)
+- [x] **Set forms** (2026-10-25, Cory's request): a full walk sheet per hero per set (12), 24x32 frames, escalating by act (`sprites/source/build_set_forms.py` -> `<hero>_<set>_walk.png`)
 
 ## Deferred to later passes
 

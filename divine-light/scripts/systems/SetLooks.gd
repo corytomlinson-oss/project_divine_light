@@ -11,44 +11,21 @@ extends RefCounted
 
 const SHADER := preload("res://assets/shaders/palette_swap.gdshader")
 
-const LOOKS := {
-	# Vael: tabard T/t, steel D/S, shield P/B/b
-	"holy_guardian": [[[236, 228, 208], [244, 222, 150]], [[184, 172, 146], [196, 166, 92]]],
-	"sacred_aegis": [
-		[[138, 147, 168], [184, 194, 214]], [[72, 80, 104], [112, 122, 150]],
-		[[96, 132, 204], [255, 248, 222]], [[52, 84, 156], [236, 222, 180]], [[30, 46, 100], [184, 160, 104]],
-		[[236, 228, 208], [156, 196, 240]], [[184, 172, 146], [100, 138, 196]],
-	],
-	# Ryn: gi O/o, headband R/r, wraps T
-	"iron_monk": [[[236, 150, 52], [156, 156, 168]], [[184, 100, 36], [100, 100, 114]], [[196, 48, 48], [128, 28, 36]]],
-	"storm_dragon": [
-		[[236, 150, 52], [76, 118, 210]], [[184, 100, 36], [42, 72, 146]],
-		[[196, 48, 48], [232, 184, 48]], [[128, 28, 36], [168, 116, 28]], [[236, 228, 208], [248, 248, 252]],
-	],
-	# Lyra: robe C/c
-	"arcane_scholar": [[[40, 138, 138], [116, 74, 176]], [[24, 88, 96], [72, 42, 120]]],
-	"elemental_weave": [[[40, 138, 138], [190, 56, 64]], [[24, 88, 96], [122, 32, 46]]],
-	# Silas: hood H/h/j, scarf M/m
-	"shadow_walker": [
-		[[58, 52, 72], [36, 32, 46]], [[88, 80, 106], [60, 54, 76]], [[34, 30, 44], [20, 18, 28]],
-		[[52, 104, 72], [112, 62, 152]], [[32, 68, 48], [72, 38, 102]],
-	],
-	"venom_weave": [
-		[[58, 52, 72], [46, 64, 54]], [[88, 80, 106], [72, 96, 80]], [[34, 30, 44], [26, 38, 32]],
-		[[52, 104, 72], [124, 204, 64]], [[32, 68, 48], [72, 132, 38]],
-	],
-}
+# Every set now swaps in a whole form (FORMS below), so no recolors are left;
+# material_for() stays for any future set without art (it returns null).
+const LOOKS := {}
 
 
-# Act III's sets don't recolor: they swap in a whole new form (Cory,
-# 2026-10-25: "completely change the characters... ready to kick ass").
-# set id -> hero; the sheet is <hero>_ascended_walk.png, 24x32 frames in the
-# base sheets' layout (assets/sprites/source/build_act3_forms.py).
+# Every set swaps in a whole new form (Cory, 2026-10-25: the Act III sets
+# "completely change the characters", then "different models for each of the
+# sets... a gradual increase"). set id -> hero; the sheet is
+# <hero>_<set id>_walk.png, 24x32 frames in the base sheets' layout
+# (assets/sprites/source/build_set_forms.py).
 const FORMS := {
-	"divine_champion": "vael",
-	"rising_force": "ryn",
-	"cosmic_conduit": "lyra",
-	"deaths_hand": "silas",
+	"holy_guardian": "vael", "sacred_aegis": "vael", "divine_champion": "vael",
+	"iron_monk": "ryn", "storm_dragon": "ryn", "rising_force": "ryn",
+	"arcane_scholar": "lyra", "elemental_weave": "lyra", "cosmic_conduit": "lyra",
+	"shadow_walker": "silas", "venom_weave": "silas", "deaths_hand": "silas",
 }
 const FORM_W := 24
 static var _form_cache := {}
@@ -59,7 +36,7 @@ static func active_set(member: Combatant) -> String:
 	if member == null:
 		return ""
 	for set_id: String in Equipment.SET_BONUSES:
-		if Equipment.has_set_bonus(member, set_id):
+		if Equipment.wears_full_set(member, set_id):  # the look follows what's worn, not mastery
 			return set_id
 	return ""
 
@@ -92,10 +69,11 @@ static func member_for(sprite_name: String) -> Combatant:
 
 ## The hero's Act III form sheet if they wear its full set, else null.
 static func form_texture(member: Combatant) -> Texture2D:
-	var hero: String = FORMS.get(active_set(member), "")
+	var set_id := active_set(member)
+	var hero: String = FORMS.get(set_id, "")
 	if hero == "":
 		return null
-	return load("res://assets/sprites/%s_ascended_walk.png" % hero)
+	return load("res://assets/sprites/%s_%s_walk.png" % [hero, set_id])
 
 
 ## The frames to show for this hero: `base` (their walk frames), or the same

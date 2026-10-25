@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c47xg8qgs0ad0"
-path="res://.godot/imported/ryn_ascended_walk.png-01229ad0bcd3e424254a697e0be16a91.ctex"
+uid="uid://ce43gm8i0npaf"
+path="res://.godot/imported/silas_deaths_hand_walk.png-d5bccfbadad7bb583e21046c8270f435.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ryn_ascended_walk.png"
-dest_files=["res://.godot/imported/ryn_ascended_walk.png-01229ad0bcd3e424254a697e0be16a91.ctex"]
+source_file="res://assets/sprites/silas_deaths_hand_walk.png"
+dest_files=["res://.godot/imported/silas_deaths_hand_walk.png-d5bccfbadad7bb583e21046c8270f435.ctex"]
 
 [params]
 

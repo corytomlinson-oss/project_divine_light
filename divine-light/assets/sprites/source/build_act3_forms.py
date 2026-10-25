@@ -564,14 +564,5 @@ def sheet(name):
 
 
 if __name__ == '__main__':
-    out_dir = sys.argv[1]
-    sheets = {n: sheet(n) for n in HEROES}
-    for n, s in sheets.items():
-        s.save(os.path.join(out_dir, '%s_ascended_walk.png' % n))
-    if len(sys.argv) > 2:
-        prev = Image.new('RGBA', (sum(s.width for s in sheets.values()) + 50, H * 3 + 8), (52, 46, 64, 255))
-        x = 10
-        for s in sheets.values():
-            prev.alpha_composite(s, (x, 4))
-            x += s.width + 10
-        prev.resize((prev.width * 5, prev.height * 5), Image.NEAREST).save(sys.argv[2])
+    # The sheets are written by build_set_forms.py now (every set's form).
+    raise SystemExit('Run build_set_forms.py instead: it builds every form, these included.')

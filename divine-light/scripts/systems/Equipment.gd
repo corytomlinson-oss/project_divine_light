@@ -201,6 +201,7 @@ static func equip(member: Combatant, item_name: String) -> bool:
 	member.equipment[slot] = item_name
 	member.hp = mini(member.hp, member.max_hp)
 	member.mp = mini(member.mp, member.max_mp)
+	update_mastery(member)
 	return true
 
 
@@ -228,12 +229,34 @@ static func _apply_stats(member: Combatant, def: Dictionary, sign: int) -> void:
 ## True only when every one of armor/helmet/gloves/accessory is equipped and
 ## shares this set_id. Weapons are deliberately excluded - "Weapons upgrade
 ## independently and are not part of sets" per the design doc.
-static func has_set_bonus(member: Combatant, set_id: String) -> bool:
+## All four pieces of the set worn right now (decides the hero's look).
+static func wears_full_set(member: Combatant, set_id: String) -> bool:
 	for slot in ["armor", "helmet", "gloves", "accessory"]:
 		var item_name: String = member.equipment.get(slot, "")
 		if item_name == "" or DEFS.get(item_name, {}).get("set_id", "") != set_id:
 			return false
 	return true
+
+
+## Whether the set's bonus applies. Completing a set masters its bonus for
+## good (Cory, 2026-10-25: "the set bonuses stack"), so a hero keeps every
+## bonus they've ever completed, whatever they wear now.
+static func has_set_bonus(member: Combatant, set_id: String) -> bool:
+	if member == null:
+		return false
+	if set_id in member.mastered_sets:
+		return true
+	if wears_full_set(member, set_id):
+		member.mastered_sets.append(set_id)
+		return true
+	return false
+
+
+## Records any set this member is wearing complete (after equipping, loading).
+static func update_mastery(member: Combatant) -> void:
+	for set_id: String in SET_BONUSES:
+		if wears_full_set(member, set_id) and not set_id in member.mastered_sets:
+			member.mastered_sets.append(set_id)
 
 
 ## Items in inventory this member could equip into this specific slot.

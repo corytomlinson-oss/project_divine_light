@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dlp7efl88k0e8"
-path="res://.godot/imported/lyra_ascended_walk.png-d143e07f01e5ccdd904bc71818309d15.ctex"
+uid="uid://ca5v6vig4fyob"
+path="res://.godot/imported/vael_holy_guardian_walk.png-af47dbd1e726703926ca9ca8e8c2269a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/lyra_ascended_walk.png"
-dest_files=["res://.godot/imported/lyra_ascended_walk.png-d143e07f01e5ccdd904bc71818309d15.ctex"]
+source_file="res://assets/sprites/vael_holy_guardian_walk.png"
+dest_files=["res://.godot/imported/vael_holy_guardian_walk.png-af47dbd1e726703926ca9ca8e8c2269a.ctex"]
 
 [params]
 

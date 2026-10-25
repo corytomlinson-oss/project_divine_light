@@ -132,8 +132,19 @@ func _set_progress_text(member: Combatant, set_id: String) -> String:
 			count += 1
 	if count == 0:
 		return ""
-	var status := " - active, buffs +1 round" if count == 4 else ""
-	return "\n%s: %d/4 equipped%s" % [set_name, count, status]
+	var def: Dictionary = Equipment.SET_BONUSES[set_id]
+	var title: String = def["name"]
+	if count == 4:
+		return "\n%s: complete - %s" % [title, def.get("desc", "buffs last 1 extra round")]
+	return "\n%s: %d/4 equipped" % [title, count]
+
+
+## The sets this hero has mastered (their bonuses stay for good).
+func _mastered_text(member: Combatant) -> String:
+	var names: Array = []
+	for set_id: String in member.mastered_sets:
+		names.append(String(Equipment.SET_BONUSES.get(set_id, {}).get("name", set_id)).trim_suffix(" Set"))
+	return "" if names.is_empty() else "\nMastered: " + ", ".join(names)
 
 
 func _update_ui() -> void:
@@ -161,6 +172,7 @@ func _update_ui() -> void:
 			var stats_text := "ATK %d  DEF %d  INT %d  RES %d  AGI %d" % [member.atk, member.defense, member.int_stat, member.res_stat, member.agi]
 			for set_id: String in Equipment.SET_BONUSES:
 				stats_text += _set_progress_text(member, set_id)
+			stats_text += _mastered_text(member)
 			stats_label.text = stats_text
 			help_label.text = "Up/Down: Select   A: Confirm   B: Back"
 			for i in Equipment.SLOTS.size():

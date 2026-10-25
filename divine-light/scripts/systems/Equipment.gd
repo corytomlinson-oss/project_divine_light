@@ -259,6 +259,55 @@ static func update_mastery(member: Combatant) -> void:
 			member.mastered_sets.append(set_id)
 
 
+# ---------------------------------------------------------------- describing gear
+# What a piece does, in words (2026-10-25, Cory: "there isn't like a tool tip
+# for the equipment"). Used by the equip screen and the shops.
+const STAT_LABELS := [["atk", "ATK"], ["def", "DEF"], ["int", "INT"], ["res", "RES"], ["agi", "AGI"], ["hp", "HP"], ["mp", "MP"]]
+
+
+## "ATK +6, HP +40" (every stat the item gives).
+static func stat_text(item_name: String) -> String:
+	var def: Dictionary = DEFS.get(item_name, {})
+	var parts: Array = []
+	for pair: Array in STAT_LABELS:
+		if int(def.get(pair[0], 0)) != 0:
+			parts.append("%s %+d" % [pair[1], int(def[pair[0]])])
+	return ", ".join(parts) if not parts.is_empty() else "no stats"
+
+
+## "Armor - DEF +10, RES +2 (Vael only)".
+static func describe(item_name: String) -> String:
+	var def: Dictionary = DEFS.get(item_name, {})
+	if def.is_empty():
+		return ""
+	var who: String = def.get("class", "")
+	return "%s - %s%s" % [String(def.get("slot", "")).capitalize(), stat_text(item_name), (" (%s only)" % who) if who != "" else ""]
+
+
+## How this member's stats would change by putting `item_name` in its slot
+## ("" = taking off what's there): "ATK +6, DEF -2", or "No change".
+static func compare_text(member: Combatant, slot: String, item_name: String) -> String:
+	var now: Dictionary = DEFS.get(member.equipment.get(slot, ""), {})
+	var next: Dictionary = DEFS.get(item_name, {})
+	var parts: Array = []
+	for pair: Array in STAT_LABELS:
+		var d := int(next.get(pair[0], 0)) - int(now.get(pair[0], 0))
+		if d != 0:
+			parts.append("%s %+d" % [pair[1], d])
+	return ", ".join(parts) if not parts.is_empty() else "No change"
+
+
+## The piece's set and its bonus, and where this member stands with it.
+static func set_text(member: Combatant, item_name: String) -> String:
+	var set_id: String = DEFS.get(item_name, {}).get("set_id", "")
+	if set_id == "":
+		return ""
+	var def: Dictionary = SET_BONUSES[set_id]
+	var bonus: String = def.get("desc", "buff skills last 1 extra round")
+	var status := "mastered - yours for good" if member != null and set_id in member.mastered_sets else "wear all 4 to master it"
+	return "%s: %s (%s)" % [def["name"], bonus, status]
+
+
 ## Items in inventory this member could equip into this specific slot.
 static func equippable_items_for(member: Combatant, slot: String) -> Array:
 	var result: Array = []

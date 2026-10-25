@@ -104,15 +104,13 @@ func _refresh() -> void:
 func _describe(item: String) -> String:
 	if ITEM_TEXT.has(item):
 		return ITEM_TEXT[item]
-	var def: Dictionary = Equipment.DEFS.get(item, {})
-	if def.is_empty():
+	if not Equipment.DEFS.has(item):
 		return ""
-	var parts: Array = []
-	for stat: String in ["atk", "def", "int", "res", "agi"]:
-		if def.has(stat):
-			parts.append("%s +%d" % [stat.to_upper(), def[stat]])
-	var who: String = def.get("class", "")
-	return "%s. %s%s" % [String(def.get("slot", "")).capitalize(), ", ".join(parts), (" (%s only)" % who) if who != "" else " (anyone)"]
+	var text := Equipment.describe(item)
+	var set_id: String = Equipment.DEFS[item].get("set_id", "")
+	if set_id != "":
+		text += ". " + String(Equipment.SET_BONUSES[set_id]["name"]) + ": " + String(Equipment.SET_BONUSES[set_id].get("desc", "buff skills last 1 extra round"))
+	return text
 
 
 func _process(_delta: float) -> void:

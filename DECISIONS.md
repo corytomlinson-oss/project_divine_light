@@ -531,3 +531,8 @@ How it was tested: a data cross-check of every enemy, item, shop, quest giver, c
 - **"The permanent bonus of completing a set so the set bonuses stack":** completing a set records it in `Combatant.mastered_sets` (saved); `Equipment.has_set_bonus()` is true for a mastered set whatever is worn, so every hook in Battle.gd picks it up unchanged. The **look** follows only the set worn complete right now (`Equipment.wears_full_set()`). Older saves: a set worn complete when loaded counts as mastered.
 - **Bug found on the way:** the equip screen's set line printed Godot's `set_name` method instead of the set's name, and said "buffs +1 round" for every set. Now it shows the real name and that set's bonus, plus a "Mastered:" line.
 - **Balance check:** traced Vorath fights with every hero's three sets mastered (levels 18 and 20) still take 13-16 rounds; mastery is a mild boost. No retune.
+
+## Equipment descriptions (2026-10-25, Cory: "there isn't like a tool tip for the equipment")
+- **The equip screen now says what gear does.** On the item list, the text area under it shows the highlighted piece's stats, **what changes if you equip it** compared with what's on now ("If equipped: DEF +4, RES +2"; "Take it off: ..." for Unequip), and its set with the bonus and whether it's mastered. On the slot list, the highlighted slot's equipped piece and its stats.
+- **Shops use the same wording** (`Equipment.describe()`), now including HP and MP (they were left out, so the Star Charm read "RES +10" only) and the set bonus for set pieces.
+- Shared helpers in `Equipment.gd`: `stat_text()`, `describe()`, `compare_text()`, `set_text()`.

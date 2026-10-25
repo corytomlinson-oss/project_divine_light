@@ -139,6 +139,21 @@ func _set_progress_text(member: Combatant, set_id: String) -> String:
 	return "\n%s: %d/4 equipped" % [title, count]
 
 
+## The highlighted item: what it gives, what changes if you equip it, and
+## its set's bonus (2026-10-25: Cory couldn't tell what gear was doing).
+func _item_info(member: Combatant) -> String:
+	if _item_options.is_empty():
+		return ""
+	var item_name: String = _item_options[clampi(_cursor, 0, _item_options.size() - 1)]
+	if item_name == "":
+		return "Take it off: %s" % Equipment.compare_text(member, _slot, "")
+	var lines: Array = [Equipment.describe(item_name), "If equipped: " + Equipment.compare_text(member, _slot, item_name)]
+	var set_line := Equipment.set_text(member, item_name)
+	if set_line != "":
+		lines.append(set_line)
+	return "\n".join(lines)
+
+
 ## The sets this hero has mastered (their bonuses stay for good).
 func _mastered_text(member: Combatant) -> String:
 	var names: Array = []
@@ -170,6 +185,9 @@ func _update_ui() -> void:
 			var member: Combatant = GameManager.party[_member_index]
 			title_label.text = "%s - Equipment" % member.display_name
 			var stats_text := "ATK %d  DEF %d  INT %d  RES %d  AGI %d" % [member.atk, member.defense, member.int_stat, member.res_stat, member.agi]
+			var worn: String = member.equipment.get(Equipment.SLOTS[mini(_cursor, Equipment.SLOTS.size() - 1)], "")
+			if worn != "":
+				stats_text += "\n%s: %s" % [worn, Equipment.stat_text(worn)]
 			for set_id: String in Equipment.SET_BONUSES:
 				stats_text += _set_progress_text(member, set_id)
 			stats_text += _mastered_text(member)
@@ -185,7 +203,7 @@ func _update_ui() -> void:
 		MenuState.ITEM_SELECT:
 			var member: Combatant = GameManager.party[_member_index]
 			title_label.text = "%s - %s" % [member.display_name, _slot.capitalize()]
-			stats_label.text = ""
+			stats_label.text = _item_info(member)
 			help_label.text = "Up/Down: Select   A: Equip   B: Back"
 			if _item_options.is_empty():
 				_option_labels[0].text = "No equippable items."

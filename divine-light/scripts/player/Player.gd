@@ -28,6 +28,7 @@ func _ready() -> void:
 		if ResourceLoader.exists(path):
 			_sprite.sprite_frames = load(path)
 		_sprite.material = SetLooks.material_for(GameManager.party[0])  # armor set look (25b)
+		_sprite.sprite_frames = SetLooks.frames_for(GameManager.party[0], _sprite.sprite_frames)  # Act III form
 	_reset_encounter_counter()
 	# Deferred: by then the map has put the player in place (Milestone 22a).
 	GameManager.autosave_if_pending.call_deferred()

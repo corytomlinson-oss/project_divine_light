@@ -133,10 +133,15 @@ func _add_party_row(member: Combatant, y: float) -> void:
 		var frame := AtlasTexture.new()
 		frame.atlas = load(sheet_path)
 		frame.region = Rect2(0, 0, 16, 32)  # idle, facing down
+		var form := SetLooks.form_texture(member)
 		var portrait := TextureRect.new()
+		portrait.position = Vector2(8, y)
+		if form != null:  # Act III form: a wider frame, centred on the same spot
+			frame.atlas = form
+			frame.region = Rect2(0, 0, SetLooks.FORM_W, 32)
+			portrait.position.x -= (SetLooks.FORM_W - 16) / 2.0
 		portrait.texture = frame
 		portrait.material = SetLooks.material_for(member)  # armor set look (25b)
-		portrait.position = Vector2(8, y)
 		if member.is_ko:
 			portrait.modulate = Color(0.45, 0.4, 0.55)
 		_party_window.add_child(portrait)

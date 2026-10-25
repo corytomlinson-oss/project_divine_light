@@ -552,7 +552,7 @@ func _setup_party_sprites() -> void:
 		var sprite: AnimatedSprite2D = null
 		if ResourceLoader.exists(path):
 			sprite = AnimatedSprite2D.new()
-			sprite.sprite_frames = load(path)
+			sprite.sprite_frames = SetLooks.frames_for(member, load(path))  # Act III form
 			sprite.material = SetLooks.material_for(member)  # armor set look (25b)
 			sprite.flip_h = true
 			sprite.play(&"idle_side")

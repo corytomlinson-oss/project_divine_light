@@ -33,22 +33,25 @@ const LOOKS := {
 		[[58, 52, 72], [36, 32, 46]], [[88, 80, 106], [60, 54, 76]], [[34, 30, 44], [20, 18, 28]],
 		[[52, 104, 72], [112, 62, 152]], [[32, 68, 48], [72, 38, 102]],
 	],
-	# Act III (28b)
-	"divine_champion": [
-		[[138, 147, 168], [236, 222, 170]], [[72, 80, 104], [178, 150, 90]], [[200, 208, 220], [255, 244, 200]],
-		[[96, 132, 204], [255, 255, 255]], [[52, 84, 156], [236, 200, 90]], [[236, 228, 208], [250, 250, 255]],
-	],
-	"rising_force": [[[236, 150, 52], [230, 70, 50]], [[184, 100, 36], [150, 36, 30]], [[196, 48, 48], [255, 214, 90]], [[128, 28, 36], [200, 150, 40]]],
-	"cosmic_conduit": [[[40, 138, 138], [40, 40, 100]], [[24, 88, 96], [20, 20, 60]], [[232, 184, 48], [210, 220, 255]]],
-	"deaths_hand": [
-		[[58, 52, 72], [24, 22, 26]], [[88, 80, 106], [46, 42, 50]], [[34, 30, 44], [12, 10, 14]],
-		[[52, 104, 72], [180, 30, 40]], [[32, 68, 48], [110, 16, 24]],
-	],
 	"venom_weave": [
 		[[58, 52, 72], [46, 64, 54]], [[88, 80, 106], [72, 96, 80]], [[34, 30, 44], [26, 38, 32]],
 		[[52, 104, 72], [124, 204, 64]], [[32, 68, 48], [72, 132, 38]],
 	],
 }
+
+
+# Act III's sets don't recolor: they swap in a whole new form (Cory,
+# 2026-10-25: "completely change the characters... ready to kick ass").
+# set id -> hero; the sheet is <hero>_ascended_walk.png, 24x32 frames in the
+# base sheets' layout (assets/sprites/source/build_act3_forms.py).
+const FORMS := {
+	"divine_champion": "vael",
+	"rising_force": "ryn",
+	"cosmic_conduit": "lyra",
+	"deaths_hand": "silas",
+}
+const FORM_W := 24
+static var _form_cache := {}
 
 
 ## The complete set this hero wears, or "".
@@ -85,3 +88,37 @@ static func material_for(member: Combatant) -> ShaderMaterial:
 ## The roster member a sprite name stands for ("vael" -> Vael), if any.
 static func member_for(sprite_name: String) -> Combatant:
 	return GameManager.roster.get(sprite_name.capitalize(), null)
+
+
+## The hero's Act III form sheet if they wear its full set, else null.
+static func form_texture(member: Combatant) -> Texture2D:
+	var hero: String = FORMS.get(active_set(member), "")
+	if hero == "":
+		return null
+	return load("res://assets/sprites/%s_ascended_walk.png" % hero)
+
+
+## The frames to show for this hero: `base` (their walk frames), or the same
+## animations cut from their Act III form sheet when they wear its full set.
+static func frames_for(member: Combatant, base: SpriteFrames) -> SpriteFrames:
+	var tex := form_texture(member)
+	if tex == null or base == null:
+		return base
+	var key := tex.resource_path
+	if _form_cache.has(key):
+		return _form_cache[key]
+	var frames := SpriteFrames.new()
+	frames.remove_animation(&"default")
+	for anim: StringName in base.get_animation_names():
+		frames.add_animation(anim)
+		frames.set_animation_speed(anim, base.get_animation_speed(anim))
+		frames.set_animation_loop(anim, base.get_animation_loop(anim))
+		for i in base.get_frame_count(anim):
+			var src := base.get_frame_texture(anim, i) as AtlasTexture
+			var cut := AtlasTexture.new()
+			cut.atlas = tex
+			# the same cell of the 3x3 grid, 24px wide instead of 16
+			cut.region = Rect2(src.region.position.x / 16.0 * FORM_W, src.region.position.y, FORM_W, src.region.size.y)
+			frames.add_frame(anim, cut, base.get_frame_duration(anim, i))
+	_form_cache[key] = frames
+	return frames

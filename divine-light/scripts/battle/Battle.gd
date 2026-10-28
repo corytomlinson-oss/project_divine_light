@@ -56,6 +56,64 @@ const CLASS_SKILLS: Dictionary = {
 
 const LYRA_STANCES: Array = ["Fire", "Ice", "Lightning", "Earth"]
 
+# What each skill does, shown in the message window while the cursor is on it
+# (2026-10-28, Cory: "a window tool tip that tells me what the skill does").
+const SKILL_HELP := {
+	# Vael
+	"Holy Light": "Restores some HP to the most hurt ally.",
+	"Smite": "Holy damage to one enemy. Extra damage against corrupted foes.",
+	"Guard": "One ally takes less damage for 2 rounds.",
+	"Taunt": "Every enemy attacks Vael for a round.",
+	"Fortify": "Raises the whole party's DEF for 2 rounds.",
+	"Divine Strike": "Strong holy damage to one enemy. May stun corrupted foes.",
+	"Divine Shield": "Allies in Vael's row take less damage for 2 rounds.",
+	"Battle Hymn": "Raises the whole party's attack for 2 rounds.",
+	"Consecrate": "Holy damage to every enemy. Extra damage against corrupted foes.",
+	"Sanctuary": "Completely blocks the next attack on one ally.",
+	"Purify": "Cures one ally of every status effect, bleeding included.",
+	"Resurrection": "Revives the fallen ally with the most max HP, at half HP.",
+	"Divine Wrath": "Massive holy damage to one enemy. Always stuns corrupted foes.",
+	# Ryn
+	"Iron Fist": "A strong strike on one enemy.",
+	"Vital Touch": "Restores HP to one ally.",
+	"Sweep": "A spinning kick that hits every enemy.",
+	"Pressure Point": "Stuns one enemy for a turn. No damage.",
+	"Ki Burst": "Concentrated ki that ignores half the enemy's DEF.",
+	"Ki Blast": "A ranged ki strike: full damage even from the back row.",
+	"Mending Flow": "Restores a lot of HP to one ally.",
+	"Storm Flurry": "Strikes one enemy 3 times in a row.",
+	"Crippling Strike": "A heavy blow that halves an enemy's AGI for 2 rounds.",
+	"Dragon's Maw": "A devastating strike on one enemy.",
+	"Healing Wave": "Restores HP to the whole party.",
+	"Rising Dragon": "Massive damage to one enemy and a guaranteed stun.",
+	# Silas
+	"Quick Strike": "A fast strike with a high chance of a critical hit.",
+	"Envenom": "Poisons one enemy for 3 rounds.",
+	"Shadow Strike": "High damage to one enemy. Front row only.",
+	"Vanish": "Silas slips to the back row and is hard to hit this round.",
+	"Lacerate": "Makes one enemy bleed heavily for 4 rounds.",
+	"Smoke Bomb": "Every enemy misses more often for 2 rounds.",
+	"Expose": "Lowers one enemy's DEF so the whole party hits it harder.",
+	"Garrote": "Stuns one enemy for a turn.",
+	"Flurry": "4 rapid strikes on one enemy; each can land a critical hit.",
+	"Toxic Cloud": "Poisons every enemy.",
+	"Death Mark": "One enemy takes extra damage from everything for 3 rounds.",
+	"Shadowstep": "Massive damage to one enemy, then poison, bleeding and a stun.",
+	# Lyra
+	"Ember": "Fire damage to one enemy.",
+	"Flare": "Strong fire damage to one enemy.",
+	"Inferno": "Massive fire damage to one enemy, and it burns for 3 rounds.",
+	"Frost": "Ice damage to one enemy, and it slows down.",
+	"Blizzard": "Strong ice damage to one enemy. May freeze it for a turn.",
+	"Glacier": "Ice damage to every enemy. May freeze each of them.",
+	"Spark": "Lightning damage to one enemy.",
+	"Bolt": "Lightning damage to every enemy.",
+	"Thunderstrike": "Massive lightning damage to one enemy, and it's paralyzed.",
+	"Tremor": "Heavy earth damage to one enemy. From the back row it hits every enemy, weaker.",
+	"Tremor (AoE)": "Earth damage to every enemy (weaker from the back row).",
+	"Quake": "Earth damage to every enemy, and their DEF drops for 2 rounds.",
+}
+
 # Milestone 20c: what an elemental aura is weak to (the Void Mage), the spell
 # names and sounds for aura magic, and element names for messages.
 const AURA_WEAKNESS := {"fire": "ice", "ice": "fire", "lightning": "earth", "earth": "lightning"}
@@ -242,6 +300,7 @@ var _target_index: int = 0
 var _target_ally_index: int = 0
 var _pending_action: String = ""
 var _pending_skill: Dictionary = {}
+var _help_shown := false  # the message window holds a skill/item description
 
 @onready var message_label: Label = $MessageBanner/MessageLabel
 @onready var message_banner: PanelContainer = $MessageBanner
@@ -3071,8 +3130,36 @@ func _clamp_list_scroll() -> void:
 		_list_scroll = _menu_cursor - page + 1
 
 
+## The message window explains the highlighted skill or item (2026-10-28).
+func _menu_help() -> String:
+	if _menu_state == MenuState.SKILL and _menu_cursor < _active_skills.size():
+		var skill: Dictionary = _active_skills[_menu_cursor]
+		var skill_name: String = skill["name"]
+		if skill["effect"] == "switch_stance":
+			var to: String = skill["to_stance"]
+			var lyra: Combatant = _party[_selecting_index]
+			var spells: Array = []
+			for sp: Dictionary in LYRA_SKILLS.get(to, []):
+				if lyra.level >= int(sp.get("min_level", 1)):
+					spells.append(sp["name"])
+			var free := Equipment.has_set_bonus(lyra, "arcane_scholar")
+			return "Change to the %s stance%s. Spells: %s." % [to, " (free - Arcane Scholar)" if free else " (uses Lyra's turn)", ", ".join(spells) if not spells.is_empty() else "none yet"]
+		return "%s: %s" % [skill_name, SKILL_HELP.get(skill_name, "")]
+	if _menu_state == MenuState.ITEM and _menu_cursor < _active_items.size():
+		var item_name: String = _active_items[_menu_cursor]["name"]
+		return "%s: %s" % [item_name, ShopMenu.ITEM_TEXT.get(item_name, "")]
+	return ""
+
+
 func _update_menu() -> void:
 	action_menu.visible = true
+	var help := _menu_help()
+	if help != "":
+		message_label.text = help
+		_help_shown = true
+	elif _help_shown:
+		message_label.text = ""
+		_help_shown = false
 	var page: int = _option_labels.size()
 	var scrollable: bool = _menu_state == MenuState.SKILL or _menu_state == MenuState.ITEM or _menu_state == MenuState.MAIN
 	for i in page:

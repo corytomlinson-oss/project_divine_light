@@ -557,3 +557,6 @@ How it was tested: a data cross-check of every enemy, item, shop, quest giver, c
 
 ## Bug: the kingdom victory card played under a black screen (2026-10-28, Cory: Nordveil's was "just black", music and sounds only)
 - The town faded to black through `Transition` (layer 100) before the card, and the card (`KingdomVictory`, layer 61) never lifted it, so it played hidden. The Act I finale and the ending movie already lift it as they start; now `KingdomVictory._run()` does too (`Transition.fade_in(0.4)` under its own black). Checked with screenshots mid-card (Nordveil); Duskara and Selavon share the code. My earlier victory tests only checked that the steps ran, not what was on screen.
+
+## Skill and item descriptions in battle (2026-10-28, Cory: "a window tool tip that tells me what the skill does")
+- While the cursor is on a skill or an item, the message window at the top of the battle screen explains it ("Smite: Holy damage to one enemy. Extra damage against corrupted foes."); it follows the cursor, stays up while you pick the target, and clears when you back out. Lyra's stance switches say which spells that stance has at her level and whether the switch costs her turn (free with Arcane Scholar). Items reuse the shop's descriptions. *Change:* `Battle.SKILL_HELP`, `_menu_help()`, `_update_menu()`.

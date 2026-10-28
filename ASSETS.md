@@ -371,6 +371,6 @@ Code-made like the Act I assets; the enemy sprites are recolors of Act I enemies
 
 ## Deferred to later passes
 
-- **Equipment icons** (12 items from Milestone 15) — deferred until a later pass; equip screen stays text-only for now.
+- **Equipment icons** — done 2026-10-28: one 12x12 icon per piece from a shape x material atlas (`ui/equip_icons.png`, `ui/source/build_equip_icons.py`).
 - **Boss phase-2 visual variant** (Hollow Warden) — would need a code change to actually swap the texture on phase transition, not just new art; not scoped into this pass. **Done differently in 18d:** no new art; the boss gets a lasting reddish tint plus a flash/shake/thunder effect at the phase change.
 - **Per-class player sprites** — blocked on a starting-class-selection feature that doesn't exist in code yet.

@@ -304,8 +304,86 @@ static func set_text(member: Combatant, item_name: String) -> String:
 		return ""
 	var def: Dictionary = SET_BONUSES[set_id]
 	var bonus: String = def.get("desc", "buff skills last 1 extra round")
-	var status := "mastered - yours for good" if member != null and set_id in member.mastered_sets else "wear all 4 to master it"
+	var status := "mastered" if member != null and set_id in member.mastered_sets else "all 4 to master"
 	return "%s: %s (%s)" % [def["name"], bonus, status]
+
+
+# ---------------------------------------------------------------- icons
+# One 12x12 cell per item in assets/ui/equip_icons.png (2026-10-28, Cory):
+# the column is what it is (slot + class, or the accessory's kind), the row is
+# what it's made of or the set it belongs to. Built by
+# assets/ui/source/build_equip_icons.py - keep both tables in the same order.
+const ICON_ATLAS := preload("res://assets/ui/equip_icons.png")
+const ICON_CELL := 12
+const ICON_SHAPES := {
+	"weapon": {"Vael": 0, "Ryn": 1, "Lyra": 2, "Silas": 3},
+	"armor": {"Vael": 4, "Ryn": 5, "Lyra": 6, "Silas": 7},
+	"helmet": {"Vael": 8, "Ryn": 9, "Lyra": 10, "Silas": 11},
+	"gloves": {"Vael": 12, "Ryn": 13, "Lyra": 14, "Silas": 15},
+}
+const ICON_ROWS := ["iron", "steel", "frost", "sun", "storm", "star",
+	"holy_guardian", "iron_monk", "arcane_scholar", "shadow_walker",
+	"sacred_aegis", "storm_dragon", "elemental_weave", "venom_weave",
+	"divine_champion", "rising_force", "cosmic_conduit", "deaths_hand", "relic"]
+# name fragment -> material, first match wins (sets are checked before this)
+const ICON_MATERIALS := [
+	["Starforged", "star"], ["Star ", "star"], ["Stormsilver", "storm"], ["Tide", "storm"],
+	["Seafoam", "storm"], ["Reef", "storm"], ["Sunsteel", "sun"], ["Sun", "sun"], ["Desert", "sun"],
+	["Sandwalker", "sun"], ["Mirage", "sun"], ["Dune", "sun"], ["Oasis", "sun"], ["Amber", "sun"],
+	["Frost", "frost"], ["Knight's Mail", "frost"], ["Furred", "frost"], ["Snow", "frost"],
+	["Hearthstone", "frost"], ["Steel", "steel"], ["Moonstone", "steel"],
+	["Dawn Oath", "relic"], ["Grandmaster's", "relic"], ["Astral", "relic"], ["Ghoststep", "relic"],
+	["Fox-Eye", "relic"],
+]
+static var _icon_cache := {}
+
+
+## The atlas cell (column, row) for this item's icon.
+static func icon_cell(item_name: String) -> Vector2i:
+	var def: Dictionary = DEFS.get(item_name, {})
+	var slot: String = def.get("slot", "accessory")
+	var col := 17  # amulet / charm / sigil / emblem / halo / medallion
+	if slot == "accessory":
+		if item_name.contains("Ring"):
+			col = 16
+		elif item_name.contains("Pearl") or item_name.contains("Focus") or item_name.contains("Lens"):
+			col = 18
+		elif item_name.contains("Beads"):
+			col = 19
+	else:
+		col = ICON_SHAPES.get(slot, {}).get(def.get("class", ""), 17)
+	var material := "iron"
+	var set_id: String = def.get("set_id", "")
+	if set_id != "":
+		material = set_id
+	else:
+		for pair: Array in ICON_MATERIALS:
+			if item_name.contains(pair[0]):
+				material = pair[1]
+				break
+	return Vector2i(col, maxi(0, ICON_ROWS.find(material)))
+
+
+## This item's 12x12 icon (cached).
+static func icon(item_name: String) -> Texture2D:
+	if not _icon_cache.has(item_name):
+		var tex := AtlasTexture.new()
+		tex.atlas = ICON_ATLAS
+		var c := icon_cell(item_name)
+		tex.region = Rect2(c.x * ICON_CELL, c.y * ICON_CELL, ICON_CELL, ICON_CELL)
+		_icon_cache[item_name] = tex
+	return _icon_cache[item_name]
+
+
+## Each stat's change if `item_name` goes in `slot` ("" = take off): keys
+## hp, mp, atk, def, int, res, agi.
+static func stat_deltas(member: Combatant, slot: String, item_name: String) -> Dictionary:
+	var now: Dictionary = DEFS.get(member.equipment.get(slot, ""), {})
+	var next: Dictionary = DEFS.get(item_name, {})
+	var out := {}
+	for pair: Array in STAT_LABELS:
+		out[pair[0]] = int(next.get(pair[0], 0)) - int(now.get(pair[0], 0))
+	return out
 
 
 ## Items in inventory this member could equip into this specific slot.

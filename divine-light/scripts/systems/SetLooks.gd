@@ -31,14 +31,19 @@ const FORM_W := 24
 static var _form_cache := {}
 
 
-## The complete set this hero wears, or "".
+## The set whose look this hero has: the strongest set they've mastered
+## (Cory, 2026-10-28: an unlocked set's form becomes the hero's look until
+## the next one - swapping in a single piece of the next set doesn't drop them
+## back to the base sprite). SET_BONUSES lists the sets act by act, so the
+## last one found is the strongest. "" = the base sprite.
 static func active_set(member: Combatant) -> String:
 	if member == null:
 		return ""
+	var best := ""
 	for set_id: String in Equipment.SET_BONUSES:
-		if Equipment.wears_full_set(member, set_id):  # the look follows what's worn, not mastery
-			return set_id
-	return ""
+		if set_id in member.mastered_sets or Equipment.wears_full_set(member, set_id):
+			best = set_id
+	return best
 
 
 ## A material recoloring this hero for their set, or null (no set, no look).

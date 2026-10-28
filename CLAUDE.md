@@ -686,7 +686,7 @@ Built in four steps, each tested and committed on its own:
 - Towns: `divine-light/scripts/town/Town.gd` (base: inn, shrine, Frank, talking, quest marks) + Verdance, Edenmere, Nordveil, Duskara, Selavon, Threshold; scenes in `divine-light/scenes/town/`
 - Story progress: `divine-light/scripts/systems/ActOne.gd` (Act I routes), `Kingdoms.gd` (Act II kingdoms + the Maw, road order, cleansing), `Quests.gd` (every quest, hunt, fetch, blessing), `Loot.gd` (chest loot, armor-set placement), `SetLooks.gd` (set recolors)
 - Movies: `divine-light/scripts/cutscene/ActOneFinale.gd` (Act I finale), `KingdomVictory.gd` (each freed kingdom, the end of Act II), `EndingMovie.gd` (the ending + credits)
-- Map screen and quest log: `divine-light/scripts/menu/MapScreen.gd`, `QuestLog.gd`; save screen `SaveMenu.gd`
+- Map screen, quest log, status screen: `divine-light/scripts/menu/MapScreen.gd`, `QuestLog.gd`, `StatusScreen.gd`; save screen `SaveMenu.gd`
 - Procedural dungeon generator (pure logic, no scene dependencies): `divine-light/scripts/dungeon/DungeonGenerator.gd` (`class_name DungeonGenerator`)
 - Equipment system (pure logic, only touches the GameManager autoload for inventory): `divine-light/scripts/systems/Equipment.gd` (`class_name Equipment`)
 - Equip screen (opened from the pause menu): `divine-light/scripts/equip/Equip.gd` + `divine-light/scenes/equip/Equip.tscn`

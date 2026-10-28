@@ -80,12 +80,10 @@ const CHEST_LOOT := {
 
 ## Once Act I is over the forest's monsters are no match for the party, and
 ## the trips through it are just travel between towns and roads (2026-10-28,
-## Cory): fights come about a fifth as often - the same quiet as a cleared
-## dungeon. Before that, the usual Region rate.
-func encounter_steps() -> Vector2i:
-	if GameManager.has_flag("act_one_complete"):
-		return Vector2i(70, 130)
-	return super.encounter_steps()
+## Cory: first a fifth as often, then "turn the random fights off entirely").
+## Visible hunts and the dungeons themselves are unaffected.
+func is_safe() -> bool:
+	return GameManager.has_flag("act_one_complete")
 
 
 func region_id() -> String:

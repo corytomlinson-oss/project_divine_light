@@ -78,6 +78,16 @@ const CHEST_LOOT := {
 	Vector2i(17, 39): {"item": "Fox-Eye Ring", "count": 1},      # clearing by the Guild
 }
 
+## Once Act I is over the forest's monsters are no match for the party, and
+## the trips through it are just travel between towns and roads (2026-10-28,
+## Cory): fights come about a fifth as often - the same quiet as a cleared
+## dungeon. Before that, the usual Region rate.
+func encounter_steps() -> Vector2i:
+	if GameManager.has_flag("act_one_complete"):
+		return Vector2i(70, 130)
+	return super.encounter_steps()
+
+
 func region_id() -> String:
 	return "overworld"
 

@@ -866,6 +866,9 @@ func on_captive_tile(_cell: Vector2i) -> void:
 	await Cutscene.play(_data["rescue_scene"])
 	_tile_map.set_cell(_captive_cell, 0, FLOOR_COORDS)
 	GameManager.autosave()  # a rescue (22a)
+	var done := Quests.check_clears()
+	if not done.is_empty():
+		await Cutscene.play_text("\n".join(done))
 	# The fourth hero rescued: Act I ends here (20d). Afterwards the party is
 	# back outside, free to roam until Act II exists.
 	if ActOne.all_cleared() and not GameManager.has_flag("act_one_complete"):
@@ -890,6 +893,9 @@ func _play_act_two_story() -> void:
 	await _after_transition()
 	var boss_name: String = EnemyData.BOSSES.get(_data.get("boss", ""), {}).get("name", "The boss")
 	await Cutscene.play_text("narrate %s crumbles, and the Unraveling's hold on %s shatters with it." % [boss_name, Kingdoms.KINGDOMS[kingdom]["name"]])
+	var done := Quests.check_clears()
+	if not done.is_empty():
+		await Cutscene.play_text("\n".join(done))
 	GameManager.arrival = dungeon_id
 	GameManager.dungeon_floor = 0
 	GameManager.autosave_pending = true  # saved on arrival outside (22a)

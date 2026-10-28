@@ -18,6 +18,28 @@ extends RefCounted
 # Lines are cutscene commands (say / narrate / sound).
 
 const QUESTS := {
+	# ------------------------------------------------------ story quests
+	# (2026-10-28, Cory: once a dungeon opens, a quest to go and free it, so
+	# the next step is always in the log.) Started by the key quest's "next";
+	# nobody offers them (giver ""); a "clear" step is done once that dungeon's
+	# captive is rescued (Act I) or its kingdom is freed (Act II/III).
+	"free_vael": {"name": "Free Vael", "dungeon": "cathedral", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Cathedral, defeat the Fallen Guardian and free Vael.", "clear": "cathedral"}]},
+	"free_ryn": {"name": "Free Ryn", "dungeon": "monastery", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Monastery, defeat the Corrupted Grandmaster and free Ryn.", "clear": "monastery"}]},
+	"free_lyra": {"name": "Free Lyra", "dungeon": "observatory", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Observatory, defeat the Void Archmage and free Lyra.", "clear": "observatory"}]},
+	"free_silas": {"name": "Free Silas", "dungeon": "guild", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Underground Guild, defeat the Shadow Lord and free Silas.", "clear": "guild"}]},
+	"free_nordveil": {"name": "Free Nordveil", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Climb the Frozen Citadel up the mountain road and defeat the Frozen Sovereign.", "clear": "frozen_citadel"}]},
+	"free_duskara": {"name": "Free Duskara", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Descend into the Sunken Sanctum and defeat the Burning Tyrant.", "clear": "sunken_sanctum"}]},
+	"free_selavon": {"name": "Free Selavon", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Cross to the Drowned Fortress at low tide and defeat the Drowned Admiral.", "clear": "drowned_fortress"}]},
+	"the_architect": {"name": "The Architect", "dungeon": "blighted_maw", "kingdom": "maw", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Open the portal in the Reach, descend the Blighted Maw and defeat Vorath.", "clear": "blighted_maw"}]},
+
 	# ---------------------------------------------------------- The Cathedral
 	"grey_field": {
 		"name": "Grey Field", "dungeon": "cathedral", "part": 1, "giver": "verdance/farmer",
@@ -50,7 +72,7 @@ const QUESTS := {
 				"say Mayor: If you mean to go up there... take it. And may the light go with you.",
 			]},
 		],
-		"key": "Cathedral Key",
+		"key": "Cathedral Key", "next": "free_vael",
 	},
 	# ---------------------------------------------------------- The Monastery
 	"closed_gate": {
@@ -80,7 +102,7 @@ const QUESTS := {
 				"say Priestess: There. Show this at the pilgrim gate. The monks - whoever is left - will know it.",
 			]},
 		],
-		"key": "Pilgrim's Token",
+		"key": "Pilgrim's Token", "next": "free_ryn",
 	},
 	# -------------------------------------------------------- The Observatory
 	"lost_cart": {
@@ -112,7 +134,7 @@ const QUESTS := {
 				"say Innkeeper: He sent me this chart before the roads closed. The stars on it open the dome door. Bring him home if you can.",
 			]},
 		],
-		"key": "Star Chart",
+		"key": "Star Chart", "next": "free_lyra",
 	},
 	# ------------------------------------------------- The Underground Guild
 	"pickpocket": {
@@ -142,7 +164,7 @@ const QUESTS := {
 				"say Farmer: I left that life behind. But if it gets those tunnels cleaned out - lean close. The word is \"lantern in the dark.\"",
 			]},
 		],
-		"key": "Guild Password",
+		"key": "Guild Password", "next": "free_silas",
 	},
 	# ======================================================= Act II (Milestone 26)
 	# Per kingdom (Cory, 2026-10-18): one required quest that seals its
@@ -163,7 +185,7 @@ const QUESTS := {
 				"say Captain: His pack... and the Ember Seal, still warm. He'd have wanted it used. Take it to the gate.",
 			]},
 		],
-		"key": "Ember Seal", "xp": 500, "gold": 300,
+		"key": "Ember Seal", "next": "free_nordveil", "xp": 500, "gold": 300,
 	},
 	"lost_axe": {
 		"name": "The Lost Axe", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 2, "optional": true, "giver": "nordveil/woodcutter",
@@ -199,7 +221,7 @@ const QUESTS := {
 			{"log": "Take the Sun Disc back from the marauder chief, south of the desert road.", "hunt": "marauder_chief"},
 			{"log": "Bring the Sun Disc to Duskara's water-keeper.", "talk": "duskara/keeper", "lines": ["say Water-Keeper: The Sun Disc, home again. Hold it up to the Sanctum's doors - they will know it."]},
 		],
-		"key": "Sun Disc", "xp": 700, "gold": 400,
+		"key": "Sun Disc", "next": "free_duskara", "xp": 700, "gold": 400,
 	},
 	"dye_root": {
 		"name": "Dye-Root", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 2, "optional": true, "giver": "duskara/weaver",
@@ -232,7 +254,7 @@ const QUESTS := {
 			{"log": "Find the tide chart in the wrecked boat south of the coast road.", "fetch": "tide_chart"},
 			{"log": "Bring the tide chart to Selavon's harbormaster.", "talk": "selavon/harbormaster", "lines": ["say Harbormaster: Soaked, but readable. There - the channel opens at low tide. Go when the water draws back."]},
 		],
-		"key": "Tide Chart", "xp": 900, "gold": 500,
+		"key": "Tide Chart", "next": "free_selavon", "xp": 900, "gold": 500,
 	},
 	"sailors_compass": {
 		"name": "The Sailor's Compass", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 2, "optional": true, "giver": "selavon/sailor",
@@ -295,7 +317,7 @@ const QUESTS := {
 				"say Frank: ...Last time? Did I say that? Long day. Go on, you'll want to rest before the Maw.",
 			]},
 		],
-		"key": "Portal Key", "xp": 2000, "gold": 1200,
+		"key": "Portal Key", "next": "the_architect", "xp": 2000, "gold": 1200,
 	},
 	# ======================================================= Act III (29)
 	# "Last preparations" (README roadmap): optional, offered as soon as the
@@ -624,7 +646,8 @@ static func town_has_business(town: String) -> bool:
 static func advance(id: String) -> Array:
 	GameManager.quests[id] = stage(id) + 1
 	if not is_done(id):
-		return []
+		# (2026-10-28, Cory: after a hunt nothing said the quest had moved on)
+		return ["sound menu_confirm", "narrate Quest updated: %s" % current_step(id)["log"]]
 	return _reward(id)
 
 
@@ -648,11 +671,41 @@ static func _reward(id: String) -> Array:
 	if q.has("blessing"):
 		lines.append_array(_bless(q["blessing"]))
 	GameManager.gold += gold
-	lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
+	if xp > 0 or gold > 0:
+		lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
 	for m: Combatant in GameManager.party:
-		if m.gain_xp(xp):
+		if xp > 0 and m.gain_xp(xp):
 			lines.append("narrate %s reached Level %d!" % [m.display_name, m.level])
+	var next: String = q.get("next", "")
+	if next != "" and not is_started(next):
+		GameManager.quests[next] = 0
+		lines.append("narrate New quest: %s - %s" % [QUESTS[next]["name"], QUESTS[next]["steps"][0]["log"]])
 	return lines
+
+
+## A dungeon's story is done: its captive rescued (Act I) or its kingdom freed.
+static func _cleared(dungeon: String) -> bool:
+	var kingdom := Kingdoms.for_dungeon(dungeon)
+	if kingdom != "":
+		return Kingdoms.is_cleansed(kingdom)
+	return ActOne.is_cleared(dungeon)
+
+
+## Finishes any story quest whose dungeon is now done. Returns the lines to
+## show (called right after a rescue or a kingdom's liberation, and by the log).
+static func check_clears() -> Array:
+	var lines: Array = []
+	for id: String in QUESTS:
+		var step := current_step(id)
+		if step.has("clear") and _cleared(step["clear"]):
+			lines.append_array(advance(id))
+	return lines
+
+
+## The hunt is still waiting to be fought (its quest is on that step).
+static func hunt_pending(hunt_id: String) -> bool:
+	var id := hunt_quest(hunt_id)
+	return id != "" and current_step(id).get("hunt", "") == hunt_id
 
 
 # The kingdoms' blessings (26): finishing a freed kingdom's second optional
@@ -739,6 +792,13 @@ static func hunt_enemy(hunt_id: String) -> Dictionary:
 
 ## For the Quests screen: active quests first (with what to do now), then done.
 static func log_entries() -> Array:
+	# A save from before the story quests catches up here: start the ones
+	# whose key quest is done, then finish any whose dungeon already is.
+	for id: String in QUESTS:
+		var next: String = QUESTS[id].get("next", "")
+		if next != "" and is_done(id) and not is_started(next):
+			GameManager.quests[next] = 0
+	check_clears()
 	var active: Array = []
 	var done: Array = []
 	for id: String in QUESTS:

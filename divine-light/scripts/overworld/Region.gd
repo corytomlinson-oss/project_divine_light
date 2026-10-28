@@ -495,11 +495,12 @@ func _add_quest_spots() -> void:
 		sprite.position = _tile_map.map_to_local(cell)
 		_tile_map.add_child(sprite)
 		_spots[cell] = {"kind": spot["kind"], "id": spot["id"], "sprite": sprite}
-	# Scenery that belongs to a hunt (the smith's wrecked cart) shows once its
-	# quest has started.
+	# Scenery that belongs to a hunt (the smith's wrecked cart) shows while
+	# that fight is still to come; once it's won the crate is taken and the
+	# wreck cleared (2026-10-28, Cory: it stayed, so the quest looked unfinished).
 	for hunt: String in Quests.HUNTS:
 		var h: Dictionary = Quests.HUNTS[hunt]
-		if h.has("prop") and h.get("region", "overworld") == region_id() and Quests.is_started(Quests.hunt_quest(hunt)):
+		if h.has("prop") and h.get("region", "overworld") == region_id() and Quests.hunt_pending(hunt):
 			var wreck := Sprite2D.new()
 			wreck.texture = QUEST_PROPS
 			wreck.hframes = 3

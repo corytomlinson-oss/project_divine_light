@@ -211,6 +211,12 @@ var _data: Dictionary
 var _exit_cell: Vector2i
 var _captive_cell: Vector2i
 var _room_rects: Array = []  # Rect2i per room, for the auto-map
+# The boss waits in its room, shown as its battle sprite; walking into the
+# room starts the fight (2026-10-28, Cory - it used to be a red floor tile).
+var _boss_sprite: AnimatedSprite2D = null
+var _boss_room := Rect2i()
+var _boss_stand := Vector2i(-9999, -9999)
+var _boss_started := false
 var _chests: Dictionary = {}  # cell -> {cell, kind, reward, sprite}
 var _springs: Dictionary = {}  # cell -> Sprite2D
 # Act II floors (25a)
@@ -308,6 +314,10 @@ func _generate_and_build() -> void:
 			tiles[_captive_cell] = DungeonGenerator.FLOOR
 	if _boss_defeated() and tiles.get(boss_cell, "") == DungeonGenerator.BOSS_TRIGGER:
 		tiles[boss_cell] = DungeonGenerator.FLOOR
+	# No red tile any more: the boss itself stands in the room (_place_boss).
+	var boss_here: bool = tiles.get(boss_cell, "") == DungeonGenerator.BOSS_TRIGGER
+	if boss_here:
+		tiles[boss_cell] = DungeonGenerator.FLOOR
 
 	for cell in tiles.keys():
 		_tile_map.set_cell(cell, 0, _coords(tiles[cell]))
@@ -316,6 +326,8 @@ func _generate_and_build() -> void:
 	else:
 		_place_captive()
 	_place_treasure(layout, seed_value)
+	if boss_here:
+		_place_boss(boss_cell)
 	if _floors > 1 and _floor in _data.get("levers", []):
 		_place_levers(layout, tiles, seed_value)
 	if _floors > 1 and _floor in _data.get("rod_floors", []):
@@ -655,7 +667,7 @@ func _sealed(chest: Dictionary) -> bool:
 
 func is_blocked(cell: Vector2i) -> bool:
 	return _chests.has(cell) or _springs.has(cell) or (_guard != null and cell == _stairs_down) \
-			or _sealed_doors.has(cell) or cell == _lever_cell or _rods.has(cell)
+			or _sealed_doors.has(cell) or cell == _lever_cell or _rods.has(cell) 			or (_boss_sprite != null and cell == _boss_stand)
 
 
 ## Stairs are doors (Player.gd asks): up always, down once its guard is gone.
@@ -784,6 +796,60 @@ func _drink(cell: Vector2i) -> void:
 	await Cutscene.play_text(SPRING_TEXT)
 
 
+## The boss fought here: Act II/III name it per dungeon; Act I goes by
+## location (the escape warden or the rescue boss, like Battle does).
+func _boss_data() -> Dictionary:
+	var id: String = _data.get("boss", "") if _floors > 1 else ""
+	if id == "":
+		var by_location: Dictionary = load("res://scripts/battle/Battle.gd").get_script_constant_map()["LOCATION_BOSSES"]
+		id = by_location.get(GameManager.current_location, "")
+	return EnemyData.BOSSES.get(id, {})
+
+
+## Stands the boss in the middle of its room, idling, facing the way in.
+func _place_boss(door_side: Vector2i) -> void:
+	for rect: Rect2i in _room_rects:
+		if rect.has_point(door_side):
+			_boss_room = rect
+	if _boss_room.size == Vector2i.ZERO:
+		return
+	_boss_stand = _boss_room.get_center()
+	# not on a chest or anything else already standing in the room
+	var tries := 0
+	while is_blocked(_boss_stand) and tries < 8:
+		_boss_stand += [Vector2i.UP, Vector2i.LEFT, Vector2i.DOWN, Vector2i.RIGHT][tries % 4] * (tries / 4 + 1)
+		tries += 1
+	var boss: Dictionary = _boss_data()
+	var path := "res://assets/sprites/enemies/%s.png" % String(boss.get("name", "")).to_lower().replace(" ", "_")
+	if boss.is_empty() or not ResourceLoader.exists(path):
+		return
+	var tex: Texture2D = load(path)
+	var w := tex.get_width() / 2
+	var frames := SpriteFrames.new()
+	frames.set_animation_speed(&"default", 2.0)
+	for f in 2:
+		var atlas := AtlasTexture.new()
+		atlas.atlas = tex
+		atlas.region = Rect2(f * w, 0, w, tex.get_height())
+		frames.add_frame(&"default", atlas)
+	var sprite := AnimatedSprite2D.new()
+	sprite.sprite_frames = frames
+	sprite.z_index = 1
+	# feet on the bottom of its tile; battle sprites face right
+	sprite.position = _tile_map.map_to_local(_boss_stand) + Vector2(0, 8 - tex.get_height() / 2.0)
+	sprite.flip_h = door_side.x < _boss_stand.x
+	_tile_map.add_child(sprite)
+	sprite.play(&"default")
+	_boss_sprite = sprite
+
+
+## Walked into the boss's room: it turns on you and the fight begins.
+func _confront_boss() -> void:
+	var boss_name: String = _boss_data().get("name", "The boss")
+	await Cutscene.play_text("narrate %s turns to face you!" % boss_name)
+	_player.start_boss_battle()
+
+
 ## Called by Player.gd on stepping onto the captive rune.
 func on_captive_tile(_cell: Vector2i) -> void:
 	if _escape:
@@ -882,6 +948,9 @@ func _after_transition() -> void:
 ## Called by Player.gd on every tile: stepping into a room reveals all of it
 ## (walls included); in a corridor you see two tiles around you.
 func on_player_moved(cell: Vector2i) -> void:
+	if _settled and _boss_sprite != null and not _boss_started and _boss_room.has_point(cell):
+		_boss_started = true
+		_confront_boss.call_deferred()
 	var seen: Array = []
 	for rect: Rect2i in _room_rects:
 		if rect.has_point(cell):
@@ -965,7 +1034,9 @@ func map_markers() -> Array:
 	var markers: Array = []
 	for cell in GameManager.explored.get(GameManager.current_location, {}):
 		var coords := _tile_map.get_cell_atlas_coords(cell)
-		if _rods.has(cell):
+		if cell == _boss_stand and _boss_sprite != null:
+			markers.append({"cell": cell, "color": Color(0.95, 0.25, 0.25), "legend": "Boss"})
+		elif _rods.has(cell):
 			markers.append({"cell": cell, "color": Color(1.0, 0.95, 0.5), "legend": "Lightning rod"})
 		elif cell == _lever_cell:
 			markers.append({"cell": cell, "color": Color(0.95, 0.6, 0.2), "legend": "Lever"})

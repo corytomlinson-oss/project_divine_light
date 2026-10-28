@@ -536,3 +536,8 @@ How it was tested: a data cross-check of every enemy, item, shop, quest giver, c
 - **The equip screen now says what gear does.** On the item list, the text area under it shows the highlighted piece's stats, **what changes if you equip it** compared with what's on now ("If equipped: DEF +4, RES +2"; "Take it off: ..." for Unequip), and its set with the bonus and whether it's mastered. On the slot list, the highlighted slot's equipped piece and its stats.
 - **Shops use the same wording** (`Equipment.describe()`), now including HP and MP (they were left out, so the Star Charm read "RES +10" only) and the set bonus for set pieces.
 - Shared helpers in `Equipment.gd`: `stat_text()`, `describe()`, `compare_text()`, `set_text()`.
+
+## Bosses stand in their rooms (2026-10-28, Cory: "have the boss display instead of the red marker... entering the boss room automatically triggers the boss fight")
+- **No more red trigger tile.** The boss stands in the middle of its room as its battle sprite (idle animation, facing the side of the room it's entered from, blocking its tile, nudged off any chest). The map marks it where it stands.
+- **Walking into the room starts the fight:** a line ("The Frozen Sovereign turns to face you!") and the battle. Same everywhere: Act I rescue bosses, the escape wardens (who wait in the room by the exit), every Act II boss and Vorath. Beaten bosses are gone from their rooms. The old fallbacks stay (the escape exit door and the captive's rune still start the fight if reached first).
+- It triggers only on a step, not on loading into the room. *Change:* `Dungeon._place_boss()`, `_confront_boss()`, `on_player_moved()`.

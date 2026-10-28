@@ -554,3 +554,6 @@ How it was tested: a data cross-check of every enemy, item, shop, quest giver, c
 
 ## Quieter forest after Act I (2026-10-28, Cory: "once we clear act 1... make the random combat encounters a lot more rare in the act 1 area")
 - Once Act I is complete, the Forest Heartlands has **no random fights at all** (first tried at a fifth as often; Cory: "turn the random fights off entirely"). Visible hunts, the dungeons and the kingdom regions are unchanged. *Change:* `Overworld.is_safe()`.
+
+## Bug: the kingdom victory card played under a black screen (2026-10-28, Cory: Nordveil's was "just black", music and sounds only)
+- The town faded to black through `Transition` (layer 100) before the card, and the card (`KingdomVictory`, layer 61) never lifted it, so it played hidden. The Act I finale and the ending movie already lift it as they start; now `KingdomVictory._run()` does too (`Transition.fade_in(0.4)` under its own black). Checked with screenshots mid-card (Nordveil); Duskara and Selavon share the code. My earlier victory tests only checked that the steps ran, not what was on screen.

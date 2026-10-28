@@ -34,6 +34,10 @@ static func play_for(from: Node, kingdom: String) -> void:
 
 func _run() -> void:
 	await get_tree().process_frame
+	# The town faded to black through Transition (layer 100, above this one):
+	# lift it, or the whole card plays under black (2026-10-28, Cory: "just
+	# black", music and sounds only). ActOneFinale and EndingMovie do the same.
+	Transition.fade_in(0.4)
 	Music.play("finale")
 	_start_ms = Time.get_ticks_msec()
 	var k: int = Kingdoms.ORDER.find(_freed)

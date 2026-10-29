@@ -23,6 +23,7 @@ Music="*res://scripts/systems/Music.gd"
 UiInput="*res://scripts/systems/UiInput.gd"
 Transition="*res://scripts/systems/Transition.gd"
 Cutscene="*res://scripts/systems/Cutscene.gd"
+BalanceLog="*res://scripts/systems/BalanceLog.gd"
 
 [display]
 

@@ -166,6 +166,7 @@ The design sections below are the original plan and are kept as written, except 
 - **Dialogue has name tags, no portraits.**
 - **Suspend save mid-battle** restarts that fight from its beginning rather than resuming mid-turn.
 - **Side quests:** Act I seals each dungeon behind two town quests; Act II has one required quest per kingdom plus two optional ones (kingdom blessings); Act III has the portal-key quests plus five optional "last preparations" quests (Milestones 24, 26, 28a, 29).
+- **Balance log:** every play session writes a log of battles, damage, XP and quests to `%APPDATA%/Godot/app_userdata/divine_light/balance_logs`. `python tools/balance_report.py` summarises the newest one.
 - **Road quests:** once a town has nothing left for you, Frank's stall offers a quest to find the next town (Verdance -> Edenmere, then Nordveil, Duskara, Selavon and the Threshold as each road opens); walking into that town completes it.
 
 ---

@@ -774,9 +774,13 @@ static func _reward(id: String) -> Array:
 	GameManager.gold += gold
 	if xp > 0 or gold > 0:
 		lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
+	BalanceLog.write("quest", {"id": id, "name": q["name"], "xp": xp, "gold": gold, "optional": q.get("optional", false)})
 	for m: Combatant in GameManager.party:
+		var level_before := m.level
 		if xp > 0 and m.gain_xp(xp):
 			lines.append("narrate %s reached Level %d!" % [m.display_name, m.level])
+		if xp > 0:
+			BalanceLog.xp("quest: " + String(q["name"]), xp, m, level_before)
 	var next: String = q.get("next", "")
 	if next != "" and not is_started(next):
 		GameManager.quests[next] = 0

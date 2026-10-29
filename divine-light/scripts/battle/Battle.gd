@@ -331,6 +331,7 @@ var _frank_joined := false
 var _frank_sprite: AnimatedSprite2D = null
 var _frank_invoiced := false
 var _frank_blessed := false
+var _auto_won := false  # F3: logged as an auto-win, not a real fight
 var _unravel_charge := 0
 var _unravel_grace := false
 var _immune_turn := 0
@@ -360,6 +361,7 @@ func _ready() -> void:
 		"name": e.display_name, "hp": e.max_hp, "atk": e.atk, "def": e.defense, "agi": e.agi,
 		"xp": e.xp_reward, "is_boss": e.is_boss, "phase_hp_thresholds": e.phase_hp_thresholds.duplicate(),
 	}))
+	BalanceLog.battle_start(_party, _enemies)
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
 	var vorath_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.display_name == "Vorath")
 	Music.play("vorath" if vorath_fight else ("boss" if boss_fight else "battle"), "battle")  # Vorath's own theme (30)
@@ -990,6 +992,8 @@ func _debug_level_all(direction: int) -> void:
 func _debug_auto_win() -> void:
 	if state == State.BATTLE_OVER or _acting:
 		return
+	BalanceLog.end_action(message_label.text)
+	_auto_won = true
 	for e in _enemies:
 		e.receive_damage(e.hp)
 	_update_ui()
@@ -1157,6 +1161,7 @@ func _attempt_escape() -> void:
 	var avg_enemy: float = float(enemy_total) / max(1, enemy_count)
 	var chance: int = clampi(50 + roundi((avg_party - avg_enemy) * 2.0), 10, 90)
 	if randi() % 100 < chance:
+		BalanceLog.battle_end("escaped", _party, 0, 0)
 		Transition.change_scene(GameManager.current_scene_path)
 	else:
 		message_label.text = "Couldn't escape!"
@@ -1447,6 +1452,7 @@ func _begin_resolving() -> void:
 					_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
+	BalanceLog.new_round()
 	_advance_turn()
 
 
@@ -1455,6 +1461,7 @@ func _begin_resolving() -> void:
 func _advance_turn() -> void:
 	_acting = true
 	await _execute_next_turn()
+	BalanceLog.end_action(message_label.text)
 	_acting = false
 	_message_timer = _message_time()
 
@@ -1463,6 +1470,7 @@ func _execute_next_turn() -> void:
 	while not _turn_queue.is_empty() and _turn_queue[0].is_ko:
 		_turn_queue.pop_front()
 	if _turn_queue.is_empty():
+		BalanceLog.begin("end of round", "poison / bleed / buffs")
 		for member in _party:
 			member.defending = false
 		for enemy in _enemies:
@@ -1478,6 +1486,7 @@ func _execute_next_turn() -> void:
 		_begin_selection()
 		return
 	var combatant: Combatant = _turn_queue.pop_front()
+	BalanceLog.begin(combatant.display_name, _log_action_name(combatant))
 	# The acting party member steps forward for their turn (enemies: nobody).
 	_party_acting = _party.find(combatant)
 	if combatant.is_stunned:
@@ -1501,6 +1510,18 @@ func _execute_next_turn() -> void:
 		await _execute_enemy_turn(combatant)
 	else:
 		await _execute_party_turn(combatant)
+
+
+## What a fighter is about to do, for the balance log.
+func _log_action_name(c: Combatant) -> String:
+	if c.is_stunned:
+		return "stunned"
+	if c.is_enemy:
+		return "boss turn (phase %d)" % (c.boss_phase + 1) if c.is_boss else "turn"
+	match c.queued_action:
+		"skill":    return "skill: " + String(c.queued_skill.get("name", "?"))
+		"item_use": return "item: " + String(c.queued_skill.get("name", "?"))
+	return c.queued_action
 
 
 func _get_enemy_target(member: Combatant) -> Combatant:
@@ -2771,6 +2792,7 @@ func _summon(summoner: Combatant, group: Array) -> void:
 		add.summoned = true
 		add.xp_reward = 0
 		_enemies.append(add)
+		BalanceLog.add_fighter(add)
 	for sprite: CanvasItem in _enemy_sprites:
 		if sprite != null:
 			sprite.queue_free()
@@ -2842,7 +2864,10 @@ func _vorath_turn(vorath: Combatant, note: String) -> String:
 		if not _frank_joined:
 			await _frank_revelation(vorath)
 		vorath.immune = []
+		BalanceLog.begin(GameManager.FRANK_TRUE_NAME + " (Frank)", "assist")
 		await _frank_acts(vorath)
+		BalanceLog.end_action(message_label.text)
+		BalanceLog.begin(vorath.display_name, "boss turn (phase %d)" % (vorath.boss_phase + 1))
 		if not vorath.is_alive():
 			return note
 		if _unravel_grace:
@@ -3077,6 +3102,7 @@ func _tick_dot() -> void:
 
 
 func _end_battle(victory: bool) -> void:
+	BalanceLog.end_action(message_label.text)
 	state = State.BATTLE_OVER
 	GameManager.battle_snapshot = {}  # a suspend from here on saves the result
 	_victory = victory
@@ -3094,8 +3120,12 @@ func _end_battle(victory: bool) -> void:
 				GameManager.defeated_bosses[GameManager.current_location] = true
 				GameManager.autosave_pending = true  # saved back on the map (22a)
 		for member in _party:
+			var level_before: int = member.level
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))
+			if total_xp > 0:
+				BalanceLog.xp("auto-win" if _auto_won else "battle", total_xp, member, level_before)
+		BalanceLog.battle_end("auto-win" if _auto_won else "won", _party, total_xp, total_gold)
 		_update_ui()
 		Music.stop(0.3)
 		Sfx.play("victory")
@@ -3112,6 +3142,7 @@ func _end_battle(victory: bool) -> void:
 	else:
 		Music.stop(1.0)
 		message_label.text = "The party has fallen..."
+		BalanceLog.battle_end("lost", _party, 0, 0)
 
 
 func _build_levelup_text(member: Combatant) -> String:

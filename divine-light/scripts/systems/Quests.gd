@@ -40,6 +40,49 @@ const QUESTS := {
 	"the_architect": {"name": "The Architect", "dungeon": "blighted_maw", "kingdom": "maw", "part": 9, "giver": "", "xp": 0, "gold": 0,
 		"steps": [{"log": "Open the portal in the Reach, descend the Blighted Maw and defeat Vorath.", "clear": "blighted_maw"}]},
 
+	# ------------------------------------------------------- road quests
+	# (2026-10-29, Cory: once a town's quests are done, a quest - from Frank -
+	# to go and find the next town, so you know where to go.) "road" is the
+	# kingdom whose road it is ("" = Act I's Edenmere, offered once Verdance
+	# has nothing left for you); giver "*/frank" is Frank at any stall. The
+	# "reach" step is done on walking into that town (Town._road_arrival).
+	"road_edenmere": {"name": "The Road to Edenmere", "road": "", "dungeon": "", "part": 0, "giver": "verdance/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Looks like Verdance has nothing more for you, friend. Folk here are sorted, thanks to you.",
+			"say Frank: Try Edenmere - follow the road south-east through the forest. Bigger town, more people, more trouble that needs fixing.",
+		],
+		"remind": [],
+		"steps": [{"log": "Follow the road south-east through the forest to the town of Edenmere.", "reach": "edenmere"}]},
+	"road_nordveil": {"name": "The Road to Nordveil", "road": "nordveil", "dungeon": "", "part": 0, "giver": "*/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: All four of you together at last. Now the real work starts.",
+			"say Frank: The kingdoms past the forest have gone quiet. Nordveil first - take the mountain pass at the north edge of the forest, up into the Tundra.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the mountain pass at the forest's north edge and find the town of Nordveil in the Northern Tundra.", "reach": "nordveil"}]},
+	"road_duskara": {"name": "The Road to Duskara", "road": "duskara", "dungeon": "", "part": 0, "giver": "nordveil/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Nordveil's breathing again. You did that.",
+			"say Frank: Word is the sandstorm on the forest's west road has dropped. Duskara's out past it, in the Wastes - and it needs you as badly as this place did.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the west road out of the Forest Heartlands and find the town of Duskara in the Wastes.", "reach": "duskara"}]},
+	"road_selavon": {"name": "The Road to Selavon", "road": "selavon", "dungeon": "", "part": 0, "giver": "duskara/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Cool wind in Duskara. Never thought I'd see it.",
+			"say Frank: The storm surf on the forest's east road is going down. Selavon's at the end of it, on the coast. Last of the three.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the east road out of the Forest Heartlands and find the town of Selavon on the coast.", "reach": "selavon"}]},
+	"road_threshold": {"name": "The Road to the Threshold", "road": "maw", "dungeon": "", "part": 0, "giver": "selavon/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Three kingdoms free. Now there's only the one who did this to them.",
+			"say Frank: The grey fog south of the forest is thinning. Take the road below the Underground Guild into the Blighted Reach - there's a camp at its edge, the Threshold.",
+			"say Frank: I'll go on ahead and meet you there.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the south road below the Underground Guild into the Blighted Reach and find the Threshold.", "reach": "threshold"}]},
+
 	# ---------------------------------------------------------- The Cathedral
 	"grey_field": {
 		"name": "Grey Field", "dungeon": "cathedral", "part": 1, "giver": "verdance/farmer",
@@ -552,6 +595,8 @@ static func is_available(id: String) -> bool:
 	if is_started(id):
 		return false
 	var q: Dictionary = QUESTS[id]
+	if q.has("road"):
+		return _road_open(id)
 	if q.has("kingdom"):  # Act II (26)
 		var kingdom: String = q["kingdom"]
 		if q.get("optional", false):
@@ -566,6 +611,49 @@ static func is_available(id: String) -> bool:
 		return false
 	var prev := _previous(id)
 	return prev == "" or is_done(prev)
+
+
+## A road quest is offered once its road is open and you haven't been there:
+## Act I's (Edenmere) when Verdance has nothing left for you, the others once
+## the kingdom before is freed.
+static func _road_open(id: String) -> bool:
+	var q: Dictionary = QUESTS[id]
+	if _been_to(q["steps"][0]["reach"]):
+		return false
+	var road: String = q["road"]
+	if road == "":
+		return not GameManager.has_flag("act_one_complete") and not _town_busy("verdance")
+	return Kingdoms.is_open(road) and not Kingdoms.is_cleansed(road)
+
+
+## Been to this town: walked in since road quests (the "visited_" flag), or -
+## for older saves - taken a quest from someone there.
+static func _been_to(town: String) -> bool:
+	if GameManager.has_flag("visited_" + town) or (town == "threshold" and GameManager.has_flag("threshold_arrived")):
+		return true
+	for id: String in QUESTS:
+		if QUESTS[id]["giver"].begins_with(town + "/") and is_started(id):
+			return true
+	return false
+
+
+## Someone in this town still has a quest for you, or one of theirs is still
+## going (road quests aside).
+static func _town_busy(town: String) -> bool:
+	for id: String in QUESTS:
+		if QUESTS[id].has("road"):
+			continue
+		if String(current_step(id).get("talk", "")).begins_with(town + "/"):
+			return true
+		if QUESTS[id]["giver"].begins_with(town + "/") and (is_active(id) or is_available(id)):
+			return true
+	return false
+
+
+## This person hands out this quest ("*/frank": Frank at any town's stall).
+static func _gives(id: String, who: String) -> bool:
+	var giver: String = QUESTS[id]["giver"]
+	return giver == who or (giver.begins_with("*/") and who.ends_with(giver.substr(1)))
 
 
 static func key_for(dungeon: String) -> String:
@@ -601,14 +689,14 @@ static func talk(who: String) -> Array:
 			lines.append_array(step["lines"])
 			lines.append_array(advance(id))
 	for id: String in QUESTS:
-		if QUESTS[id]["giver"] == who and is_available(id):
+		if _gives(id, who) and is_available(id):
 			GameManager.quests[id] = 0
 			Sfx.play("menu_confirm")
 			lines.append_array(QUESTS[id]["offer"])
 			lines.append("narrate New quest: %s." % QUESTS[id]["name"])
 	if lines.is_empty():
 		for id: String in QUESTS:
-			if QUESTS[id]["giver"] == who and is_active(id):
+			if _gives(id, who) and is_active(id):
 				lines.append_array(QUESTS[id]["remind"])
 				break
 	return lines
@@ -621,7 +709,7 @@ static func mark_for(who: String) -> String:
 		if current_step(id).get("talk", "") == who:
 			return "?"
 	for id: String in QUESTS:
-		if QUESTS[id]["giver"] == who and is_available(id):
+		if _gives(id, who) and is_available(id):
 			return "!"
 	return ""
 
@@ -635,11 +723,22 @@ static func has_business(who: String) -> bool:
 static func town_has_business(town: String) -> bool:
 	for id: String in QUESTS:
 		var who: String = current_step(id).get("talk", "")
-		if who.begins_with(town + "/"):
+		if who.begins_with(town + "/") or current_step(id).get("reach", "") == town:
 			return true
 		if QUESTS[id]["giver"].begins_with(town + "/") and is_available(id):
 			return true
 	return false
+
+
+## Walked into a town: remembers it, and finishes any road quest heading here.
+## Returns the lines to show.
+static func arrive(town: String) -> Array:
+	GameManager.story_flags["visited_" + town] = true
+	var lines: Array = []
+	for id: String in QUESTS:
+		if current_step(id).get("reach", "") == town:
+			lines.append_array(advance(id))
+	return lines
 
 
 ## Next step; on the last one, the reward. Returns the lines announcing it.

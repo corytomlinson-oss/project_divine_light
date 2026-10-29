@@ -193,7 +193,7 @@ func interact(cell: Vector2i, facing: String) -> void:
 	if _npcs.has(cell):
 		var id: String = _npcs[cell]
 		if id == "frank":
-			await _frank()
+			await _frank(facing)
 		elif id == "harbormaster" and cleansed() and not GameManager.has_flag(GIFT_FLAG):
 			await _gift(facing)
 		else:

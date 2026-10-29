@@ -195,7 +195,7 @@ func interact(cell: Vector2i, facing: String) -> void:
 	if _npcs.has(cell):
 		var id: String = _npcs[cell]
 		if id == "frank":
-			await _frank()
+			await _frank(facing)
 		else:
 			await _talk(id, facing)
 	elif cell == INN_DOOR:

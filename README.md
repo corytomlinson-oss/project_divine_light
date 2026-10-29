@@ -154,16 +154,17 @@ The design sections below are the original plan and are kept as written, except 
 - **Vorath:** 9000 HP; phase 2 (from 70%) rotates his immunity every turn (fire, ice, lightning, earth, holy); phase 3 (from 40%) brings Frank in, and the Final Unraveling wipes the party 4 turns after one free round.
 - **Bosses can't be stun-locked:** after losing a turn to a stun, a boss shrugs off stuns for its next two turns, and it still changes phase on time.
 - **Armor-set looks:** every full set swaps the hero into its own hand-drawn form (24x32 sprite), escalating from Act I (geared up) through Act II (heavier, elemental) to Act III (the full transformation: Vael's winged champion, Ryn's flame-haired ki master, Lyra's star-robed conduit, Silas's horned reaper).
-- **Set bonuses stack:** completing a set masters its bonus for good, so a hero keeps every bonus they've earned; the look follows the set worn now.
+- **Set bonuses stack:** completing a set masters its bonus for good, so a hero keeps every bonus they've earned; their look is the strongest set they've mastered, kept until they master the next one.
 - **Items:** a revival item exists, the **Phoenix Feather** (revives the fallen ally with the most max HP at 1/4 HP; Frank, freed kingdoms, the Threshold). The **Elixir fully restores** one ally's HP and MP (it was 120 HP).
 - **After the ending** the Reach turns green (a restored tileset) and has no random fights.
 - **The Blighted Maw is reached through a portal** in the Blighted Reach, opened by a three-part Portal Key from three required quests (Cory's idea). The Threshold sits at the Reach's edge.
 - **Frank's shop has a fixed stock** (no level-scaled random accessories); kingdom armories and the Threshold sell the higher tiers. After the ending Frank is a faint echo of light who still keeps his stall.
 - **Shrines:** Edenmere's and the freed kingdoms' heal once per dungeon trip; the Threshold's is unlimited.
-- **Menus and controls:** B / Start open the pause menu (Equip, Map, Quests, Save); Y or M opens the map. There's no separate inventory (X) or Formation (Select) screen; rows are swapped in battle only.
+- **Menus and controls:** B / Start open the pause menu (Equip, Status, Map, Quests, Save); Y or M opens the map. There's no separate inventory (X) or Formation (Select) screen; rows are swapped in battle only.
 - **Dialogue has name tags, no portraits.**
 - **Suspend save mid-battle** restarts that fight from its beginning rather than resuming mid-turn.
 - **Side quests:** Act I seals each dungeon behind two town quests; Act II has one required quest per kingdom plus two optional ones (kingdom blessings); Act III has the portal-key quests plus five optional "last preparations" quests (Milestones 24, 26, 28a, 29).
+- **Road quests:** once a town has nothing left for you, Frank's stall offers a quest to find the next town (Verdance -> Edenmere, then Nordveil, Duskara, Selavon and the Threshold as each road opens); walking into that town completes it.
 
 ---
 

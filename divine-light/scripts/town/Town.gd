@@ -84,6 +84,7 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 ## (Every town calls this last in _ready, once its people are placed - so the
 ## quest marks go up here too.)
 func _place_player(entry: Vector2i) -> void:
+	_road_arrival()
 	_refresh_quest_marks()
 	_apply_kingdom_state()
 	_play_victory()
@@ -92,6 +93,21 @@ func _place_player(entry: Vector2i) -> void:
 		GameManager.has_pending_spawn = false
 	else:
 		_player.snap_to(_tile_map.map_to_local(entry))
+
+
+## Arriving finishes a road quest heading here (Frank's directions,
+## 2026-10-29); it says so once the way in, and any arrival scene, is over.
+func _road_arrival() -> void:
+	var lines := Quests.arrive(GameManager.current_location)
+	if lines.is_empty():
+		return
+	if Transition.is_busy():
+		await Transition.finished
+	await get_tree().process_frame  # let an arrival scene (Verdance, the Threshold) start first
+	while Cutscene.is_playing():
+		await get_tree().process_frame
+	await Cutscene.play_text("\n".join(lines))
+	_refresh_quest_marks()
 
 
 func is_blocked(cell: Vector2i) -> bool:
@@ -242,7 +258,10 @@ func _restore_party() -> void:
 			m.mp = m.max_mp
 
 
-func _frank() -> void:
+func _frank(facing := "up") -> void:
+	# His directions to the next town come first (road quests, 2026-10-29).
+	if Quests.mark_for(GameManager.current_location + "/frank") == "!" and await _quest_talk("frank", facing):
+		return
 	if GameManager.has_flag("game_complete") and not _frank_echo_seen:
 		_frank_echo_seen = true
 		await Cutscene.play_text("narrate Frank's outline shimmers in the light, faint as a memory. Somehow, the stall is still open.")

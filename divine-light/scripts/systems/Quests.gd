@@ -801,6 +801,15 @@ static func check_clears() -> Array:
 	return lines
 
 
+## Every quest for this kingdom is done, optional ones included (a region
+## with nothing left to do goes quiet, Region.is_safe).
+static func kingdom_done(kingdom: String) -> bool:
+	for id: String in QUESTS:
+		if QUESTS[id].get("kingdom", "") == kingdom and not is_done(id):
+			return false
+	return true
+
+
 ## The hunt is still waiting to be fought (its quest is on that step).
 static func hunt_pending(hunt_id: String) -> bool:
 	var id := hunt_quest(hunt_id)

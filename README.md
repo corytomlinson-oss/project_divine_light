@@ -157,6 +157,7 @@ The design sections below are the original plan and are kept as written, except 
 - **Set bonuses stack:** completing a set masters its bonus for good, so a hero keeps every bonus they've earned; their look is the strongest set they've mastered, kept until they master the next one.
 - **Items:** a revival item exists, the **Phoenix Feather** (revives the fallen ally with the most max HP at 1/4 HP; Frank, freed kingdoms, the Threshold). The **Elixir fully restores** one ally's HP and MP (it was 120 HP).
 - **After the ending** the Reach turns green (a restored tileset) and has no random fights.
+- **Random fights:** Act II regions and dungeons have them about a third less often than Act I's (every 20-36 steps on the region maps, 14-26 in the dungeons). A kingdom's region has none at all once it's freed and every quest there, optional ones included, is done. The forest has none after Act I.
 - **The Blighted Maw is reached through a portal** in the Blighted Reach, opened by a three-part Portal Key from three required quests (Cory's idea). The Threshold sits at the Reach's edge.
 - **Frank's shop has a fixed stock** (no level-scaled random accessories); kingdom armories and the Threshold sell the higher tiers. After the ending Frank is a faint echo of light who still keeps his stall.
 - **Shrines:** Edenmere's and the freed kingdoms' heal once per dungeon trip; the Threshold's is unlimited.

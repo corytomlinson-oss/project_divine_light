@@ -144,6 +144,7 @@ func _ready() -> void:
 		if Transition.is_busy():
 			await Transition.finished
 		await Cutscene.play_text("\n".join(hunt_lines))
+	await _announce_if_quiet()
 
 
 func _paint() -> void:
@@ -341,9 +342,33 @@ func _kingdom_dungeon(id: String) -> Dictionary:
 
 
 ## The overworld is big (23c), so fights come a little less often here than
-## in dungeons: walking between places shouldn't be a slog.
+## in dungeons: walking between places shouldn't be a slog. Act II's regions
+## space them out further (2026-10-29, Cory: doing every quest, the party
+## reached Act III at level 22 against a planned ~14).
 func encounter_steps() -> Vector2i:
-	return Vector2i(14, 26)
+	return Vector2i(20, 36) if Kingdoms.for_region(region_id()) in Kingdoms.ORDER else Vector2i(14, 26)
+
+
+## No random fights once this kingdom is free and every quest for it is done,
+## optional ones included (2026-10-29, Cory). The forest and the Reach have
+## their own rules.
+func is_safe() -> bool:
+	var kingdom := Kingdoms.for_region(region_id())
+	return kingdom != "" and Kingdoms.is_cleansed(kingdom) and Quests.kingdom_done(kingdom)
+
+
+## Once per region, the first time it's here and safe.
+func _announce_if_quiet() -> void:
+	var kingdom := Kingdoms.for_region(region_id())
+	var flag := "quiet_" + region_id()
+	if not (kingdom in Kingdoms.ORDER) or not is_safe() or GameManager.has_flag(flag):
+		return
+	GameManager.story_flags[flag] = true
+	if Transition.is_busy():
+		await Transition.finished
+	while Cutscene.is_playing():
+		await get_tree().process_frame
+	await Cutscene.play_text("narrate With %s free and nothing left undone, %s has fallen quiet. Nothing hunts these roads anymore." % [Kingdoms.KINGDOMS[kingdom]["name"], Kingdoms.REGIONS[region_id()]["name"]])
 
 
 # ---------------------------------------------------------------- corruption (25a)

@@ -763,9 +763,12 @@ func _dungeon_done() -> bool:
 
 
 ## With the boss beaten, fights come a fifth as often (every 50-100 steps
-## instead of 10-20).
+## instead of 10-20). Act II's dungeons space them out a little more until
+## then (14-26; 2026-10-29, Cory: the party was arriving over-levelled).
 func encounter_steps() -> Vector2i:
-	return Vector2i(50, 100) if _dungeon_done() else Vector2i(10, 20)
+	if _dungeon_done():
+		return Vector2i(50, 100)
+	return Vector2i(14, 26) if _data.get("kingdom", "") in Kingdoms.ORDER else Vector2i(10, 20)
 
 
 ## Once per dungeon, the moment it becomes safe.

@@ -222,7 +222,8 @@ func _image(path: String) -> TextureRect:
 
 func _hero(cls: String, at: Vector2) -> AnimatedSprite2D:
 	var s := AnimatedSprite2D.new()
-	s.sprite_frames = load("res://assets/sprites/%s_frames.tres" % cls.to_lower())
+	s.sprite_frames = SetLooks.frames_for(SetLooks.member_for(cls.to_lower()), load("res://assets/sprites/%s_frames.tres" % cls.to_lower()))
+	s.material = SetLooks.material_for(SetLooks.member_for(cls.to_lower()))
 	s.scale = Vector2(2, 2)
 	s.position = at + Vector2(0, -32)  # 16x32 frames at 2x, feet on `at`
 	s.play("idle_side")
@@ -481,7 +482,7 @@ func _kingdom(k: int) -> void:
 	_stage.add_child(_sky(info["sky"][0], info["sky"][1]))
 	var land := Node2D.new()
 	_stage.add_child(land)
-	for poly in _silhouettes(k):
+	for poly in silhouettes(k):
 		var p := Polygon2D.new()
 		p.polygon = PackedVector2Array(poly)
 		p.color = info["land"]
@@ -498,7 +499,7 @@ func _kingdom(k: int) -> void:
 			_stage.move_child(sun, _stage.get_child_count() - 2)  # just under the land
 	land.position.x = 8.0
 	_tween().tween_property(land, "position:x", -8.0, KINGDOM_LEN)  # slow push across
-	var weather := Weather.new()
+	var weather := WeatherFx.new()
 	weather.kind = info["weather"]
 	_stage.add_child(weather)
 	_white(0.9, 0.35)
@@ -529,7 +530,7 @@ func _sky(top: Color, bottom: Color) -> TextureRect:
 
 ## Each kingdom's skyline (polygons in screen pixels), a little wider than the
 ## screen so the slow push never shows an edge.
-func _silhouettes(k: int) -> Array:
+static func silhouettes(k: int) -> Array:
 	match k:
 		0:  # mountains, and the citadel's spires between them
 			return [
@@ -566,49 +567,6 @@ func _silhouettes(k: int) -> Array:
 				sea,
 			]
 
-
-## Falling snow, blowing sand or slanting rain, drawn as whole pixels.
-class Weather extends Node2D:
-	var kind := "snow"
-	var _motes: Array = []
-	var _rng := RandomNumberGenerator.new()
-
-	func _ready() -> void:
-		_rng.seed = 2410
-		for i in (70 if kind != "rain" else 90):
-			_motes.append(Vector3(_rng.randf_range(0, 320), _rng.randf_range(0, 180), _rng.randf_range(0.5, 1.0)))
-
-	func _process(delta: float) -> void:
-		for i in _motes.size():
-			var m: Vector3 = _motes[i]
-			match kind:
-				"snow":
-					m.y += 22.0 * m.z * delta
-					m.x += sin(m.y / 14.0 + i) * 8.0 * delta - 6.0 * delta
-				"sand":
-					m.x -= 120.0 * m.z * delta
-					m.y += sin(m.x / 20.0 + i) * 6.0 * delta
-				_:
-					m.x -= 60.0 * delta
-					m.y += 220.0 * m.z * delta
-			if m.y > 182:
-				m.y -= 184
-			if m.x < -4:
-				m.x += 326
-			_motes[i] = m
-		queue_redraw()
-
-	func _draw() -> void:
-		for m: Vector3 in _motes:
-			var p := Vector2(roundf(m.x), roundf(m.y))
-			match kind:
-				"snow":
-					draw_rect(Rect2(p, Vector2.ONE * (2 if m.z > 0.85 else 1)), Color(1, 1, 1, 0.5 + 0.5 * m.z))
-				"sand":
-					draw_rect(Rect2(p, Vector2(3 if m.z > 0.8 else 2, 1)), Color(1.0, 0.8, 0.5, 0.35 + 0.4 * m.z))
-				_:
-					for s in 4:
-						draw_rect(Rect2(p + Vector2(s, -s * 3), Vector2.ONE), Color(0.7, 0.85, 0.95, 0.5 * m.z))
 
 
 # ------------------------------------------------------------------ Vorath
@@ -653,5 +611,6 @@ func _title_card() -> void:
 	_fx.sparkles(_local(Vector2(110, 80)), BattleFx.PALETTES["holy"], true, 1.4)
 	_fx.sparkles(_local(Vector2(210, 80)), BattleFx.PALETTES["holy"], true, 1.4)
 	await _at(T_TITLE + 2 * BAR)
-	_show(_caption, "Coming in a later update.")
+	# Act II begins with Nordveil (25b); the old card said it was coming later.
+	_show(_caption, "The mountain pass to Nordveil lies north." if Kingdoms.is_built("nordveil") else "Coming in a later update.")
 	await _at(T_END)

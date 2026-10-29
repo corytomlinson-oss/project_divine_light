@@ -12,6 +12,10 @@ const DUNGEON_SETS := {
 	"monastery": ["Iron Monk Gi", "Iron Monk Headband", "Iron Knuckles", "Iron Monk Beads"],
 	"observatory": ["Arcane Robe", "Scholar's Circlet", "Scholar's Gloves", "Arcane Focus"],
 	"guild": ["Shadow Walker Garb", "Shadow Cowl", "Shadow Grips", "Shadow Sigil"],
+	# Act II (25b): each dungeon holds one kind of piece from all four sets.
+	"frozen_citadel": ["Sacred Aegis Plate", "Storm Dragon Gi", "Elemental Weave Robe", "Venom Weave Garb"],
+	"sunken_sanctum": ["Sacred Aegis Helm", "Storm Dragon Band", "Elemental Weave Hood", "Venom Weave Mask"],
+	"drowned_fortress": ["Sacred Aegis Gauntlets", "Storm Dragon Fists", "Elemental Weave Gloves", "Venom Weave Wraps"],
 }
 
 # Plain chests: a weighted pick of an item (count = [min, max]) or gold.

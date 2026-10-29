@@ -504,7 +504,8 @@ func make_character(sprite_name: String) -> AnimatedSprite2D:
 	# 16x32 sprite's feet would sit under the next row of tiles otherwise.
 	sprite.z_index = 1
 	if ResourceLoader.exists(path):
-		sprite.sprite_frames = load(path)
+		sprite.sprite_frames = SetLooks.frames_for(SetLooks.member_for(sprite_name), load(path))  # Act III form
+		sprite.material = SetLooks.material_for(SetLooks.member_for(sprite_name))  # a hero's set look (25b)
 	else:
 		sprite.sprite_frames = load("res://assets/sprites/vael_frames.tres")
 		# self_modulate: only the sprite goes dark, not its emote bubbles.

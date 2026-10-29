@@ -3,6 +3,10 @@ extends Node
 signal party_loaded
 
 const SAVE_DIR: String = "user://saves/"
+# Frank's true name, spoken for the first time in the Vorath fight (28c).
+# A placeholder Cory hasn't confirmed (suggested: Faranoth / Aldaran / Ithriel
+# / Solmund) - change it here and every line that says it follows.
+const FRANK_TRUE_NAME := "Faranoth"
 const SAVE_SLOTS: int = 3
 # Slot 0 is the autosave (Milestone 22a): its own file, so it never overwrites
 # one of the three manual slots.
@@ -56,6 +60,16 @@ var key_items: Dictionary = {}
 # A quest hunt in progress: the HUNTS id, so the overworld can settle it on
 # the way back (won: the step's done; fled: it's still out there).
 var pending_hunt: String = ""
+# Act II dungeons have floors (25a): which one you're on in the current
+# dungeon (0 = the entrance floor). Saved, so a save or suspend mid-dungeon
+# comes back on the right floor. Set to 0 entering from a region map.
+var dungeon_floor: int = 0
+# A boss fight a map started itself names its boss here (Act II floors use
+# per-floor location ids, so Battle.LOCATION_BOSSES can't), cleared by Battle.
+var pending_boss_id: String = ""
+# The next battle starts with the party wading (25d: flooded floors) - its
+# enemies get +30% AGI. Set by Player.gd, cleared by Battle after setup.
+var battle_in_water: bool = false
 # Development/testing: when set (a list of enemy dicts, EnemyData format), the
 # next battle fights exactly this group - bosses too, via "is_boss" and
 # "phase_hp_thresholds" - then it's cleared (Milestone 20a).
@@ -133,6 +147,8 @@ func start_new_game(cls: String) -> void:
 	quests = {}
 	key_items = {}
 	pending_hunt = ""
+	dungeon_floor = 0
+	pending_boss_id = ""
 	dungeon_seeds = {}
 	defeated_bosses = {}
 	explored = {}
@@ -223,6 +239,7 @@ func _save_data() -> Dictionary:
 		"story_flags": story_flags.duplicate(),
 		"quests": quests.duplicate(),
 		"key_items": key_items.keys(),
+		"dungeon_floor": dungeon_floor,
 		"scene": current_scene_path,
 		"location": location_name(current_location),
 		"location_id": current_location,
@@ -251,14 +268,31 @@ func autosave_if_pending() -> void:
 
 
 ## A place's name for the save screen.
+## The location without a dungeon floor suffix ("frozen_citadel_f2" ->
+## "frozen_citadel"): what encounter tables and battle backgrounds go by.
+static func base_location(location: String) -> String:
+	var floor_at := location.rfind("_f")
+	if floor_at > 0 and location.substr(floor_at + 2).is_valid_int():
+		return location.substr(0, floor_at)
+	return location
+
+
 static func location_name(location: String) -> String:
 	var id := location.trim_suffix("_escape")
 	if ActOne.DUNGEONS.has(id):
 		return ActOne.DUNGEONS[id]["name"]
+	# A dungeon floor past the first: "<dungeon>_f<n>" -> "The Frozen Citadel 2F".
+	var floor_at := id.rfind("_f")
+	if floor_at > 0 and id.substr(floor_at + 2).is_valid_int():
+		return "%s %dF" % [location_name(id.substr(0, floor_at)), int(id.substr(floor_at + 2)) + 1]
+	var act_two := Kingdoms.location_name(id)
+	if act_two != "":
+		return act_two
 	match id:
 		"overworld": return "Forest Heartlands"
 		"verdance": return "Verdance"
 		"edenmere": return "Edenmere"
+		"threshold": return "The Threshold"
 	return id.capitalize()
 
 
@@ -352,6 +386,8 @@ func _apply(parsed: Dictionary) -> void:
 	for item_name in parsed.get("key_items", []):
 		key_items[String(item_name)] = true
 	pending_hunt = ""
+	dungeon_floor = int(parsed.get("dungeon_floor", 0))
+	pending_boss_id = ""
 	# Where the save was made (Milestone 22a); older saves land on the overworld.
 	current_scene_path = String(parsed.get("scene", "res://scenes/overworld/Overworld.tscn"))
 	var pos: Array = parsed.get("position", [])

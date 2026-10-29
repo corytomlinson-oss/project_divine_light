@@ -103,6 +103,7 @@ const BY_NAME := {
 # Items are tossed to the target (18d); used on yourself, the toss is skipped.
 const ITEMS := {
 	"item_heal": {"cast": "projectile", "impact": "sparkles", "palette": "heal", "sound": "heal"},
+	"item_full_restore": {"cast": "projectile", "impact": "sparkles", "palette": "heal", "sound": "heal"},
 	"item_restore_mp": {"cast": "projectile", "impact": "sparkles", "palette": "mana", "sound": "heal"},
 	"item_cure_poison": {"cast": "projectile", "impact": "sparkles", "palette": "poison", "sound": "heal"},
 }

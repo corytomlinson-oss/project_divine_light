@@ -1,0 +1,34 @@
+# Nordveil is free (Milestone 25b; Cory: a victory scene for every freed
+# kingdom). Plays in the town the first time you arrive after the Frozen
+# Sovereign falls (Town._play_victory), right after the color washes back
+# across the Tundra; KingdomVictory's short movie card follows. {a1}-{a3} are
+# the other three heroes; the party walks up from the gate into the square
+# while the townsfolk pour out of their houses.
+
+spawn {a1} {a1} at 15,19 facing up
+spawn {a2} {a2} at 17,19 facing up
+spawn {a3} {a3} at 16,19 facing up
+music town
+move player to 16,12 async
+move {a1} to 15,13 async
+move {a2} to 17,13 async
+move {a3} to 16,14 async
+spawn kid1 child at 5,15 facing up
+spawn neighbor1 worker at 24,15 facing up
+spawn neighbor2 merchant at 6,4 facing down
+move kid1 to 12,12 async
+move neighbor1 to 20,12 async
+move neighbor2 to 13,10 async
+sync
+face player up
+emote kid1 heart
+emote neighbor1 note
+say Captain: Do you feel it? The wind's gone warm. The blizzard is over - truly over.
+say Captain: The Frozen Sovereign held Nordveil by the throat for months. You walked into his citadel and broke his grip.
+emote player note
+say Elder: The shrine's flame caught on the very first spark. Nordveil has not seen a morning like this in a generation.
+say Child: Mama! Mama, the snow is sparkly again!
+emote frank note
+say Frank: Ha! Look at all these faces. That's what a kingdom looks like when it can breathe again.
+say Frank: Two more to go. Duskara burns in the west, and Selavon drowns to the east. But tonight? Tonight, Nordveil lights its fires for you.
+say Captain: Nordveil's gates are yours, now and always. Rest, eat, and let the forge outfit you. You've earned it.

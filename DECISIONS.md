@@ -387,3 +387,208 @@ Cory asked for a movie-style Act I cutscene with the bosses slain and cool effec
 - **Code-driven, not a .scene script:** walking, dashing, wind-ups and effects need real animation the movie format doesn't have. The kingdom teasers are drawn in code (no Act II art exists yet), with weather to make them move.
 - **A new track** ("finale") rather than reusing the boss or intro theme, laid out bar for bar against the shots so every cut lands on a downbeat.
 - **F9 previews it** on any map, like F7/F8 for the demos.
+
+## Milestone 25 — Act II (scoped 2026-10-23)
+
+Cory's calls, before anything was built:
+- **Region maps** joined by border roads (not one giant continent, not a world-map screen).
+- **Fixed kingdom order: Nordveil, Duskara, Selavon**; cleansing one opens the road to the next.
+- **Generated multi-floor dungeons** (one floor per zone in the doc) with each kingdom's gimmick on top.
+
+### 25a — foundations (built 2026-10-23)
+
+My calls while building (Cory: "I think we are good, let's start"):
+- **Overworld.gd became the `Region` base class + the forest's data**, rather than a second copy for the Tundra: every region (and later ones) behaves the same and gets fixes once.
+- **Corruption is a shader on the tiles** (drained violet-grey), not separate corrupted tilesets: it works on every region and town for free, and the cleansing wave is just tweening it away. Real per-kingdom art can still layer on in 27.
+- **New paths after cleansing are blight brambles** (`x` in a map): a visible, explained barrier ("not while the Unraveling holds this land") instead of invisible walls.
+- **Act II roads stay closed until each kingdom is built** (`Kingdoms.BUILT`), even after Act I, with a "coming in a later update" note, so the stub Tundra and stand-in Citadel never show up in a real game before 25b.
+- **Floors are one scene per dungeon with a saved floor number**, each floor its own location id, so the map, chests and the "quiet" rule work per floor with no changes to those systems.
+- **A floor's guard stands on its stairs down** (the doc's "elite knight guarding the inner sanctum gate"): walking up to it starts a no-escape fight; it blocks the stairs until beaten.
+- **The Tundra's names:** "The Northern Tundra", and placeholders "The Duskara Wastes" / "The Selavon Coast" for the other two regions. *Change:* `Kingdoms.REGIONS`.
+
+### 25b-25d calls (Cory, 2026-10-23)
+- **Act II armor sets spread across Act II** (pieces of all four in every Act II dungeon, plus freed towns' armories).
+- **Tune Act II to the current XP curve** (Nordveil ~7-9, Duskara ~9-11, Selavon ~11-13); Act I unchanged.
+- **A victory scene for each freed kingdom:** in-town scene, then a short animated card.
+- **Sliding ice** in the Frozen Citadel.
+
+### 25b — my calls while Cory was away (2026-10-23, "keep going through this milestone")
+- **Act II set distribution:** each Act II dungeon holds one kind of piece from all four sets (the Citadel = the four armors, in frozen chests on floor 3), and each freed town's armory sells two of the accessories (Nordveil: Aegis Sigil, Dragon Pearl). Duskara: helmets + the other two accessories; Selavon: gloves. *Change:* `Loot.DUNGEON_SETS`, each town's armory stock.
+- **Set piece stats** sit a little above Act II's shop tier, so a full set is worth chasing without making shop gear pointless. *Change:* `Equipment.DEFS`.
+- **Set looks for all eight sets** (Act I's too), one color scheme each (`SetLooks.LOOKS`): Holy Guardian gold tabard / Sacred Aegis silver, white-gold shield, sky-blue tabard; Iron Monk iron-grey gi / Storm Dragon storm-blue gi, gold headband; Arcane Scholar purple robe / Elemental Weave crimson robe; Shadow Walker black hood, violet scarf / Venom Weave dark-green hood, venom-green scarf.
+- **Sliding ice keeps a walkable rim** around every ice room (no way to get stuck or locked out of a door), on the Citadel's first two floors (the doc's Mountain Approach and Outer Citadel).
+- **Frozen chests replace Silas's locks in the Citadel** (vault chests are frozen, not locked), so the Citadel's gimmick is Lyra's. Lyra must be in Fire stance, which she keeps after a battle; the hint text tells the player.
+- **Tundra enemy numbers** (README roster): tuned for four heroes around level 7-9; the Frost Warden 700 HP, the Sovereign 1500 HP with phases at 66/33%.
+- **Nordveil's people and lines** (a captain, an elder, a huntress hinting at the blight valley; after cleansing a smith, priestess, child, woodcutter and Frank) and its prices (inn 40g -> 20g).
+- **The victory chain** (Cory asked for an in-town scene + a short card): boss falls -> out to the region for the color wave -> straight on into the town for the celebration -> the card -> you're free in the town. Going to the town automatically (rather than leaving it to the player) so the celebration can't be missed. *Change:* `Region._cleansing_wave()`, `Town._play_victory()`.
+- **Nordveil's victory scene:** the party walks into the square, villagers pour out of their houses, the captain, elder, a child and Frank speak (Frank names Duskara and Selavon next). Frank speaks from his stall rather than walking in, so the town's own Frank stays where you can shop.
+- **The victory card reuses the finale's look and theme** (the "finale" track's opening bars), ~14.5s, skippable like the movies (Start / F3).
+- **Act II opens with Nordveil only:** the west and east roads keep their "coming in a later update" note until 25c/25d. The Act I finale's last caption now points north instead of saying Act II is coming later.
+- **Balance is by formula, not playtested** (like Act I's first pass): tundra enemies hit for roughly 30-40 on the back row and ~10 on Vael at level 7-8; fights give ~150-250 XP, so Nordveil (with the Warden and the Sovereign) should carry the party from ~6 to ~9. Worth a check in Cory's playtest.
+- **Music placeholders:** the Tundra asks for a `tundra` track and uncleansed Nordveil for `nordveil_cold`; neither exists yet, so they fall back to the overworld and town themes (written in the Act II art & music pass, 27).
+
+## Milestone 25c — Duskara (built 2026-10-23, on my recommendations; Cory: "move on to 25c")
+- **Fire tiles keep a safe rim** around every burning room (the doc's "some paths safe, some fast but costly": cut across and pay, or walk round). Damage is 6% of max HP per tile for everyone standing, and **never knocks anyone out** (it leaves them at 1). *Change:* `Dungeon.FIRE_DAMAGE`, `_burn_party()`.
+- **Fire on the first three floors**, levers on floors 2 and 3, the Blazing Sentinel on floor 3's stairs, the Tyrant on floor 4.
+- **Levers seal the side rooms** (the vaults and springs), one lever per floor opens all of them, and it stays pulled. The doc's "set pieces in sealed chambers" became: the helmets sit on floor 3 like the Citadel's armors, and the sealed chambers hold the rich vault chests. *Change:* `_place_levers()`.
+- **Dune Marauders steal consumables, not equipment** (the doc says equipment too; losing a set piece mid-dungeon would feel bad). Items come back if you win, like the Guild's thieves.
+- **The Tyrant's third phase reuses the Void Mage's rotating aura** (ice, lightning, switching every cast) rather than a new system.
+- **Act II's second gear tier is "Sunsteel"** (sold in freed Duskara, ~1100g weapons); the set accessories Prism Focus and Viper Fang Charm are sold there too, completing the four accessories across Nordveil and Duskara.
+- **Duskara's look:** two maps (a house buried in a dune, a dry oasis -> dug out, brimming), a heat haze with blowing sand before cleansing. People: a water-keeper (story), a nomad (hints: vipers, earth-proof golems), a guard; after: a smith, priestess, child, weaver, Frank.
+- **Victory scene:** the water-keeper, the guard, a child and Frank (who points at Selavon next).
+- **Test-process change:** a fresh backup of Cory's saves right before every test (an older backup was restored once this session; he hadn't played in between).
+
+## Milestone 25d — Selavon (built 2026-10-23, Cory asleep: "do 25d, then 26 and 27")
+- **Flooded rooms, not flooded corridors:** the doc's "flooded corridors" became flooded room middles with a dry rim (like ice and fire), so wading is a choice (cut through slowly, or walk round); corridors are the only links between rooms and flooding them would make the slow path mandatory. Wading = 60% speed; a fight that starts in water gives the enemies +30% AGI (the doc's "AGI bonus in water").
+- **Lightning rods** strike every 6 steps (a crackle the step before), 10% max HP within 2 tiles, never below 1 HP; only on floor 2 (the doc's Fortress Exterior).
+- **"Immune to water" = immune to ice** (the game has no water element); Coral Brutes are weak to lightning instead.
+- **The Admiral's two-round bolt:** telegraphed one turn, lands the next (110 power to everyone), halved by Defend and stopped by Sanctuary, as the doc asks. Repeats every other turn in phase 3.
+- **Selavon's reward:** the harbormaster's one-time gift (2000 gold + 3 Elixirs), the cheapest shop prices in Act II, and the Stormsilver tier.
+- **The end of Act II's kingdoms:** the victory card adds "Act II - The Purge" -> "Act III - The Source: coming in a later update" (no separate scene); flag `act_two_complete`. The doc's "Verdance becomes a hub after Act II" is left for later (not in 25's scope; noted here).
+- **Tidestone Ring** (the coast's hidden clearing): +5 RES, +3 AGI, +25 MP.
+
+## Milestone 26 — Act II side quests (built 2026-10-23, Cory asleep)
+- **One required quest per kingdom** (Cory said "one or two"; one keeps each kingdom's opening brisk), two steps each, sealing its dungeon until done — the same shape as Act I's.
+- **Two optional quests per kingdom, offered only after it's freed** (the doc's freed towns reward revisiting; the before-state towns have few people out).
+- **Permanent buffs = kingdom blessings:** +3 RES / DEF / AGI for all four heroes, for finishing each kingdom's second optional quest. Small and fixed (three in all), applied to base stats so they survive saves and level-ups. *Change:* `Quests.BLESSINGS`.
+- **Act II hunt targets aren't scaled by party size** (the party is always four in Act II); their numbers are tuned for four heroes at that point.
+- **Rewards:** required quests 500-900 XP + gold and the key; optional 600-1000 XP + gold + potions (Hi-Potions, Hi-Ethers, Elixirs).
+
+## Milestone 27 — Act II art & music (2026-10-23, Cory asleep)
+- **Music first:** six tracks (three regions, three dungeons). Corrupted towns reuse their region's theme instead of three extra "cursed town" tracks (the freed towns already have the warm town theme); the three Act II bosses keep the existing boss theme. *Change:* `build_music.py`, the towns' `Music.play` lines.
+- **Art priorities:** the code-made tilesets, backgrounds and props from 25 stay; the next step replaces the recolor stand-ins for the three kingdom bosses with hand-placed sprites (the most visible stand-ins). Regular enemies stay recolors for now.
+- **27 step 2:** hand-placed sprites for the three kingdom bosses only; the regular Act II enemies, mini-bosses and hunts stay recolors (ASSETS.md lists them as still to do). Stopped after 27 as Cory asked; 28 (the APK) needs the device.
+
+## Act III roadmap (Cory, 2026-10-24)
+- **Act III split 28a-28d** (Threshold + portal key / Blighted Maw / Vorath / ending), **29** optional side quests + Verdance hub, **30** art & music, **APK last at 31**.
+- **The portal-key quests move into 28a** (they gate the Maw, so they have to come before it).
+- **Vael gets Resurrection late in Act III.**
+- **Frank's true name:** suggestions given (Faranoth, Aldaran, Ithriel, Solmund); Cory to choose by 28c.
+
+## Milestone 28a — the Threshold + portal key (2026-10-24, Cory away: "go as far as you can")
+- **Level curve: compress skill unlocks above level 8** (formula `8 + (old - 8) * 0.55`), not raise XP: one table, Act I untouched, and Act II/III enemies don't need retuning. Sanctuary is now L20, Divine Wrath L23, Divine Shield L15.
+- **The Reach is south of the forest** (the doc's world map: the Maw below the Heartlands, between the Desert and the Coast), reached by a new road below the Guild once all three kingdoms are free.
+- **The Maw is a pseudo-kingdom** in `Kingdoms` (drained land, a road gate after Selavon, "cleansed" when Vorath falls) — reuses the whole cleansing system instead of special cases.
+- **The portal key quests:** the frame from a Hollow Custodian at a ruined shrine, the core from Nordveil's priestess (the shard of pure light in her shrine's flame), the binding by Frank, with a slip that hints at his past.
+- **"Void Sentinel" renamed "Null Sentinel"** for Act III (the name was taken in Act I).
+- **The Threshold:** free inn, unlimited shrine, Starforged gear, the cheapest potions, refugees from every kingdom.
+
+## Milestone 28b — the Blighted Maw (2026-10-24)
+- **The Maw echoes the three kingdoms:** a frozen floor (ice), a burning floor (fire), a drowned floor (wading), then the depths and Vorath's chamber — 5 floors, reusing the Act II hazards so the last dungeon tests everything.
+- **Two Act III set bonuses redefined** because the doc's versions don't apply in this game: Cosmic Conduit = Lyra's spells -25% MP (no summons exist); Death's Hand = Shadowstep +30% damage (it has no row limit). The other two as written.
+- **Resurrection auto-targets** the fallen ally with the most max HP (no target menu for KO'd allies exists); level 21, 30 MP.
+- **Act III sets are all findable in the Maw except the gloves** (Threshold armory), so they don't depend on optional quests.
+
+## Milestones 28c + 28d — Vorath and the ending (2026-10-24, Cory away)
+- **Frank acts on his own, not as a menu-driven 5th member:** the battle UI (party panel, targeting, turn order) is built for four; he acts right after each Vorath turn with a fixed priority (Final Invoice once under 15% HP, Blessing when the party is hurt, else Balance's Judgment). *Change:* `Battle._frank_acts()`.
+- **Frank's true name is a placeholder: "Faranoth"** (first of my suggestions). One constant: `GameManager.FRANK_TRUE_NAME`.
+- **Vorath tuning:** 6000 HP / ATK 80 / DEF 30, phases at 66% and 33%, for a level ~20-22 party with Act III sets. A by-formula guess; needs a playtest.
+- **Phase 2 immunity rotates every Vorath turn** (fire, ice, lightning, earth, holy) and is announced, so it rewards reading the log rather than punishing a fixed element.
+- **The Final Unraveling:** one grace round after the revelation, then 4 Vorath turns of charge; at 4 the party is wiped (a normal defeat -> Game Over / retry). Frank's Final Invoice is there to make the race winnable. *Change:* `Battle.UNRAVEL_TURNS`.
+- **After the credits the game returns to the Title**, with an autosave placed in the cleansed Reach and flag `game_complete`, so loading it continues in the freed world (post-game wandering; 29 adds things to do).
+- **Battle ignores input while a Cutscene is playing** (found in testing: the revelation's dialogue and the battle menu shared the confirm button).
+- **Credits text** is mine ("A game by Cory Tomlinson", "Story, design and direction: Cory Tomlinson", "Built with Claude") — edit in `EndingMovie.gd`.
+
+## Milestone 29 — Act III side quests + Verdance hub (2026-10-24, Cory away)
+- **Five optional quests:** one "last errand" per hero (the roadmap's "each hero's last errand") plus one Frank-lore quest ("hints about Frank"). All optional, offered as soon as the Reach is open and still doable after the ending (`"anytime"`), so they never gate Vorath.
+- **Rewards:** each hero's errand gives that hero's best accessory (class-locked) and a permanent +4 to one stat for that hero only; the lore quest gives the whole party +3 ATK and 5 Elixirs ("the best gear" + "permanent buffs" from the roadmap).
+- **The lore quest stays a hint, not a reveal:** Frank deflects ("wide hats come back into fashion"); the real reveal stays in the Vorath fight.
+- **Verdance hub = three envoys + new lines for everyone**, not new shops or systems: the doc only asks that representatives appear and the town feel thriving.
+- **Frank after the ending is a faint echo who still keeps his stall** — the ending has him fade into the light, but removing him would cut post-game shopping and revives in six towns.
+
+## Milestone 30 — Act III art & music (2026-10-24, Cory away)
+- **Music first, three tracks:** the Reach, the Maw, and a Vorath battle theme (the last fight deserves its own; the other bosses share "boss"). The Threshold stays on the warm town theme on purpose: it's the last safe place.
+- **The Vorath theme loops at 25s** (16 bars at 152 BPM, like the other battle themes' length in bars). Easy to lengthen if it wears thin.
+- **Art: only Vorath hand-placed**, at 64x64 so the final boss stands taller than everything else. The regular Act III enemies, the Hollow Custodian and the 29 hunts stay recolors, as Act II's regular enemies did in 27; the most visible stand-in got the effort.
+- **No separate sprite for Frank's true form:** his revelation already glows him up in battle; a real true-form sprite is a good candidate for a later art pass.
+- **Stopped before 31** (the APK), as Cory asked.
+
+## Documentation review (2026-10-24, Cory asked for it)
+- **CLAUDE.md's "Picking back up" rewritten as a short current-state summary** (status, what's playtested, next steps, open questions, an APK checklist gathered from the milestone notes). The old stacked notes, which contradicted each other ("28 = the APK", "Act III coming later"), moved below it as history.
+- **README gets an "As built" section** listing where the game differs from the design doc, rather than rewriting the design sections; small inline notes mark the same spots. The skill tables now show the real (compressed) unlock levels, plus Resurrection.
+- **One in-game fix found along the way:** the end-of-Act II card still said "Act III - The Source / Coming in a later update." It now says the road south of the Guild leads to the Blighted Reach (same pattern as the Act I finale's caption). *Change:* `KingdomVictory.gd`.
+
+## Playtest pass (2026-10-24, Cory away: "playtest the game and find any bugs and fix them")
+How it was tested: a data cross-check of every enemy, item, shop, quest giver, cutscene and map spot (0 problems); a reachability check of every region map; **a simulated critical-path playthrough** from the end of Act I to Vorath (about 90 real battles with a simple "sensible player" AI, real XP, HP/MP/KOs carried through each dungeon); traced Vorath fights at levels 17/19/21; a screenshot tour of every Act II/III map in each state.
+- **Bug: bosses could be stun-locked.** Pressure Point (2 Qi), Garrote and the ultimates stun guaranteed, and a stunned enemy skipped its turn *before* the phase check, so a stunned boss also never changed phase (Vorath sat in phase 1 down to 784 HP; Frank's revelation never came). **Fix:** after losing a turn to a stun, a boss shrugs off stuns for its next two turns ("X resists the stun!"), and its phase check runs even on a stunned turn. *Change:* `Battle._execute_next_turn`, the end of `_execute_party_turn`, `Combatant.stun_guard`.
+- **Gap: no revival item existed**, though the design doc (and comments in the inn/spring code) assume "Frank and revival consumables". A hero who fell on a dungeon's first floor stayed down through every floor and the boss. **Added the Phoenix Feather:** revives the fallen ally with the most max HP at 1/4 HP (battle Items menu; not used up if nobody has fallen). Sold by Frank (150g), the freed kingdoms (130-150g) and the Threshold (100g); the corrupted towns keep their "basic stock only" per the doc. *Change:* `Battle.ITEM_DEFS`, `_confirm_item`, `_do_item`, the shop lists.
+- **Balance: the critical path reached Vorath at level 17**, so Resurrection (L21) and the ultimates (L23), which the design doc names as phase 3's win conditions, were out of reach; and Vorath died in ~11 rounds without the Final Unraveling ever passing 1/4. **Changes:** skill unlocks above 15 compressed again (`15 + (x - 15) * 0.4`: ultimates at 18, Resurrection at 17); Act III enemy XP x1.6 (Reach/Maw tables, the Thrall guard, the Hollow Custodian); Vorath 9000 HP / ATK 95 / INT 72 with phase 3 at 40%. **Result (simulated):** main path arrives at level 18; Vorath takes 13-20 rounds, phase 3 lasts 3-6 and the Unraveling reaches 2-3 of 4. The AI plays well, so a person should feel it more. Easy to dial back in `EnemyData.BOSSES["vorath"]`.
+- **The cleansed Reach stayed a grey wasteland** (its tiles are drawn dead, so the shader had nothing to restore), and the post-game save drops you there right after the credits. **Added a restored atlas** (`reach_tiles_restored.png`: young grass, leafing trees, wildflowers, the portal gone quiet) swapped in once the Maw is cleansed, plus the forest theme there instead of the Reach's dread. *Change:* `Reach.gd`, `build_reach_tiles.py`.
+- **Checked and fine:** every region reachable (only blight-sealed chests/springs closed before cleansing, as designed); all three Act II bosses and every guard/hunt winnable first try at the levels the path gives (8-9 / 11-12 / 13-14); no script errors in any battle.
+- **Bug: the equip screen crashed with 6+ choices for a slot.** It had exactly 5 option labels and read past them ("Out of bounds get index 5"), easy to hit with accessories by Act II. **Fix:** the item list shows 5 rows and scrolls, with arrows. *Change:* `Equip.gd`.
+- **Bug: the quest log overflowed its window** by Act III (the "Done" list and key items ran off the bottom). **Fix:** it scrolls with Up/Down, with arrows; the empty-log hint no longer says "Verdance and Edenmere". *Change:* `QuestLog.gd`.
+- **Economy: the Elixir was worse than a Hi-Potion** (120 HP vs 220, and pricier), so the Elixir rewards (Selavon's gift, the sailor's and the archivist's quests) were duds. **Now it fully restores one ally's HP and MP**, the classic FF Elixir. In Act I that's about what 120 HP was anyway. *Change:* `Battle.ITEM_DEFS`, `_do_item`.
+- **Also checked:** save/load round trips are identical on Maw 3F, the Threshold and the post-game Reach; a suspend mid-battle in the Maw resumes into that fight; the ending chain from Vorath's floor to the title (flags, cleansed Maw, autosave in the Reach); the Threshold armory's 13-item list fits.
+- **The restored Reach has no random fights** after the ending (they were the Unraveling's own creatures, still attacking in the green post-game Reach). Visible side-quest hunts still stand. The freed kingdoms keep their regional monsters, which is normal for the genre. *Change:* `Reach.is_safe()`.
+
+## Act III forms (2026-10-25, Cory: "the final set should completely change the characters... a dramatic change... ready to kick ass")
+- **The Act III sets swap the whole sprite instead of recoloring.** Each hero has a new hand-placed walk sheet (`<hero>_ascended_walk.png`, built by `assets/sprites/source/build_act3_forms.py`): Vael a winged-helm champion in pearl-and-gold plate with a royal cape, sun shield and greatsword; Ryn with flame-swept hair, an open crimson-and-gold gi and blazing ki fists; Lyra in a starfield robe with a floating-crystal crown, glowing hair tips and a star-topped staff; Silas as a horned, bone-masked reaper with a red-seamed cloak and twin curved blades.
+- **Frames are 24x32 (the base sheets are 16x32)**, so pauldrons, wings, capes and auras reach past the body; the body stays on the same centre column and the feet on the same row, so the forms stand exactly where the heroes always do. Same 3x3 layout as the base sheets, so `SetLooks.frames_for()` rebuilds the hero's animations from the form sheet (cut 24 wide) and every place that draws a hero uses it: the map, battle, cutscenes, the pause portraits, the finale/victory movies.
+- The Act I and II sets still recolor. The old Act III palette swaps were removed from `SetLooks.LOOKS`.
+
+## Every set has a form; set bonuses stack (2026-10-25, Cory)
+- **"Different models for each of the sets... a gradual increase":** all 12 sets now swap in a hand-drawn form (`build_set_forms.py` -> `<hero>_<set>_walk.png`, 24x32, same layout). Act I = the hero geared up, close to the base silhouette (Vael's plumed knight with a cross tabard and kite shield; Ryn's grey gi, iron bracers and topknot; Lyra's purple scholar robe and floating spellbook; Silas's violet hood, mask and twin daggers). Act II = heavier and elemental (Vael's silver-blue plate, half cape, round aegis with a glowing gem; Ryn's blue-gold gi, dragon pauldron, lightning fists; Lyra's crimson layered robe, circlet, four elemental motes; Silas's venom leathers, glowing vials, dripping blades, toxic mist). Act III unchanged. No recolors remain (`SetLooks.LOOKS` is empty; the Act III-only `*_ascended_walk.png` sheets were replaced by the per-set names).
+- **"The permanent bonus of completing a set so the set bonuses stack":** completing a set records it in `Combatant.mastered_sets` (saved); `Equipment.has_set_bonus()` is true for a mastered set whatever is worn, so every hook in Battle.gd picks it up unchanged. The **look** follows only the set worn complete right now (`Equipment.wears_full_set()`). Older saves: a set worn complete when loaded counts as mastered.
+- **Bug found on the way:** the equip screen's set line printed Godot's `set_name` method instead of the set's name, and said "buffs +1 round" for every set. Now it shows the real name and that set's bonus, plus a "Mastered:" line.
+- **Balance check:** traced Vorath fights with every hero's three sets mastered (levels 18 and 20) still take 13-16 rounds; mastery is a mild boost. No retune.
+
+## Equipment descriptions (2026-10-25, Cory: "there isn't like a tool tip for the equipment")
+- **The equip screen now says what gear does.** On the item list, the text area under it shows the highlighted piece's stats, **what changes if you equip it** compared with what's on now ("If equipped: DEF +4, RES +2"; "Take it off: ..." for Unequip), and its set with the bonus and whether it's mastered. On the slot list, the highlighted slot's equipped piece and its stats.
+- **Shops use the same wording** (`Equipment.describe()`), now including HP and MP (they were left out, so the Star Charm read "RES +10" only) and the set bonus for set pieces.
+- Shared helpers in `Equipment.gd`: `stat_text()`, `describe()`, `compare_text()`, `set_text()`.
+
+## Bosses stand in their rooms (2026-10-28, Cory: "have the boss display instead of the red marker... entering the boss room automatically triggers the boss fight")
+- **No more red trigger tile.** The boss stands in the middle of its room as its battle sprite (idle animation, facing the side of the room it's entered from, blocking its tile, nudged off any chest). The map marks it where it stands.
+- **Walking into the room starts the fight:** a line ("The Frozen Sovereign turns to face you!") and the battle. Same everywhere: Act I rescue bosses, the escape wardens (who wait in the room by the exit), every Act II boss and Vorath. Beaten bosses are gone from their rooms. The old fallbacks stay (the escape exit door and the captive's rune still start the fight if reached first).
+- It triggers only on a step, not on loading into the room. *Change:* `Dungeon._place_boss()`, `_confront_boss()`, `on_player_moved()`.
+
+## Equip screen in windows, equipment icons (2026-10-28, Cory: "use the windows... it just looks like a blob of text... create icons for the equipment")
+- **The equip screen is laid out in the game's framed windows:** a header (hero, level, class; what you're choosing), the list on the left (slot names, item icons, up to 8 rows with scroll arrows), a Stats window on the right (HP, MP, ATK, DEF, INT, RES, AGI) that shows **what each stat would become** for the highlighted item (green up, red down), and a description window along the bottom (what the piece gives, its set and bonus, mastered sets). Logic unchanged; the scene is now just a background and everything is built in `Equip.gd`.
+- **Every piece has an icon,** with no per-item table: a 20-shape x 19-material atlas (`assets/ui/equip_icons.png`, `assets/ui/source/build_equip_icons.py`). The shape comes from slot + class (sword / claws / staff / daggers, plate / gi / robe / leathers, helm / band / circlet / hood, gauntlets / fist wraps / gloves / grips) or the accessory's kind (ring / amulet / orb / beads); the colours from the set, or the tier in the name (iron, steel, Frostforged, Sunsteel, Stormsilver, Starforged), with gold for the one-of-a-kind relics. `Equipment.icon(item)`; new items get an icon automatically.
+- The set line was shortened ("(mastered)" / "(all 4 to master)") so the description fits its three lines.
+
+## Quest feedback and story quests (2026-10-28, Cory: the wreck stayed after the Wreck Ghoul, "so I don't know if I completed the quest"; "add another quest to go defeat the boss and free the prisoner")
+- **Every quest step now says what's next:** finishing a step that isn't the last plays a chime and "Quest updated: <the next step>" (after a hunt, a pickup, or a conversation).
+- **Hunt scenery goes once its fight is won:** the smith's wrecked cart shows only while the Wreck Ghoul is still to be fought (`Quests.hunt_pending()`).
+- **Story quests:** when a key quest hands over its key, a follow-up starts right away and the log shows it: *Free Vael / Ryn / Lyra / Silas* ("Enter the Observatory, defeat the Void Archmage and free Lyra"), *Free Nordveil / Duskara / Selavon* (defeat the kingdom's boss), and *The Architect* (descend the Maw, defeat Vorath) after the Portal Key. A new step type `"clear": <dungeon>` completes when that captive is rescued or that kingdom freed; the game says "Quest complete" at the rescue / liberation. No XP of their own (the boss already gives plenty). Older saves: opening the quest log starts any that should have begun and completes any already finished.
+
+## Quieter forest after Act I (2026-10-28, Cory: "once we clear act 1... make the random combat encounters a lot more rare in the act 1 area")
+- Once Act I is complete, the Forest Heartlands has **no random fights at all** (first tried at a fifth as often; Cory: "turn the random fights off entirely"). Visible hunts, the dungeons and the kingdom regions are unchanged. *Change:* `Overworld.is_safe()`.
+
+## Bug: the kingdom victory card played under a black screen (2026-10-28, Cory: Nordveil's was "just black", music and sounds only)
+- The town faded to black through `Transition` (layer 100) before the card, and the card (`KingdomVictory`, layer 61) never lifted it, so it played hidden. The Act I finale and the ending movie already lift it as they start; now `KingdomVictory._run()` does too (`Transition.fade_in(0.4)` under its own black). Checked with screenshots mid-card (Nordveil); Duskara and Selavon share the code. My earlier victory tests only checked that the steps ran, not what was on screen.
+
+## Skill and item descriptions in battle (2026-10-28, Cory: "a window tool tip that tells me what the skill does")
+- While the cursor is on a skill or an item, the message window at the top of the battle screen explains it ("Smite: Holy damage to one enemy. Extra damage against corrupted foes."); it follows the cursor, stays up while you pick the target, and clears when you back out. Lyra's stance switches say which spells that stance has at her level and whether the switch costs her turn (free with Arcane Scholar). Items reuse the shop's descriptions. *Change:* `Battle.SKILL_HELP`, `_menu_help()`, `_update_menu()`.
+
+## Status screen; the look follows the strongest mastered set (2026-10-28, Cory)
+- **"A character summary type screen":** **Status** in the pause menu (`scripts/menu/StatusScreen.gd`, code-built like the quest log). Two pages per hero: *Stats & Gear* (portrait in their current form, class, level, HP / MP or Qi, XP to the next level, ATK/DEF/INT/RES/AGI, row, the five slots with icons, the current look, the mastered set bonuses with what each does) and *Skills* (every class skill in two columns, learned in white with cost, locked greyed with the level it comes at; the cursor walks them and the bottom window explains each; Lyra's grouped by stance). Left/Right turns the page, L1/R1 changes hero, B closes.
+- **"When I unlock a set bonus, that should be the new base sprite until I unlock the next one":** the look is now the strongest set the hero has mastered (the last in `SET_BONUSES` order, which runs act by act), not the set worn complete. Swapping in one piece of the next set keeps the current form; it survives save/load (mastery is saved). *Change:* `SetLooks.active_set()`.
+
+## Road quests: Frank points to the next town (2026-10-29, Cory: "after we clear each town we should then get a quest (maybe from Frank) to go and find the second town (then third, fourth)")
+- **Frank gives them**, at his stall, with a "!" over his head like any quest giver; talking to him then offers the quest before the shop (and once it's taken, he's back to being a shop).
+- **When:** *The Road to Edenmere* once nobody in Verdance has a quest to offer or one still going (Act I's routes move between the two towns, so "Verdance is done" is the trigger rather than a dungeon). *The Road to Nordveil* after Act I, from Frank in Verdance or Edenmere. *Duskara*, *Selavon* and *the Threshold* from Frank in the town just freed, as soon as it's freed: the optional quests there don't hold the next road back (my call: waiting on optional quests would leave players who skip them with no direction).
+- **Done on arrival:** walking into the town finishes it ("Quest complete: The Road to Duskara!"), after any arrival scene. The destination town gets the pink quest marker on the region map. No XP or gold (it's directions, not a task).
+- **Older saves:** a town counts as visited if you've taken a quest from anyone there (or, for the Threshold, its arrival scene played), so Frank never sends a late-game save to a town it already knows.
+- *Change:* `Quests` (`road_*` quests, `"road"` / `"reach"` keys, `"*/frank"` giver, `_road_open()`, `_been_to()`, `_town_busy()`, `_gives()`, `arrive()`), `Town._road_arrival()` and `_frank(facing)`, each town passing `facing` to `_frank`.
+
+## Fewer random fights in Act II; finished regions go quiet (2026-10-29, Cory: reached Act III at level 22 after every Act II quest; "scale back our random encounters a bit... once we clear an area in Act II (all quests including optional ones) that area no longer triggers random encounters")
+- **Less often:** Act II's region maps roll a fight every 20-36 steps (was 14-26), its dungeons every 14-26 (was 10-20) until the kingdom is freed (then 50-100, unchanged). About a third fewer fights overall. Act I and Act III are unchanged (Act I wasn't reported as over-levelled; Act III is where the over-levelling shows, and fewer Act II fights fix the arrival level).
+- **Quiet once finished:** a kingdom's region has no random fights once the kingdom is freed and every quest for it is done, optional ones included (`Quests.kingdom_done()`). The first time you're back there afterwards: "With Nordveil free and nothing left undone, the Northern Tundra has fallen quiet." Visible hunts are unaffected (by then there are none left). The dungeons keep their own rule (quiet once freed and every chest open).
+- *Change:* `Region.encounter_steps()`, `Region.is_safe()`, `Region._announce_if_quiet()`, `Dungeon.encounter_steps()`, `Quests.kingdom_done()`.
+
+## Act III: fewer fights, half XP for optional quests, Frank toned down (2026-10-29, Cory: met Vorath at level 28 and "he couldn't really damage me at all"; "slow down the random encounters and maybe quest exp just a bit more"; Frank hit Vorath for 919)
+- **Why not cut Act III's enemy XP:** the playtest pass raised it x1.6 because the main path alone reached Vorath at only 17-18. The extra levels come from doing everything, so the cuts land on optional content and on fight frequency instead.
+- **Optional quests and their hunts give half the XP** (Act II's Lost Axe, White Wolf, Dye-Root, Dune Stalker, Sailor's Compass, Reef Horror; Act III's four hero errands and The Merchant of Every Age; the Snowmane, Dune Stalker, Reef Horror, Oathbreaker and Grave Robber fights). Gold and item rewards are unchanged. Main-path quests are unchanged. About 9,000 XP less for a completionist across Acts II-III, on top of 8078baf's fewer Act II fights.
+- **About 20% fewer Act III fights:** the Reach every 18-32 steps (was 14-26), the Maw 12-22 (was 10-20).
+- **Frank in phase 3:** Balance's Judgment ~200 (was ~420), the Final Invoice 900 (was 1500), and his Blessing (half HP to everyone, revives) once per fight instead of whenever anyone is under 45% - its own line already says "one last time". Before, he did about 3,000 of phase 3's 3,600 HP and kept topping the party up; now about 1,700, so the party has to win the Unraveling race themselves.
+- *Change:* `Quests.gd` (quest and `HUNTS` XP), `Reach.encounter_steps()`, `Dungeon.encounter_steps()`, `Battle._frank_acts()` (`_frank_blessed`).
+
+## Balance logging (2026-10-29, Cory: "add some logging in (like everytime I gain experience, how much damage I do, how much damage bosses do)... so we can use the logs to fine tune the game")
+- **A `BalanceLog` autoload writes one JSON line per event** to `user://balance_logs/session_<date>.jsonl` (its own folder: the engine already writes `user://logs`). A new file each time the game starts; flushed every line, so a crash or a quit loses nothing. Always on: it's small, and on the Retroid it's the only way to see what happened.
+- **Events:** `session`; `battle_start` (location, enemies' stats, each hero's level, HP/MP, stats, row and gear); `action` (round, who, what - attack / "skill: Smite" / "boss turn (phase 2)" / "end of round" - the battle message, and every HP change it caused, with HP left and KOs); `battle_end` (won / lost / escaped / auto-win, rounds, seconds, XP, gold, HP left, damage dealt, taken and healed per fighter); `xp` (source, amount, level before and after); `quest` (id, XP, gold, optional).
+- **Actions are logged by diffing everyone's HP around each turn** rather than hooking every damage and heal call site (there are dozens in `Battle.gd`), so skills, items, counters, poison, Frank and enemy abilities are all covered, including future ones. Frank's assist is split out from Vorath's turn. Healing is credited to whoever acted.
+- **F3 auto-wins are logged as `auto-win`**, with their XP, so the level curve is still right even when random fights are skipped.
+- **`tools/balance_report.py`** prints the newest log as boss-fight breakdowns (damage per hero, the boss's biggest hits as a share of max HP, HP left), random fights per location, and the XP sources and level-ups. `--all` lists every action in boss fights.
+- **Found while testing:** at level 22 with no gear, Vorath's phase-1 attacks hit for 3-31 (1-7% of max HP). Left alone until Cory's playthrough log shows the real numbers.
+- *Change:* `scripts/systems/BalanceLog.gd` (new, autoload), `Battle.gd` (`_ready`, `_begin_resolving`, `_advance_turn`, `_execute_next_turn`, `_log_action_name`, `_vorath_turn`, `_summon`, `_attempt_escape`, `_debug_auto_win`, `_end_battle`), `Quests._reward()`, `tools/balance_report.py` (new).

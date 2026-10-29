@@ -1,0 +1,15 @@
+# Arriving at the Threshold (Act III, Milestone 28a). Plays once. Frank got
+# here first, of course.
+
+spawn {a1} {a1} at ~-1,1 facing up
+spawn {a2} {a2} at ~1,1 facing up
+spawn {a3} {a3} at ~0,2 facing up
+emote frank note
+say Frank: There you are. Took the long way round, I see. Three kingdoms long.
+say Frank: This is the Threshold. Every age has one - the last lamp before the dark. Past it, south, is the Blighted Maw. Vorath's home.
+say Frank: The way in is a portal, sealed since before any of you were born. It takes a key, and the key was broken in three. The keeper here knows where the pieces went.
+emote player !
+say Frank: Rest first. The inn's free, the shrine never runs dry, and the smith has steel you won't find anywhere else. Then go and see the keeper.
+despawn {a1}
+despawn {a2}
+despawn {a3}

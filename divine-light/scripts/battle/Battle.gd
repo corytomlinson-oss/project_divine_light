@@ -3,52 +3,116 @@ extends Node2D
 enum State { SELECTING, RESOLVING, BATTLE_OVER }
 enum MenuState { MAIN, SKILL, ITEM, TARGETING, ALLY_TARGETING }
 
+# Unlock levels (28a, then the playtest pass of 2026-10-24): above level 8
+# compressed to 8 + (old - 8) * 0.55, then above 15 again to 15 + (x - 15) * 0.4,
+# so the whole kit (ultimates at 18) arrives by the end of Act III's main path.
 const CLASS_SKILLS: Dictionary = {
 	"Vael": [
 		{"name": "Holy Light",    "cost": 10, "cost_type": "mp", "target": "ally",        "effect": "heal",         "power": 25, "min_level": 1},
 		{"name": "Smite",         "cost": 8,  "cost_type": "mp", "target": "enemy",       "effect": "holy",         "power": 15, "min_level": 4},
 		{"name": "Guard",         "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "guard",        "power": 15, "min_level": 7},
-		{"name": "Taunt",         "cost": 6,  "cost_type": "mp", "target": "self",        "effect": "taunt",        "power": 0,  "min_level": 10},
-		{"name": "Fortify",       "cost": 15, "cost_type": "mp", "target": "ally_all",    "effect": "fortify",      "power": 10, "min_level": 14},
-		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "min_level": 17},
-		{"name": "Divine Shield", "cost": 20, "cost_type": "mp", "target": "ally_all",    "effect": "divine_shield","power": 12, "min_level": 20},
-		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 23},
-		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 26},
-		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 29},
-		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 32},
-		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 35},
+		{"name": "Taunt",         "cost": 6,  "cost_type": "mp", "target": "self",        "effect": "taunt",        "power": 0,  "min_level": 9},
+		{"name": "Fortify",       "cost": 15, "cost_type": "mp", "target": "ally_all",    "effect": "fortify",      "power": 10, "min_level": 11},
+		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "min_level": 13},
+		{"name": "Divine Shield", "cost": 20, "cost_type": "mp", "target": "ally_all",    "effect": "divine_shield","power": 12, "min_level": 15},
+		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 15},
+		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 16},
+		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 17},
+		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 17},
+		# Act III (28b; Cory: Vael learns it late): revives the fallen ally with
+		# the most max HP, at half HP (full with Divine Champion).
+		{"name": "Resurrection", "cost": 30, "cost_type": "mp", "target": "self", "effect": "resurrect", "power": 0, "min_level": 17},
+		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 18},
 	],
 	"Ryn": [
 		{"name": "Iron Fist",        "cost": 1, "cost_type": "qi", "target": "enemy",       "effect": "physical",     "power": 18, "min_level": 1},
 		{"name": "Vital Touch",      "cost": 2, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 30, "min_level": 4},
 		{"name": "Sweep",            "cost": 2, "cost_type": "qi", "target": "enemy_all",    "effect": "sweep",        "power": 12, "min_level": 7},
-		{"name": "Pressure Point",   "cost": 2, "cost_type": "qi", "target": "enemy",        "effect": "stun_phys",    "power": 0,  "min_level": 10},
-		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 14},
-		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 17, "ranged": true},
-		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 20},
-		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 23},
-		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 26},
-		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 29},
-		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 32},
-		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 35},
+		{"name": "Pressure Point",   "cost": 2, "cost_type": "qi", "target": "enemy",        "effect": "stun_phys",    "power": 0,  "min_level": 9},
+		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 11},
+		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 13, "ranged": true},
+		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 15},
+		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 15},
+		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 16},
+		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 17},
+		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 17},
+		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 18},
 	],
 	"Silas": [
 		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "min_level": 1},
 		{"name": "Envenom",       "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "poison",      "power": 10, "min_level": 4},
 		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "min_level": 7, "row_restrict": "front"},
-		{"name": "Vanish",        "cost": 6,  "cost_type": "mp", "target": "self",      "effect": "vanish",      "power": 0,  "min_level": 10},
-		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 13},
-		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 16},
-		{"name": "Expose",        "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "expose",      "power": 10, "min_level": 19},
-		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 22},
-		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 25, "hits": 4},
-		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 28},
-		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 31},
-		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 35},
+		{"name": "Vanish",        "cost": 6,  "cost_type": "mp", "target": "self",      "effect": "vanish",      "power": 0,  "min_level": 9},
+		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 11},
+		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 12},
+		{"name": "Expose",        "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "expose",      "power": 10, "min_level": 14},
+		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 15},
+		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 16, "hits": 4},
+		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 17},
+		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 17},
+		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 18},
 	],
 }
 
 const LYRA_STANCES: Array = ["Fire", "Ice", "Lightning", "Earth"]
+
+# What each skill does, shown in the message window while the cursor is on it
+# (2026-10-28, Cory: "a window tool tip that tells me what the skill does").
+const SKILL_HELP := {
+	# Vael
+	"Holy Light": "Restores some HP to the most hurt ally.",
+	"Smite": "Holy damage to one enemy. Extra damage against corrupted foes.",
+	"Guard": "One ally takes less damage for 2 rounds.",
+	"Taunt": "Every enemy attacks Vael for a round.",
+	"Fortify": "Raises the whole party's DEF for 2 rounds.",
+	"Divine Strike": "Strong holy damage to one enemy. May stun corrupted foes.",
+	"Divine Shield": "Allies in Vael's row take less damage for 2 rounds.",
+	"Battle Hymn": "Raises the whole party's attack for 2 rounds.",
+	"Consecrate": "Holy damage to every enemy. Extra damage against corrupted foes.",
+	"Sanctuary": "Completely blocks the next attack on one ally.",
+	"Purify": "Cures one ally of every status effect, bleeding included.",
+	"Resurrection": "Revives the fallen ally with the most max HP, at half HP.",
+	"Divine Wrath": "Massive holy damage to one enemy. Always stuns corrupted foes.",
+	# Ryn
+	"Iron Fist": "A strong strike on one enemy.",
+	"Vital Touch": "Restores HP to one ally.",
+	"Sweep": "A spinning kick that hits every enemy.",
+	"Pressure Point": "Stuns one enemy for a turn. No damage.",
+	"Ki Burst": "Concentrated ki that ignores half the enemy's DEF.",
+	"Ki Blast": "A ranged ki strike: full damage even from the back row.",
+	"Mending Flow": "Restores a lot of HP to one ally.",
+	"Storm Flurry": "Strikes one enemy 3 times in a row.",
+	"Crippling Strike": "A heavy blow that halves an enemy's AGI for 2 rounds.",
+	"Dragon's Maw": "A devastating strike on one enemy.",
+	"Healing Wave": "Restores HP to the whole party.",
+	"Rising Dragon": "Massive damage to one enemy and a guaranteed stun.",
+	# Silas
+	"Quick Strike": "A fast strike with a high chance of a critical hit.",
+	"Envenom": "Poisons one enemy for 3 rounds.",
+	"Shadow Strike": "High damage to one enemy. Front row only.",
+	"Vanish": "Silas slips to the back row and is hard to hit this round.",
+	"Lacerate": "Makes one enemy bleed heavily for 4 rounds.",
+	"Smoke Bomb": "Every enemy misses more often for 2 rounds.",
+	"Expose": "Lowers one enemy's DEF so the whole party hits it harder.",
+	"Garrote": "Stuns one enemy for a turn.",
+	"Flurry": "4 rapid strikes on one enemy; each can land a critical hit.",
+	"Toxic Cloud": "Poisons every enemy.",
+	"Death Mark": "One enemy takes extra damage from everything for 3 rounds.",
+	"Shadowstep": "Massive damage to one enemy, then poison, bleeding and a stun.",
+	# Lyra
+	"Ember": "Fire damage to one enemy.",
+	"Flare": "Strong fire damage to one enemy.",
+	"Inferno": "Massive fire damage to one enemy, and it burns for 3 rounds.",
+	"Frost": "Ice damage to one enemy, and it slows down.",
+	"Blizzard": "Strong ice damage to one enemy. May freeze it for a turn.",
+	"Glacier": "Ice damage to every enemy. May freeze each of them.",
+	"Spark": "Lightning damage to one enemy.",
+	"Bolt": "Lightning damage to every enemy.",
+	"Thunderstrike": "Massive lightning damage to one enemy, and it's paralyzed.",
+	"Tremor": "Heavy earth damage to one enemy. From the back row it hits every enemy, weaker.",
+	"Tremor (AoE)": "Earth damage to every enemy (weaker from the back row).",
+	"Quake": "Earth damage to every enemy, and their DEF drops for 2 rounds.",
+}
 
 # Milestone 20c: what an elemental aura is weak to (the Void Mage), the spell
 # names and sounds for aura magic, and element names for messages.
@@ -61,29 +125,38 @@ const LYRA_SKILLS: Dictionary = {
 	"Fire": [
 		{"name": "Ember",   "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 14, "min_level": 1},
 		{"name": "Flare",   "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 26, "min_level": 8},
-		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "min_level": 24},
+		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "min_level": 16},
 	],
 	"Ice": [
 		{"name": "Frost",    "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "ice_slow",      "power": 14, "min_level": 4},
-		{"name": "Blizzard", "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "ice_freeze",    "power": 28, "min_level": 14},
-		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "min_level": 28},
+		{"name": "Blizzard", "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "ice_freeze",    "power": 28, "min_level": 11},
+		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "min_level": 17},
 	],
 	"Lightning": [
 		{"name": "Spark",         "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "lightning",          "power": 16, "min_level": 6},
-		{"name": "Bolt",          "cost": 18, "cost_type": "mp", "target": "enemy_all", "effect": "lightning_aoe",      "power": 18, "min_level": 18},
-		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "min_level": 32},
+		{"name": "Bolt",          "cost": 18, "cost_type": "mp", "target": "enemy_all", "effect": "lightning_aoe",      "power": 18, "min_level": 14},
+		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "min_level": 17},
 	],
 	"Earth": [
-		{"name": "Tremor", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "earth",        "power": 24, "min_level": 10},
-		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "min_level": 22},
+		{"name": "Tremor", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "earth",        "power": 24, "min_level": 9},
+		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "min_level": 15},
 	],
 }
 
 const ITEM_DEFS: Dictionary = {
 	"Potion":   {"name": "Potion",   "effect": "item_heal",       "power": 50,  "target": "ally_choose"},
-	"Elixir":   {"name": "Elixir",   "effect": "item_heal",       "power": 120, "target": "ally_choose"},
+	# Elixir: full HP and MP (playtest pass, 2026-10-24: at 120 HP it cost more
+	# than a Hi-Potion and healed less, so every Elixir reward was a dud).
+	"Elixir":   {"name": "Elixir",   "effect": "item_full_restore", "power": 0, "target": "ally_choose"},
 	"Ether":    {"name": "Ether",    "effect": "item_restore_mp", "power": 30,  "target": "ally_choose"},
 	"Antidote": {"name": "Antidote", "effect": "item_cure_poison","power": 0,   "target": "ally_choose"},
+	# The design doc's revival consumable (added in the 2026-10-24 playtest
+	# pass: it was missing, so a hero who fell deep in a dungeon stayed down
+	# until Frank). Revives the fallen ally with the most max HP at 25%.
+	"Phoenix Feather": {"name": "Phoenix Feather", "effect": "item_revive", "power": 25, "target": "fallen"},
+	# Act II's stronger stock (25b: freed Nordveil's item shop)
+	"Hi-Potion": {"name": "Hi-Potion", "effect": "item_heal",       "power": 220, "target": "ally_choose"},
+	"Hi-Ether":  {"name": "Hi-Ether",  "effect": "item_restore_mp", "power": 80,  "target": "ally_choose"},
 }
 
 # Enemy stats, kits (abilities, attack modifiers, weaknesses) and encounter
@@ -113,6 +186,15 @@ const BATTLE_BACKGROUNDS: Dictionary = {
 	"observatory_escape": "res://assets/ui/battle_bg_observatory.png",
 	"guild": "res://assets/ui/battle_bg_guild.png",
 	"guild_escape": "res://assets/ui/battle_bg_guild.png",
+	# Act II (25b; every floor of a dungeon goes by its base location)
+	"tundra": "res://assets/ui/battle_bg_tundra.png",
+	"frozen_citadel": "res://assets/ui/battle_bg_citadel.png",
+	"desert": "res://assets/ui/battle_bg_desert.png",
+	"sunken_sanctum": "res://assets/ui/battle_bg_sanctum.png",
+	"coast": "res://assets/ui/battle_bg_coast.png",
+	"reach": "res://assets/ui/battle_bg_reach.png",
+	"blighted_maw": "res://assets/ui/battle_bg_maw.png",
+	"drowned_fortress": "res://assets/ui/battle_bg_fortress.png",
 }
 
 # Battlefield (Milestone 17b, SNES layout): enemies on the left and the party on
@@ -218,6 +300,7 @@ var _target_index: int = 0
 var _target_ally_index: int = 0
 var _pending_action: String = ""
 var _pending_skill: Dictionary = {}
+var _help_shown := false  # the message window holds a skill/item description
 
 @onready var message_label: Label = $MessageBanner/MessageLabel
 @onready var message_banner: PanelContainer = $MessageBanner
@@ -242,6 +325,16 @@ var _acting := false
 var _skill_element := ""
 var _weak_hit := false
 var _immune_hit := false
+# The Vorath fight (28c)
+const UNRAVEL_TURNS := 4  # Vorath turns in phase 3 before the Final Unraveling lands
+var _frank_joined := false
+var _frank_sprite: AnimatedSprite2D = null
+var _frank_invoiced := false
+var _frank_blessed := false
+var _auto_won := false  # F3: logged as an auto-win, not a real fight
+var _unravel_charge := 0
+var _unravel_grace := false
+var _immune_turn := 0
 # Frank's help in an escape warden fight (Milestone 20a): a blinding vial at
 # the start, one potion when a hero is about to fall.
 var _actor: Combatant = null     # the party member whose action is resolving
@@ -261,14 +354,17 @@ func _ready() -> void:
 	_setup_background()
 	_setup_party_window()
 	_enemies = _generate_encounter()
+	GameManager.battle_in_water = false  # used up by this battle's enemies (25d)
 	GameManager.last_battle_won = false
 	# For a suspend mid-fight (22b): the game as the fight began, and its enemies.
 	GameManager.begin_battle(_enemies.map(func(e: Combatant) -> Dictionary: return {
 		"name": e.display_name, "hp": e.max_hp, "atk": e.atk, "def": e.defense, "agi": e.agi,
 		"xp": e.xp_reward, "is_boss": e.is_boss, "phase_hp_thresholds": e.phase_hp_thresholds.duplicate(),
 	}))
+	BalanceLog.battle_start(_party, _enemies)
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
-	Music.play("boss" if boss_fight else "battle", "battle")
+	var vorath_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.display_name == "Vorath")
+	Music.play("vorath" if vorath_fight else ("boss" if boss_fight else "battle"), "battle")  # Vorath's own theme (30)
 	_setup_enemy_ui()
 	_setup_party_sprites()
 	_setup_fx()
@@ -326,13 +422,19 @@ func _generate_encounter() -> Array:
 		return forced
 	if GameManager.pending_boss_battle:
 		GameManager.pending_boss_battle = false
-		var boss_data: Dictionary = EnemyData.BOSSES.get(LOCATION_BOSSES.get(GameManager.current_location, ""), {})
+		# A map can name its boss (Act II floors, 25a); otherwise by location.
+		var boss_id: String = GameManager.pending_boss_id
+		GameManager.pending_boss_id = ""
+		if boss_id == "":
+			boss_id = LOCATION_BOSSES.get(GameManager.current_location, "")
+		var boss_data: Dictionary = EnemyData.BOSSES.get(boss_id, {})
 		if not boss_data.is_empty():
 			var boss: Combatant = _build_enemy(boss_data)
 			boss.is_boss = true
 			boss.phase_hp_thresholds = boss_data.get("phase_hp_thresholds", []).duplicate()
 			return [boss]
-	var table: Array = EnemyData.ENCOUNTER_TABLES.get(GameManager.current_location, EnemyData.FOREST_ENCOUNTERS)
+	var where := GameManager.base_location(GameManager.current_location)  # every floor of a dungeon alike (25a)
+	var table: Array = EnemyData.ENCOUNTER_TABLES.get(GameManager.current_location, EnemyData.ENCOUNTER_TABLES.get(where, EnemyData.FOREST_ENCOUNTERS))
 	# Groups sized to the party (Milestone 20a): at most one enemy more than
 	# there are party members, so a lone hero at the start of Act I isn't
 	# thrown against three at once.
@@ -361,6 +463,13 @@ func _build_enemy(data: Dictionary) -> Combatant:
 	e.aura_cycle = kit.get("aura", [])
 	e.aura_weakness = bool(kit.get("aura_weakness", false))
 	e.immune_from_phase = int(kit.get("immune_from_phase", -1))
+	e.immune = kit.get("immune", []).duplicate()  # always immune (25c: Dust Golem / earth)
+	if kit.has("random_immune"):  # resists N random elements each battle (28a, Null Sentinel)
+		var pool: Array = ["holy", "fire", "ice", "lightning", "earth"]
+		pool.shuffle()
+		e.immune.append_array(pool.slice(0, int(kit["random_immune"])))
+	if GameManager.battle_in_water:
+		e.agi = roundi(e.agi * 1.3)  # the party was caught wading (25d)
 	return e
 
 
@@ -473,7 +582,7 @@ func _setup_enemy_ui() -> void:
 
 
 func _setup_background() -> void:
-	var path: String = BATTLE_BACKGROUNDS.get(GameManager.current_location, "")
+	var path: String = BATTLE_BACKGROUNDS.get(GameManager.current_location, BATTLE_BACKGROUNDS.get(GameManager.base_location(GameManager.current_location), ""))
 	if path.is_empty() or not ResourceLoader.exists(path):
 		return
 	var art := TextureRect.new()
@@ -505,7 +614,8 @@ func _setup_party_sprites() -> void:
 		var sprite: AnimatedSprite2D = null
 		if ResourceLoader.exists(path):
 			sprite = AnimatedSprite2D.new()
-			sprite.sprite_frames = load(path)
+			sprite.sprite_frames = SetLooks.frames_for(member, load(path))  # Act III form
+			sprite.material = SetLooks.material_for(member)  # armor set look (25b)
 			sprite.flip_h = true
 			sprite.play(&"idle_side")
 			sprite.position = _party_home(i)
@@ -800,6 +910,8 @@ func _process(delta: float) -> void:
 	_cursor.target = _cursor_target()
 	_update_windows()
 	_update_advance_hint(delta)
+	if Cutscene.is_playing():
+		return  # dialogue over the battle (Frank's revelation, 28c) owns the buttons
 	match state:
 		State.SELECTING:
 			_handle_menu_input()
@@ -880,6 +992,8 @@ func _debug_level_all(direction: int) -> void:
 func _debug_auto_win() -> void:
 	if state == State.BATTLE_OVER or _acting:
 		return
+	BalanceLog.end_action(message_label.text)
+	_auto_won = true
 	for e in _enemies:
 		e.receive_damage(e.hp)
 	_update_ui()
@@ -1047,6 +1161,7 @@ func _attempt_escape() -> void:
 	var avg_enemy: float = float(enemy_total) / max(1, enemy_count)
 	var chance: int = clampi(50 + roundi((avg_party - avg_enemy) * 2.0), 10, 90)
 	if randi() % 100 < chance:
+		BalanceLog.battle_end("escaped", _party, 0, 0)
 		Transition.change_scene(GameManager.current_scene_path)
 	else:
 		message_label.text = "Couldn't escape!"
@@ -1093,6 +1208,7 @@ func _open_skill_menu(member: Combatant) -> void:
 		func(s):
 			return member.level >= int(s.get("min_level", 1)) and (s.get("row_restrict", "") == "" or member.row == s["row_restrict"])
 	)
+	_active_skills = _active_skills.map(func(s: Dictionary) -> Dictionary: return _set_cost(member, s))
 	if _active_skills.is_empty():
 		message_label.text = "No skills learned yet."
 		return
@@ -1117,7 +1233,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 			var back_row_tremor: Dictionary = skill.duplicate()
 			back_row_tremor["name"] = "Tremor (AoE)"
 			back_row_tremor["effect"] = "earth_aoe"
-			back_row_tremor["power"] = 14
+			back_row_tremor["power"] = skill["power"] if Equipment.has_set_bonus(member, "elemental_weave") else 14  # full with Elemental Weave (25b)
 			back_row_tremor["target"] = "enemy_all"
 			_active_skills.append(back_row_tremor)
 		else:
@@ -1129,6 +1245,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 				"target": "self", "effect": "switch_stance", "power": 0,
 				"to_stance": s, "min_level": 1,
 			})
+	_active_skills = _active_skills.map(func(sk: Dictionary) -> Dictionary: return _set_cost(member, sk))
 	_menu_state = MenuState.SKILL
 	_list_scroll = 0
 	_menu_options = []
@@ -1245,6 +1362,18 @@ func _confirm_item() -> void:
 	if _active_items.is_empty():
 		return
 	var item_def: Dictionary = _active_items[_menu_cursor]
+	if item_def["target"] == "fallen":
+		# No target to pick: like Resurrection, it finds the fallen ally.
+		if not _party.any(func(c: Combatant) -> bool: return c.is_ko):
+			message_label.text = "No one has fallen."
+			return
+		var member: Combatant = _party[_selecting_index]
+		member.queued_action = "item_use"
+		member.queued_skill = item_def
+		member.queued_target = -1
+		_menu_state = MenuState.MAIN
+		_advance_selection()
+		return
 	_enter_ally_targeting("item_use", item_def)
 
 
@@ -1323,6 +1452,7 @@ func _begin_resolving() -> void:
 					_turn_queue.append(enemy)
 	_turn_queue.sort_custom(func(a, b): return (a.agi - a.agi_debuff) > (b.agi - b.agi_debuff))
 	_update_enemy_ui()
+	BalanceLog.new_round()
 	_advance_turn()
 
 
@@ -1331,6 +1461,7 @@ func _begin_resolving() -> void:
 func _advance_turn() -> void:
 	_acting = true
 	await _execute_next_turn()
+	BalanceLog.end_action(message_label.text)
 	_acting = false
 	_message_timer = _message_time()
 
@@ -1339,6 +1470,7 @@ func _execute_next_turn() -> void:
 	while not _turn_queue.is_empty() and _turn_queue[0].is_ko:
 		_turn_queue.pop_front()
 	if _turn_queue.is_empty():
+		BalanceLog.begin("end of round", "poison / bleed / buffs")
 		for member in _party:
 			member.defending = false
 		for enemy in _enemies:
@@ -1354,6 +1486,7 @@ func _execute_next_turn() -> void:
 		_begin_selection()
 		return
 	var combatant: Combatant = _turn_queue.pop_front()
+	BalanceLog.begin(combatant.display_name, _log_action_name(combatant))
 	# The acting party member steps forward for their turn (enemies: nobody).
 	_party_acting = _party.find(combatant)
 	if combatant.is_stunned:
@@ -1362,11 +1495,33 @@ func _execute_next_turn() -> void:
 		if combatant.stun_rounds <= 0:
 			combatant.is_stunned = false
 		message_label.text = "%s is stunned and cannot act!" % combatant.display_name
+		if combatant.is_enemy and combatant.is_boss:
+			# Bosses can't be stun-locked (found in the 2026-10-24 playtest:
+			# Pressure Point / Garrote / the ultimates kept Vorath frozen in
+			# phase 1): after losing a turn they shrug off stuns for their
+			# next two turns, and a phase change still happens on time.
+			combatant.stun_guard = 2
+			var note := _check_boss_phase_transition(combatant)
+			if note != "":
+				await _play_boss_phase_change(combatant)
+				message_label.text = note + message_label.text
 		return
 	if combatant.is_enemy:
 		await _execute_enemy_turn(combatant)
 	else:
 		await _execute_party_turn(combatant)
+
+
+## What a fighter is about to do, for the balance log.
+func _log_action_name(c: Combatant) -> String:
+	if c.is_stunned:
+		return "stunned"
+	if c.is_enemy:
+		return "boss turn (phase %d)" % (c.boss_phase + 1) if c.is_boss else "turn"
+	match c.queued_action:
+		"skill":    return "skill: " + String(c.queued_skill.get("name", "?"))
+		"item_use": return "item: " + String(c.queued_skill.get("name", "?"))
+	return c.queued_action
 
 
 func _get_enemy_target(member: Combatant) -> Combatant:
@@ -1445,6 +1600,12 @@ func _execute_party_turn(member: Combatant) -> void:
 	if _counter_note != "":
 		message_label.text += "
 " + _counter_note
+	for e: Combatant in _enemies:
+		if e.is_boss and e.is_stunned and e.stun_guard > 0 and e.is_alive():
+			e.is_stunned = false
+			e.stun_rounds = 0
+			message_label.text += "\n%s resists the stun!" % e.display_name
+			_update_ui()
 	_skill_element = ""
 	_actor = null
 
@@ -1633,9 +1794,25 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 	var power: int = int(skill["power"])
 
 	match effect:
+		"resurrect":
+			# Vael's Resurrection (28b): the fallen ally with the most max HP.
+			var fallen: Array = _party.filter(func(c: Combatant) -> bool: return c.is_ko)
+			if fallen.is_empty():
+				message_label.text = "%s calls on %s...\nbut no one has fallen." % [member.display_name, skill["name"]]
+				return
+			fallen.sort_custom(func(a, b): return a.max_hp > b.max_hp)
+			var who: Combatant = fallen[0]
+			who.is_ko = false
+			who.hp = who.max_hp if Equipment.has_set_bonus(member, "divine_champion") else who.max_hp / 2
+			_fx_on(who, "pillar", "holy")
+			Sfx.play("holy")
+			_update_ui()
+			message_label.text = "%s calls on %s!\n%s rises again!" % [member.display_name, skill["name"], who.display_name]
 		"heal":
 			var target: Combatant = _get_ally_target(member, skill)
 			var amount: int = power + member.int_stat / 2
+			if member.char_class == "Ryn" and Equipment.has_set_bonus(member, "storm_dragon"):
+				amount = roundi(amount * 1.3)  # Storm Dragon (25b)
 			target.hp = mini(target.max_hp, target.hp + amount)
 			_update_ui()
 			message_label.text = "%s uses %s!\n%s restored %d HP!" % [member.display_name, skill["name"], target.display_name, amount]
@@ -1717,12 +1894,16 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 
 		"divine_shield":
 			var rounds: int = _buff_duration(member, 2)
+			var whole_party := Equipment.has_set_bonus(member, "sacred_aegis")  # Sacred Aegis (25b)
 			for ally in _party:
-				if ally.is_alive() and ally.row == member.row:
+				if ally.is_alive() and (whole_party or ally.row == member.row):
 					ally.def_buff = maxi(ally.def_buff, int(power))
 					ally.def_buff_rounds = rounds
 			_update_ui()
-			message_label.text = "%s raises %s!\n%s row DEF increased for %d rounds!" % [member.display_name, skill["name"], member.row.capitalize(), rounds]
+			if whole_party:
+				message_label.text = "%s raises %s!\nThe whole party's DEF increased for %d rounds!" % [member.display_name, skill["name"], rounds]
+			else:
+				message_label.text = "%s raises %s!\n%s row DEF increased for %d rounds!" % [member.display_name, skill["name"], member.row.capitalize(), rounds]
 
 		"battle_hymn":
 			var rounds: int = _buff_duration(member, 2)
@@ -2031,11 +2212,11 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				dmg *= 2
 			dmg = _hit(target, dmg)
 			if not target.is_ko:
-				target.poison_rounds = 3
+				target.poison_rounds = _poison_rounds(member)
 				target.poison_power = 8 + member.atk / 6
 			_update_ui()
 			var crit_tag := " CRIT!" if crit else ""
-			message_label.text = "%s uses %s on %s for %d!%s\nPoisoned for 3 rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag]
+			message_label.text = "%s uses %s on %s for %d!%s\nPoisoned for %d rounds!" % [member.display_name, skill["name"], target.display_name, dmg, crit_tag, _poison_rounds(member)]
 			if _foes_defeated():
 				_end_battle(true)
 
@@ -2105,7 +2286,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
 				if not enemy.is_ko:
-					enemy.poison_rounds = 3
+					enemy.poison_rounds = _poison_rounds(member)
 					enemy.poison_power = 8 + member.atk / 6
 			_update_ui()
 			message_label.text = "%s uses %s!\nAll enemies poisoned!" % [member.display_name, skill["name"]]
@@ -2128,12 +2309,14 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				return
 			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
+			if Equipment.has_set_bonus(member, "deaths_hand"):
+				dmg = roundi(dmg * 1.3)  # Death's Hand (28b)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
 			dmg = _hit(target, dmg)
 			if not target.is_ko:
-				target.poison_rounds = 3
+				target.poison_rounds = _poison_rounds(member)
 				target.poison_power = 10 + member.atk / 6
 				target.bleed_rounds = 4
 				target.bleed_power = 12 + member.atk / 5
@@ -2152,6 +2335,21 @@ func _do_item(member: Combatant, item_def: Dictionary) -> void:
 	if count <= 0:
 		message_label.text = "No %s left!" % item_name
 		return
+	if item_def["effect"] == "item_revive":
+		var fallen: Array = _party.filter(func(c: Combatant) -> bool: return c.is_ko)
+		if fallen.is_empty():
+			message_label.text = "%s holds up the %s...\nbut no one has fallen." % [member.display_name, item_name]
+			return
+		GameManager.inventory[item_name] = count - 1
+		fallen.sort_custom(func(a, b): return a.max_hp > b.max_hp)
+		var who: Combatant = fallen[0]
+		who.is_ko = false
+		who.hp = maxi(1, who.max_hp * int(item_def["power"]) / 100)
+		_fx_on(who, "pillar", "holy")
+		Sfx.play("heal")
+		_update_ui()
+		message_label.text = "%s uses a %s!\n%s is back on their feet!" % [member.display_name, item_name, who.display_name]
+		return
 	GameManager.inventory[item_name] = count - 1
 
 	var target: Combatant = _get_ally_target(member, item_def)
@@ -2163,6 +2361,12 @@ func _do_item(member: Combatant, item_def: Dictionary) -> void:
 			target.hp = mini(target.max_hp, target.hp + power)
 			_update_ui()
 			message_label.text = "%s uses %s on %s!\nRestored %d HP!" % [member.display_name, item_name, target.display_name, power]
+		"item_full_restore":
+			target.hp = target.max_hp
+			target.mp = target.max_mp
+			_update_ui()
+			message_label.text = "%s uses %s on %s!
+Fully restored!" % [member.display_name, item_name, target.display_name]
 		"item_restore_mp":
 			target.mp = mini(target.max_mp, target.mp + power)
 			_update_ui()
@@ -2186,6 +2390,7 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not in_sight.is_empty():
 		targets = in_sight
 	enemy.turns_taken += 1
+	enemy.stun_guard = maxi(0, enemy.stun_guard - 1)
 	var phase_note := ""
 	if enemy.is_boss:
 		phase_note = _check_boss_phase_transition(enemy)
@@ -2194,8 +2399,15 @@ func _execute_enemy_turn(enemy: Combatant) -> void:
 	if not enemy.charging.is_empty():
 		var charged: Dictionary = enemy.charging
 		enemy.charging = {}
-		await _enemy_attack(enemy, targets, phase_note, charged)
+		if charged.get("kind", "") == "charge_all":
+			await _storm_strike(enemy, targets, phase_note, charged)
+		else:
+			await _enemy_attack(enemy, targets, phase_note, charged)
 		return
+	if enemy.display_name == "Vorath":
+		phase_note = await _vorath_turn(enemy, phase_note)
+		if not _party.any(func(c): return c.is_alive()) or not enemy.is_alive():
+			return
 	var ability := _choose_ability(enemy)
 	if not ability.is_empty():
 		await _enemy_ability(enemy, ability, targets, phase_note)
@@ -2216,6 +2428,9 @@ func _choose_ability(enemy: Combatant) -> Dictionary:
 			continue
 		if a.get("kind", "") == "silence" and _party.all(func(m: Combatant) -> bool: return not m.is_alive() or m.silence_rounds > 0):
 			continue
+		# Absorbing its summons (25b) only means something while they stand.
+		if a.get("kind", "") == "absorb" and not _enemies.any(func(e: Combatant) -> bool: return e.summoned and e.is_alive()):
+			continue
 		if a.has("every"):
 			if enemy.turns_taken % int(a["every"]) == 0:
 				return a
@@ -2225,7 +2440,8 @@ func _choose_ability(enemy: Combatant) -> Dictionary:
 
 
 ## Taunt wins; back-row hunters (Hollow Archer) pick the back row 75% of the
-## time when anyone's there; otherwise anyone.
+## time when anyone's there; front-row predators (Tundra Troll, 25b) only ever
+## hit the front row while anyone stands there; otherwise anyone.
 func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 	for m: Combatant in targets:
 		if m.taunt_rounds > 0:
@@ -2234,6 +2450,10 @@ func _pick_target(enemy: Combatant, targets: Array) -> Combatant:
 		var back := targets.filter(func(m: Combatant) -> bool: return m.row == "back")
 		if not back.is_empty() and randi() % 100 < 75:
 			return back[randi() % back.size()]
+	if enemy.attack_mods.get("target", "") == "front_row":
+		var front := targets.filter(func(m: Combatant) -> bool: return m.row == "front")
+		if not front.is_empty():
+			return front[randi() % front.size()]
 	return targets[randi() % targets.size()]
 
 
@@ -2301,6 +2521,10 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 		target.is_stunned = true
 		target.stun_rounds = 1
 		status += " Stunned!"
+	if target.is_alive() and randi() % 100 < int(mods.get("burn_chance", 0)):
+		target.burn_rounds = int(mods.get("burn_rounds", 3))
+		target.burn_power = int(mods.get("burn_power", 6))
+		status += " Burned!"
 	if target.is_alive() and randi() % 100 < int(mods.get("random_status", 0)):
 		status += _random_status(target)
 	if target.is_alive() and randi() % 100 < int(mods.get("bleed_chance", 0)):
@@ -2401,14 +2625,25 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			var target := _pick_target(enemy, targets)
 			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
 			_fx_on(target, "pillar", a.get("palette", "debuff"))
-			Sfx.play("holy")
+			Sfx.play("thunder" if a.get("palette", "") == "lightning" else "holy")
 			target.receive_damage(dmg)
+			var para := ""
+			if target.is_alive() and randi() % 100 < int(a.get("stun_chance", 0)):
+				target.is_stunned = true  # paralysis (25d, Sea Specter)
+				target.stun_rounds = 1
+				para = " Paralyzed!"
 			_update_ui()
-			message_label.text = phase_note + "%s casts %s!\n%s takes %d!" % [enemy.display_name, ability_name, target.display_name, dmg]
+			message_label.text = phase_note + "%s casts %s!\n%s takes %d!%s" % [enemy.display_name, ability_name, target.display_name, dmg, para]
 		"dot_strike":
-			# A basic hit that always poisons and bleeds (20d).
+			# A basic hit that always poisons and bleeds (20d); Vorath's Death
+			# Touch stuns too (28c).
 			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, 1,
-					{"poison_chance": 100, "bleed_chance": 100, "poison_power": int(a.get("poison_power", 4)), "bleed_power": int(a.get("bleed_power", 5))})
+					{"poison_chance": 100, "bleed_chance": 100, "poison_power": int(a.get("poison_power", 4)), "bleed_power": int(a.get("bleed_power", 5)),
+					"stun_chance": int(a.get("stun_chance", 0))})
+			return
+		"multi_strike":
+			# Several blows in one turn (28c, Vorath's Void Strike).
+			await _enemy_attack(enemy, targets, phase_note + "%s uses %s!\n" % [enemy.display_name, ability_name], {}, int(a.get("hits", 3)))
 			return
 		"summon":
 			await _summon(enemy, a.get("enemies", []))
@@ -2442,6 +2677,95 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			enemy.aura_index += 1
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s! %s\nIts aura shifts to %s." % [enemy.display_name, spell, result, enemy.aura()]
+		"drain_mp":
+			# Drains MP - or Qi - from one hero and heals itself (28a, Entropy Shade).
+			var drained: Array = targets.filter(func(m: Combatant) -> bool: return m.mp > 0 or m.qi > 0)
+			var target: Combatant = drained.pick_random() if not drained.is_empty() else _pick_target(enemy, targets)
+			var took := ""
+			if target.max_qi > 0:
+				var q := mini(target.qi, 2)
+				target.qi -= q
+				took = "%d Qi" % q
+			else:
+				var mp := mini(target.mp, power)
+				target.mp -= mp
+				took = "%d MP" % mp
+			enemy.hp = mini(enemy.max_hp, enemy.hp + power)
+			_fx_on(target, "sinking", "arcane")
+			Sfx.play("spell")
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!\nIt drains %s from %s!" % [enemy.display_name, ability_name, took, target.display_name]
+		"heal_allies":
+			# An enemy healer (25d, Tidal Witch): mends every ally still standing.
+			for e: Combatant in _enemies:
+				if e.is_alive():
+					e.hp = mini(e.max_hp, e.hp + power)
+					_fx_on(e, "sparkles", "heal")
+			Sfx.play("heal")
+			_update_enemy_ui()
+			message_label.text = phase_note + "%s casts %s!\nThe enemies' wounds close!" % [enemy.display_name, ability_name]
+		"charge_all":
+			# Telegraphed this turn, unleashed on the whole party next turn
+			# (25d, the Drowned Admiral's storm): Defend halves it, Sanctuary stops it.
+			enemy.charging = a
+			_fx_on(enemy, "stars", "lightning")
+			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "gathers a storm...")]
+		"burn_row", "burn_all":
+			# Fire that sets heroes alight (25c): the front row (Scorched Mage)
+			# or everyone (Blazing Sentinel); damage now, burn for a few rounds.
+			var hit: Array = targets
+			if a.get("kind") == "burn_row":
+				hit = targets.filter(func(m: Combatant) -> bool: return m.row == "front")
+				if hit.is_empty():
+					hit = targets
+			_fx.flash(BattleFx.PALETTES["fire"][0], 0.35)
+			Sfx.play("fire")
+			for m: Combatant in hit:
+				_fx_on(m, "burst", "fire")
+				m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+				if m.is_alive():
+					m.burn_rounds = rounds
+					m.burn_power = int(a.get("burn_power", 8))
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!\n%s set ablaze!" % [enemy.display_name, ability_name,
+					"The front row is" if a.get("kind") == "burn_row" and hit != targets else "The whole party is"]
+		"party_agi_down":
+			# Group slow (25b, Frost Wraith): everyone's AGI drops for a while.
+			for m: Combatant in targets:
+				m.agi_debuff = power
+				m.agi_debuff_rounds = rounds
+				_fx_on(m, "sinking", a.get("palette", "ice"))
+			Sfx.play("ice")
+			message_label.text = phase_note + "%s breathes %s!
+The party slows down!" % [enemy.display_name, ability_name]
+		"freeze":
+			# Ice magic that freezes one hero solid for a round (25b).
+			var target := _pick_target(enemy, targets)
+			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			_fx_on(target, "crystals", "ice")
+			Sfx.play("ice")
+			target.receive_damage(dmg)
+			if target.is_alive():
+				target.is_stunned = true
+				target.stun_rounds = 1
+			_update_ui()
+			message_label.text = phase_note + "%s casts %s!
+%s takes %d and is frozen solid!" % [enemy.display_name, ability_name, target.display_name, dmg]
+		"absorb":
+			# Swallows its summoned minions for power (25b, the Frozen
+			# Sovereign's third phase): each one adds `power` ATK and DEF for good.
+			var eaten := _enemies.filter(func(e: Combatant) -> bool: return e.summoned and e.is_alive())
+			for e: Combatant in eaten:
+				_fx_on(e, "cloud", "ice")
+				e.hp = 0
+				e.is_ko = true
+			enemy.atk += power * eaten.size()
+			enemy.defense += power * eaten.size()
+			_fx_on(enemy, "ring", "ice")
+			Sfx.play("thunder")
+			_update_enemy_ui()
+			message_label.text = phase_note + "%s uses %s!
+It swallows its knights and grows stronger!" % [enemy.display_name, ability_name]
 		"magic_all":
 			_fx.flash(pal[0], 0.4)
 			Sfx.play("thunder")
@@ -2468,6 +2792,7 @@ func _summon(summoner: Combatant, group: Array) -> void:
 		add.summoned = true
 		add.xp_reward = 0
 		_enemies.append(add)
+		BalanceLog.add_fighter(add)
 	for sprite: CanvasItem in _enemy_sprites:
 		if sprite != null:
 			sprite.queue_free()
@@ -2484,6 +2809,169 @@ func _summon(summoner: Combatant, group: Array) -> void:
 			_fx.impact({"impact": "cloud", "palette": "shadow", "size": 12.0}, [sprite])
 	Sfx.play("encounter")
 	_update_enemy_ui()
+
+
+## The Drowned Admiral's charged storm (25d) lands on everyone: half damage
+## while defending, nothing behind a Sanctuary.
+func _storm_strike(enemy: Combatant, targets: Array, phase_note: String, a: Dictionary) -> void:
+	_fx.flash(Color(1, 1, 0.8), 0.7)
+	Sfx.play("thunder")
+	var power: int = int(a.get("power", 60))
+	for m: Combatant in targets:
+		if m.sanctuary:
+			m.sanctuary = false
+			continue
+		var dmg := maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-3, 3))
+		if m.defending:
+			dmg /= 2
+		_fx_on(m, "bolt", "lightning")
+		m.receive_damage(dmg)
+	_update_ui()
+	message_label.text = phase_note + "%s unleashes %s!\nLightning tears through the party!" % [enemy.display_name, a.get("name", "the storm")]
+	if _party.filter(func(c): return c.is_alive()).is_empty():
+		_end_battle(false)
+
+
+## Act III set bonuses that change a skill's cost (28b): Rising Force makes
+## Rising Dragon 4 Qi; Cosmic Conduit takes 25% off Lyra's spells.
+func _set_cost(member: Combatant, skill: Dictionary) -> Dictionary:
+	if skill.get("effect", "") == "switch_stance":
+		return skill
+	if skill.get("name", "") == "Rising Dragon" and Equipment.has_set_bonus(member, "rising_force"):
+		var s := skill.duplicate()
+		s["cost"] = 4
+		return s
+	if member.char_class == "Lyra" and skill.get("cost_type", "") == "mp" and Equipment.has_set_bonus(member, "cosmic_conduit"):
+		var s2 := skill.duplicate()
+		s2["cost"] = maxi(1, roundi(int(skill["cost"]) * 0.75))
+		return s2
+	return skill
+
+
+# ------------------------------------------------------------ Vorath (28c)
+
+## Before each of Vorath's moves: Frank's revelation when phase 3 begins,
+## the rotating immunity in phase 2, Frank's own action and the Final
+## Unraveling countdown in phase 3. Returns the message prefix to show.
+func _vorath_turn(vorath: Combatant, note: String) -> String:
+	if vorath.boss_phase == 1:
+		var elements := ["fire", "ice", "lightning", "earth", "holy"]
+		var element: String = elements[_immune_turn % elements.size()]
+		_immune_turn += 1
+		vorath.immune = [element]
+		note += "Vorath drinks in %s - immune to %s this round!\n" % [ELEMENT_NOUNS[element], element]
+	elif vorath.boss_phase >= 2:
+		if not _frank_joined:
+			await _frank_revelation(vorath)
+		vorath.immune = []
+		BalanceLog.begin(GameManager.FRANK_TRUE_NAME + " (Frank)", "assist")
+		await _frank_acts(vorath)
+		BalanceLog.end_action(message_label.text)
+		BalanceLog.begin(vorath.display_name, "boss turn (phase %d)" % (vorath.boss_phase + 1))
+		if not vorath.is_alive():
+			return note
+		if _unravel_grace:
+			_unravel_grace = false
+			note += "%s's seal holds the Final Unraveling back - one free round!\n" % GameManager.FRANK_TRUE_NAME
+		else:
+			_unravel_charge += 1
+			if _unravel_charge >= UNRAVEL_TURNS:
+				await _final_unraveling(vorath)
+				return note
+			note += "The Final Unraveling gathers... (%d/%d)\n" % [_unravel_charge, UNRAVEL_TURNS]
+	return note
+
+
+## Between phases 2 and 3: Frank drops the merchant's mask (the doc), says his
+## true name, weakens Vorath and joins the fight. Vorath's Void Form: DEF and
+## RES fall, his damage spikes.
+func _frank_revelation(vorath: Combatant) -> void:
+	_frank_joined = true
+	_unravel_grace = true
+	var true_name := GameManager.FRANK_TRUE_NAME
+	await Cutscene.play_text("\n".join([
+		"say Vorath: Enough. This age ends now - and the next, and the next. I will unmake the cycle itself.",
+		"say Frank: No. You won't.",
+		"narrate Frank steps forward. The merchant's coat falls away, and light pours out of him like a door opening.",
+		"say Vorath: ...You. I know that light. I thought you faded ages ago.",
+		"say Frank: I stayed. That's the difference between us, old friend. You refused the cycle. I chose to keep it.",
+		"say Frank: Four pure souls of an older age. You were one. I was another. My name is %s." % true_name,
+		"say %s: And I've been waiting a very long time to stand beside these four." % true_name,
+		"narrate %s's light pins Vorath in place. The Architect's form cracks open into raw void." % true_name,
+	]))
+	vorath.defense = roundi(vorath.defense * 0.5)
+	vorath.res_stat = roundi(vorath.res_stat * 0.5)
+	vorath.atk += 20
+	vorath.int_stat += 20
+	var area: Node = get_node_or_null("PartyArea")
+	if area != null and ResourceLoader.exists("res://assets/sprites/frank_frames.tres"):
+		_frank_sprite = AnimatedSprite2D.new()
+		_frank_sprite.sprite_frames = load("res://assets/sprites/frank_frames.tres")
+		_frank_sprite.flip_h = true
+		_frank_sprite.play(&"idle_side")
+		_frank_sprite.position = _party_home(0) + Vector2(-30, 8)
+		_frank_sprite.modulate = Color(1.3, 1.25, 1.1)
+		area.add_child(_frank_sprite)
+		_fx.impact({"impact": "pillar", "palette": "holy", "size": 14.0}, [_frank_sprite])
+	Sfx.play("holy")
+	_fx.flash(Color(1, 1, 0.85), 0.8, 0.6)
+
+
+## Frank fights on his own (the doc's three skills): Blessing when the party
+## is hurt, the Final Invoice once Vorath is nearly gone, Balance's Judgment
+## otherwise. Shown for a moment before Vorath moves. Toned down 2026-10-29
+## (Cory: he was doing most of phase 3's damage): Blessing once a fight
+## ("one last time"), Judgment ~200 (was ~420), the Invoice 900 (was 1500).
+func _frank_acts(vorath: Combatant) -> void:
+	var true_name := GameManager.FRANK_TRUE_NAME
+	var hurt := _party.any(func(c: Combatant) -> bool: return c.is_ko or float(c.hp) / c.max_hp < 0.45)
+	if hurt and not _frank_blessed:
+		_frank_blessed = true
+		for c: Combatant in _party:
+			if c.is_ko:
+				c.is_ko = false
+				c.hp = c.max_hp / 3
+			else:
+				c.hp = mini(c.max_hp, c.hp + c.max_hp / 2)
+			_fx_on(c, "sparkles", "heal")
+		Sfx.play("heal")
+		message_label.text = "%s uses %s's Blessing!\n\"On the house - one last time.\"" % [true_name, true_name]
+	elif not _frank_invoiced and float(vorath.hp) / vorath.max_hp < 0.15:
+		_frank_invoiced = true
+		var dmg := 900
+		vorath.receive_damage(dmg)
+		_fx.flash(Color(1, 0.95, 0.6), 0.9, 0.5)
+		_fx_on(vorath, "pillar", "holy")
+		Sfx.play("thunder")
+		message_label.text = "%s presents The Final Invoice!\n\"For everything you've destroyed.\" %d damage!" % [true_name, dmg]
+	else:
+		var dmg := 200 + randi_range(-20, 20)
+		vorath.receive_damage(dmg)
+		_fx_on(vorath, "burst", "holy")
+		Sfx.play("holy")
+		message_label.text = "%s strikes with Balance's Judgment!\nVorath takes %d!" % [true_name, dmg]
+	_update_ui()
+	await get_tree().create_timer(1.4).timeout
+	if not vorath.is_alive() and not _foes_defeated():
+		return
+	if _foes_defeated():
+		_end_battle(true)
+
+
+## The Final Unraveling completes: the party is unmade.
+func _final_unraveling(vorath: Combatant) -> void:
+	_fx.flash(Color(0.1, 0, 0.15), 1.0, 1.2)
+	Sfx.play("thunder")
+	for c: Combatant in _party:
+		c.receive_damage(c.hp)
+	_update_ui()
+	message_label.text = "Vorath completes The Final Unraveling!\nEverything goes dark..."
+	_end_battle(false)
+
+
+## How long Silas's poisons last: 3 rounds, 5 with Venom Weave (25b).
+func _poison_rounds(member: Combatant) -> int:
+	return 5 if Equipment.has_set_bonus(member, "venom_weave") else 3
 
 
 ## One BattleFx impact of `kind` in `palette` on a fighter.
@@ -2519,6 +3007,9 @@ func _check_boss_phase_transition(enemy: Combatant) -> String:
 	if enemy.counter_from_phase >= 0 and enemy.boss_phase >= enemy.counter_from_phase:
 		enemy.counter_rounds = 999  # from here on it's always countering (20b)
 		return "%s enters a new phase! It will counter every blow!\n" % enemy.display_name
+	if enemy.display_name == "Vorath":
+		return ["", "Vorath channels the Unraveling itself! Every attack strikes the whole party!\n",
+				"Vorath's form cracks open into the Void!\n"][mini(enemy.boss_phase, 2)]
 	return "%s enters a new phase!\n" % enemy.display_name
 
 
@@ -2611,6 +3102,7 @@ func _tick_dot() -> void:
 
 
 func _end_battle(victory: bool) -> void:
+	BalanceLog.end_action(message_label.text)
 	state = State.BATTLE_OVER
 	GameManager.battle_snapshot = {}  # a suspend from here on saves the result
 	_victory = victory
@@ -2628,8 +3120,12 @@ func _end_battle(victory: bool) -> void:
 				GameManager.defeated_bosses[GameManager.current_location] = true
 				GameManager.autosave_pending = true  # saved back on the map (22a)
 		for member in _party:
+			var level_before: int = member.level
 			if member.gain_xp(total_xp):
 				_level_up_queue.append(_build_levelup_text(member))
+			if total_xp > 0:
+				BalanceLog.xp("auto-win" if _auto_won else "battle", total_xp, member, level_before)
+		BalanceLog.battle_end("auto-win" if _auto_won else "won", _party, total_xp, total_gold)
 		_update_ui()
 		Music.stop(0.3)
 		Sfx.play("victory")
@@ -2646,6 +3142,7 @@ func _end_battle(victory: bool) -> void:
 	else:
 		Music.stop(1.0)
 		message_label.text = "The party has fallen..."
+		BalanceLog.battle_end("lost", _party, 0, 0)
 
 
 func _build_levelup_text(member: Combatant) -> String:
@@ -2668,8 +3165,36 @@ func _clamp_list_scroll() -> void:
 		_list_scroll = _menu_cursor - page + 1
 
 
+## The message window explains the highlighted skill or item (2026-10-28).
+func _menu_help() -> String:
+	if _menu_state == MenuState.SKILL and _menu_cursor < _active_skills.size():
+		var skill: Dictionary = _active_skills[_menu_cursor]
+		var skill_name: String = skill["name"]
+		if skill["effect"] == "switch_stance":
+			var to: String = skill["to_stance"]
+			var lyra: Combatant = _party[_selecting_index]
+			var spells: Array = []
+			for sp: Dictionary in LYRA_SKILLS.get(to, []):
+				if lyra.level >= int(sp.get("min_level", 1)):
+					spells.append(sp["name"])
+			var free := Equipment.has_set_bonus(lyra, "arcane_scholar")
+			return "Change to the %s stance%s. Spells: %s." % [to, " (free - Arcane Scholar)" if free else " (uses Lyra's turn)", ", ".join(spells) if not spells.is_empty() else "none yet"]
+		return "%s: %s" % [skill_name, SKILL_HELP.get(skill_name, "")]
+	if _menu_state == MenuState.ITEM and _menu_cursor < _active_items.size():
+		var item_name: String = _active_items[_menu_cursor]["name"]
+		return "%s: %s" % [item_name, ShopMenu.ITEM_TEXT.get(item_name, "")]
+	return ""
+
+
 func _update_menu() -> void:
 	action_menu.visible = true
+	var help := _menu_help()
+	if help != "":
+		message_label.text = help
+		_help_shown = true
+	elif _help_shown:
+		message_label.text = ""
+		_help_shown = false
 	var page: int = _option_labels.size()
 	var scrollable: bool = _menu_state == MenuState.SKILL or _menu_state == MenuState.ITEM or _menu_state == MenuState.MAIN
 	for i in page:

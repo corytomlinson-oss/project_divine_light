@@ -29,6 +29,8 @@ var is_enemy: bool = false
 var is_ko: bool = false
 var is_stunned: bool = false
 var stun_rounds: int = 0
+var mastered_sets: Array = []  # set ids whose bonus this hero keeps for good (2026-10-25)
+var stun_guard: int = 0  # bosses: own turns left shrugging off stuns after one lands (playtest pass)
 var defending: bool = false
 var def_buff: int = 0
 var def_buff_rounds: int = 0
@@ -187,6 +189,7 @@ func to_save_dict() -> Dictionary:
 		"stance": stance,
 		"is_ko": is_ko,
 		"equipment": equipment.duplicate(),
+		"mastered_sets": mastered_sets.duplicate(),
 	}
 
 
@@ -211,3 +214,7 @@ func load_save_dict(data: Dictionary) -> void:
 	var saved_equipment: Dictionary = data.get("equipment", {})
 	for slot in equipment.keys():
 		equipment[slot] = String(saved_equipment.get(slot, ""))
+	mastered_sets = []
+	for set_id in data.get("mastered_sets", []):
+		mastered_sets.append(String(set_id))
+	Equipment.update_mastery(self)  # older saves: a set worn complete counts

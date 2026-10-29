@@ -1,0 +1,30 @@
+# Duskara is free (Milestone 25c; like nordveil_victory.scene). The party
+# walks up from the gate as the town spills out around the brimming oasis.
+
+spawn {a1} {a1} at 15,18 facing up
+spawn {a2} {a2} at 17,18 facing up
+spawn {a3} {a3} at 16,19 facing up
+music town
+move player to 16,12 async
+move {a1} to 15,13 async
+move {a2} to 17,13 async
+move {a3} to 16,14 async
+spawn kid1 child at 5,15 facing up
+spawn neighbor1 worker at 22,16 facing up
+spawn neighbor2 merchant at 6,4 facing down
+move kid1 to 12,12 async
+move neighbor1 to 20,12 async
+move neighbor2 to 13,10 async
+sync
+face player up
+emote kid1 heart
+emote neighbor1 note
+say Water-Keeper: Feel that wind? It's cool. It's actually cool! The heat is broken.
+say Water-Keeper: The oasis came back the moment the Tyrant fell - water pushing up through the cracked mud like it had been waiting.
+emote player note
+say Guard: We'll have that buried house dug out by sundown. And tonight we drink well water until we can't stand.
+say Child: The water's cold! Come and feel it!
+emote frank note
+say Frank: Two kingdoms breathing again. You four are getting good at this.
+say Frank: That leaves Selavon, out on the eastern coast. The Drowned Admiral has it locked in a storm that never ends. But that's a problem for another day.
+say Water-Keeper: Duskara's wells and gates are yours, always. Rest. Eat. Let the smith fit you with Sunsteel.

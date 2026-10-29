@@ -44,7 +44,7 @@ func _ready() -> void:
 	_opened_frame = Engine.get_process_frames()
 	# Saving from the menu is an overworld thing (Cory's call, 22a); towns
 	# have their inns, dungeons and battles have only autosaves.
-	var can_save := get_tree().current_scene.name == "Overworld"
+	var can_save := get_tree().current_scene is Region  # any overworld map (25a)
 	if not can_save:
 		var save_option := $CommandWindow/Options/Save
 		$CommandWindow/Options.remove_child(save_option)
@@ -58,7 +58,7 @@ func _ready() -> void:
 	_cursor.target = _options[_index]
 	# Gold under the commands (Milestone 20a).
 	var gold_box := Panel.new()
-	gold_box.position = Vector2(244, 54 if not can_save else 64)
+	gold_box.position = Vector2(244, 64 if not can_save else 74)
 	gold_box.size = Vector2(72, 18)
 	add_child(gold_box)
 	var gold := Label.new()
@@ -83,6 +83,7 @@ func _process(_delta: float) -> void:
 		Sfx.play("menu_confirm")
 		match _options[_index].name:
 			"Equip": _open_equip()
+			"Status": _open_status()
 			"Map": _open_map()
 			"Quests": _open_quests()
 			"Save": _save()
@@ -102,6 +103,13 @@ func _save() -> void:
 func _open_map() -> void:
 	set_process(false)
 	await MapScreen.open(_player).closed
+	set_process(true)
+	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
+
+
+func _open_status() -> void:
+	set_process(false)
+	await StatusScreen.open(self).closed
 	set_process(true)
 	_opened_frame = Engine.get_process_frames()  # don't re-read the closing press
 
@@ -133,9 +141,15 @@ func _add_party_row(member: Combatant, y: float) -> void:
 		var frame := AtlasTexture.new()
 		frame.atlas = load(sheet_path)
 		frame.region = Rect2(0, 0, 16, 32)  # idle, facing down
+		var form := SetLooks.form_texture(member)
 		var portrait := TextureRect.new()
-		portrait.texture = frame
 		portrait.position = Vector2(8, y)
+		if form != null:  # Act III form: a wider frame, centred on the same spot
+			frame.atlas = form
+			frame.region = Rect2(0, 0, SetLooks.FORM_W, 32)
+			portrait.position.x -= (SetLooks.FORM_W - 16) / 2.0
+		portrait.texture = frame
+		portrait.material = SetLooks.material_for(member)  # armor set look (25b)
 		if member.is_ko:
 			portrait.modulate = Color(0.45, 0.4, 0.55)
 		_party_window.add_child(portrait)

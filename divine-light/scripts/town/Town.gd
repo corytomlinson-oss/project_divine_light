@@ -27,6 +27,7 @@ const FRANK_STOCK: Array = [
 	{"item": "Antidote", "price": 15},
 	{"item": "Ether", "price": 60},
 	{"item": "Elixir", "price": 150},
+	{"item": "Phoenix Feather", "price": 150},
 	{"item": "Iron Sword", "price": 120},
 	{"item": "Iron Claws", "price": 120},
 	{"item": "Apprentice Staff", "price": 120},
@@ -40,10 +41,19 @@ const OPPOSITE := {"up": "down", "down": "up", "left": "right", "right": "left"}
 @onready var _tile_map: TileMapLayer = $TileMapLayer
 @onready var _player: Node2D = $TileMapLayer/Player
 
+# Act II towns (25a) belong to a kingdom: until it's cleansed they draw grey
+# and violet (the region shader) and use their "before" state - each town
+# checks cleansed() for its people, shops and lines. "" = never corrupted.
+var kingdom_id := ""
+
 var _npcs: Dictionary = {}  # cell -> actor id
 var _npc_nodes: Dictionary = {}  # actor id -> character node
 var _quest_marks: Dictionary = {}  # actor id -> QuestMark over their head
 
+
+# After the ending (29): Frank is a faint echo of light, still minding the stall.
+const FRANK_ECHO := Color(1.0, 0.95, 0.7, 0.45)
+var _frank_echo_seen := false
 
 func _paint(map: Array) -> void:
 	_tile_map.clear()
@@ -54,6 +64,8 @@ func _paint(map: Array) -> void:
 
 
 func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, tint := Color.WHITE) -> void:
+	if id == "frank" and GameManager.has_flag("game_complete"):
+		tint = FRANK_ECHO  # he faded into the light at the end (28d); an echo keeps the stall
 	var npc := Cutscene.make_character(sprite_name)
 	if tint != Color.WHITE:
 		npc.self_modulate = tint
@@ -72,12 +84,30 @@ func _add_npc(id: String, sprite_name: String, cell: Vector2i, facing: String, t
 ## (Every town calls this last in _ready, once its people are placed - so the
 ## quest marks go up here too.)
 func _place_player(entry: Vector2i) -> void:
+	_road_arrival()
 	_refresh_quest_marks()
+	_apply_kingdom_state()
+	_play_victory()
 	if GameManager.has_pending_spawn:
 		_player.snap_to(GameManager.pending_spawn_position)
 		GameManager.has_pending_spawn = false
 	else:
 		_player.snap_to(_tile_map.map_to_local(entry))
+
+
+## Arriving finishes a road quest heading here (Frank's directions,
+## 2026-10-29); it says so once the way in, and any arrival scene, is over.
+func _road_arrival() -> void:
+	var lines := Quests.arrive(GameManager.current_location)
+	if lines.is_empty():
+		return
+	if Transition.is_busy():
+		await Transition.finished
+	await get_tree().process_frame  # let an arrival scene (Verdance, the Threshold) start first
+	while Cutscene.is_playing():
+		await get_tree().process_frame
+	await Cutscene.play_text("\n".join(lines))
+	_refresh_quest_marks()
 
 
 func is_blocked(cell: Vector2i) -> bool:
@@ -87,6 +117,36 @@ func is_blocked(cell: Vector2i) -> bool:
 ## The person turns to face the player, then says their lines (scene commands).
 func _talk_lines(id: String, facing: String, lines: Array) -> void:
 	await Cutscene.play_text("face %s %s\n%s" % [id, OPPOSITE[facing], "\n".join(lines)])
+
+
+## Free of the Unraveling (always true for Verdance and Edenmere).
+func cleansed() -> bool:
+	return kingdom_id == "" or Kingdoms.is_cleansed(kingdom_id)
+
+
+## The first visit after this town's kingdom is freed (25b): its victory
+## scene (data/cutscenes/<kingdom>_victory.scene), then KingdomVictory's
+## movie card.
+func _play_victory() -> void:
+	if kingdom_id == "" or not GameManager.has_flag("victory_pending_" + kingdom_id):
+		return
+	GameManager.story_flags.erase("victory_pending_" + kingdom_id)
+	if Transition.is_busy():
+		await Transition.finished
+	await Cutscene.play("res://data/cutscenes/%s_victory.scene" % kingdom_id)
+	await Transition.fade_out(0.5)
+	await KingdomVictory.play_for(self, kingdom_id)
+	Music.play("town", "overworld")
+	await Transition.fade_in(0.6)
+
+
+func _apply_kingdom_state() -> void:
+	if cleansed():
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = Region.CORRUPTION_SHADER
+	mat.set_shader_parameter("amount", 1.0)
+	_tile_map.material = mat
 
 
 ## Side quests (Milestone 24) come first: if this person has quest business,
@@ -198,7 +258,13 @@ func _restore_party() -> void:
 			m.mp = m.max_mp
 
 
-func _frank() -> void:
+func _frank(facing := "up") -> void:
+	# His directions to the next town come first (road quests, 2026-10-29).
+	if Quests.mark_for(GameManager.current_location + "/frank") == "!" and await _quest_talk("frank", facing):
+		return
+	if GameManager.has_flag("game_complete") and not _frank_echo_seen:
+		_frank_echo_seen = true
+		await Cutscene.play_text("narrate Frank's outline shimmers in the light, faint as a memory. Somehow, the stall is still open.")
 	var fallen := GameManager.party.filter(func(m: Combatant) -> bool: return m.is_ko)
 	var options: Array = ["Buy"]
 	if not fallen.is_empty():

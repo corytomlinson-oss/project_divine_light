@@ -1,0 +1,21 @@
+# Vorath has fallen (Milestone 28d). In his chamber, the party and Frank -
+# whose true name the world has finally heard. Then the ending movie.
+
+spawn {a1} {a1} at ~-1,1 facing up
+spawn {a2} {a2} at ~1,1 facing up
+spawn {a3} {a3} at ~0,2 facing up
+spawn frank frank at ~0,-1 facing down
+narrate The last of the void bleeds out of the chamber. Somewhere far above, for the first time in an age, the sky is clear.
+emote frank note
+say Frank: It's done. The cycle turns again - clean, the way it was meant to.
+say Vael: Frank... or should we call you something else now?
+say Frank: Frank will do. I've grown fond of it. It's what's left of my name after a few thousand years of people shortening it.
+say Ryn: You knew. All this time, from the first cell. You knew what we were walking into.
+say Frank: I knew what you could be. That's not the same thing. You did the walking.
+say Lyra: Will you stay? Valdris could use someone who remembers the old ages.
+say Frank: Valdris has four someones now. I've kept watch long enough. It's time I let the cycle carry me, the way Vorath never would.
+emote player !
+say Silas: So that's it? You just... go?
+say Frank: Everyone goes, friend. The trick is leaving the world better than you found it.
+say Frank: And you lot? You've left it in very good shape indeed. That one's on the house.
+fade out 2

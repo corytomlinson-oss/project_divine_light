@@ -60,6 +60,138 @@ const KITS := {
 		{"name": "Grave Swing", "kind": "charge", "every": 3, "mult": 2.2, "tell": "raises its pitchfork high!"},
 	]},
 	"Cutpurse": {"attack": {"steal": 40}},
+	# The Blighted Reach and the Maw (Act III, 28a; README "The Blighted Maw").
+	# The doc calls the first one a Void Sentinel; the Observatory's escape
+	# warden already has that name, so it's a Null Sentinel here.
+	"Null Sentinel": {"res": 20, "random_immune": 2},
+	"Unraveled Soul": {"int": 44, "res": 18, "attack": {"hits": 1, "hits_max": 3}, "abilities": [
+		{"name": "Dark Smite", "kind": "magic_all", "chance": 25, "power": 30, "palette": "debuff"},
+		{"name": "Death Touch", "kind": "dot_strike", "chance": 25, "poison_power": 8, "bleed_power": 8},
+		{"name": "Chaos Bolt", "kind": "magic_single", "chance": 35, "power": 44, "palette": "arcane", "stun_chance": 10},
+	]},
+	"Entropy Shade": {"int": 40, "res": 26, "weak": ["holy"], "abilities": [
+		{"name": "Entropy", "kind": "drain_mp", "chance": 55, "power": 24},
+	]},
+	"Architect's Thrall": {"int": 46, "res": 22, "weak": ["holy"], "abilities": [
+		{"name": "Unmaking", "kind": "charge", "every": 3, "mult": 2.2, "tell": "pulls the light out of the air around it..."},
+		{"name": "Void Lance", "kind": "magic_single", "chance": 35, "power": 48, "palette": "debuff"},
+	]},
+	"Hollow Custodian": {"int": 46, "res": 24, "weak": ["holy"], "random_immune": 1, "abilities": [
+		{"name": "Seal of Ruin", "kind": "magic_all", "every": 3, "power": 34, "palette": "debuff"},
+		{"name": "Grave Hammer", "kind": "charge", "every": 4, "mult": 2.2, "tell": "raises its broken hammer..."},
+	]},
+	# Vorath, the Architect (28c; README "Vorath"): phase 1 mirrors the four
+	# classes, phase 2 is all area attacks with a rotating immunity (Battle),
+	# phase 3 is the Void Form race against the Final Unraveling (Battle).
+	"Vorath": {"int": 72, "res": 28, "aura": ["fire", "ice", "lightning", "earth"], "abilities": [
+		{"name": "Dark Smite", "kind": "magic_all", "chance": 30, "max_phase": 0, "power": 40, "palette": "debuff"},
+		{"name": "Death Touch", "kind": "dot_strike", "every": 4, "max_phase": 0, "poison_power": 10, "bleed_power": 10, "stun_chance": 100},
+		{"name": "Void Strike", "kind": "multi_strike", "chance": 30, "max_phase": 0, "hits": 3},
+		{"name": "Chaos Bolt", "kind": "aura_bolt", "chance": 60, "max_phase": 0, "power": 55},
+		{"name": "Unraveling Wave", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 48, "palette": "debuff"},
+		{"name": "Void Cataclysm", "kind": "magic_all", "chance": 50, "phase": 2, "power": 62, "palette": "debuff"},
+		{"name": "Void Strike", "kind": "multi_strike", "chance": 60, "phase": 2, "hits": 3},
+	]},
+	# Act II side-quest hunts (Milestone 26)
+	"Marauder Chief": {"attack": {"steal": 40, "hits": 1, "hits_max": 2}},
+	"Snowmane": {"weak": ["fire"], "attack": {"hits": 2}, "abilities": [
+		{"name": "Blizzard Howl", "kind": "party_agi_down", "every": 4, "power": 8, "rounds": 2},
+		{"name": "Savage Lunge", "kind": "charge", "every": 3, "mult": 2.0, "tell": "crouches low in the snow..."},
+	]},
+	"Dune Stalker": {"res": 12, "immune": ["earth"], "weak": ["ice"], "abilities": [
+		{"name": "Sand Crush", "kind": "charge", "every": 3, "mult": 2.1, "tell": "draws the dunes up around its fists..."},
+	]},
+	"Reef Horror": {"res": 14, "immune": ["ice"], "weak": ["lightning"], "attack": {"stun_chance": 15}, "abilities": [
+		{"name": "Brine Mend", "kind": "heal_allies", "every": 4, "power": 120},
+		{"name": "Coral Crush", "kind": "charge", "every": 3, "mult": 2.1, "tell": "hunches, coral spines bristling..."},
+	]},
+	# The Northern Tundra (Act II, 25b; README "Tundra Kingdom")
+	"Frost Wraith": {"int": 30, "res": 18, "weak": ["fire"], "abilities": [
+		{"name": "Chilling Mist", "kind": "party_agi_down", "chance": 30, "power": 6, "rounds": 2, "palette": "ice"},
+		{"name": "Frost Bolt", "kind": "magic_single", "chance": 40, "power": 30, "palette": "ice"},
+	]},
+	"Corrupted Knight": {"res": 6, "weak": ["holy"], "attack": {"stun_chance": 10}},
+	"Tundra Troll": {"attack": {"target": "front_row"}, "abilities": [
+		{"name": "Avalanche Swing", "kind": "charge", "every": 3, "mult": 1.8, "tell": "hoists its club over its head!"},
+	]},
+	"Blizzard Hawk": {"attack": {"target": "back_row", "hits": 1, "hits_max": 2}, "weak": ["lightning"]},
+	# The Duskara Wastes (Act II, 25c; README "Desert Kingdom")
+	"Sand Viper": {"attack": {"poison_chance": 100, "poison_power": 6, "poison_rounds": 3}, "weak": ["ice"]},
+	"Dust Golem": {"res": 10, "immune": ["earth"], "weak": ["ice"], "abilities": [
+		{"name": "Sandslide", "kind": "charge", "every": 3, "mult": 1.8, "tell": "gathers the sand around its fists..."},
+	]},
+	"Scorched Mage": {"int": 36, "res": 20, "weak": ["ice"], "abilities": [
+		{"name": "Flame Wall", "kind": "burn_row", "chance": 45, "power": 26, "rounds": 3, "burn_power": 8},
+	]},
+	"Dune Marauder": {"attack": {"steal": 35}},
+	# The Selavon Coast (Act II, 25d; README "Coastal Kingdom")
+	"Sea Specter": {"int": 34, "res": 20, "weak": ["holy"], "abilities": [
+		{"name": "Charged Mist", "kind": "magic_single", "chance": 60, "power": 34, "stun_chance": 30, "palette": "lightning"},
+	]},
+	"Coral Brute": {"res": 12, "immune": ["ice"], "weak": ["lightning"], "attack": {"stun_chance": 10}},
+	"Tidal Witch": {"int": 34, "res": 18, "weak": ["lightning"], "abilities": [
+		{"name": "Healing Tide", "kind": "heal_allies", "every": 2, "power": 60},
+		{"name": "Undertow", "kind": "magic_single", "chance": 35, "power": 30, "palette": "ice"},
+	]},
+	"Storm Gull": {"attack": {"hits": 2}},
+	# The Drowned Fortress's guard and boss (25d)
+	"First Mate": {"int": 36, "res": 16, "weak": ["earth"], "attack": {"hits": 1, "hits_max": 2}, "abilities": [
+		{"name": "Call the Storm", "kind": "magic_all", "every": 4, "power": 30, "palette": "lightning"},
+	]},
+	"Drowned Admiral": {"int": 48, "res": 20, "weak": ["earth"], "abilities": [
+		# Phase 1: lightning with a chance to paralyze
+		{"name": "Thunderclap", "kind": "magic_single", "chance": 50, "max_phase": 0, "power": 46, "stun_chance": 30, "palette": "lightning"},
+		# Phase 2: Sea Specters, and a storm aura striking everyone every round
+		{"name": "Raise the Drowned", "kind": "summon", "chance": 100, "phase": 1, "max_phase": 1,
+			"tell": "raises his cutlass - Sea Specters rise from the flooded deck!",
+			"enemies": [
+				{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8, "agi": 16, "xp": 0},
+				{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8, "agi": 16, "xp": 0},
+			]},
+		{"name": "Storm Aura", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 28, "palette": "lightning"},
+		# Phase 3: a massive strike charged over two rounds - Defend or Sanctuary
+		{"name": "Maelstrom Bolt", "kind": "charge_all", "every": 2, "phase": 2, "power": 110,
+			"tell": "lifts his cutlass to the sky - the storm gathers around him! (Defend!)"},
+		{"name": "Thunderclap", "kind": "magic_single", "chance": 60, "phase": 2, "power": 50, "stun_chance": 30, "palette": "lightning"},
+	]},
+	# The Sunken Sanctum's guard and boss (25c)
+	"Blazing Sentinel": {"int": 36, "res": 16, "weak": ["ice"], "attack": {"burn_chance": 30, "burn_power": 8}, "abilities": [
+		{"name": "Wildfire", "kind": "burn_all", "every": 3, "power": 22, "rounds": 3, "burn_power": 9},
+		{"name": "Molten Strike", "kind": "charge", "every": 4, "mult": 2.0, "tell": "glows white-hot..."},
+	]},
+	"Burning Tyrant": {"int": 46, "res": 18, "weak": ["ice"], "aura": ["ice", "lightning"],
+		"attack": {"burn_chance": 30, "burn_power": 9}, "abilities": [
+		# Phase 1: fire spells and burning blows
+		{"name": "Flame Lash", "kind": "magic_single", "chance": 40, "max_phase": 0, "power": 44, "palette": "fire"},
+		# Phase 2: the arena itself burns - everyone takes fire every round
+		{"name": "Arena Ablaze", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 26, "palette": "fire"},
+		# Phase 3: ice and lightning, switching every cast - keep up
+		{"name": "Tempest", "kind": "aura_storm", "every": 3, "phase": 2, "power": 30},
+		{"name": "Void Bolt", "kind": "aura_bolt", "every": 1, "phase": 2, "power": 50},
+	]},
+	# The Frozen Citadel's guard and boss (25b)
+	"Frost Warden": {"int": 30, "res": 14, "weak": ["fire"], "abilities": [
+		{"name": "Frostbind", "kind": "freeze", "every": 3, "power": 26},
+		{"name": "Shatter Strike", "kind": "charge", "every": 4, "mult": 2.0, "tell": "drives its blade into the ice..."},
+	]},
+	"Ice Knight": {"res": 8, "weak": ["fire"]},
+	"Frozen Sovereign": {"int": 40, "res": 16, "weak": ["fire", "holy"], "abilities": [
+		# Phase 1: ice and steel, freezing one hero at a time
+		{"name": "Frostbind", "kind": "freeze", "every": 3, "max_phase": 0, "power": 30},
+		{"name": "Glacial Edge", "kind": "magic_single", "chance": 35, "max_phase": 0, "power": 40, "palette": "ice"},
+		# Phase 2: two ice knights, and a blizzard every round
+		{"name": "Call the Guard", "kind": "summon", "chance": 100, "phase": 1, "max_phase": 1,
+			"tell": "raises its sword - two Ice Knights crack free of the walls!",
+			"enemies": [
+				{"name": "Ice Knight", "hp": 150, "atk": 46, "def": 20, "agi": 6, "xp": 0},
+				{"name": "Ice Knight", "hp": 150, "atk": 46, "def": 20, "agi": 6, "xp": 0},
+			]},
+		{"name": "Blizzard", "kind": "magic_all", "every": 1, "phase": 1, "max_phase": 1, "power": 26, "palette": "ice"},
+		# Phase 3: swallows its knights for power, then berserk ice-and-steel
+		{"name": "Frozen Communion", "kind": "absorb", "every": 1, "phase": 2, "power": 6},
+		{"name": "Frozen Fury", "kind": "charge", "every": 2, "phase": 2, "mult": 2.2, "tell": "glows white-hot with cold..."},
+		{"name": "Glacial Edge", "kind": "magic_single", "chance": 45, "phase": 2, "power": 46, "palette": "ice"},
+	]},
 	# The Cathedral
 	"Fallen Priest": {"int": 12, "res": 10, "abilities": [
 		{"name": "Dark Litany", "kind": "party_def_down", "chance": 45, "power": 4, "rounds": 2},
@@ -268,10 +400,132 @@ const GUILD_ENCOUNTERS: Array = [
 	 {"name": "Hired Muscle",       "hp": 110, "atk": 36, "def": 12, "agi": 4,  "xp": 60}],
 ]
 
+# The Blighted Maw's guard (28b): an Architect's Thrall on floor 4's stairs.
+const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 1600, "atk": 76, "def": 26, "agi": 16, "xp": 3500,
+		"tell": "narrate Something tall and wrong unfolds from the dark at the foot of the stairs. It has the Architect's mark burned into its chest."}
+
+# The Drowned Fortress's mid-dungeon guard (25d; the doc's Admiral's First
+# Mate): very high AGI - often acts before Silas - and a party-wide storm.
+const FIRST_MATE := {"name": "First Mate", "hp": 1150, "atk": 60, "def": 20, "agi": 40, "xp": 1600,
+		"tell": "say First Mate: The Admiral's orders - none get past this deck alive!"}
+
+# The Sunken Sanctum's mid-dungeon guard (25c; the doc's Blazing Sentinel):
+# burns the whole party every third turn.
+const BLAZING_SENTINEL := {"name": "Blazing Sentinel", "hp": 950, "atk": 56, "def": 20, "agi": 10, "xp": 1200,
+		"tell": "narrate A warrior wreathed in living flame rises from the stairs!"}
+
+# The Frozen Citadel's mid-dungeon guard (25b; the doc's Frost Warden): it
+# stands on its floor's stairs (Dungeon.gd); "tell" is for the map,
+# Battle ignores it. Freezes one hero solid every third turn.
+const FROST_WARDEN := {"name": "Frost Warden", "hp": 700, "atk": 50, "def": 20, "agi": 10, "xp": 900,
+		"tell": "narrate An armored knight sheathed in ice turns from the stairs, blade raised!"}
+
 # A mimic (23b) - only in rescue dungeons, so there's always a party.
 const MIMIC := {"name": "Mimic", "hp": 170, "atk": 32, "def": 12, "agi": 9, "xp": 120}
 
 # Location -> table. "cathedral_escape" is the Cathedral as a starting dungeon.
+# The Northern Tundra (25b): the doc's four, for four heroes around level 7-9
+# (groups are capped at one more than the party, max 3).
+const TUNDRA_ENCOUNTERS: Array = [
+	[{"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65}],
+	[{"name": "Corrupted Knight", "hp": 170, "atk": 46, "def": 26, "agi": 6,  "xp": 85},
+	 {"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70}],
+	[{"name": "Tundra Troll",     "hp": 230, "atk": 52, "def": 12, "agi": 5,  "xp": 95},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65}],
+	[{"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65},
+	 {"name": "Blizzard Hawk",    "hp": 90,  "atk": 42, "def": 6,  "agi": 26, "xp": 65},
+	 {"name": "Frost Wraith",     "hp": 110, "atk": 40, "def": 6,  "agi": 14, "xp": 70}],
+	[{"name": "Tundra Troll",     "hp": 230, "atk": 52, "def": 12, "agi": 5,  "xp": 95}],
+]
+# The Frozen Citadel (25b): the knights and wraiths hold the fortress, the
+# trolls guard its gates; a little heavier than the open tundra.
+const CITADEL_ENCOUNTERS: Array = [
+	[{"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90},
+	 {"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90}],
+	[{"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75},
+	 {"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75},
+	 {"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90}],
+	[{"name": "Tundra Troll",     "hp": 240, "atk": 54, "def": 12, "agi": 5,  "xp": 100},
+	 {"name": "Frost Wraith",     "hp": 120, "atk": 42, "def": 6,  "agi": 14, "xp": 75}],
+	[{"name": "Corrupted Knight", "hp": 180, "atk": 48, "def": 26, "agi": 6,  "xp": 90},
+	 {"name": "Blizzard Hawk",    "hp": 95,  "atk": 44, "def": 6,  "agi": 26, "xp": 70}],
+]
+
+# The Duskara Wastes and the Sunken Sanctum (25c): four heroes around level 9-11.
+const DESERT_ENCOUNTERS: Array = [
+	[{"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Dust Golem",    "hp": 260, "atk": 54, "def": 22, "agi": 4,  "xp": 110},
+	 {"name": "Scorched Mage", "hp": 130, "atk": 40, "def": 8,  "agi": 12, "xp": 95}],
+	[{"name": "Dune Marauder", "hp": 170, "atk": 50, "def": 14, "agi": 18, "xp": 95},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Scorched Mage", "hp": 130, "atk": 40, "def": 8,  "agi": 12, "xp": 95},
+	 {"name": "Dune Marauder", "hp": 170, "atk": 50, "def": 14, "agi": 18, "xp": 95},
+	 {"name": "Sand Viper",    "hp": 120, "atk": 48, "def": 8,  "agi": 24, "xp": 85}],
+	[{"name": "Dust Golem",    "hp": 260, "atk": 54, "def": 22, "agi": 4,  "xp": 110}],
+]
+const SANCTUM_ENCOUNTERS: Array = [
+	[{"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100}],
+	[{"name": "Dust Golem",    "hp": 270, "atk": 56, "def": 22, "agi": 4,  "xp": 115},
+	 {"name": "Sand Viper",    "hp": 125, "atk": 50, "def": 8,  "agi": 24, "xp": 90}],
+	[{"name": "Dust Golem",    "hp": 270, "atk": 56, "def": 22, "agi": 4,  "xp": 115},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100},
+	 {"name": "Sand Viper",    "hp": 125, "atk": 50, "def": 8,  "agi": 24, "xp": 90}],
+	[{"name": "Dune Marauder", "hp": 180, "atk": 52, "def": 14, "agi": 18, "xp": 100},
+	 {"name": "Scorched Mage", "hp": 140, "atk": 42, "def": 8,  "agi": 12, "xp": 100}],
+]
+
+# The Selavon Coast and the Drowned Fortress (25d): four heroes ~level 11-13.
+const COAST_ENCOUNTERS: Array = [
+	[{"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Coral Brute", "hp": 320, "atk": 60, "def": 26, "agi": 5,  "xp": 130},
+	 {"name": "Tidal Witch", "hp": 150, "atk": 42, "def": 10, "agi": 14, "xp": 115}],
+	[{"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8,  "agi": 16, "xp": 110},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Tidal Witch", "hp": 150, "atk": 42, "def": 10, "agi": 14, "xp": 115},
+	 {"name": "Sea Specter", "hp": 140, "atk": 44, "def": 8,  "agi": 16, "xp": 110},
+	 {"name": "Storm Gull",  "hp": 120, "atk": 50, "def": 8,  "agi": 28, "xp": 100}],
+	[{"name": "Coral Brute", "hp": 320, "atk": 60, "def": 26, "agi": 5,  "xp": 130}],
+]
+const FORTRESS_ENCOUNTERS: Array = [
+	[{"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115}],
+	[{"name": "Coral Brute", "hp": 330, "atk": 62, "def": 26, "agi": 5,  "xp": 135},
+	 {"name": "Tidal Witch", "hp": 160, "atk": 44, "def": 10, "agi": 14, "xp": 120}],
+	[{"name": "Coral Brute", "hp": 330, "atk": 62, "def": 26, "agi": 5,  "xp": 135},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115},
+	 {"name": "Tidal Witch", "hp": 160, "atk": 44, "def": 10, "agi": 14, "xp": 120}],
+	[{"name": "Storm Gull",  "hp": 125, "atk": 52, "def": 8,  "agi": 28, "xp": 105},
+	 {"name": "Sea Specter", "hp": 150, "atk": 46, "def": 8,  "agi": 16, "xp": 115}],
+]
+
+# The Blighted Reach (28a): four heroes around level 14-16.
+const REACH_ENCOUNTERS: Array = [
+	[{"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 240},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270}],
+	[{"name": "Null Sentinel",  "hp": 300, "atk": 64, "def": 28, "agi": 8,  "xp": 260},
+	 {"name": "Entropy Shade",  "hp": 180, "atk": 56, "def": 10, "agi": 22, "xp": 240}],
+	[{"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270},
+	 {"name": "Unraveled Soul", "hp": 240, "atk": 62, "def": 16, "agi": 18, "xp": 270}],
+	[{"name": "Architect's Thrall", "hp": 520, "atk": 70, "def": 24, "agi": 14, "xp": 480}],
+]
+
+# The Blighted Maw (28b): heavier than the Reach, four heroes ~level 16-21.
+const MAW_ENCOUNTERS: Array = [
+	[{"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 300},
+	 {"name": "Unraveled Soul", "hp": 270, "atk": 66, "def": 16, "agi": 18, "xp": 300},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 270}],
+	[{"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 290},
+	 {"name": "Null Sentinel",  "hp": 340, "atk": 68, "def": 28, "agi": 8,  "xp": 290}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510},
+	 {"name": "Entropy Shade",  "hp": 200, "atk": 60, "def": 10, "agi": 22, "xp": 270}],
+	[{"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510},
+	 {"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510}],
+]
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -282,10 +536,46 @@ const ENCOUNTER_TABLES: Dictionary = {
 	"observatory_escape": OBSERVATORY_ESCAPE_ENCOUNTERS,
 	"guild": GUILD_ENCOUNTERS,
 	"guild_escape": GUILD_ESCAPE_ENCOUNTERS,
+	"tundra": TUNDRA_ENCOUNTERS,
+	"frozen_citadel": CITADEL_ENCOUNTERS,
+	"desert": DESERT_ENCOUNTERS,
+	"sunken_sanctum": SANCTUM_ENCOUNTERS,
+	"coast": COAST_ENCOUNTERS,
+	"reach": REACH_ENCOUNTERS,
+	"blighted_maw": MAW_ENCOUNTERS,
+	"drowned_fortress": FORTRESS_ENCOUNTERS,
 }
 
 # Bosses by id. The escape warden is tuned for a lone hero around level 2-3.
 const BOSSES := {
+	# Nordveil's boss (25b; README "Act II Kingdom Bosses"): three phases at
+	# 66% / 33% HP - freezing steel, then two Ice Knights and a blizzard every
+	# round, then it swallows the knights and goes berserk. Tuned for four
+	# heroes around level 8-9.
+	# Duskara's boss (25c; README "Act II Kingdom Bosses"): phases at 66% /
+	# 33% - fire and burning blows, then the arena burns every round, then
+	# rapid ice and lightning. Tuned for four heroes around level 10-11.
+	# Selavon's boss (25d): phases at 66% / 33% - paralyzing lightning, then
+	# Sea Specters and a storm every round, then a strike charged over two
+	# rounds that only Defend or Sanctuary softens. Four heroes ~level 12-13.
+	# The final boss (28c): phases at 66% / 33%. Tuned for four heroes around
+	# level 21-23 with Act III gear, plus Frank in phase 3.
+	"vorath": {
+		"name": "Vorath", "hp": 9000, "atk": 95, "def": 30, "agi": 16, "xp": 0,
+		"phase_hp_thresholds": [0.7, 0.4],  # playtest pass: phase 3 long enough for the Final Unraveling race
+	},
+	"drowned_admiral": {
+		"name": "Drowned Admiral", "hp": 2600, "atk": 62, "def": 20, "agi": 13, "xp": 4200,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
+	"burning_tyrant": {
+		"name": "Burning Tyrant", "hp": 2000, "atk": 58, "def": 18, "agi": 11, "xp": 3200,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
+	"frozen_sovereign": {
+		"name": "Frozen Sovereign", "hp": 1500, "atk": 54, "def": 18, "agi": 9, "xp": 2400,
+		"phase_hp_thresholds": [0.66, 0.33],
+	},
 	"hollow_warden": {
 		"name": "Hollow Warden", "hp": 120, "atk": 26, "def": 6, "agi": 3, "xp": 150,
 		"phase_hp_thresholds": [0.5],
@@ -329,6 +619,7 @@ const BOSSES := {
 # "cursed_paladin", "scale": 2, "tint": Color(...)}. Empty since every Act I
 # enemy got real art in Milestone 21; Act II's new enemies can use it until
 # their own art pass.
+# Enemies without their own art yet borrow another's (Battle.gd, Dungeon.gd).
 const STAND_INS := {}
 
 

@@ -13,6 +13,13 @@ const WIDTH := 292.0
 
 var _was_paused := false
 var _opened_frame := 0
+# Scrolling (playtest pass, 2026-10-24): by Act III the log outgrows its
+# window, so the list sits in a clipped box and Up/Down move it a line at a time.
+const VIEW_H := 148.0
+const LINE := 10.0
+var _list: VBoxContainer
+var _scroll := 0.0
+var _hint := ScrollHint.new()
 
 
 static func open(from: Node) -> QuestLog:
@@ -42,11 +49,19 @@ func _ready() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
+	var clip := Control.new()
+	clip.position = Vector2(14, 20)
+	clip.size = Vector2(WIDTH, VIEW_H)
+	clip.clip_contents = true
+	add_child(clip)
 	var list := VBoxContainer.new()
-	list.position = Vector2(14, 20)
-	list.size = Vector2(WIDTH, 148)
+	list.size = Vector2(WIDTH, VIEW_H)
 	list.add_theme_constant_override("separation", 3)
-	add_child(list)
+	clip.add_child(list)
+	_list = list
+	_hint.position = Vector2(306, 20)
+	_hint.height = VIEW_H - 3
+	add_child(_hint)
 
 	var entries := Quests.log_entries()
 	var done: Array = []
@@ -57,7 +72,7 @@ func _ready() -> void:
 		list.add_child(_label(e["name"], GOLD))
 		list.add_child(_wrapped("  " + e["text"], Color.WHITE))
 	if entries.filter(func(e: Dictionary) -> bool: return not e["done"]).is_empty():
-		list.add_child(_wrapped("No quest in hand. Folk in Verdance and Edenmere may need a hand - talk to them.", GREY))
+		list.add_child(_wrapped("No quest in hand. Townsfolk with a gold ! over their heads may need a hand.", GREY))
 	if not done.is_empty():
 		list.add_child(_wrapped("Done: " + ", ".join(done), GREY))
 	if not GameManager.key_items.is_empty():
@@ -78,10 +93,24 @@ func _wrapped(text: String, color: Color) -> Label:
 	return label
 
 
+func _max_scroll() -> float:
+	return maxf(0.0, _list.get_combined_minimum_size().y - VIEW_H)
+
+
 func _process(_delta: float) -> void:
+	_hint.more_above = _scroll > 0.0
+	_hint.more_below = _scroll < _max_scroll()
 	# The press that opened the log is still "just pressed" this frame.
 	if Engine.get_process_frames() == _opened_frame:
 		return
+	var step := 0.0
+	if UiInput.nav(&"down"):
+		step = LINE
+	elif UiInput.nav(&"up"):
+		step = -LINE
+	if step != 0.0:
+		_scroll = clampf(_scroll + step, 0.0, _max_scroll())
+		_list.position.y = -_scroll
 	for action in [&"cancel", &"confirm", &"pause"]:
 		if Input.is_action_just_pressed(action):
 			Sfx.play("menu_cancel")

@@ -18,6 +18,71 @@ extends RefCounted
 # Lines are cutscene commands (say / narrate / sound).
 
 const QUESTS := {
+	# ------------------------------------------------------ story quests
+	# (2026-10-28, Cory: once a dungeon opens, a quest to go and free it, so
+	# the next step is always in the log.) Started by the key quest's "next";
+	# nobody offers them (giver ""); a "clear" step is done once that dungeon's
+	# captive is rescued (Act I) or its kingdom is freed (Act II/III).
+	"free_vael": {"name": "Free Vael", "dungeon": "cathedral", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Cathedral, defeat the Fallen Guardian and free Vael.", "clear": "cathedral"}]},
+	"free_ryn": {"name": "Free Ryn", "dungeon": "monastery", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Monastery, defeat the Corrupted Grandmaster and free Ryn.", "clear": "monastery"}]},
+	"free_lyra": {"name": "Free Lyra", "dungeon": "observatory", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Observatory, defeat the Void Archmage and free Lyra.", "clear": "observatory"}]},
+	"free_silas": {"name": "Free Silas", "dungeon": "guild", "part": 3, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Enter the Underground Guild, defeat the Shadow Lord and free Silas.", "clear": "guild"}]},
+	"free_nordveil": {"name": "Free Nordveil", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Climb the Frozen Citadel up the mountain road and defeat the Frozen Sovereign.", "clear": "frozen_citadel"}]},
+	"free_duskara": {"name": "Free Duskara", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Descend into the Sunken Sanctum and defeat the Burning Tyrant.", "clear": "sunken_sanctum"}]},
+	"free_selavon": {"name": "Free Selavon", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Cross to the Drowned Fortress at low tide and defeat the Drowned Admiral.", "clear": "drowned_fortress"}]},
+	"the_architect": {"name": "The Architect", "dungeon": "blighted_maw", "kingdom": "maw", "part": 9, "giver": "", "xp": 0, "gold": 0,
+		"steps": [{"log": "Open the portal in the Reach, descend the Blighted Maw and defeat Vorath.", "clear": "blighted_maw"}]},
+
+	# ------------------------------------------------------- road quests
+	# (2026-10-29, Cory: once a town's quests are done, a quest - from Frank -
+	# to go and find the next town, so you know where to go.) "road" is the
+	# kingdom whose road it is ("" = Act I's Edenmere, offered once Verdance
+	# has nothing left for you); giver "*/frank" is Frank at any stall. The
+	# "reach" step is done on walking into that town (Town._road_arrival).
+	"road_edenmere": {"name": "The Road to Edenmere", "road": "", "dungeon": "", "part": 0, "giver": "verdance/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Looks like Verdance has nothing more for you, friend. Folk here are sorted, thanks to you.",
+			"say Frank: Try Edenmere - follow the road south-east through the forest. Bigger town, more people, more trouble that needs fixing.",
+		],
+		"remind": [],
+		"steps": [{"log": "Follow the road south-east through the forest to the town of Edenmere.", "reach": "edenmere"}]},
+	"road_nordveil": {"name": "The Road to Nordveil", "road": "nordveil", "dungeon": "", "part": 0, "giver": "*/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: All four of you together at last. Now the real work starts.",
+			"say Frank: The kingdoms past the forest have gone quiet. Nordveil first - take the mountain pass at the north edge of the forest, up into the Tundra.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the mountain pass at the forest's north edge and find the town of Nordveil in the Northern Tundra.", "reach": "nordveil"}]},
+	"road_duskara": {"name": "The Road to Duskara", "road": "duskara", "dungeon": "", "part": 0, "giver": "nordveil/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Nordveil's breathing again. You did that.",
+			"say Frank: Word is the sandstorm on the forest's west road has dropped. Duskara's out past it, in the Wastes - and it needs you as badly as this place did.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the west road out of the Forest Heartlands and find the town of Duskara in the Wastes.", "reach": "duskara"}]},
+	"road_selavon": {"name": "The Road to Selavon", "road": "selavon", "dungeon": "", "part": 0, "giver": "duskara/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Cool wind in Duskara. Never thought I'd see it.",
+			"say Frank: The storm surf on the forest's east road is going down. Selavon's at the end of it, on the coast. Last of the three.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the east road out of the Forest Heartlands and find the town of Selavon on the coast.", "reach": "selavon"}]},
+	"road_threshold": {"name": "The Road to the Threshold", "road": "maw", "dungeon": "", "part": 0, "giver": "selavon/frank", "xp": 0, "gold": 0,
+		"offer": [
+			"say Frank: Three kingdoms free. Now there's only the one who did this to them.",
+			"say Frank: The grey fog south of the forest is thinning. Take the road below the Underground Guild into the Blighted Reach - there's a camp at its edge, the Threshold.",
+			"say Frank: I'll go on ahead and meet you there.",
+		],
+		"remind": [],
+		"steps": [{"log": "Take the south road below the Underground Guild into the Blighted Reach and find the Threshold.", "reach": "threshold"}]},
+
 	# ---------------------------------------------------------- The Cathedral
 	"grey_field": {
 		"name": "Grey Field", "dungeon": "cathedral", "part": 1, "giver": "verdance/farmer",
@@ -50,7 +115,7 @@ const QUESTS := {
 				"say Mayor: If you mean to go up there... take it. And may the light go with you.",
 			]},
 		],
-		"key": "Cathedral Key",
+		"key": "Cathedral Key", "next": "free_vael",
 	},
 	# ---------------------------------------------------------- The Monastery
 	"closed_gate": {
@@ -80,7 +145,7 @@ const QUESTS := {
 				"say Priestess: There. Show this at the pilgrim gate. The monks - whoever is left - will know it.",
 			]},
 		],
-		"key": "Pilgrim's Token",
+		"key": "Pilgrim's Token", "next": "free_ryn",
 	},
 	# -------------------------------------------------------- The Observatory
 	"lost_cart": {
@@ -112,7 +177,7 @@ const QUESTS := {
 				"say Innkeeper: He sent me this chart before the roads closed. The stars on it open the dome door. Bring him home if you can.",
 			]},
 		],
-		"key": "Star Chart",
+		"key": "Star Chart", "next": "free_lyra",
 	},
 	# ------------------------------------------------- The Underground Guild
 	"pickpocket": {
@@ -142,7 +207,266 @@ const QUESTS := {
 				"say Farmer: I left that life behind. But if it gets those tunnels cleaned out - lean close. The word is \"lantern in the dark.\"",
 			]},
 		],
-		"key": "Guild Password",
+		"key": "Guild Password", "next": "free_silas",
+	},
+	# ======================================================= Act II (Milestone 26)
+	# Per kingdom (Cory, 2026-10-18): one required quest that seals its
+	# dungeon until done (the second step hands over the key), and two
+	# optional ones once it's free - XP, gold and potions, and the second
+	# grants the kingdom's blessing (a permanent party-wide stat boost).
+	# "kingdom" marks an Act II quest; "optional" ones need the kingdom freed.
+	# Optional quests (and their hunts) give half the XP of the main path's
+	# (2026-10-29, Cory: doing everything, the party met Vorath at level 28).
+	"frozen_gate": {
+		"name": "The Frozen Gate", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 1, "giver": "nordveil/captain",
+		"offer": [
+			"say Captain: Before you climb - the Citadel's gate is sealed under a wall of black ice. Steel won't scratch it.",
+			"say Captain: My last scout carried an Ember Seal, a relic that melts any ice it touches. He fell on the mountain road. His pack must still be up there.",
+		],
+		"remind": ["say Captain: The scout's pack - up the mountain road, north of the crossroads. Bring me the Ember Seal."],
+		"steps": [
+			{"log": "Find the fallen scout's pack on the mountain road north of the crossroads.", "fetch": "scout_pack"},
+			{"log": "Bring the scout's pack to Nordveil's captain.", "talk": "nordveil/captain", "lines": [
+				"say Captain: His pack... and the Ember Seal, still warm. He'd have wanted it used. Take it to the gate.",
+			]},
+		],
+		"key": "Ember Seal", "next": "free_nordveil", "xp": 500, "gold": 300,
+	},
+	"lost_axe": {
+		"name": "The Lost Axe", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 2, "optional": true, "giver": "nordveil/woodcutter",
+		"offer": ["say Woodcutter: When the cold broke I went straight back to my old cutting grove... and dropped my grandfather's axe in a drift. West of the river crossing. Would you?"],
+		"remind": ["say Woodcutter: My axe - in the snow west of the crossing, by the river."],
+		"steps": [
+			{"log": "Find the woodcutter's axe in the snow west of the river crossing.", "fetch": "woodcutter_axe"},
+			{"log": "Return the axe to Nordveil's woodcutter.", "talk": "nordveil/woodcutter", "lines": ["say Woodcutter: That's the one! Three generations of Nordveil firewood in that handle. Thank you."]},
+		],
+		"xp": 300, "gold": 300, "items": {"Hi-Potion": 3},
+	},
+	"white_wolf": {
+		"name": "The White Wolf", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 3, "optional": true, "giver": "nordveil/huntress",
+		"offer": [
+			"say Huntress: There's a white wolf in the southern basin - Snowmane, we call him. The Sovereign's cold made him huge and cruel, and it didn't wear off.",
+			"say Huntress: Bring him down and Nordveil will remember it. The old ones say the land blesses those who protect it.",
+		],
+		"remind": ["say Huntress: Snowmane hunts the southern basin, west of the road."],
+		"steps": [
+			{"log": "Hunt Snowmane in the Tundra's southern basin.", "hunt": "snowmane"},
+			{"log": "Tell Nordveil's huntress Snowmane is dead.", "talk": "nordveil/huntress", "lines": ["say Huntress: Snowmane, gone... The tundra feels lighter already. Stand still a moment - can you feel it?"]},
+		],
+		"xp": 400, "gold": 400, "blessing": "nordveil",
+	},
+	"sun_disc": {
+		"name": "The Sun Disc", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 1, "giver": "duskara/keeper",
+		"offer": [
+			"say Water-Keeper: The Sanctum's great doors open only to the Sun Disc. It was ours to keep - until a marauder chief snatched it from the shrine.",
+			"say Water-Keeper: He camps south of the road, east of the Sanctum path. Take it back from him.",
+		],
+		"remind": ["say Water-Keeper: The marauder chief camps south of the road. Get the Sun Disc back."],
+		"steps": [
+			{"log": "Take the Sun Disc back from the marauder chief, south of the desert road.", "hunt": "marauder_chief"},
+			{"log": "Bring the Sun Disc to Duskara's water-keeper.", "talk": "duskara/keeper", "lines": ["say Water-Keeper: The Sun Disc, home again. Hold it up to the Sanctum's doors - they will know it."]},
+		],
+		"key": "Sun Disc", "next": "free_duskara", "xp": 700, "gold": 400,
+	},
+	"dye_root": {
+		"name": "Dye-Root", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 2, "optional": true, "giver": "duskara/weaver",
+		"offer": ["say Weaver: My looms are back, but no color to weave with. Crimson dye-root grows in the far west of the wastes, past the crossroads. Could you dig me some?"],
+		"remind": ["say Weaver: Dye-root - the far west of the wastes, along the road."],
+		"steps": [
+			{"log": "Dig up dye-root in the far west of the Duskara Wastes.", "fetch": "dye_root"},
+			{"log": "Bring the dye-root to Duskara's weaver.", "talk": "duskara/weaver", "lines": ["say Weaver: Oh, it's perfect - deep as a sunset. The first new cloth in Duskara will be crimson."]},
+		],
+		"xp": 350, "gold": 350, "items": {"Hi-Ether": 2},
+	},
+	"dune_stalker": {
+		"name": "The Dune Stalker", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 3, "optional": true, "giver": "duskara/guard",
+		"offer": ["say Guard: Something big still prowls the south-western dunes by the Sanctum. A golem the Tyrant left behind, they say - it smashes caravans for no reason at all."],
+		"remind": ["say Guard: The Dune Stalker - south-western dunes, near the Sanctum."],
+		"steps": [
+			{"log": "Destroy the Dune Stalker in the south-western dunes.", "hunt": "dune_stalker"},
+			{"log": "Tell Duskara's guard the Dune Stalker is gone.", "talk": "duskara/guard", "lines": ["say Guard: The caravans can run again. Hold on - the sand around you just glittered. The desert's thanking you."]},
+		],
+		"xp": 450, "gold": 450, "blessing": "duskara",
+	},
+	"tide_chart": {
+		"name": "The Tide Chart", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 1, "giver": "selavon/harbormaster",
+		"offer": [
+			"say Harbormaster: The pier's end is choked with wreckage and breakers - no way onto the island without the old tide chart, which shows when the channel opens.",
+			"say Harbormaster: It went down with a fishing boat that washed up on the beach south of the coast road. Search the wreck.",
+		],
+		"remind": ["say Harbormaster: The tide chart - in the wrecked boat on the beach south of the road."],
+		"steps": [
+			{"log": "Find the tide chart in the wrecked boat south of the coast road.", "fetch": "tide_chart"},
+			{"log": "Bring the tide chart to Selavon's harbormaster.", "talk": "selavon/harbormaster", "lines": ["say Harbormaster: Soaked, but readable. There - the channel opens at low tide. Go when the water draws back."]},
+		],
+		"key": "Tide Chart", "next": "free_selavon", "xp": 900, "gold": 500,
+	},
+	"sailors_compass": {
+		"name": "The Sailor's Compass", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 2, "optional": true, "giver": "selavon/sailor",
+		"offer": ["say Sailor: First clear sky in a month and I can't steer by it - lost my compass in the storm, washed up somewhere along the western shore. Find it for me?"],
+		"remind": ["say Sailor: My compass - the western shore of the coast, by the road."],
+		"steps": [
+			{"log": "Find the sailor's compass on the coast's western shore.", "fetch": "compass"},
+			{"log": "Return the compass to Selavon's sailor.", "talk": "selavon/sailor", "lines": ["say Sailor: Still points true! I'll be out past the reef by morning. Here - for your trouble."]},
+		],
+		"xp": 400, "gold": 400, "items": {"Elixir": 3},
+	},
+	# ======================================================= Act III (28a)
+	# The portal key (Cory, 2026-10-18): three required quests in order that
+	# assemble the key into the Blighted Maw - the frame, the core, the
+	# binding (Frank binds it, a hint at who he is).
+	"the_frame": {
+		"name": "The Frame", "dungeon": "blighted_maw", "kingdom": "maw", "part": 1, "giver": "threshold/keeper",
+		"offer": [
+			"say Keeper: The portal key was a ring of three parts: a frame, a core, and the binding that made them one. When the portal was sealed, the parts were scattered.",
+			"say Keeper: The frame lies in the ruined shrine west of the road. Something the Unraveling made guards it - a custodian of the old seal. It will not give the frame up gently.",
+		],
+		"remind": ["say Keeper: The ruined shrine - west across the plain, past the chasm."],
+		"steps": [
+			{"log": "Take the key's frame from the Hollow Custodian at the ruined shrine, west of the road.", "hunt": "hollow_custodian"},
+			{"log": "Bring the frame to the keeper of the Threshold.", "talk": "threshold/keeper", "lines": [
+				"say Keeper: The frame... cold as the void, and still humming. Look - it turns in your hand. It's pointing north. Toward the core.",
+			]},
+		],
+		"xp": 1500, "gold": 800,
+	},
+	"the_core": {
+		"name": "The Core", "dungeon": "blighted_maw", "kingdom": "maw", "part": 2, "giver": "threshold/keeper",
+		"offer": [
+			"say Keeper: The core is a shard of pure light, left behind by the four pure souls of an older age. One of them was Vorath, before he fell.",
+			"say Keeper: The frame points north - to Nordveil. Their shrine has burned for ages. If anyone kept the shard, it was them. Ask their priestess.",
+		],
+		"remind": ["say Keeper: The core - Nordveil's priestess. The frame points to her."],
+		"steps": [
+			{"log": "Ask Nordveil's priestess about the shard of pure light.", "talk": "nordveil/priestess", "lines": [
+				"say Priestess: The shard... yes. It sat at the heart of our shrine's flame for longer than Nordveil has had a name. I always wondered what it was waiting for.",
+				"say Priestess: Take it. When the Sovereign came, it was the one thing the cold could never touch.",
+			]},
+			{"log": "Bring the core to the keeper of the Threshold.", "talk": "threshold/keeper", "lines": [
+				"say Keeper: Frame and core. They won't join - I can't make them. The binding was never a thing you could find. It was a someone.",
+				"say Keeper: Your merchant friend. Ask him. I have a feeling he's done this before.",
+			]},
+		],
+		"xp": 1800, "gold": 1000,
+	},
+	"the_binding": {
+		"name": "The Binding", "dungeon": "blighted_maw", "kingdom": "maw", "part": 3, "giver": "threshold/keeper",
+		"offer": ["say Keeper: Go on. Take them to Frank."],
+		"remind": ["say Keeper: Frank. His stall's in the square."],
+		"steps": [
+			{"log": "Ask Frank to bind the frame and the core.", "talk": "threshold/frank", "lines": [
+				"say Frank: ...Ah. The keeper sent you. Of course she did.",
+				"say Frank: Hold them out. Both hands. And don't ask me how I know the words.",
+				"narrate Frank lays a hand over the frame and the core and says something under his breath, in a language none of you know. Light pours between his fingers.",
+				"say Frank: There. One key. It hasn't been whole since the last time someone was foolish enough to go down there.",
+				"say Frank: ...Last time? Did I say that? Long day. Go on, you'll want to rest before the Maw.",
+			]},
+		],
+		"key": "Portal Key", "next": "the_architect", "xp": 2000, "gold": 1200,
+	},
+	# ======================================================= Act III (29)
+	# "Last preparations" (README roadmap): optional, offered as soon as the
+	# Reach is open ("anytime": before or after Vorath). One errand per hero
+	# from the Threshold's refugees - each ends with that hero's best
+	# accessory and a permanent stat boost for them - and one from Verdance's
+	# archivist that follows Frank back through the ages.
+	"paladins_oath": {
+		"name": "A Paladin's Oath", "dungeon": "blighted_maw", "kingdom": "maw", "part": 4, "optional": true, "anytime": true, "giver": "threshold/northerner",
+		"offer": [
+			"say Northerner: There was a knight of Nordveil, Ser Aldric. He rode into the Reach a year ago, sworn to find the portal and seal it for good.",
+			"say Northerner: Travelers say a knight in black armor walks the east plain now, past the road. It wears his crest. Please - if it's him, give him rest.",
+		],
+		"remind": ["say Northerner: The knight in black - the east plain, beyond the road."],
+		"steps": [
+			{"log": "Find the black knight on the Reach's east plain.", "hunt": "oathbreaker"},
+			{"log": "Bring Ser Aldric's crest to the Threshold's northerner.", "talk": "threshold/northerner", "lines": [
+				"say Northerner: So it was him. The Unraveling took even Aldric...",
+				"say Northerner: He'd want his oath carried by someone who can still keep it. Vael - this was his. Kneel a moment. He taught us a prayer for this.",
+			]},
+		],
+		"xp": 800, "gold": 800, "items": {"Dawn Oath Medallion": 1}, "blessing": "vael_oath",
+	},
+	"last_lesson": {
+		"name": "The Last Lesson", "dungeon": "blighted_maw", "kingdom": "maw", "part": 5, "optional": true, "anytime": true, "giver": "threshold/nomad",
+		"offer": [
+			"say Nomad: An old monk came through before the portal was sealed. He meant to carry the Monastery's last scroll into the Reach and read it to the dark, to see if it would listen.",
+			"say Nomad: We found his staff by the chasm on the east plain. Not the scroll. If it's still there... your monk should have it.",
+		],
+		"remind": ["say Nomad: The scroll - by the chasm on the east plain."],
+		"steps": [
+			{"log": "Search the east chasm's edge for the monk's scroll.", "fetch": "monk_scroll"},
+			{"log": "Bring the scroll to the Threshold's nomad.", "talk": "threshold/nomad", "lines": [
+				"say Nomad: Open it? ...No. You're right. It's for Ryn.",
+				"narrate Ryn reads the scroll in silence. Whatever it says, Ryn stands a little straighter afterward.",
+			]},
+		],
+		"xp": 800, "gold": 800, "items": {"Grandmaster's Beads": 1}, "blessing": "ryn_lesson",
+	},
+	"fallen_star": {
+		"name": "The Fallen Star", "dungeon": "blighted_maw", "kingdom": "maw", "part": 6, "optional": true, "anytime": true, "giver": "threshold/sailor",
+		"offer": [
+			"say Sailor: The night the portal sealed, Selavon's watchmen saw a star fall into the Reach - west, by the chasm there.",
+			"say Sailor: Star-glass, they call what's left. Sorcerers once paid fortunes for a sliver. Your sorceress might do more with it than anyone.",
+		],
+		"remind": ["say Sailor: The fallen star - by the western chasm."],
+		"steps": [
+			{"log": "Find the fallen star by the Reach's western chasm.", "fetch": "star_glass"},
+			{"log": "Show the star-glass to the Threshold's sailor.", "talk": "threshold/sailor", "lines": [
+				"say Sailor: It's still glowing! Here, Lyra - the smith can set it, but you're the one who'll know what to do with it.",
+			]},
+		],
+		"xp": 800, "gold": 800, "items": {"Astral Lens": 1}, "blessing": "lyra_stars",
+	},
+	"one_last_job": {
+		"name": "One Last Job", "dungeon": "blighted_maw", "kingdom": "maw", "part": 7, "optional": true, "anytime": true, "giver": "threshold/child",
+		"offer": [
+			"say Child: A man in a grey hood took my mama's locket. He digs in the old graves south-west of here and takes things that aren't his.",
+			"say Child: Everyone says he's dangerous. But you're not scared of anything, right?",
+		],
+		"remind": ["say Child: The grey hood man - the old graves, south-west."],
+		"steps": [
+			{"log": "Get the locket back from the grave robber, south-west of the Threshold.", "hunt": "grave_robber"},
+			{"log": "Return the locket to the Threshold's child.", "talk": "threshold/child", "lines": [
+				"say Child: Mama's locket! You got it back!",
+				"say Child: Mama says you should have this - she found it in the ash. It's a lucky charm. Silas, it looks like yours.",
+			]},
+		],
+		"xp": 800, "gold": 800, "items": {"Ghoststep Charm": 1}, "blessing": "silas_job",
+	},
+	"merchant_of_ages": {
+		"name": "The Merchant of Every Age", "dungeon": "blighted_maw", "kingdom": "maw", "part": 8, "optional": true, "anytime": true, "giver": "verdance/archivist",
+		"offer": [
+			"say Archivist: I keep Selavon's sea archive - what the flood left of it. I've been reading the oldest chronicles, from ages back. Something strange keeps turning up.",
+			"say Archivist: In every age, when the darkness rose, a merchant appeared. A wide hat, a heavy pack, and far too much to say about prices.",
+			"say Archivist: Ask the old keepers of the kingdoms - Nordveil's priestess, Duskara's water-keeper. See what they remember.",
+		],
+		"remind": ["say Archivist: Nordveil's priestess, Duskara's water-keeper - see what they remember."],
+		"steps": [
+			{"log": "Ask Nordveil's priestess about a merchant in the old days.", "talk": "nordveil/priestess", "lines": [
+				"say Priestess: A merchant? ...Yes. The shrine's oldest carving shows the first priestess taking a flame from a man with a pack on his back. His hat is very wide.",
+				"say Priestess: We always thought the carver had a sense of humor.",
+			]},
+			{"log": "Ask Duskara's water-keeper about a merchant in the old days.", "talk": "duskara/keeper", "lines": [
+				"say Water-Keeper: The great drought, four hundred years ago. The songs say a stranger sold Duskara a map to the Sanctum spring - for one copper.",
+				"say Water-Keeper: He haggled for an hour to get that copper. The songs are very clear on that.",
+			]},
+			{"log": "Ask Frank about the merchant of every age.", "talk": "threshold/frank", "lines": [
+				"say Frank: The archivist's chronicles? Hmm. Wide hats come back into fashion every few centuries.",
+				"say Frank: ...You're looking at me like that again. Fine. Whoever he was, he never stopped hoping someone would finish the job.",
+				"say Frank: Here - take these. On the house. Don't tell anyone, it'd ruin my reputation.",
+			]},
+		],
+		"xp": 1000, "gold": 1000, "items": {"Elixir": 5}, "blessing": "ages",
+	},
+	"reef_horror": {
+		"name": "The Reef Horror", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 3, "optional": true, "giver": "selavon/fisher",
+		"offer": ["say Fisher: The fish are back, but so is something that eats them - a coral-crusted brute east of the pier road. Kill it and the bay is ours again."],
+		"remind": ["say Fisher: The Reef Horror - east of the pier road, on the shore."],
+		"steps": [
+			{"log": "Slay the Reef Horror east of the pier road.", "hunt": "reef_horror"},
+			{"log": "Tell Selavon's fisher the Reef Horror is dead.", "talk": "selavon/fisher", "lines": ["say Fisher: The bay's safe! Listen - the sea's humming. They say the tide blesses the ones who free it."]},
+		],
+		"xp": 500, "gold": 500, "blessing": "selavon",
 	},
 }
 
@@ -162,11 +486,50 @@ const HUNTS := {
 		"enemy": {"name": "Cutpurse", "hp": 120, "atk": 25, "def": 5, "agi": 22, "xp": 110},
 		"tell": "say Cutpurse: You again? Nobody's taking this box off me!",
 		"won": "narrate The cutpurse drops the strongbox and bolts into the trees."},
+	# Act II hunts (26): tuned for the whole party, so no party-size scaling.
+	"marauder_chief": {"cell": Vector2i(26, 25), "region": "desert", "scale": false,
+		"enemy": {"name": "Marauder Chief", "hp": 720, "atk": 56, "def": 16, "agi": 22, "xp": 700},
+		"tell": "say Marauder Chief: Come for the shiny disc? Come and take it, then!",
+		"won": "narrate The marauder chief drops the Sun Disc in the sand and flees into the dunes."},
+	"snowmane": {"cell": Vector2i(20, 36), "region": "tundra", "scale": false,
+		"enemy": {"name": "Snowmane", "hp": 820, "atk": 58, "def": 14, "agi": 26, "xp": 400},
+		"tell": "narrate A white wolf the size of a horse rises from the snow, eyes like cold coals!",
+		"won": "narrate Snowmane falls. The snow around him glitters, and the wind drops to a whisper."},
+	"dune_stalker": {"cell": Vector2i(20, 34), "region": "desert", "scale": false,
+		"enemy": {"name": "Dune Stalker", "hp": 1100, "atk": 64, "def": 24, "agi": 8, "xp": 500},
+		"tell": "narrate The dune heaves - a golem of fused sand and stone stands up out of it!",
+		"won": "narrate The Dune Stalker crumbles back into the desert it came from."},
+	"hollow_custodian": {"cell": Vector2i(8, 17), "region": "reach", "scale": false,
+		"enemy": {"name": "Hollow Custodian", "hp": 1600, "atk": 68, "def": 24, "agi": 14, "xp": 2600},
+		"tell": "narrate The shrine's broken statue turns its head. It was never a statue.",
+		"won": "narrate The Hollow Custodian crumbles to grey dust. In the rubble lies a ring of black metal, humming faintly: the frame."},
+	"reef_horror": {"cell": Vector2i(36, 28), "region": "coast", "scale": false,
+		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 600},
+		"tell": "narrate Coral and barnacles shift on the shore - the Reef Horror lurches toward you!",
+		"won": "narrate The Reef Horror collapses into a heap of coral, and the waves wash it away."},
+	# Act III side-quest hunts (29)
+	"oathbreaker": {"cell": Vector2i(40, 13), "region": "reach", "scale": false,
+		"enemy": {"name": "Oathbreaker", "hp": 2000, "atk": 74, "def": 28, "agi": 14, "xp": 900},
+		"tell": "say Oathbreaker: ...I swore... to close it... I swore...",
+		"won": "narrate The black armor falls empty. A Nordveil crest, scratched but whole, lies in the ash."},
+	"grave_robber": {"cell": Vector2i(10, 25), "region": "reach", "scale": false,
+		"enemy": {"name": "Grave Robber", "hp": 1700, "atk": 70, "def": 20, "agi": 32, "xp": 800},
+		"tell": "say Grave Robber: More visitors for the graves? Turn out your pockets.",
+		"won": "narrate The grave robber flees into the ash, dropping a sack of stolen trinkets. A small silver locket is among them."},
 }
 
 const FETCHES := {
 	"silverleaf": {"cell": Vector2i(54, 4),
 		"text": "narrate Silver-veined leaves, cool to the touch. You gather a good handful."},
+	# Act II (26)
+	"scout_pack": {"cell": Vector2i(34, 13), "region": "tundra", "text": "narrate Half-buried in the snow: a scout's pack. Inside, wrapped in oilcloth, a disc of red glass that's warm to the touch."},
+	"woodcutter_axe": {"cell": Vector2i(14, 24), "region": "tundra", "text": "narrate An old axe juts from a snowdrift, its handle worn smooth by three generations of hands."},
+	"dye_root": {"cell": Vector2i(12, 20), "region": "desert", "text": "narrate You dig up a tangle of crimson dye-root. It stains your fingers red."},
+	"tide_chart": {"cell": Vector2i(24, 30), "region": "coast", "text": "narrate Wedged in the wreck's cabin: a rolled chart in a waxed tube. The tide tables are still readable."},
+	"compass": {"cell": Vector2i(8, 16), "region": "coast", "text": "narrate Something glints in the grass: a brass compass, still pointing faithfully north."},
+	# Act III (29)
+	"monk_scroll": {"cell": Vector2i(42, 15), "region": "reach", "text": "narrate Half-buried in grey ash at the chasm's edge: a scroll case stamped with the Monastery's sign. The seal hasn't been broken."},
+	"star_glass": {"cell": Vector2i(13, 23), "region": "reach", "text": "narrate At the chasm's edge, a shard of glass the size of a fist glows a soft, steady blue. It's warm, like something alive."},
 }
 
 # What a dungeon's door says while it's sealed (the member gate is checked
@@ -176,12 +539,22 @@ const SEAL_TEXT := {
 	"monastery": "The pilgrim gate is barred. A carved sign reads: \"Pilgrims, show your token.\" Someone in the towns may know how to get one.",
 	"observatory": "The dome door has no handle - only a ring of brass stars that turn. Without knowing the pattern, it won't budge. Someone in the towns may know it.",
 	"guild": "A voice hisses through the hatch: \"Word?\" You don't know it, and the hatch stays shut. Someone in the towns may know the word.",
+	# Act II (26)
+	"frozen_citadel": "The Citadel's gate is sealed under a wall of black ice. Nordveil's captain may know a way through.",
+	"sunken_sanctum": "The Sanctum's great doors bear a carved sun, and won't move. Duskara's water-keeper may know how they open.",
+	"drowned_fortress": "Wreckage and breaking waves block the way onto the island. Selavon's harbormaster may know a safer path.",
+	"blighted_maw": "The portal is a ring of black stone around nothing at all. It wants a key. The keeper of the Threshold may know where it went.",
 }
 const OPEN_TEXT := {
 	"cathedral": "The sexton's key turns with a groan, and the chains slide to the ground.",
 	"monastery": "You hold up the pilgrim's token. After a long moment, the bar on the other side scrapes back.",
 	"observatory": "You turn the brass stars to match the chart. Something deep in the door clicks.",
 	"guild": "\"Lantern in the dark,\" you whisper. The hatch creaks open.",
+	# Act II (26)
+	"frozen_citadel": "You press the Ember Seal to the black ice. It hisses, cracks, and slumps away from the gate.",
+	"sunken_sanctum": "You raise the Sun Disc. Light pours from it into the carved sun on the doors, and they grind open.",
+	"drowned_fortress": "The tide draws back exactly as the chart said. A path of wet stone opens to the fortress gate.",
+	"blighted_maw": "The key's three parts flare as one. The ring of black stone tears open onto a darkness that goes down forever.",
 }
 
 const QUEST_COLOR := Color(1.0, 0.55, 0.85)  # map markers
@@ -223,11 +596,66 @@ static func _previous(id: String) -> String:
 static func is_available(id: String) -> bool:
 	if is_started(id):
 		return false
+	var q: Dictionary = QUESTS[id]
+	if q.has("road"):
+		return _road_open(id)
+	if q.has("kingdom"):  # Act II (26)
+		var kingdom: String = q["kingdom"]
+		if q.get("optional", false):
+			if q.get("anytime", false):  # Act III's last preparations (29)
+				return Kingdoms.is_open(kingdom)
+			return Kingdoms.is_cleansed(kingdom)
+		var prev2 := _previous(id)
+		return Kingdoms.is_open(kingdom) and not Kingdoms.is_cleansed(kingdom) and not has_key(q["dungeon"]) \
+				and (prev2 == "" or is_done(prev2))
 	var dungeon: String = QUESTS[id]["dungeon"]
 	if ActOne.next_dungeon() != dungeon or ActOne.is_start_dungeon(dungeon) or has_key(dungeon):
 		return false
 	var prev := _previous(id)
 	return prev == "" or is_done(prev)
+
+
+## A road quest is offered once its road is open and you haven't been there:
+## Act I's (Edenmere) when Verdance has nothing left for you, the others once
+## the kingdom before is freed.
+static func _road_open(id: String) -> bool:
+	var q: Dictionary = QUESTS[id]
+	if _been_to(q["steps"][0]["reach"]):
+		return false
+	var road: String = q["road"]
+	if road == "":
+		return not GameManager.has_flag("act_one_complete") and not _town_busy("verdance")
+	return Kingdoms.is_open(road) and not Kingdoms.is_cleansed(road)
+
+
+## Been to this town: walked in since road quests (the "visited_" flag), or -
+## for older saves - taken a quest from someone there.
+static func _been_to(town: String) -> bool:
+	if GameManager.has_flag("visited_" + town) or (town == "threshold" and GameManager.has_flag("threshold_arrived")):
+		return true
+	for id: String in QUESTS:
+		if QUESTS[id]["giver"].begins_with(town + "/") and is_started(id):
+			return true
+	return false
+
+
+## Someone in this town still has a quest for you, or one of theirs is still
+## going (road quests aside).
+static func _town_busy(town: String) -> bool:
+	for id: String in QUESTS:
+		if QUESTS[id].has("road"):
+			continue
+		if String(current_step(id).get("talk", "")).begins_with(town + "/"):
+			return true
+		if QUESTS[id]["giver"].begins_with(town + "/") and (is_active(id) or is_available(id)):
+			return true
+	return false
+
+
+## This person hands out this quest ("*/frank": Frank at any town's stall).
+static func _gives(id: String, who: String) -> bool:
+	var giver: String = QUESTS[id]["giver"]
+	return giver == who or (giver.begins_with("*/") and who.ends_with(giver.substr(1)))
 
 
 static func key_for(dungeon: String) -> String:
@@ -243,6 +671,9 @@ static func has_key(dungeon: String) -> bool:
 
 ## The quest seal: open if you started here, already cleared it, or have the key.
 static func is_unsealed(dungeon: String) -> bool:
+	var kingdom := Kingdoms.for_dungeon(dungeon)
+	if kingdom != "":  # Act II (26): open once freed, or with the key
+		return Kingdoms.is_cleansed(kingdom) or has_key(dungeon)
 	return ActOne.is_start_dungeon(dungeon) or ActOne.is_cleared(dungeon) or has_key(dungeon)
 
 
@@ -260,14 +691,14 @@ static func talk(who: String) -> Array:
 			lines.append_array(step["lines"])
 			lines.append_array(advance(id))
 	for id: String in QUESTS:
-		if QUESTS[id]["giver"] == who and is_available(id):
+		if _gives(id, who) and is_available(id):
 			GameManager.quests[id] = 0
 			Sfx.play("menu_confirm")
 			lines.append_array(QUESTS[id]["offer"])
 			lines.append("narrate New quest: %s." % QUESTS[id]["name"])
 	if lines.is_empty():
 		for id: String in QUESTS:
-			if QUESTS[id]["giver"] == who and is_active(id):
+			if _gives(id, who) and is_active(id):
 				lines.append_array(QUESTS[id]["remind"])
 				break
 	return lines
@@ -280,7 +711,7 @@ static func mark_for(who: String) -> String:
 		if current_step(id).get("talk", "") == who:
 			return "?"
 	for id: String in QUESTS:
-		if QUESTS[id]["giver"] == who and is_available(id):
+		if _gives(id, who) and is_available(id):
 			return "!"
 	return ""
 
@@ -294,18 +725,30 @@ static func has_business(who: String) -> bool:
 static func town_has_business(town: String) -> bool:
 	for id: String in QUESTS:
 		var who: String = current_step(id).get("talk", "")
-		if who.begins_with(town + "/"):
+		if who.begins_with(town + "/") or current_step(id).get("reach", "") == town:
 			return true
 		if QUESTS[id]["giver"].begins_with(town + "/") and is_available(id):
 			return true
 	return false
 
 
+## Walked into a town: remembers it, and finishes any road quest heading here.
+## Returns the lines to show.
+static func arrive(town: String) -> Array:
+	GameManager.story_flags["visited_" + town] = true
+	var lines: Array = []
+	for id: String in QUESTS:
+		if current_step(id).get("reach", "") == town:
+			lines.append_array(advance(id))
+	return lines
+
+
 ## Next step; on the last one, the reward. Returns the lines announcing it.
 static func advance(id: String) -> Array:
 	GameManager.quests[id] = stage(id) + 1
 	if not is_done(id):
-		return []
+		# (2026-10-28, Cory: after a hunt nothing said the quest had moved on)
+		return ["sound menu_confirm", "narrate Quest updated: %s" % current_step(id)["log"]]
 	return _reward(id)
 
 
@@ -321,28 +764,119 @@ static func _reward(id: String) -> Array:
 		if ActOne.is_cleared(d):
 			depth += 1
 	depth = clampi(depth, 1, 3)
-	var xp: int = (90 if q["part"] == 1 else 130) * depth
-	var gold: int = (50 if q["part"] == 1 else 80) * depth
+	var xp: int = int(q.get("xp", (90 if q["part"] == 1 else 130) * depth))
+	var gold: int = int(q.get("gold", (50 if q["part"] == 1 else 80) * depth))
+	for item: String in q.get("items", {}):
+		GameManager.inventory[item] = mini(99, int(GameManager.inventory.get(item, 0)) + int(q["items"][item]))
+		lines.append("narrate Received %d %s." % [q["items"][item], item + ("s" if int(q["items"][item]) > 1 and not item.ends_with("s") else "")])
+	if q.has("blessing"):
+		lines.append_array(_bless(q["blessing"]))
 	GameManager.gold += gold
-	lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
+	if xp > 0 or gold > 0:
+		lines.append("narrate The party gains %d XP and %d gold." % [xp, gold])
+	BalanceLog.write("quest", {"id": id, "name": q["name"], "xp": xp, "gold": gold, "optional": q.get("optional", false)})
 	for m: Combatant in GameManager.party:
-		if m.gain_xp(xp):
+		var level_before := m.level
+		if xp > 0 and m.gain_xp(xp):
 			lines.append("narrate %s reached Level %d!" % [m.display_name, m.level])
+		if xp > 0:
+			BalanceLog.xp("quest: " + String(q["name"]), xp, m, level_before)
+	var next: String = q.get("next", "")
+	if next != "" and not is_started(next):
+		GameManager.quests[next] = 0
+		lines.append("narrate New quest: %s - %s" % [QUESTS[next]["name"], QUESTS[next]["steps"][0]["log"]])
 	return lines
+
+
+## A dungeon's story is done: its captive rescued (Act I) or its kingdom freed.
+static func _cleared(dungeon: String) -> bool:
+	var kingdom := Kingdoms.for_dungeon(dungeon)
+	if kingdom != "":
+		return Kingdoms.is_cleansed(kingdom)
+	return ActOne.is_cleared(dungeon)
+
+
+## Finishes any story quest whose dungeon is now done. Returns the lines to
+## show (called right after a rescue or a kingdom's liberation, and by the log).
+static func check_clears() -> Array:
+	var lines: Array = []
+	for id: String in QUESTS:
+		var step := current_step(id)
+		if step.has("clear") and _cleared(step["clear"]):
+			lines.append_array(advance(id))
+	return lines
+
+
+## Every quest for this kingdom is done, optional ones included (a region
+## with nothing left to do goes quiet, Region.is_safe).
+static func kingdom_done(kingdom: String) -> bool:
+	for id: String in QUESTS:
+		if QUESTS[id].get("kingdom", "") == kingdom and not is_done(id):
+			return false
+	return true
+
+
+## The hunt is still waiting to be fought (its quest is on that step).
+static func hunt_pending(hunt_id: String) -> bool:
+	var id := hunt_quest(hunt_id)
+	return id != "" and current_step(id).get("hunt", "") == hunt_id
+
+
+# The kingdoms' blessings (26): finishing a freed kingdom's second optional
+# quest raises one stat for all four heroes, for good (applied straight to
+# their stats, which the save already keeps; once each - flag blessing_<id>).
+const BLESSINGS := {
+	"nordveil": {"name": "Blessing of Nordveil", "stat": "res_stat", "label": "RES", "amount": 3},
+	"duskara": {"name": "Blessing of Duskara", "stat": "defense", "label": "DEF", "amount": 3},
+	"selavon": {"name": "Blessing of Selavon", "stat": "agi", "label": "AGI", "amount": 3},
+	# Act III (29): the heroes' errands bless only that hero ("who").
+	"vael_oath": {"name": "Oath of the Dawn", "stat": "defense", "label": "DEF", "amount": 4, "who": "Vael"},
+	"ryn_lesson": {"name": "Grandmaster's Lesson", "stat": "atk", "label": "ATK", "amount": 4, "who": "Ryn"},
+	"lyra_stars": {"name": "Starlight", "stat": "int_stat", "label": "INT", "amount": 4, "who": "Lyra"},
+	"silas_job": {"name": "Ghost's Luck", "stat": "agi", "label": "AGI", "amount": 4, "who": "Silas"},
+	"ages": {"name": "Blessing of the Ages", "stat": "atk", "label": "ATK", "amount": 3},
+}
+
+
+static func _bless(kingdom: String) -> Array:
+	var flag := "blessing_" + kingdom
+	if GameManager.has_flag(flag):
+		return []
+	GameManager.story_flags[flag] = true
+	var b: Dictionary = BLESSINGS[kingdom]
+	var who: String = b.get("who", "")
+	for cls: String in GameManager.roster:
+		if who != "" and cls != who:
+			continue
+		var m: Combatant = GameManager.roster[cls]
+		m.set(b["stat"], int(m.get(b["stat"])) + int(b["amount"]))
+	if who != "":
+		return ["sound holy", "narrate %s: +%d %s for %s, for good." % [b["name"], b["amount"], b["label"], who]]
+	return ["sound holy", "narrate The %s settles over the party: +%d %s for everyone, for good." % [b["name"], b["amount"], b["label"]]]
 
 
 # ---------------------------------------------------------------- overworld
 
-## The hunt or fetch spots the current steps call for: {kind, id, cell}.
-static func active_spots() -> Array:
+## The hunt or fetch spots the current steps call for on this region map
+## (HUNTS / FETCHES "region", default the Forest Heartlands): {kind, id, cell}.
+static func active_spots(region := "overworld") -> Array:
 	var spots: Array = []
 	for id: String in QUESTS:
 		var step := current_step(id)
-		if step.has("hunt"):
+		if step.has("hunt") and HUNTS[step["hunt"]].get("region", "overworld") == region:
 			spots.append({"kind": "hunt", "id": step["hunt"], "cell": HUNTS[step["hunt"]]["cell"]})
-		elif step.has("fetch"):
+		elif step.has("fetch") and FETCHES[step["fetch"]].get("region", "overworld") == region:
 			spots.append({"kind": "fetch", "id": step["fetch"], "cell": FETCHES[step["fetch"]]["cell"]})
 	return spots
+
+
+## The quest with a step hunting this target ("" if none).
+static func hunt_quest(hunt_id: String) -> String:
+	for id: String in QUESTS:
+		for step: Dictionary in QUESTS[id]["steps"]:
+			if step.get("hunt", "") == hunt_id:
+				return id
+	return ""
 
 
 ## A hunt or fetch step is done. Returns the quest's lines (reward, if any).
@@ -358,6 +892,8 @@ static func complete_spot(kind: String, spot_id: String) -> Array:
 ## whether its dungeon is 2nd or 4th on the route.
 static func hunt_enemy(hunt_id: String) -> Dictionary:
 	var e: Dictionary = HUNTS[hunt_id]["enemy"].duplicate()
+	if not HUNTS[hunt_id].get("scale", true):
+		return e  # Act II hunts are tuned for the whole party (26)
 	var extra := maxi(0, GameManager.party.size() - 1)
 	e["hp"] = int(e["hp"] * (1.0 + 0.7 * extra))
 	e["atk"] = int(e["atk"]) + 3 * extra
@@ -370,6 +906,13 @@ static func hunt_enemy(hunt_id: String) -> Dictionary:
 
 ## For the Quests screen: active quests first (with what to do now), then done.
 static func log_entries() -> Array:
+	# A save from before the story quests catches up here: start the ones
+	# whose key quest is done, then finish any whose dungeon already is.
+	for id: String in QUESTS:
+		var next: String = QUESTS[id].get("next", "")
+		if next != "" and is_done(id) and not is_started(next):
+			GameManager.quests[next] = 0
+	check_clears()
 	var active: Array = []
 	var done: Array = []
 	for id: String in QUESTS:

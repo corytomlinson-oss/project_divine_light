@@ -13,7 +13,7 @@ This document is the canonical design reference for *Divine Light*, a retro high
 | Game Design Document | Complete |
 | Dev Environment Setup | Complete |
 | Godot Project Created | Complete — `c:\vs_workspace\games\project_divine_light\divine-light\` |
-| Implementation | In Progress — Milestone 1 complete |
+| Implementation | Milestones 1-30 built: the whole game is playable start to finish. Remaining: **31, the Android APK** (waits for the Retroid). Cory has playtested through Milestone 24 + the Act I finale; 25b-30 await his playtest. |
 
 **Completed:** Milestone 1 — Player character moves on a TileMapLayer overworld. Camera2D follows player. Grid-based tile movement (16×16 tiles, 96px/sec).
 
@@ -101,6 +101,28 @@ Next: Milestone 22, save/load triggers.
 
 **Act I finale movie:** rescuing the fourth hero now ends Act I with a minute-long animated movie set to a new theme. The bosses you fought fall one by one, each struck down by the newest hero in your party with their own signature effect, and each freed captive steps out of the light to join the line. Then the four stand together, the three kingdoms of Act II flash by in snow, sand and rain, Vorath looms, and \"Act II - The Purge\" takes the screen.
 
+**Completed:** Milestone 25a — Act II foundations (nothing new to play yet). The world can now grow past the Forest Heartlands: each Act II kingdom gets its own region map, reached by a border road off the forest's edge (a mountain pass to the north, roads west and east), opening in order as each kingdom is freed. A corrupted region is drained to a cold violet-grey with thorny blight choking some paths; when its kingdom's boss falls, the color washes back across the land, the brambles wither, and new ways open. Act II dungeons have several floors joined by stairs, with guardians standing on the stairs and the kingdom's boss at the bottom. The roads stay closed until Nordveil is built in 25b.
+
+**Completed:** Milestone 25b — Nordveil, and Act II begins. After Act I, the mountain pass above the Cathedral climbs to the Northern Tundra: a frozen land drained grey and violet by the Frozen Sovereign's blizzard, with a frozen river, brambles of blight sealing off a valley, and a hidden clearing. Nordveil huddles in the snow with its armory boarded up and its shrine dead; the captain points the way up the mountain road to the Frozen Citadel. Four floors of ice: sliding sheets of ice to cross, chests sealed in ice that only Lyra's Fire stance can melt, the Frost Warden guarding the stairs to the inner sanctum, and the three-phase Frozen Sovereign at the top (freezing steel, then two Ice Knights and a blizzard every round, then he swallows his knights and goes berserk). The tundra brings its own enemies (Frost Wraiths, Corrupted Knights, Tundra Trolls, Blizzard Hawks) and new tricks: party-wide slows, freezes, trolls that only hit the front row. The Act II armor sets arrive (the Citadel holds the armors, Nordveil sells two accessories), and wearing a full set now changes a hero's colors, Act I sets included. Free Nordveil and the color washes back across the tundra, the townsfolk pour out to celebrate, and a short movie marks the victory; the town reopens with warm windows, a working shrine, Frostforged gear and Hi-Potions. Next: 25c, Duskara.
+
+**Completed:** Milestone 25c — Duskara. With Nordveil free, the west road out of the forest crosses into the Duskara Wastes, baking under the Burning Tyrant's heatwave: dunes, a dried-up oasis, brambles of blight in a canyon and an alcove, and a hidden clearing with the Sunstone Ring. Duskara bakes too, one house buried to the roof in sand. Down in the Sunken Sanctum, burning floors scorch anyone who cuts across them (or walk the long way round), old levers open sealed chambers full of treasure, the Blazing Sentinel sets the whole party alight, and the Burning Tyrant turns the arena to fire before switching between ice and lightning faster than Lyra can keep up. New enemies: Sand Vipers that poison every bite, Dust Golems that shrug off earth magic, Scorched Mages that burn the front row, and Dune Marauders that steal. Free Duskara and the heat breaks, the oasis fills again, the town celebrates, and the Sunsteel forge opens. Next: 25d, Selavon.
+
+**Completed:** Milestone 25d — Selavon, and the end of Act II's kingdoms. The east road out of the forest reaches the Selavon Coast, lashed by the Drowned Admiral's endless storm. Selavon's harbor quarter is underwater. Out at the end of a pier, the Drowned Fortress floods room by room — wade through and enemies that catch you in the water are quicker — and lightning rods on its walls strike in a rhythm you learn to count. The Admiral's First Mate moves faster than Silas, and the Admiral himself raises Sea Specters, wraps the arena in a storm, and finally charges a bolt that only a well-timed Defend or Vael's Sanctuary will survive. New enemies: paralyzing Sea Specters, Coral Brutes that shrug off ice, Tidal Witches that heal their allies, and Storm Gulls. Free Selavon and the sea goes calm, the harbor drains, the merchants shower you with gifts, and Act II's kingdoms are all free — Act III, the Blighted Maw, comes later.
+
+**Completed:** Milestone 26 — Act II side quests. Each kingdom's dungeon is now locked until you help its town first: recover a fallen scout's Ember Seal to melt the Citadel's gate of black ice, take the Sun Disc back from a marauder chief to open the Sanctum, salvage a tide chart from a wrecked boat to find the way to the Drowned Fortress. Once a kingdom is free, two more townsfolk ask for help — a lost axe, a white wolf called Snowmane, crimson dye-root, a rampaging dune golem, a sailor's compass, a coral-crusted Reef Horror — for XP, gold and potions, and finishing a kingdom's last request earns its blessing: a permanent boost to the whole party's RES, DEF or AGI.
+
+**Completed:** Milestone 27 — Act II art & music. Act II has its own sound now: a cold, wide theme for the Northern Tundra, a heat-shimmer Phrygian one for the Duskara Wastes, a seafaring one for the Selavon Coast, and a theme for each kingdom's dungeon (an icy organ in the Citadel, a ritual drum in the Sanctum, a drowned heartbeat in the Fortress); corrupted towns echo their region until they're freed. The three kingdom bosses — the Frozen Sovereign, the Burning Tyrant and the Drowned Admiral — have their own hand-drawn sprites.
+
+**Completed:** Milestone 28 — Act III, and the end of the game (not yet playtested). With all three kingdoms free, a road south of the Guild leads into the Blighted Reach, a land of ash and dead trees around a sealed portal. At its edge is the Threshold, the last free town: a free inn, a shrine without limits, the best gear in the world, and refugees from every kingdom. Three quests in order build the Portal Key: the frame from a Hollow Custodian at a ruined shrine, a shard of pure light from Nordveil's priestess, and Frank to bind them (he seems to know a little too much about the place). Below the portal is the Blighted Maw, five floors deep: a frozen floor, a burning floor, a drowned floor, the depths, and Vorath's chamber. Inside are the last armor sets (Divine Champion, Rising Force, Cosmic Conduit, Death's Hand), and Vael learns Resurrection. Vorath fights in three phases. In the second he turns immune to a new element every turn. In the third, Frank steps in, speaks his true name and fights alongside you, while Vorath begins the Final Unraveling: four turns to kill him before it ends everything. Win, and the Maw is cleansed and a one-minute ending movie plays, with credits. Skills above level 8 now unlock sooner, so the whole kit arrives by the end of Act III.
+
+**Completed:** Milestone 29 — Act III side quests and Verdance as the hub (not yet playtested). Before the last descent, the Threshold's refugees each have one last errand, one for each hero: lay a fallen Nordveil knight to rest (Vael), recover the Monastery's last scroll from the edge of a chasm (Ryn), find the star that fell into the Reach (Lyra), and get a child's locket back from a grave robber (Silas). Each one pays off with that hero's best accessory and a permanent stat boost. Back in Verdance, now a hub with envoys from all three freed kingdoms, Selavon's archivist has found a merchant with a very wide hat in every age of the chronicles, and would like you to ask around. All of these can be done before or after Vorath, and Verdance has new things to say once the world is saved.
+
+**Completed:** Milestone 30 — Act III art & music. The end of the game has its own sound now: a weary, sparse theme for the Blighted Reach, a heartbeat-and-organ dread for the Blighted Maw, and a driving final battle theme that plays only against Vorath. Vorath himself is drawn by hand, the biggest sprite in the game: a floating hooded titan whose robe is a hole in the world full of stars, crowned with shattered light under a broken golden halo, one hand raising a void orb and the other reaching for the party with the threads of the Unraveling crackling from his fingers. (The regular Act II and III enemies are still recolors of older sprites.)
+
+**Playtest pass (2026-10-24, while Cory was away):** a simulated run of the whole main path from the end of Act I to Vorath (about 90 real battles), plus data, map, save/load and screen checks. Fixed: bosses could be stun-locked (and then never changed phase); the equip screen crashed with 6+ items for a slot; the quest log overflowed; there was no revival item (the Phoenix Feather now); the Elixir was worse than a Hi-Potion (now a full restore); Act III and Vorath were too easy and the end-game skills came too late (rebalanced); the Reach stayed grey after the ending (restored tiles). Details in DECISIONS.md.
+
+**What's next:** Cory playtests 25b-30, then the PRs into `main`, then Milestone 31 (the Android APK on the Retroid Pocket 6). Where the finished game differs from the design below, see **As built** right after this section.
+
 **Dungeon generation — decided (2026-08-06).** Approach is **hybrid: fixed anchor rooms, procedurally generated middle**, built as three layers:
 
 1. **Template (hand-authored, one per dungeon)** — room count range, required anchor rooms + ordering constraints, tileset, enemy table, chest count, and tile-level flags for Act II's unique mechanics (frozen chests, fire hazard tiles, flooded corridors). This is where each dungeon keeps its own identity.
@@ -113,9 +135,39 @@ Next: Milestone 22, save/load triggers.
 
 **Split into 13a/13b** (matching the 8a–8d / 20a–20d convention) so dungeon traversal tech is proven against a fixed, hand-built map before generation randomness is layered on top.
 
-**Enemy scaling note (open question, no target milestone yet):** Cory wants to discuss whether enemies should scale with the party's level, so the game stays challenging no matter where the player is in the story instead of becoming trivial once over-leveled. He's not sure yet whether it's a good idea for this game or when the right time to design it would be — noted here so it doesn't get lost. Currently `ENCOUNTERS` in Battle.gd has fixed enemy stats with no relationship to player level at all, and the difficulty curve described below (Enemy Design section) is by *region*, not by player level — so this would be a new axis, not an extension of anything already planned.
+**Enemy scaling note — decided 2026-09-29: no level scaling** (difficulty is set by region; see DECISIONS.md). The original note: Cory wanted to discuss whether enemies should scale with the party's level, so the game stays challenging no matter where the player is in the story instead of becoming trivial once over-leveled. He's not sure yet whether it's a good idea for this game or when the right time to design it would be — noted here so it doesn't get lost. Currently `ENCOUNTERS` in Battle.gd has fixed enemy stats with no relationship to player level at all, and the difficulty curve described below (Enemy Design section) is by *region*, not by player level — so this would be a new axis, not an extension of anything already planned.
 
 See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification checklist.
+
+---
+
+## As built — where the game differs from this design doc
+
+The design sections below are the original plan and are kept as written, except where marked. Where the built game went another way (Cory's calls or logged decisions in `DECISIONS.md`):
+
+- **Skill unlock levels are compressed** above level 8 (`8 + (old - 8) * 0.55`), then again above 15 (`15 + (x - 15) * 0.4`), so every class has its whole kit by level 18, which the main path reaches at Vorath (the party ends Act II around 14). The skill tables below show the built levels.
+- **Vael learns Resurrection** (level 17, 30 MP): revives the fallen ally with the most max HP at half HP (full with the Divine Champion set). Frank and revival items are no longer the only revives.
+- **Lyra has no summons.** Ignus/Glacius were never built; so the Cosmic Conduit set became "Lyra's spells cost 25% less MP", and Death's Hand became "Shadowstep +30% damage" (it has no row limit to lift).
+- **Silas uses MP.** Ryn's Qi caps at 6.
+- **Act III's "Void Sentinel" is the Null Sentinel** (the Observatory's escape warden already has that name).
+- **Frank in the Vorath fight acts on his own** after every Vorath turn (Blessing once per fight, Balance's Judgment for about 200, the Final Invoice for 900 under 15% HP) instead of being a menu-controlled 5th member; the battle UI is built for four. His true name is a placeholder until Cory picks one ("Faranoth", `GameManager.FRANK_TRUE_NAME`).
+- **Vorath:** 9000 HP; phase 2 (from 70%) rotates his immunity every turn (fire, ice, lightning, earth, holy); phase 3 (from 40%) brings Frank in, and the Final Unraveling wipes the party 4 turns after one free round.
+- **Bosses can't be stun-locked:** after losing a turn to a stun, a boss shrugs off stuns for its next two turns, and it still changes phase on time.
+- **Armor-set looks:** every full set swaps the hero into its own hand-drawn form (24x32 sprite), escalating from Act I (geared up) through Act II (heavier, elemental) to Act III (the full transformation: Vael's winged champion, Ryn's flame-haired ki master, Lyra's star-robed conduit, Silas's horned reaper).
+- **Set bonuses stack:** completing a set masters its bonus for good, so a hero keeps every bonus they've earned; their look is the strongest set they've mastered, kept until they master the next one.
+- **Items:** a revival item exists, the **Phoenix Feather** (revives the fallen ally with the most max HP at 1/4 HP; Frank, freed kingdoms, the Threshold). The **Elixir fully restores** one ally's HP and MP (it was 120 HP).
+- **After the ending** the Reach turns green (a restored tileset) and has no random fights.
+- **Random fights:** Act II regions and dungeons have them about a third less often than Act I's (every 20-36 steps on the region maps, 14-26 in the dungeons); Act III's about a fifth less (the Reach every 18-32, the Maw 12-22). A kingdom's region has none at all once it's freed and every quest there, optional ones included, is done. The forest has none after Act I.
+- **Optional quests give half the XP** of main-path ones (their gold and items are unchanged), so doing everything doesn't leave the party far over-levelled.
+- **The Blighted Maw is reached through a portal** in the Blighted Reach, opened by a three-part Portal Key from three required quests (Cory's idea). The Threshold sits at the Reach's edge.
+- **Frank's shop has a fixed stock** (no level-scaled random accessories); kingdom armories and the Threshold sell the higher tiers. After the ending Frank is a faint echo of light who still keeps his stall.
+- **Shrines:** Edenmere's and the freed kingdoms' heal once per dungeon trip; the Threshold's is unlimited.
+- **Menus and controls:** B / Start open the pause menu (Equip, Status, Map, Quests, Save); Y or M opens the map. There's no separate inventory (X) or Formation (Select) screen; rows are swapped in battle only.
+- **Dialogue has name tags, no portraits.**
+- **Suspend save mid-battle** restarts that fight from its beginning rather than resuming mid-turn.
+- **Side quests:** Act I seals each dungeon behind two town quests; Act II has one required quest per kingdom plus two optional ones (kingdom blessings); Act III has the portal-key quests plus five optional "last preparations" quests (Milestones 24, 26, 28a, 29).
+- **Balance log:** every play session writes a log of battles, damage, XP and quests to `%APPDATA%/Godot/app_userdata/divine_light/balance_logs`. `python tools/balance_report.py` summarises the newest one.
+- **Road quests:** once a town has nothing left for you, Frank's stall offers a quest to find the next town (Verdance -> Edenmere, then Nordveil, Duskara, Selavon and the Threshold as each road opens); walking into that town completes it.
 
 ---
 
@@ -143,19 +195,19 @@ Recommended build order — each milestone is a working, testable slice of the g
 | 16 | **Current-content art & music pass** | First real (non-placeholder) art/audio pass, covering everything built so far: Player sprite, Overworld tileset, the Cathedral's generated-dungeon tileset (floor/wall/door/captive/boss — the same 5-tile vocabulary `DungeonGenerator` paints with), current enemy sprites (overworld's four + the Cathedral's three placeholder enemies + the Milestone 14 test boss), Battle screen backgrounds/UI frames, and baseline BGM (overworld, battle) + SFX (attack, menu, victory, level-up). **Why here, not one monolithic art pass at the very end:** splits what used to be milestones 15/16 (Sprites & tiles, Music & sound) to mirror content delivery instead — see the Roadmap restructuring section in CLAUDE.md for the full reasoning. **Known tradeoff:** the Cathedral's placeholder enemies and test boss get real art here but may be replaced/renamed once Act I content (20a) delivers the real Fallen Guardian and real enemy roster — accepted deliberately so there's something to actually look at now rather than waiting. **Asset strategy:** source pixel art packs from itch.io or Kenney.nl first, Midjourney/DALL-E for concept generation if needed (prompts written per asset); Suno AI (suno.com) for chiptune/SNES-style BGM, OpenGameArt.org for pre-made free tracks |
 | 17 | **UI/UX polish** | **Split 2026-09-29 into 17a (pixel rendering & text — done), 17b (battle-screen layout), 17c (controller: input map, hold-to-repeat, simple B pause menu with Equip, battle shortcuts), 17d (transitions & feedback). Spell & combat VFX split out as their own milestone (now 18).** Original scope: once the current-content art/music pass (16) exists, do a design pass over the UI built so far — HUD composition (party panel, enemy panel, menus), screen transition/animation polish, spacing/readability, controller-nav feel — using real assets to design around instead of placeholder colors. Doesn't need to wait for *every* asset in the whole game to exist first, just enough real material to work with. Explicitly does **not** include Equipment's equip screen (15) or Save/load's slot-picker screen (22) — those are new screens with their own functional scope, built when their milestone comes up |
 | 18 | **Spell & combat VFX** | Visual effects for skills, spells and hits across all 4 classes, mostly built in code (tweens, particles, procedural shapes) rather than drawn art. Split out of UI/UX polish (17) on 2026-09-29 since it's bigger than polish; placed right after it so every existing skill has real feedback before Act I content adds more **Split 2026-09-29 into 18a (effect system), 18b (Vael + Ryn), 18c (Lyra + Silas), 18d (status markers + polish).** |
-| 19a–19b | **Cutscenes** | A reusable cutscene system, placed before Act I content so every story milestone scripts its own scenes: in-engine scenes FF6-style (sprites walking and emoting over the map, a dialogue box with name tags, fades, camera pans, music cues, driven by a simple step-list script), plus a full-screen pixel "movie" mode. **19a** = the system + movie mode; **19b** = the intro movie (the pixel-art opening before the player wakes up captive). The ending movie is part of Act III + Vorath (29). Scenes for each story beat (finding Frank, rescues, bosses, act transitions, liberated kingdoms, the finale) are written in the content milestone where that beat happens |
+| 19a–19b | **Cutscenes** | A reusable cutscene system, placed before Act I content so every story milestone scripts its own scenes: in-engine scenes FF6-style (sprites walking and emoting over the map, a dialogue box with name tags, fades, camera pans, music cues, driven by a simple step-list script), plus a full-screen pixel "movie" mode. **19a** = the system + movie mode; **19b** = the intro movie (the pixel-art opening before the player wakes up captive). The ending movie was built in 28d. Scenes for each story beat (finding Frank, rescues, bosses, act transitions, liberated kingdoms, the finale) are written in the content milestone where that beat happens |
 | 20a–20d | **Act I content** | One per dungeon (mirrors the 8a–8d Class Skills pattern — each is a working, testable slice: dungeon → boss → rescue). See breakdown below |
 | 21 | **Act I art & music pass** | Real art/audio for everything Act I added: 4 dungeon tilesets with their own identity, 4 boss sprites (Fallen Guardian, Corrupted Grandmaster, Void Archmage, Shadow Lord), Frank + the 3 rescued party members' sprites/portraits, Verdance + Edenmere town tilesets/NPCs, Act I's real enemy roster, dungeon/boss/town BGM + SFX |
 | 22 | **Save / load — triggers & integration** | Wires the Milestone 12 core system to real triggers: manual save at inns (3 slots), auto-save after boss defeats/rescues/region clears, suspend save on app close including mid-dungeon position. Placed here deliberately — none of these triggers exist until Act I's towns, dungeons, and bosses do |
 | 23a–23c | **Exploration & loot** | Added 2026-10-16 at Cory's request after playtesting Milestone 22 ("dungeons are kinda boring to walk through", "the overworld needs to be bigger"). **23a** = treasure chests: random loot in wooden chests, each dungeon's captive's Act I armor set in gilded chests (the design doc's "set pieces are found in dungeon chests"), all four Act I set bonuses wired up. **23b** = dungeon twists: dead-end side rooms with the best chests, mimics, chests only Silas can pick, healing springs. **23c** = a ~3x bigger Forest Heartlands overworld with the dungeons spread out, plus overworld chests and hidden clearings |
 | 24 | **Act I side quests** | Added 2026-10-16 at Cory's request, **done 2026-10-20**: every dungeon except your starting one is sealed until its two town quests are done (fetch, hunts, errands between Verdance and Edenmere), and the second hands over the key. Quest log in the pause menu, quest markers on the map |
 | 25a–25d | **Act II content** | A shared cleansing-transformation system plus one sub-milestone per kingdom. See breakdown below |
-| 26 | **Act II side quests** | Added 2026-10-18 at Cory's request: side quests in the three kingdoms, reusing Milestone 24's quest system. A few lead into each kingdom's dungeon before it's cleansed; most reward coming back afterwards, when the towns reopen and new paths unlock, plus errands between the kingdoms. Placed before the Act II art pass so that pass covers quest art too. Not scoped yet |
-| 27 | **Act II art & music pass** | Real art/audio for Act II: 3 dungeon tilesets with their unique mechanics visualized (Frozen Citadel's frozen chests, Sunken Sanctum's fire hazards, Drowned Fortress's flooded corridors), 3 mini-bosses + 3 kingdom bosses (3-phase — may want distinct visuals per phase), each kingdom town's before/after cleansing states, Act II's enemy roster, dungeon/boss/town BGM + SFX |
-| 28 | **Android APK export** | Build and deploy to RP6, test controller input. Moved here from 25 on 2026-10-23 (the RP6 is lent out for a few months), so it's now the "Act II complete" checkpoint: the first build on the device has Acts I and II with real art and audio |
-| 29 | **Act III + Vorath** | The Blighted Maw, 3-phase final boss + Frank's revelation, and the ending movie (pixel "movie" mode from 19a) |
-| 30 | **Act III side quests** | Added 2026-10-18 at Cory's request: **3 required quests, done in order, that assemble the parts of a key opening the portal into Vorath's dungeon**, plus optional "last preparations" quests from The Threshold (each hero's last errand, the best gear, hints about Frank) for XP, gold, potions and permanent buffs. Not scoped yet |
-| 31 | **Act III art & music pass** | Real art/audio for the finale: The Blighted Maw, Vorath's 3-phase final boss (including Void Form), Frank's true-identity reveal, Act III's enemy roster, final dungeon/boss BGM, any ending sequence audio |
+| 26 | **Act II side quests** | Added 2026-10-18 at Cory's request: side quests in the three kingdoms, reusing Milestone 24's quest system. A few lead into each kingdom's dungeon before it's cleansed; most reward coming back afterwards, when the towns reopen and new paths unlock, plus errands between the kingdoms. Placed before the Act II art pass so that pass covers quest art too. **Done 2026-10-23** |
+| 27 | **Act II art & music pass** (**done 2026-10-23:** 6 tracks + the 3 kingdom bosses hand-placed) | Real art/audio for Act II: 3 dungeon tilesets with their unique mechanics visualized (Frozen Citadel's frozen chests, Sunken Sanctum's fire hazards, Drowned Fortress's flooded corridors), 3 mini-bosses + 3 kingdom bosses (3-phase — may want distinct visuals per phase), each kingdom town's before/after cleansing states, Act II's enemy roster, dungeon/boss/town BGM + SFX |
+| 28a–28d | **Act III + Vorath** (split 2026-10-24: 28a the Threshold + portal key, 28b the Blighted Maw, 28c Vorath, 28d the ending; **done 2026-10-24**) | The Blighted Maw, 3-phase final boss + Frank's revelation, and the ending movie (pixel "movie" mode from 19a) |
+| 29 | **Act III side quests** (the optional ones + Verdance as the hub; the required key quests moved into 28a) | Added 2026-10-18 at Cory's request: **3 required quests, done in order, that assemble the parts of a key opening the portal into Vorath's dungeon**, plus optional "last preparations" quests from The Threshold (each hero's last errand, the best gear, hints about Frank) for XP, gold, potions and permanent buffs. **Done 2026-10-24** |
+| 30 | **Act III art & music pass** (**done 2026-10-24:** 3 tracks + hand-placed Vorath) | Real art/audio for the finale: The Blighted Maw, Vorath's 3-phase final boss (including Void Form), Frank's true-identity reveal, Act III's enemy roster, final dungeon/boss BGM, any ending sequence audio |
+| 31 | **Android APK export** | Build and deploy to RP6, test controller input. Moved to the very end on 2026-10-24 (the RP6 is lent out for a few months), so the first build on the device is the whole game. **The only milestone not done** |
 
 ### Milestone 13 — Dungeon Maps Breakdown
 
@@ -188,26 +240,33 @@ Recommended build order — each milestone is a working, testable slice of the g
 
 Recommended folder layout inside the Godot project:
 
+The original recommendation was a little different (a `classes/` folder, `data/enemies/`); the actual layout of `divine-light/` today:
+
 ```
-divine_light/
+divine-light/
 ├── scenes/
-│   ├── overworld/       # Tile maps, player movement
-│   ├── battle/          # Battle screen, UI
-│   ├── dungeons/        # Individual dungeon maps
-│   └── ui/              # Menus, HUD, dialogue boxes
+│   ├── battle/          # Battle.tscn
+│   ├── dungeon/         # one scene per dungeon (4 Act I, 3 Act II, the Blighted Maw)
+│   ├── equip/           # the equip screen
+│   ├── menu/            # pause menu
+│   ├── overworld/       # region maps: Forest Heartlands, Tundra, Desert, Coast, Reach
+│   ├── player/          # Player.tscn, instanced by every map
+│   ├── title/           # title screen, class select
+│   └── town/            # Verdance, Edenmere, Nordveil, Duskara, Selavon, Threshold
 ├── scripts/
-│   ├── player/          # Player controller, party management
-│   ├── battle/          # Turn order, action resolution, enemy AI
-│   ├── classes/         # Vael, Ryn, Lyra, Silas — stats and skills
-│   └── systems/         # Save/load, inventory, XP, status effects
-├── assets/
-│   ├── sprites/         # Character, enemy, tile sprites
-│   ├── tilesets/        # Overworld and dungeon tilesets
-│   ├── audio/           # Music and sound effects
-│   └── fonts/           # Pixel fonts
-└── data/
-    └── enemies/         # Enemy definitions (stats, drops, behavior)
+│   ├── battle/          # Battle, Combatant, EnemyData (stats/kits/encounters), BattleFx, FxRecipes
+│   ├── cutscene/        # scene-script parser, Act I finale, kingdom victories, ending movie
+│   ├── dungeon/         # Dungeon controller, DungeonGenerator
+│   ├── equip/, menu/    # equip, pause, map, quest log, save, shop screens
+│   ├── overworld/       # Region base + one script per region
+│   ├── player/          # Player
+│   ├── systems/         # GameManager, ActOne, Kingdoms, Quests, Loot, Equipment, SetLooks, Cutscene, Music, Sfx, Transition, ...
+│   ├── title/, town/, ui/
+├── assets/              # sprites, tilesets, ui, audio, fonts, movie, shaders; generators in each source/ folder
+└── data/cutscenes/      # .scene scripts (plain text)
 ```
+
+(`scenes/dungeons/`, `scenes/ui/` and `scripts/classes/` are empty leftovers from the original layout.)
 
 ---
 
@@ -291,7 +350,7 @@ All four party members are pure entities — one is the player's chosen class, t
 
 Frank's merchant persona is a mask. His true identity — an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin — is concealed until the final confrontation. He has quietly guided the party since the moment they met. His real name is never spoken until the Vorath battle. In Phase 3 he drops the mask entirely, joins the fight as a 5th party member, and deploys power he has never once revealed.
 
-Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill.
+Frank and revival consumables are the only resurrection sources in the game — no party member has a revive skill. *(As built: Vael learns Resurrection late in Act III, Cory's call; the revival consumable is the Phoenix Feather.)*
 
 ### The Antagonist
 
@@ -322,7 +381,7 @@ Ancient. Once one of the four pure entities of a previous cycle. Refused rebirth
 
 ### Silas — The Assassin
 - **Role:** Agility-based striker and debuffer
-- **Resource:** MP or stamina (TBD)
+- **Resource:** MP
 - **Unique Trait:** Highest AGI in the party — usually acts first each round. Specializes in status effects (poison, bleeding, stun) that compound over time.
 - **Playstyle:** Set up debuffs early, let damage-over-time effects compound while the rest of the party follows up
 
@@ -436,6 +495,8 @@ Each character has the same menu structure; the Skill option is class-specific:
 
 ### Lyra — Summon Ability
 
+*(Not built: Lyra has no summons in the game.)*
+
 A high-tier skill for Lyra. When activated:
 1. Lyra declares a **Summon** instead of an elemental stance
 2. A powerful elemental creature appears as a temporary front-row combatant
@@ -445,6 +506,8 @@ A high-tier skill for Lyra. When activated:
 ---
 
 ## Class Skill Lists
+
+*Levels below are the built ones (compressed in 28a and again in the 2026-10-24 playtest pass; the original plan ran to level 35). The level cap is still 35.*
 
 ### Status Effects
 
@@ -466,15 +529,16 @@ A high-tier skill for Lyra. When activated:
 | 1 | **Holy Light** | Low | Restore minor HP to one ally |
 | 4 | **Smite** | Low | Holy damage to one enemy — bonus damage vs. corrupted enemies |
 | 7 | **Guard** | Low | Reduce incoming damage to one ally for 2 rounds |
-| 10 | **Taunt** | Low | Force all enemies to target Vael for 1 round |
-| 14 | **Fortify** | Medium | Raise DEF for all allies for 2 rounds |
-| 17 | **Divine Strike** | Medium | Strong holy damage + chance to stun corrupted enemies |
-| 20 | **Divine Shield** | Medium | Reduce damage taken by all allies in Vael's row for 2 rounds |
-| 23 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
-| 26 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
-| 29 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
-| 32 | **Purify** | Low | Remove all status effects from one ally |
-| 35 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
+| 9 | **Taunt** | Low | Force all enemies to target Vael for 1 round |
+| 11 | **Fortify** | Medium | Raise DEF for all allies for 2 rounds |
+| 13 | **Divine Strike** | Medium | Strong holy damage + chance to stun corrupted enemies |
+| 15 | **Divine Shield** | Medium | Reduce damage taken by all allies in Vael's row for 2 rounds |
+| 15 | **Battle Hymn** | Medium | Raise STR for all allies for 2 rounds |
+| 16 | **Consecrate** | High | Holy damage to all enemies — bonus damage vs. corrupted |
+| 17 | **Sanctuary** | Medium | Nullify the next attack targeting one ally entirely |
+| 17 | **Purify** | Low | Remove all status effects from one ally |
+| 17 | **Resurrection** | 30 MP | Revive the fallen ally with the most max HP at 50% HP (full with Divine Champion). *Added in 28b* |
+| 18 | **Divine Wrath** | Very High | Massive holy damage to one enemy — guaranteed stun vs. corrupted |
 
 ---
 
@@ -487,15 +551,15 @@ Qi capacity: 6 pips max. Each basic Attack generates 1 Qi. Qi can be spent on da
 | 1 | **Iron Fist** | 1 Qi | Damage | Enhanced single-target strike, stronger than a basic attack |
 | 4 | **Vital Touch** | 2 Qi | Healing | Restore HP to one ally |
 | 7 | **Sweep** | 2 Qi | Damage | Spinning low kick — hits all front-row enemies |
-| 10 | **Pressure Point** | 2 Qi | Disable | Strike targeting a vital point — inflicts stun |
-| 14 | **Ki Burst** | 3 Qi | Damage | Concentrated ki energy — ignores a portion of enemy defense |
-| 17 | **Ki Blast** | 3 Qi | Damage | Ranged ki projectile — full damage usable from back row |
-| 20 | **Mending Flow** | 4 Qi | Healing | Restore significant HP to one ally |
-| 23 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
-| 26 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
-| 29 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
-| 32 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
-| 35 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
+| 9 | **Pressure Point** | 2 Qi | Disable | Strike targeting a vital point — inflicts stun |
+| 11 | **Ki Burst** | 3 Qi | Damage | Concentrated ki energy — ignores a portion of enemy defense |
+| 13 | **Ki Blast** | 3 Qi | Damage | Ranged ki projectile — full damage usable from back row |
+| 15 | **Mending Flow** | 4 Qi | Healing | Restore significant HP to one ally |
+| 15 | **Storm Flurry** | 4 Qi | Damage | Rapid strikes — hits one target 3 times in succession |
+| 16 | **Crippling Strike** | 4 Qi | Disable | Heavy strike — lowers enemy AGI significantly for 2 rounds |
+| 17 | **Dragon's Maw** | 5 Qi | Damage | Devastating single-target strike — high damage |
+| 17 | **Healing Wave** | 5 Qi | Healing | Channel inner energy — restore HP to all allies |
+| 18 | **Rising Dragon** | 6 Qi | Ultimate | Massive single-target damage + guaranteed stun |
 
 ---
 
@@ -509,32 +573,32 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 |---|---|---|---|
 | 1 | **Ember** | Low | Fire damage to one enemy |
 | 8 | **Flare** | Medium | Strong fire damage to one enemy |
-| 24 | **Inferno** | High | Massive fire damage to one enemy + burn for 3 rounds |
+| 16 | **Inferno** | High | Massive fire damage to one enemy + burn for 3 rounds |
 
 **Ice Stance** — Damage + speed and control debuffs
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
 | 4 | **Frost** | Low | Ice damage to one enemy + lower their AGI for 1 round |
-| 14 | **Blizzard** | Medium | Ice damage to one enemy + chance to freeze (skip their next turn) |
-| 28 | **Glacier** | High | Ice damage to all enemies + freeze chance on each |
+| 11 | **Blizzard** | Medium | Ice damage to one enemy + chance to freeze (skip their next turn) |
+| 17 | **Glacier** | High | Ice damage to all enemies + freeze chance on each |
 
 **Lightning Stance** — Multi-target damage, paralysis
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
 | 6 | **Spark** | Low | Lightning damage to one enemy |
-| 18 | **Bolt** | Medium | Lightning damage to all enemies |
-| 32 | **Thunderstrike** | High | Massive lightning damage to one enemy + guaranteed paralysis |
+| 14 | **Bolt** | Medium | Lightning damage to all enemies |
+| 17 | **Thunderstrike** | High | Massive lightning damage to one enemy + guaranteed paralysis |
 
 **Earth Stance** — AoE damage, defense reduction, row-dependent
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
-| 10 | **Tremor** | Medium | Front row: heavy earth smash on one enemy / Back row: AoE tremor hitting all enemies at reduced damage |
-| 22 | **Quake** | High | AoE earth damage to all enemies + lower defense on all for 2 rounds |
+| 9 | **Tremor** | Medium | Front row: heavy earth smash on one enemy / Back row: AoE tremor hitting all enemies at reduced damage |
+| 15 | **Quake** | High | AoE earth damage to all enemies + lower defense on all for 2 rounds |
 
-**Summons** — Stance-independent, activated on any turn regardless of current stance
+**Summons** — Stance-independent, activated on any turn regardless of current stance *(not built)*
 
 | Level | Skill | MP Cost | Effect |
 |---|---|---|---|
@@ -550,15 +614,15 @@ Lyra's skills are organized by elemental stance. On her turn she either casts a 
 | 1 | **Quick Strike** | Low | Fast physical attack with high crit chance |
 | 4 | **Envenom** | Low | Apply poison to one enemy — moderate damage for 3 rounds |
 | 7 | **Shadow Strike** | Medium | Front row only — high single-target damage |
-| 10 | **Vanish** | Low | Move Silas from front to back row + increase evasion this round |
-| 13 | **Lacerate** | Medium | Apply bleed to one enemy — high damage for 4 rounds, cannot be cured by antidotes |
-| 16 | **Smoke Bomb** | Medium | Lower all enemies' accuracy for 2 rounds |
-| 19 | **Expose** | Low | Lower one enemy's defense — entire party deals bonus damage to them |
-| 22 | **Garrote** | Medium | Inflict stun on one enemy — guaranteed on non-boss enemies |
-| 25 | **Flurry** | Medium | 4 rapid strikes on one target — each hit rolls for crit independently |
-| 28 | **Toxic Cloud** | High | Apply poison to all enemies simultaneously |
-| 31 | **Death Mark** | High | Mark one enemy — they take increased damage from all sources for 3 rounds |
-| 35 | **Shadowstep** | Very High | Silas's ultimate — massive single-target damage + applies poison, bleed, and stun simultaneously |
+| 9 | **Vanish** | Low | Move Silas from front to back row + increase evasion this round |
+| 11 | **Lacerate** | Medium | Apply bleed to one enemy — high damage for 4 rounds, cannot be cured by antidotes |
+| 12 | **Smoke Bomb** | Medium | Lower all enemies' accuracy for 2 rounds |
+| 14 | **Expose** | Low | Lower one enemy's defense — entire party deals bonus damage to them |
+| 15 | **Garrote** | Medium | Inflict stun on one enemy — guaranteed on non-boss enemies |
+| 16 | **Flurry** | Medium | 4 rapid strikes on one target — each hit rolls for crit independently |
+| 17 | **Toxic Cloud** | High | Apply poison to all enemies simultaneously |
+| 17 | **Death Mark** | High | Mark one enemy — they take increased damage from all sources for 3 rounds |
+| 18 | **Shadowstep** | Very High | Silas's ultimate — massive single-target damage + applies poison, bleed, and stun simultaneously |
 
 ---
 
@@ -694,7 +758,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 |---|---|---|
 | **Arcane Scholar Set** | I | Switching elemental stance no longer costs Lyra her turn action |
 | **Elemental Weave Set** | II | Tremor's back-row AoE version now deals full damage instead of reduced |
-| **Cosmic Conduit Set** | III | Summoned creatures last 3 rounds instead of 2 |
+| **Cosmic Conduit Set** | III | ~~Summoned creatures last 3 rounds instead of 2~~ *As built:* Lyra's spells cost 25% less MP (no summons exist) |
 
 **Silas — Assassin Sets**
 
@@ -702,7 +766,7 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 |---|---|---|
 | **Shadow Walker Set** | I | Vanish also makes Silas untargetable for 1 round |
 | **Venom Weave Set** | II | Poison lasts 5 rounds instead of 3 |
-| **Death's Hand Set** | III | Shadowstep can be used from back row |
+| **Death's Hand Set** | III | ~~Shadowstep can be used from back row~~ *As built:* Shadowstep deals +30% damage (it has no row limit) |
 
 ---
 
@@ -718,9 +782,9 @@ Each class has **3 armor sets** — one per act. Collecting all 4 armor pieces f
 
 ### Frank's Stock
 
-Frank provides consumables, healing, disease curing, revival, and basic equipment throughout the game. Revival (resurrection) is only available through Frank or revival consumables — no party member has a revive skill.
+Frank provides consumables, healing, disease curing, revival, and basic equipment throughout the game. Revival (resurrection) is only available through Frank or revival consumables — no party member has a revive skill *(as built: plus Vael's Resurrection, late in Act III)*.
 
-**Accessory Stock (level-scaled)**
+**Accessory Stock (level-scaled)** *(not built: Frank keeps a fixed stock; the kingdom armories and the Threshold carry the higher tiers)*
 - **Below level 11 (Act I):** Frank sells fixed consumables and standard equipment only
 - **Level 11+ (Act II onward):** Frank carries a randomly generated stock of 3–4 accessories scaled to the party's current level
 - Frank's accessory stock **refreshes after each dungeon is cleared**
@@ -806,7 +870,7 @@ Frank provides consumables, healing, disease curing, revival, and basic equipmen
 
 | Enemy | Role | Notable Behavior |
 |---|---|---|
-| **Void Sentinel** | Elemental resistant | Resists two random elements per battle — forces Lyra to adapt |
+| **Null Sentinel** *(the doc's "Void Sentinel", renamed: the Observatory warden has that name)* | Elemental resistant | Resists two random elements per battle — forces Lyra to adapt |
 | **Unraveled Soul** | Mimic | Uses corrupted versions of the party's own skills |
 | **Entropy Shade** | Resource drain | Drains MP or Qi from one party member per round |
 | **Architect's Thrall** | Elite | Mini-boss tier — appears alone or in pairs, multiple phases |
@@ -892,7 +956,7 @@ Vorath in his true form — a pure entity from a previous cycle, now utterly cor
 Vorath channels The Unraveling directly. All attacks become AoE. He gains rotating elemental immunities — players must track which element he absorbs each round. Lyra's summons are dispelled. Vael's Resurrection becomes critical.
 
 **Frank's Revelation — Between Phase 2 and Phase 3**
-As Vorath begins his final transformation, Frank steps forward and abandons the merchant's mask. His true identity is revealed: an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin. His real name — never spoken once across the entire game — is said aloud here for the first time. He uses his true power to debuff Vorath before Phase 3 begins, then joins as a 5th party member.
+As Vorath begins his final transformation, Frank steps forward and abandons the merchant's mask. His true identity is revealed: an ancient entity from a previous cycle who, unlike Vorath, chose to fight for balance rather than ruin. His real name — never spoken once across the entire game — is said aloud here for the first time. He uses his true power to debuff Vorath before Phase 3 begins, then joins as a 5th party member. *(As built: he fights on his own after each Vorath turn rather than taking menu commands; true name placeholder "Faranoth".)*
 
 Frank's combat skills (Phase 3 only):
 
@@ -1114,7 +1178,7 @@ Verdance is never corrupted but evolves across the game:
 
 A always confirms, B always cancels — consistent across exploration and battle.
 
-**Keyboard (for PC development), built in Milestone 17c:** arrows or WASD = D-pad, Z / Enter / Space = A, X / Esc / Backspace = B, C = X button, V = Y button, Q / E = L1 / R1, Tab = Start. Select (Formation) and Y on the map (World map) aren't bound yet, since those screens don't exist.
+**Keyboard (for PC development), built in Milestone 17c:** arrows or WASD = D-pad, Z / Enter / Space = A, X / Esc / Backspace = B, C = X button, V = Y button, Q / E = L1 / R1, Tab = Start. **As built in exploration:** B / Start open the pause menu (Equip, Map, Quests, Save); Y or M opens the map; X (inventory) and Select (Formation) aren't bound, since those screens don't exist (rows are swapped in battle).
 
 ---
 
@@ -1126,7 +1190,7 @@ A always confirms, B always cancels — consistent across exploration and battle
 | **Auto-Save** | After every major event | Silent background save after boss defeats, party rescues, and region clears — a safety net |
 | **Suspend Save** | Closing the app / Home button | Saves exact game state instantly including mid-dungeon position. Resumes from the exact same spot. Deleted on load — single use. |
 
-No saving during battle. Suspend save is the only way to exit mid-fight — it resumes the battle in progress.
+No saving during battle. Suspend save is the only way to exit mid-fight — it resumes the battle in progress. *(As built: the fight restarts from its beginning.)*
 
 ### Save File Display
 

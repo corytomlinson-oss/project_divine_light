@@ -1,0 +1,31 @@
+# Selavon is free (Milestone 25d; like nordveil_victory.scene) - the last of
+# the three kingdoms: the end of Act II's kingdoms. KingdomVictory's card
+# follows, with the Act II title.
+
+spawn {a1} {a1} at 15,18 facing up
+spawn {a2} {a2} at 17,18 facing up
+spawn {a3} {a3} at 16,19 facing up
+music town
+move player to 16,12 async
+move {a1} to 15,13 async
+move {a2} to 17,13 async
+move {a3} to 16,14 async
+spawn kid1 child at 5,15 facing up
+spawn neighbor1 worker at 20,15 facing up
+spawn neighbor2 merchant at 6,4 facing down
+move kid1 to 12,12 async
+move neighbor1 to 20,12 async
+move neighbor2 to 13,10 async
+sync
+face player up
+emote kid1 heart
+emote neighbor1 note
+say Harbormaster: The sea's gone still. After a month of that storm... I can hear gulls again.
+say Harbormaster: Nordveil, Duskara, and now Selavon. Three kingdoms you've pulled back out of the dark.
+emote player note
+say Child: The water's all gone from our street! My shoes are dry!
+emote frank note
+say Frank: Look at that. Every kingdom breathing again. I've watched a lot of ages turn, friends. I've never seen four souls do it like this.
+say Frank: But the Unraveling still bleeds from one place. The Blighted Maw, to the south. That's where Vorath waits.
+say Frank: Not today, though. Today Selavon throws you a feast, and you are going to eat it.
+say Harbormaster: Come and see me before you go. The merchants have something for you.

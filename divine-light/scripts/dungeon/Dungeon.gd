@@ -768,7 +768,10 @@ func _dungeon_done() -> bool:
 func encounter_steps() -> Vector2i:
 	if _dungeon_done():
 		return Vector2i(50, 100)
-	return Vector2i(14, 26) if _data.get("kingdom", "") in Kingdoms.ORDER else Vector2i(10, 20)
+	var kingdom: String = _data.get("kingdom", "")
+	if kingdom in Kingdoms.ORDER:
+		return Vector2i(14, 26)
+	return Vector2i(12, 22) if kingdom == "maw" else Vector2i(10, 20)  # the Maw: 2026-10-29 too
 
 
 ## Once per dungeon, the moment it becomes safe.

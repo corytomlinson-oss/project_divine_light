@@ -215,6 +215,8 @@ const QUESTS := {
 	# optional ones once it's free - XP, gold and potions, and the second
 	# grants the kingdom's blessing (a permanent party-wide stat boost).
 	# "kingdom" marks an Act II quest; "optional" ones need the kingdom freed.
+	# Optional quests (and their hunts) give half the XP of the main path's
+	# (2026-10-29, Cory: doing everything, the party met Vorath at level 28).
 	"frozen_gate": {
 		"name": "The Frozen Gate", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 1, "giver": "nordveil/captain",
 		"offer": [
@@ -238,7 +240,7 @@ const QUESTS := {
 			{"log": "Find the woodcutter's axe in the snow west of the river crossing.", "fetch": "woodcutter_axe"},
 			{"log": "Return the axe to Nordveil's woodcutter.", "talk": "nordveil/woodcutter", "lines": ["say Woodcutter: That's the one! Three generations of Nordveil firewood in that handle. Thank you."]},
 		],
-		"xp": 600, "gold": 300, "items": {"Hi-Potion": 3},
+		"xp": 300, "gold": 300, "items": {"Hi-Potion": 3},
 	},
 	"white_wolf": {
 		"name": "The White Wolf", "dungeon": "frozen_citadel", "kingdom": "nordveil", "part": 3, "optional": true, "giver": "nordveil/huntress",
@@ -251,7 +253,7 @@ const QUESTS := {
 			{"log": "Hunt Snowmane in the Tundra's southern basin.", "hunt": "snowmane"},
 			{"log": "Tell Nordveil's huntress Snowmane is dead.", "talk": "nordveil/huntress", "lines": ["say Huntress: Snowmane, gone... The tundra feels lighter already. Stand still a moment - can you feel it?"]},
 		],
-		"xp": 800, "gold": 400, "blessing": "nordveil",
+		"xp": 400, "gold": 400, "blessing": "nordveil",
 	},
 	"sun_disc": {
 		"name": "The Sun Disc", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 1, "giver": "duskara/keeper",
@@ -274,7 +276,7 @@ const QUESTS := {
 			{"log": "Dig up dye-root in the far west of the Duskara Wastes.", "fetch": "dye_root"},
 			{"log": "Bring the dye-root to Duskara's weaver.", "talk": "duskara/weaver", "lines": ["say Weaver: Oh, it's perfect - deep as a sunset. The first new cloth in Duskara will be crimson."]},
 		],
-		"xp": 700, "gold": 350, "items": {"Hi-Ether": 2},
+		"xp": 350, "gold": 350, "items": {"Hi-Ether": 2},
 	},
 	"dune_stalker": {
 		"name": "The Dune Stalker", "dungeon": "sunken_sanctum", "kingdom": "duskara", "part": 3, "optional": true, "giver": "duskara/guard",
@@ -284,7 +286,7 @@ const QUESTS := {
 			{"log": "Destroy the Dune Stalker in the south-western dunes.", "hunt": "dune_stalker"},
 			{"log": "Tell Duskara's guard the Dune Stalker is gone.", "talk": "duskara/guard", "lines": ["say Guard: The caravans can run again. Hold on - the sand around you just glittered. The desert's thanking you."]},
 		],
-		"xp": 900, "gold": 450, "blessing": "duskara",
+		"xp": 450, "gold": 450, "blessing": "duskara",
 	},
 	"tide_chart": {
 		"name": "The Tide Chart", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 1, "giver": "selavon/harbormaster",
@@ -307,7 +309,7 @@ const QUESTS := {
 			{"log": "Find the sailor's compass on the coast's western shore.", "fetch": "compass"},
 			{"log": "Return the compass to Selavon's sailor.", "talk": "selavon/sailor", "lines": ["say Sailor: Still points true! I'll be out past the reef by morning. Here - for your trouble."]},
 		],
-		"xp": 800, "gold": 400, "items": {"Elixir": 3},
+		"xp": 400, "gold": 400, "items": {"Elixir": 3},
 	},
 	# ======================================================= Act III (28a)
 	# The portal key (Cory, 2026-10-18): three required quests in order that
@@ -382,7 +384,7 @@ const QUESTS := {
 				"say Northerner: He'd want his oath carried by someone who can still keep it. Vael - this was his. Kneel a moment. He taught us a prayer for this.",
 			]},
 		],
-		"xp": 1600, "gold": 800, "items": {"Dawn Oath Medallion": 1}, "blessing": "vael_oath",
+		"xp": 800, "gold": 800, "items": {"Dawn Oath Medallion": 1}, "blessing": "vael_oath",
 	},
 	"last_lesson": {
 		"name": "The Last Lesson", "dungeon": "blighted_maw", "kingdom": "maw", "part": 5, "optional": true, "anytime": true, "giver": "threshold/nomad",
@@ -398,7 +400,7 @@ const QUESTS := {
 				"narrate Ryn reads the scroll in silence. Whatever it says, Ryn stands a little straighter afterward.",
 			]},
 		],
-		"xp": 1600, "gold": 800, "items": {"Grandmaster's Beads": 1}, "blessing": "ryn_lesson",
+		"xp": 800, "gold": 800, "items": {"Grandmaster's Beads": 1}, "blessing": "ryn_lesson",
 	},
 	"fallen_star": {
 		"name": "The Fallen Star", "dungeon": "blighted_maw", "kingdom": "maw", "part": 6, "optional": true, "anytime": true, "giver": "threshold/sailor",
@@ -413,7 +415,7 @@ const QUESTS := {
 				"say Sailor: It's still glowing! Here, Lyra - the smith can set it, but you're the one who'll know what to do with it.",
 			]},
 		],
-		"xp": 1600, "gold": 800, "items": {"Astral Lens": 1}, "blessing": "lyra_stars",
+		"xp": 800, "gold": 800, "items": {"Astral Lens": 1}, "blessing": "lyra_stars",
 	},
 	"one_last_job": {
 		"name": "One Last Job", "dungeon": "blighted_maw", "kingdom": "maw", "part": 7, "optional": true, "anytime": true, "giver": "threshold/child",
@@ -429,7 +431,7 @@ const QUESTS := {
 				"say Child: Mama says you should have this - she found it in the ash. It's a lucky charm. Silas, it looks like yours.",
 			]},
 		],
-		"xp": 1600, "gold": 800, "items": {"Ghoststep Charm": 1}, "blessing": "silas_job",
+		"xp": 800, "gold": 800, "items": {"Ghoststep Charm": 1}, "blessing": "silas_job",
 	},
 	"merchant_of_ages": {
 		"name": "The Merchant of Every Age", "dungeon": "blighted_maw", "kingdom": "maw", "part": 8, "optional": true, "anytime": true, "giver": "verdance/archivist",
@@ -454,7 +456,7 @@ const QUESTS := {
 				"say Frank: Here - take these. On the house. Don't tell anyone, it'd ruin my reputation.",
 			]},
 		],
-		"xp": 2000, "gold": 1000, "items": {"Elixir": 5}, "blessing": "ages",
+		"xp": 1000, "gold": 1000, "items": {"Elixir": 5}, "blessing": "ages",
 	},
 	"reef_horror": {
 		"name": "The Reef Horror", "dungeon": "drowned_fortress", "kingdom": "selavon", "part": 3, "optional": true, "giver": "selavon/fisher",
@@ -464,7 +466,7 @@ const QUESTS := {
 			{"log": "Slay the Reef Horror east of the pier road.", "hunt": "reef_horror"},
 			{"log": "Tell Selavon's fisher the Reef Horror is dead.", "talk": "selavon/fisher", "lines": ["say Fisher: The bay's safe! Listen - the sea's humming. They say the tide blesses the ones who free it."]},
 		],
-		"xp": 1000, "gold": 500, "blessing": "selavon",
+		"xp": 500, "gold": 500, "blessing": "selavon",
 	},
 }
 
@@ -490,11 +492,11 @@ const HUNTS := {
 		"tell": "say Marauder Chief: Come for the shiny disc? Come and take it, then!",
 		"won": "narrate The marauder chief drops the Sun Disc in the sand and flees into the dunes."},
 	"snowmane": {"cell": Vector2i(20, 36), "region": "tundra", "scale": false,
-		"enemy": {"name": "Snowmane", "hp": 820, "atk": 58, "def": 14, "agi": 26, "xp": 800},
+		"enemy": {"name": "Snowmane", "hp": 820, "atk": 58, "def": 14, "agi": 26, "xp": 400},
 		"tell": "narrate A white wolf the size of a horse rises from the snow, eyes like cold coals!",
 		"won": "narrate Snowmane falls. The snow around him glitters, and the wind drops to a whisper."},
 	"dune_stalker": {"cell": Vector2i(20, 34), "region": "desert", "scale": false,
-		"enemy": {"name": "Dune Stalker", "hp": 1100, "atk": 64, "def": 24, "agi": 8, "xp": 1000},
+		"enemy": {"name": "Dune Stalker", "hp": 1100, "atk": 64, "def": 24, "agi": 8, "xp": 500},
 		"tell": "narrate The dune heaves - a golem of fused sand and stone stands up out of it!",
 		"won": "narrate The Dune Stalker crumbles back into the desert it came from."},
 	"hollow_custodian": {"cell": Vector2i(8, 17), "region": "reach", "scale": false,
@@ -502,16 +504,16 @@ const HUNTS := {
 		"tell": "narrate The shrine's broken statue turns its head. It was never a statue.",
 		"won": "narrate The Hollow Custodian crumbles to grey dust. In the rubble lies a ring of black metal, humming faintly: the frame."},
 	"reef_horror": {"cell": Vector2i(36, 28), "region": "coast", "scale": false,
-		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 1200},
+		"enemy": {"name": "Reef Horror", "hp": 1300, "atk": 66, "def": 24, "agi": 12, "xp": 600},
 		"tell": "narrate Coral and barnacles shift on the shore - the Reef Horror lurches toward you!",
 		"won": "narrate The Reef Horror collapses into a heap of coral, and the waves wash it away."},
 	# Act III side-quest hunts (29)
 	"oathbreaker": {"cell": Vector2i(40, 13), "region": "reach", "scale": false,
-		"enemy": {"name": "Oathbreaker", "hp": 2000, "atk": 74, "def": 28, "agi": 14, "xp": 1800},
+		"enemy": {"name": "Oathbreaker", "hp": 2000, "atk": 74, "def": 28, "agi": 14, "xp": 900},
 		"tell": "say Oathbreaker: ...I swore... to close it... I swore...",
 		"won": "narrate The black armor falls empty. A Nordveil crest, scratched but whole, lies in the ash."},
 	"grave_robber": {"cell": Vector2i(10, 25), "region": "reach", "scale": false,
-		"enemy": {"name": "Grave Robber", "hp": 1700, "atk": 70, "def": 20, "agi": 32, "xp": 1600},
+		"enemy": {"name": "Grave Robber", "hp": 1700, "atk": 70, "def": 20, "agi": 32, "xp": 800},
 		"tell": "say Grave Robber: More visitors for the graves? Turn out your pockets.",
 		"won": "narrate The grave robber flees into the ash, dropping a sack of stolen trinkets. A small silver locket is among them."},
 }

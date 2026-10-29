@@ -330,6 +330,7 @@ const UNRAVEL_TURNS := 4  # Vorath turns in phase 3 before the Final Unraveling 
 var _frank_joined := false
 var _frank_sprite: AnimatedSprite2D = null
 var _frank_invoiced := false
+var _frank_blessed := false
 var _unravel_charge := 0
 var _unravel_grace := false
 var _immune_turn := 0
@@ -2893,11 +2894,14 @@ func _frank_revelation(vorath: Combatant) -> void:
 
 ## Frank fights on his own (the doc's three skills): Blessing when the party
 ## is hurt, the Final Invoice once Vorath is nearly gone, Balance's Judgment
-## otherwise. Shown for a moment before Vorath moves.
+## otherwise. Shown for a moment before Vorath moves. Toned down 2026-10-29
+## (Cory: he was doing most of phase 3's damage): Blessing once a fight
+## ("one last time"), Judgment ~200 (was ~420), the Invoice 900 (was 1500).
 func _frank_acts(vorath: Combatant) -> void:
 	var true_name := GameManager.FRANK_TRUE_NAME
 	var hurt := _party.any(func(c: Combatant) -> bool: return c.is_ko or float(c.hp) / c.max_hp < 0.45)
-	if hurt:
+	if hurt and not _frank_blessed:
+		_frank_blessed = true
 		for c: Combatant in _party:
 			if c.is_ko:
 				c.is_ko = false
@@ -2909,14 +2913,14 @@ func _frank_acts(vorath: Combatant) -> void:
 		message_label.text = "%s uses %s's Blessing!\n\"On the house - one last time.\"" % [true_name, true_name]
 	elif not _frank_invoiced and float(vorath.hp) / vorath.max_hp < 0.15:
 		_frank_invoiced = true
-		var dmg := 1500
+		var dmg := 900
 		vorath.receive_damage(dmg)
 		_fx.flash(Color(1, 0.95, 0.6), 0.9, 0.5)
 		_fx_on(vorath, "pillar", "holy")
 		Sfx.play("thunder")
 		message_label.text = "%s presents The Final Invoice!\n\"For everything you've destroyed.\" %d damage!" % [true_name, dmg]
 	else:
-		var dmg := 420 + randi_range(-30, 30)
+		var dmg := 200 + randi_range(-20, 20)
 		vorath.receive_damage(dmg)
 		_fx_on(vorath, "burst", "holy")
 		Sfx.play("holy")

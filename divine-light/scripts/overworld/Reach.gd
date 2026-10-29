@@ -79,6 +79,12 @@ func is_safe() -> bool:
 	return Kingdoms.is_cleansed("maw")
 
 
+## A little further apart than the forest's 14-26 (2026-10-29, Cory: the
+## party met Vorath at level 28).
+func encounter_steps() -> Vector2i:
+	return Vector2i(18, 32)
+
+
 func region_id() -> String:
 	return "reach"
 

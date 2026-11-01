@@ -401,7 +401,7 @@ const GUILD_ENCOUNTERS: Array = [
 ]
 
 # The Blighted Maw's guard (28b): an Architect's Thrall on floor 4's stairs.
-const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 1600, "atk": 76, "def": 26, "agi": 16, "xp": 3500,
+const THRALL_GUARD := {"name": "Architect's Thrall", "hp": 2400, "atk": 76, "def": 26, "agi": 16, "xp": 3500,
 		"tell": "narrate Something tall and wrong unfolds from the dark at the foot of the stairs. It has the Architect's mark burned into its chest."}
 
 # The Drowned Fortress's mid-dungeon guard (25d; the doc's Admiral's First
@@ -526,6 +526,21 @@ const MAW_ENCOUNTERS: Array = [
 	 {"name": "Architect's Thrall", "hp": 560, "atk": 74, "def": 24, "agi": 14, "xp": 510}],
 ]
 
+# Area difficulty (2026-11-01 combat rework): every enemy fought in an area -
+# random fights, guards, hunts and its boss - gets its HP times x and its
+# attack power (ATK and INT) times y. The stats above stay as written; this is
+# the knob to turn when the balance logs say an area is too soft or too hard.
+# Areas not listed are 1.0 / 1.0. Tuned with the checkpoint simulation.
+const AREA_SCALE: Dictionary = {
+	"observatory_escape": Vector2(1.0, 0.85),
+	"cathedral": Vector2(1.0, 0.9), "monastery": Vector2(1.0, 0.9),
+	"observatory": Vector2(1.0, 0.9), "guild": Vector2(1.0, 0.9),
+	"tundra": Vector2(1.6, 1.35), "frozen_citadel": Vector2(1.6, 1.35),
+	"desert": Vector2(1.6, 1.35), "sunken_sanctum": Vector2(1.6, 1.35),
+	"coast": Vector2(1.6, 1.35), "drowned_fortress": Vector2(1.6, 1.35),
+	"reach": Vector2(2.4, 1.8), "blighted_maw": Vector2(2.4, 1.8),
+}
+
 const ENCOUNTER_TABLES: Dictionary = {
 	"overworld": FOREST_ENCOUNTERS,
 	"cathedral": CATHEDRAL_ENCOUNTERS,
@@ -561,11 +576,11 @@ const BOSSES := {
 	# The final boss (28c): phases at 66% / 33%. Tuned for four heroes around
 	# level 21-23 with Act III gear, plus Frank in phase 3.
 	"vorath": {
-		"name": "Vorath", "hp": 9000, "atk": 95, "def": 30, "agi": 16, "xp": 0,
+		"name": "Vorath", "hp": 5000, "atk": 80, "def": 30, "agi": 16, "xp": 0,
 		"phase_hp_thresholds": [0.7, 0.4],  # playtest pass: phase 3 long enough for the Final Unraveling race
 	},
 	"drowned_admiral": {
-		"name": "Drowned Admiral", "hp": 2600, "atk": 62, "def": 20, "agi": 13, "xp": 4200,
+		"name": "Drowned Admiral", "hp": 1900, "atk": 62, "def": 20, "agi": 13, "xp": 4200,
 		"phase_hp_thresholds": [0.66, 0.33],
 	},
 	"burning_tyrant": {
@@ -577,11 +592,11 @@ const BOSSES := {
 		"phase_hp_thresholds": [0.66, 0.33],
 	},
 	"hollow_warden": {
-		"name": "Hollow Warden", "hp": 120, "atk": 26, "def": 6, "agi": 3, "xp": 150,
+		"name": "Hollow Warden", "hp": 90, "atk": 23, "def": 6, "agi": 3, "xp": 150,
 		"phase_hp_thresholds": [0.5],
 	},
 	"fallen_guardian": {
-		"name": "Fallen Guardian", "hp": 300, "atk": 30, "def": 12, "agi": 8, "xp": 400,
+		"name": "Fallen Guardian", "hp": 300, "atk": 30, "def": 12, "agi": 8, "xp": 400, "party_scale": true,
 		"phase_hp_thresholds": [0.5],
 	},
 	# The Monastery's escape warden, tuned for a lone Ryn around level 2-3.
@@ -600,15 +615,15 @@ const BOSSES := {
 		"phase_hp_thresholds": [0.5],
 	},
 	"shadow_lord": {
-		"name": "Shadow Lord", "hp": 260, "atk": 30, "def": 10, "agi": 18, "xp": 400,
+		"name": "Shadow Lord", "hp": 200, "atk": 19, "def": 10, "agi": 18, "xp": 400, "party_scale": true,
 		"phase_hp_thresholds": [0.5],
 	},
 	"void_archmage": {
-		"name": "Void Archmage", "hp": 270, "atk": 24, "def": 10, "agi": 11, "xp": 400,
+		"name": "Void Archmage", "hp": 180, "atk": 24, "def": 10, "agi": 11, "xp": 400, "party_scale": true,
 		"phase_hp_thresholds": [0.5],
 	},
 	"corrupted_grandmaster": {
-		"name": "Corrupted Grandmaster", "hp": 280, "atk": 34, "def": 12, "agi": 16, "xp": 400,
+		"name": "Corrupted Grandmaster", "hp": 240, "atk": 22, "def": 12, "agi": 16, "xp": 400, "party_scale": true,
 		"phase_hp_thresholds": [0.5],
 	},
 }

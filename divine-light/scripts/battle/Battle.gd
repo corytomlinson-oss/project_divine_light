@@ -9,48 +9,48 @@ enum MenuState { MAIN, SKILL, ITEM, TARGETING, ALLY_TARGETING }
 const CLASS_SKILLS: Dictionary = {
 	"Vael": [
 		{"name": "Holy Light",    "cost": 10, "cost_type": "mp", "target": "ally",        "effect": "heal",         "power": 25, "min_level": 1},
-		{"name": "Smite",         "cost": 8,  "cost_type": "mp", "target": "enemy",       "effect": "holy",         "power": 15, "min_level": 4},
+		{"name": "Smite",         "cost": 8,  "cost_type": "mp", "target": "enemy",       "effect": "holy",         "power": 15, "mult": 1.5, "min_level": 4},
 		{"name": "Guard",         "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "guard",        "power": 15, "min_level": 7},
 		{"name": "Taunt",         "cost": 6,  "cost_type": "mp", "target": "self",        "effect": "taunt",        "power": 0,  "min_level": 9},
 		{"name": "Fortify",       "cost": 15, "cost_type": "mp", "target": "ally_all",    "effect": "fortify",      "power": 10, "min_level": 11},
-		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "min_level": 13},
+		{"name": "Divine Strike", "cost": 18, "cost_type": "mp", "target": "enemy",       "effect": "holy_stun",    "power": 30, "mult": 2.2, "min_level": 13},
 		{"name": "Divine Shield", "cost": 20, "cost_type": "mp", "target": "ally_all",    "effect": "divine_shield","power": 12, "min_level": 15},
 		{"name": "Battle Hymn",   "cost": 18, "cost_type": "mp", "target": "ally_all",    "effect": "battle_hymn",  "power": 8,  "min_level": 15},
-		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "min_level": 16},
+		{"name": "Consecrate",    "cost": 25, "cost_type": "mp", "target": "enemy_all",   "effect": "consecrate",   "power": 20, "mult": 1.2, "min_level": 16},
 		{"name": "Sanctuary",     "cost": 15, "cost_type": "mp", "target": "ally_choose", "effect": "sanctuary",    "power": 0,  "min_level": 17},
 		{"name": "Purify",        "cost": 8,  "cost_type": "mp", "target": "ally_choose", "effect": "purify",       "power": 0,  "min_level": 17},
 		# Act III (28b; Cory: Vael learns it late): revives the fallen ally with
 		# the most max HP, at half HP (full with Divine Champion).
 		{"name": "Resurrection", "cost": 30, "cost_type": "mp", "target": "self", "effect": "resurrect", "power": 0, "min_level": 17},
-		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "min_level": 18},
+		{"name": "Divine Wrath",  "cost": 40, "cost_type": "mp", "target": "enemy",       "effect": "holy_wrath",   "power": 60, "mult": 3.4, "min_level": 18},
 	],
 	"Ryn": [
-		{"name": "Iron Fist",        "cost": 1, "cost_type": "qi", "target": "enemy",       "effect": "physical",     "power": 18, "min_level": 1},
+		{"name": "Iron Fist",        "cost": 1, "cost_type": "qi", "target": "enemy",       "effect": "physical",     "power": 18, "mult": 1.5, "min_level": 1},
 		{"name": "Vital Touch",      "cost": 2, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 30, "min_level": 4},
-		{"name": "Sweep",            "cost": 2, "cost_type": "qi", "target": "enemy_all",    "effect": "sweep",        "power": 12, "min_level": 7},
+		{"name": "Sweep",            "cost": 2, "cost_type": "qi", "target": "enemy_all",    "effect": "sweep",        "power": 12, "mult": 0.9, "min_level": 7},
 		{"name": "Pressure Point",   "cost": 2, "cost_type": "qi", "target": "enemy",        "effect": "stun_phys",    "power": 0,  "min_level": 9},
-		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "min_level": 11},
-		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "min_level": 13, "ranged": true},
+		{"name": "Ki Burst",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "ki_burst",     "power": 22, "mult": 1.8, "min_level": 11},
+		{"name": "Ki Blast",         "cost": 3, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 24, "mult": 1.8, "min_level": 13, "ranged": true},
 		{"name": "Mending Flow",     "cost": 4, "cost_type": "qi", "target": "ally_choose",  "effect": "heal",         "power": 55, "min_level": 15},
-		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "min_level": 15},
-		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "min_level": 16},
-		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "min_level": 17},
+		{"name": "Storm Flurry",     "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "multi_hit",    "power": 12, "mult": 0.85, "min_level": 15},
+		{"name": "Crippling Strike", "cost": 4, "cost_type": "qi", "target": "enemy",        "effect": "cripple",      "power": 10, "mult": 1.6, "min_level": 16},
+		{"name": "Dragon's Maw",     "cost": 5, "cost_type": "qi", "target": "enemy",        "effect": "physical",     "power": 45, "mult": 2.7, "min_level": 17},
 		{"name": "Healing Wave",     "cost": 5, "cost_type": "qi", "target": "ally_all",     "effect": "heal_all",     "power": 40, "min_level": 17},
-		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "min_level": 18},
+		{"name": "Rising Dragon",    "cost": 6, "cost_type": "qi", "target": "enemy",        "effect": "rising_dragon","power": 70, "mult": 3.6, "min_level": 18},
 	],
 	"Silas": [
-		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "min_level": 1},
-		{"name": "Envenom",       "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "poison",      "power": 10, "min_level": 4},
-		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "min_level": 7, "row_restrict": "front"},
+		{"name": "Quick Strike",  "cost": 5,  "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 12, "mult": 1.3, "min_level": 1},
+		{"name": "Envenom",       "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "poison",      "power": 10, "mult": 0.8, "min_level": 4},
+		{"name": "Shadow Strike", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "physical",    "power": 32, "mult": 2.0, "min_level": 7, "row_restrict": "front"},
 		{"name": "Vanish",        "cost": 6,  "cost_type": "mp", "target": "self",      "effect": "vanish",      "power": 0,  "min_level": 9},
-		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "min_level": 11},
+		{"name": "Lacerate",      "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "bleed",       "power": 14, "mult": 0.9, "min_level": 11},
 		{"name": "Smoke Bomb",    "cost": 12, "cost_type": "mp", "target": "enemy_all", "effect": "smoke_bomb",  "power": 0,  "min_level": 12},
 		{"name": "Expose",        "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "expose",      "power": 10, "min_level": 14},
 		{"name": "Garrote",       "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "garrote",     "power": 0,  "min_level": 15},
-		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "min_level": 16, "hits": 4},
-		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "min_level": 17},
-		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "min_level": 17},
-		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "min_level": 18},
+		{"name": "Flurry",        "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "multi_hit",   "power": 14, "mult": 0.7, "min_level": 16, "hits": 4},
+		{"name": "Toxic Cloud",   "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "toxic_cloud", "power": 12, "mult": 0.6, "min_level": 17},
+		{"name": "Death Mark",    "cost": 20, "cost_type": "mp", "target": "enemy",     "effect": "death_mark",  "power": 18, "mult": 0.8, "min_level": 17},
+		{"name": "Shadowstep",    "cost": 35, "cost_type": "mp", "target": "enemy",     "effect": "shadowstep",  "power": 75, "mult": 3.6, "min_level": 18},
 	],
 }
 
@@ -123,23 +123,23 @@ const ELEMENT_NOUNS := {"holy": "holy light", "fire": "flames", "ice": "frost", 
 
 const LYRA_SKILLS: Dictionary = {
 	"Fire": [
-		{"name": "Ember",   "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 14, "min_level": 1},
-		{"name": "Flare",   "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 26, "min_level": 8},
-		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "min_level": 16},
+		{"name": "Ember",   "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 14, "mult": 1.04, "min_level": 1},
+		{"name": "Flare",   "cost": 14, "cost_type": "mp", "target": "enemy",     "effect": "fire",      "power": 26, "mult": 1.52, "min_level": 8},
+		{"name": "Inferno", "cost": 24, "cost_type": "mp", "target": "enemy",     "effect": "fire_burn", "power": 38, "mult": 2.08, "min_level": 16},
 	],
 	"Ice": [
-		{"name": "Frost",    "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "ice_slow",      "power": 14, "min_level": 4},
-		{"name": "Blizzard", "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "ice_freeze",    "power": 28, "min_level": 11},
-		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "min_level": 17},
+		{"name": "Frost",    "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "ice_slow",      "power": 14, "mult": 1.0, "min_level": 4},
+		{"name": "Blizzard", "cost": 16, "cost_type": "mp", "target": "enemy",     "effect": "ice_freeze",    "power": 28, "mult": 1.6, "min_level": 11},
+		{"name": "Glacier",  "cost": 26, "cost_type": "mp", "target": "enemy_all", "effect": "ice_freeze_aoe","power": 22, "mult": 1.04, "min_level": 17},
 	],
 	"Lightning": [
-		{"name": "Spark",         "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "lightning",          "power": 16, "min_level": 6},
-		{"name": "Bolt",          "cost": 18, "cost_type": "mp", "target": "enemy_all", "effect": "lightning_aoe",      "power": 18, "min_level": 14},
-		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "min_level": 17},
+		{"name": "Spark",         "cost": 8,  "cost_type": "mp", "target": "enemy",     "effect": "lightning",          "power": 16, "mult": 1.12, "min_level": 6},
+		{"name": "Bolt",          "cost": 18, "cost_type": "mp", "target": "enemy_all", "effect": "lightning_aoe",      "power": 18, "mult": 0.92, "min_level": 14},
+		{"name": "Thunderstrike", "cost": 30, "cost_type": "mp", "target": "enemy",     "effect": "lightning_paralyze", "power": 45, "mult": 2.48, "min_level": 17},
 	],
 	"Earth": [
-		{"name": "Tremor", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "earth",        "power": 24, "min_level": 9},
-		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "min_level": 15},
+		{"name": "Tremor", "cost": 12, "cost_type": "mp", "target": "enemy",     "effect": "earth",        "power": 24, "mult": 1.44, "min_level": 9},
+		{"name": "Quake",  "cost": 22, "cost_type": "mp", "target": "enemy_all", "effect": "earth_sunder", "power": 20, "mult": 1.0, "min_level": 15},
 	],
 }
 
@@ -360,6 +360,7 @@ func _ready() -> void:
 	GameManager.begin_battle(_enemies.map(func(e: Combatant) -> Dictionary: return {
 		"name": e.display_name, "hp": e.max_hp, "atk": e.atk, "def": e.defense, "agi": e.agi,
 		"xp": e.xp_reward, "is_boss": e.is_boss, "phase_hp_thresholds": e.phase_hp_thresholds.duplicate(),
+		"scaled": true,  # HP / ATK already include party and area scaling
 	}))
 	BalanceLog.battle_start(_party, _enemies)
 	var boss_fight: bool = _enemies.any(func(e: Combatant) -> bool: return e.is_boss)
@@ -451,6 +452,13 @@ func _generate_encounter() -> Array:
 func _build_enemy(data: Dictionary) -> Combatant:
 	var e := Combatant.new(data["name"], int(data["hp"]), int(data["atk"]), int(data["def"]), int(data["agi"]), true)
 	e.xp_reward = int(data["xp"])
+	var prescaled: bool = data.get("scaled", false)  # resumed from a suspend
+	if data.get("party_scale", false) and not prescaled:
+		# An Act I rescue boss (2026-11-01): +200% HP and +7 ATK per hero
+		# past the first, like the Act I hunts.
+		var extra := maxi(0, _party.size() - 1)
+		e.max_hp = roundi(e.max_hp * (1.0 + 2.0 * extra))
+		e.atk += 7 * extra
 	var kit: Dictionary = EnemyData.kit(e.display_name)
 	e.abilities = kit.get("abilities", [])
 	e.attack_mods = kit.get("attack", {})
@@ -470,6 +478,12 @@ func _build_enemy(data: Dictionary) -> Combatant:
 		e.immune.append_array(pool.slice(0, int(kit["random_immune"])))
 	if GameManager.battle_in_water:
 		e.agi = roundi(e.agi * 1.3)  # the party was caught wading (25d)
+	var scale: Vector2 = EnemyData.AREA_SCALE.get(GameManager.base_location(GameManager.current_location), Vector2.ONE)
+	if not prescaled:
+		e.max_hp = roundi(e.max_hp * scale.x)
+		e.atk = roundi(e.atk * scale.y)
+	e.int_stat = roundi(e.int_stat * scale.y)  # from the kit, so always
+	e.hp = e.max_hp
 	return e
 
 
@@ -1233,7 +1247,7 @@ func _open_lyra_skill_menu(member: Combatant) -> void:
 			var back_row_tremor: Dictionary = skill.duplicate()
 			back_row_tremor["name"] = "Tremor (AoE)"
 			back_row_tremor["effect"] = "earth_aoe"
-			back_row_tremor["power"] = skill["power"] if Equipment.has_set_bonus(member, "elemental_weave") else 14  # full with Elemental Weave (25b)
+			back_row_tremor["mult"] = skill["mult"] if Equipment.has_set_bonus(member, "elemental_weave") else 1.0  # full with Elemental Weave (25b)
 			back_row_tremor["target"] = "enemy_all"
 			_active_skills.append(back_row_tremor)
 		else:
@@ -1624,6 +1638,35 @@ func _element_of(member: Combatant) -> String:
 	return ""
 
 
+## Damage after defense (2026-11-01 combat rework; Cory: armor made heroes
+## immune and skills didn't scale). A share of the attack gets through instead
+## of defense being subtracted: equal attack and defense let half through,
+## double the defense a third, and doubling every stat doubles the damage, so
+## armor always helps but never makes anyone untouchable. `attack` already
+## includes any skill multiplier; +/-8% spread.
+static func mitigate(attack: float, defense: float) -> int:
+	var a := maxf(1.0, attack * randf_range(0.92, 1.08))
+	return maxi(1, roundi(a * a / (a + maxf(0.0, defense))))
+
+
+## A physical skill's attack: the skill's multiple of ATK (weapon and buffs
+## included).
+func _phys_power(member: Combatant, skill: Dictionary) -> float:
+	return (member.atk + member.atk_buff) * float(skill.get("mult", 1.0))
+
+
+## A spell's attack: the skill's multiple of INT - or for Vael, a Templar, of
+## the average of ATK and INT, so his sword counts too.
+func _spell_power(member: Combatant, skill: Dictionary) -> float:
+	return _spirit(member) * float(skill.get("mult", 1.0))
+
+
+func _spirit(member: Combatant) -> float:
+	if member.char_class == "Lyra":
+		return member.int_stat
+	return (member.atk + member.atk_buff + member.int_stat) / 2.0
+
+
 ## Deals damage from a party action, 1.5x if the enemy is weak to the
 ## action's element. Returns what was actually dealt (for the message).
 func _hit(target: Combatant, dmg: int) -> int:
@@ -1695,8 +1738,7 @@ func _maybe_counter(target: Combatant) -> void:
 		return
 	if not _physical or _actor == null or _counter_note != "" or not _actor.is_alive():
 		return
-	var effective_def := _actor.defense + _actor.def_buff
-	var dmg := maxi(1, roundi((target.atk + target.atk_buff - effective_def) * 0.8))
+	var dmg := maxi(1, roundi(mitigate(target.atk + target.atk_buff, _actor.defense + _actor.def_buff) * 0.8))
 	_actor.receive_damage(dmg)
 	var sprite := _sprite_of(_actor)
 	if sprite != null:
@@ -1767,7 +1809,7 @@ func _do_attack(member: Combatant) -> void:
 	var target: Combatant = _get_enemy_target(member)
 	if target == null:
 		return
-	var dmg := maxi(1, (member.atk + member.atk_buff) - (target.defense + target.def_buff) + randi_range(-2, 2))
+	var dmg := mitigate(member.atk + member.atk_buff, target.defense + target.def_buff)
 	dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 	var crit := _roll_crit(member)
 	if crit:
@@ -1810,7 +1852,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			message_label.text = "%s calls on %s!\n%s rises again!" % [member.display_name, skill["name"], who.display_name]
 		"heal":
 			var target: Combatant = _get_ally_target(member, skill)
-			var amount: int = power + member.int_stat / 2
+			var amount: int = power + roundi(_spirit(member))
 			if member.char_class == "Ryn" and Equipment.has_set_bonus(member, "storm_dragon"):
 				amount = roundi(amount * 1.3)  # Storm Dragon (25b)
 			target.hp = mini(target.max_hp, target.hp + amount)
@@ -1821,7 +1863,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1836,7 +1878,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1856,7 +1898,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-3, 3))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -1917,7 +1959,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"consecrate":
 			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies:
-				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				var dmg: int = mitigate(_spell_power(member, skill), enemy.res_stat)
 				if _roll_crit(member):
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
@@ -1947,7 +1989,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target, bool(skill.get("ranged", false)))))
 			var crit := _roll_crit(member)
 			if crit:
@@ -1962,7 +2004,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"sweep":
 			var alive_enemies: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies:
-				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
+				var dmg: int = mitigate(_phys_power(member, skill), enemy.defense + enemy.def_buff)
 				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
@@ -1986,7 +2028,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk - (target.defense + target.def_buff) / 2 + randi_range(-2, 2))
+			var dmg: int = mitigate(_phys_power(member, skill), (target.defense + target.def_buff) / 2.0)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
@@ -2007,7 +2049,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var any_crit := false
 			for _h in hits:
 				if target.is_alive():
-					var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
+					var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 					dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 					if _roll_crit(member):
 						dmg *= 2
@@ -2024,7 +2066,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-1, 1))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
@@ -2040,7 +2082,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 				_end_battle(true)
 
 		"heal_all":
-			var amount: int = power + member.int_stat / 2
+			var amount: int = power + roundi(_spirit(member))
 			for ally in _party:
 				if ally.is_alive():
 					ally.hp = mini(ally.max_hp, ally.hp + amount)
@@ -2051,7 +2093,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
@@ -2075,7 +2117,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -2095,7 +2137,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -2113,7 +2155,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -2132,7 +2174,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"ice_freeze_aoe":
 			var alive_enemies_ice: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_ice:
-				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				var dmg: int = mitigate(_spell_power(member, skill), enemy.res_stat)
 				if _roll_crit(member):
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
@@ -2147,7 +2189,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"lightning_aoe":
 			var alive_enemies_lt: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_lt:
-				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				var dmg: int = mitigate(_spell_power(member, skill), enemy.res_stat)
 				if _roll_crit(member):
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
@@ -2160,7 +2202,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.int_stat / 2 - target.res_stat + randi_range(-3, 3))
+			var dmg: int = mitigate(_spell_power(member, skill), target.res_stat)
 			var crit := _roll_crit(member)
 			if crit:
 				dmg *= 2
@@ -2177,7 +2219,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"earth_sunder":
 			var alive_enemies_eq: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_eq:
-				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				var dmg: int = mitigate(_spell_power(member, skill), enemy.res_stat)
 				if _roll_crit(member):
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
@@ -2192,7 +2234,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"earth_aoe":
 			var alive_enemies_tr: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_tr:
-				var dmg: int = maxi(1, power + member.int_stat / 2 - enemy.res_stat + randi_range(-2, 2))
+				var dmg: int = mitigate(_spell_power(member, skill), enemy.res_stat)
 				if _roll_crit(member):
 					dmg *= 2
 				dmg = _hit(enemy, dmg)
@@ -2205,7 +2247,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
@@ -2224,7 +2266,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-2, 2))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			var crit := _roll_crit(member)
 			if crit:
@@ -2280,7 +2322,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 		"toxic_cloud":
 			var alive_enemies_tc: Array = _enemies.filter(func(e): return e.is_alive())
 			for enemy in alive_enemies_tc:
-				var dmg: int = maxi(1, power + member.atk / 2 - (enemy.defense + enemy.def_buff) + randi_range(-2, 2))
+				var dmg: int = mitigate(_phys_power(member, skill), enemy.defense + enemy.def_buff)
 				dmg = maxi(1, roundi(float(dmg) * _row_mult(member, enemy)))
 				if _roll_crit(member):
 					dmg *= 2
@@ -2307,7 +2349,7 @@ func _do_skill(member: Combatant, skill: Dictionary) -> void:
 			var target: Combatant = _get_enemy_target(member)
 			if target == null:
 				return
-			var dmg: int = maxi(1, power + member.atk / 2 - (target.defense + target.def_buff) + randi_range(-3, 3))
+			var dmg: int = mitigate(_phys_power(member, skill), target.defense + target.def_buff)
 			dmg = maxi(1, roundi(float(dmg) * _row_mult(member, target)))
 			if Equipment.has_set_bonus(member, "deaths_hand"):
 				dmg = roundi(dmg * 1.3)  # Death's Hand (28b)
@@ -2501,10 +2543,8 @@ func _enemy_attack(enemy: Combatant, targets: Array, phase_note: String, charged
 		_fx.impact(recipe, hit_targets)
 		if not charged.is_empty():
 			Sfx.play("earth")
-		var effective_def := target.defense + target.def_buff
-		var def_val := effective_def * 2 if target.defending else effective_def
-		var dmg := maxi(1, enemy.atk + enemy.atk_buff - def_val + randi_range(-1, 1))
-		dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target) * mult))
+		var dmg := mitigate(enemy.atk + enemy.atk_buff, target.defense + target.def_buff)
+		dmg = maxi(1, roundi(float(dmg) * _row_mult(enemy, target) * mult * (0.5 if target.defending else 1.0)))
 		target.receive_damage(dmg)
 		total += dmg
 		swings += 1
@@ -2623,7 +2663,7 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			message_label.text = phase_note + "%s %s" % [enemy.display_name, a.get("tell", "gathers its strength...")]
 		"magic_single":
 			var target := _pick_target(enemy, targets)
-			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg := mitigate(power + enemy.int_stat / 2.0, target.res_stat)
 			_fx_on(target, "pillar", a.get("palette", "debuff"))
 			Sfx.play("thunder" if a.get("palette", "") == "lightning" else "holy")
 			target.receive_damage(dmg)
@@ -2664,7 +2704,7 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			var result := ""
 			if a.get("kind") == "aura_bolt":
 				var target := _pick_target(enemy, targets)
-				var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+				var dmg := mitigate(power + enemy.int_stat / 2.0, target.res_stat)
 				_fx_on(target, "pillar", element if element != "" else "debuff")
 				target.receive_damage(dmg)
 				result = "%s takes %d!" % [target.display_name, dmg]
@@ -2672,7 +2712,7 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 				_fx.flash(BattleFx.PALETTES.get(element, pal)[0], 0.4)
 				for m: Combatant in targets:
 					_fx_on(m, "burst", element if element != "" else "debuff")
-					m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+					m.receive_damage(mitigate(power + enemy.int_stat / 2.0, m.res_stat))
 				result = "The whole party is struck!"
 			enemy.aura_index += 1
 			_update_ui()
@@ -2722,7 +2762,7 @@ func _enemy_ability(enemy: Combatant, a: Dictionary, targets: Array, phase_note:
 			Sfx.play("fire")
 			for m: Combatant in hit:
 				_fx_on(m, "burst", "fire")
-				m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+				m.receive_damage(mitigate(power + enemy.int_stat / 2.0, m.res_stat))
 				if m.is_alive():
 					m.burn_rounds = rounds
 					m.burn_power = int(a.get("burn_power", 8))
@@ -2741,7 +2781,7 @@ The party slows down!" % [enemy.display_name, ability_name]
 		"freeze":
 			# Ice magic that freezes one hero solid for a round (25b).
 			var target := _pick_target(enemy, targets)
-			var dmg := maxi(1, power + enemy.int_stat / 2 - target.res_stat + randi_range(-2, 2))
+			var dmg := mitigate(power + enemy.int_stat / 2.0, target.res_stat)
 			_fx_on(target, "crystals", "ice")
 			Sfx.play("ice")
 			target.receive_damage(dmg)
@@ -2771,7 +2811,7 @@ It swallows its knights and grows stronger!" % [enemy.display_name, ability_name
 			Sfx.play("thunder")
 			for m: Combatant in targets:
 				_fx_on(m, "burst", a.get("palette", "debuff"))
-				m.receive_damage(maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-2, 2)))
+				m.receive_damage(mitigate(power + enemy.int_stat / 2.0, m.res_stat))
 			_update_ui()
 			message_label.text = phase_note + "%s casts %s!\nThe whole party is struck!" % [enemy.display_name, ability_name]
 	_update_ui()
@@ -2786,7 +2826,9 @@ func _summon(summoner: Combatant, group: Array) -> void:
 	summoner.last_summon_turn = summoner.turns_taken
 	_enemies = _enemies.filter(func(e: Combatant) -> bool: return e.is_alive())
 	for data: Dictionary in group:
-		if _enemies.size() >= 3:
+		# At most one more enemy than party members, like random fights
+		# (2026-11-01: a lone hero facing a boss and two adds).
+		if _enemies.size() >= mini(3, _party.size() + 1):
 			break
 		var add := _build_enemy(data)
 		add.summoned = true
@@ -2821,7 +2863,7 @@ func _storm_strike(enemy: Combatant, targets: Array, phase_note: String, a: Dict
 		if m.sanctuary:
 			m.sanctuary = false
 			continue
-		var dmg := maxi(1, power + enemy.int_stat / 2 - m.res_stat + randi_range(-3, 3))
+		var dmg := mitigate(power + enemy.int_stat / 2.0, m.res_stat)
 		if m.defending:
 			dmg /= 2
 		_fx_on(m, "bolt", "lightning")

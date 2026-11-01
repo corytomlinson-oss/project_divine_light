@@ -145,6 +145,7 @@ See [DEV-ENV.md](DEV-ENV.md) for full environment setup guide and verification c
 
 The design sections below are the original plan and are kept as written, except where marked. Where the built game went another way (Cory's calls or logged decisions in `DECISIONS.md`):
 
+- **Combat math (2026-11-01 rework):** defense lets a share of each hit through (attack² / (attack + defense)) instead of being subtracted, so armor always helps but never makes anyone immune. Skills deal a multiple of a stat: ATK for Ryn and Silas, INT for Lyra, the average of ATK and INT for Vael (so his sword counts), and healing adds that average too, so skills keep pace with levels and gear. Each area has a difficulty multiplier for its enemies' HP and attack power, Act I rescue bosses grow with the party, and summons never outnumber the party by more than one.
 - **Skill unlock levels are compressed** above level 8 (`8 + (old - 8) * 0.55`), then again above 15 (`15 + (x - 15) * 0.4`), so every class has its whole kit by level 18, which the main path reaches at Vorath (the party ends Act II around 14). The skill tables below show the built levels.
 - **Vael learns Resurrection** (level 17, 30 MP): revives the fallen ally with the most max HP at half HP (full with the Divine Champion set). Frank and revival items are no longer the only revives.
 - **Lyra has no summons.** Ignus/Glacius were never built; so the Cosmic Conduit set became "Lyra's spells cost 25% less MP", and Death's Hand became "Shadowstep +30% damage" (it has no row limit to lift).
